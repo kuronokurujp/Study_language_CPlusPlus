@@ -10,6 +10,9 @@ namespace Core::Common
     template <class TYPE>
     class StackBase
     {
+        HE_CLASS_COPY_NG(StackBase);
+        HE_CLASS_MOVE_NG(StackBase);
+
     public:
         StackBase(TYPE* in_tpArrayAddr, Uint32 in_uSize)
             : _pBuff(in_tpArrayAddr), _uCapacity(in_uSize)
@@ -65,6 +68,9 @@ namespace Core::Common
     template <class TYPE, Uint32 CAPACITY>
     class CustomFixStack final : public StackBase<TYPE>
     {
+        HE_CLASS_COPY_NG(CustomFixStack);
+        HE_CLASS_MOVE_NG(CustomFixStack);
+
     public:
         CustomFixStack() : StackBase<TYPE>(_taBuff, CAPACITY) {}
 

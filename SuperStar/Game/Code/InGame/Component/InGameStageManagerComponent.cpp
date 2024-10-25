@@ -1,6 +1,7 @@
 ﻿#include "InGameStageManagerComponent.h"
 
 #include "InGame/Actor/Player/InGamePlayerActor.h"
+#include "InGame/Component/Renderer/InGameRendererUserShipComponent.h"
 
 // ゲームキャラクター用のイベント
 #include "InGame/Event/InGameEventCharacter.h"
@@ -41,6 +42,8 @@ namespace InGame
     Bool InGameStageManagerComponent::VBegin()
     {
         if (Level::LevelBaseComponent::VBegin() == FALSE) return FALSE;
+
+        // TODO: ステージ制御するLuaファイルをロード
         /*
             LuaStateManager::DoFile(s_pStageManagerScriptName[m_StageIndex], "Init");
 
@@ -56,13 +59,21 @@ namespace InGame
         this->_playerHandle = this->AddActor<InGamePlayerActor>();
         // プレイヤーの外部からの初期設定
         {
+            Core::Math::Vector2 size(30.0f, 30.0f);
             auto pPlayer = this->GetActor<InGamePlayerActor>(this->_playerHandle);
             // 位置
             pPlayer->SetPos(Core::Math::Vector2(100.0f, 100.0f));
             // サイズ
-            pPlayer->SetSize(Core::Math::Vector2(30.0f, 30.0f));
+            pPlayer->SetSize(size);
 
-            pPlayer->SetViewHandle(this->_viewHandle);
+            // pPlayer->SetViewHandle(this->_viewHandle);
+
+            // プレイヤーのレンダリングコンポーネントを追加
+            auto [h, c] = pPlayer->AddComponentByHandleAndComp<InGameRendererUserShipComponent>(
+                0, Actor::Component::EPriorty_Late);
+
+            c->SetSize(size);
+            c->SetViewHandle(this->_viewHandle);
         }
 
         // TODO: イベント追加
@@ -127,8 +138,7 @@ namespace InGame
         // 移動処理をする
         if (uEventHash == EventCharacterMove::EventTypeHash())
         {
-            EventCharacterMove* pEvent =
-                reinterpret_cast<EventCharacterMove*>(in_spEventData.get());
+            auto pEvent = reinterpret_cast<EventCharacterMove*>(in_spEventData.get());
             HE_ASSERT(pEvent != NULL);
 
             switch (pEvent->_eTag)
@@ -148,8 +158,7 @@ namespace InGame
         // 攻撃処理をする
         else if (uEventHash == EventCharacterAttack::EventTypeHash())
         {
-            EventCharacterAttack* pEvent =
-                reinterpret_cast<EventCharacterAttack*>(in_spEventData.get());
+            auto pEvent = reinterpret_cast<EventCharacterAttack*>(in_spEventData.get());
             HE_ASSERT(pEvent != NULL);
 
             switch (pEvent->_eTag)
@@ -162,6 +171,19 @@ namespace InGame
 
                     break;
                 }
+                default:
+                    break;
+            }
+        }
+        // TODO: 敵生成
+        else if (uEventHash == EventCharacterPutEnemy::EventTypeHash())
+        {
+            auto pEvent = reinterpret_cast<EventCharacterPutEnemy*>(in_spEventData.get());
+            HE_ASSERT(pEvent != NULL);
+
+            // TODO: タグに応じた敵を生成する
+            switch (pEvent->_eEnemyTag)
+            {
                 default:
                     break;
             }

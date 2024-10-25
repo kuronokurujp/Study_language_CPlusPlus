@@ -17,8 +17,6 @@ namespace Level
             return TRUE;
         }
 
-        void VLateUpdate(const Float32 in_fDt, Actor::ActorManager*) override final {}
-
         /// <summary>
         /// 管理下にあるアクターに入力状態を送信
         /// </summary>
@@ -90,23 +88,22 @@ namespace Level
         return Actor::Object::VEnd();
     }
 
+    void Node::VBeginUpdate(const Float32 in_fDt)
+    {
+        Actor::Object::VBeginUpdate(in_fDt);
+        this->_actorManager.BeginUpdate(in_fDt);
+    }
+
     void Node::VUpdate(const Float32 in_fDt)
     {
         Actor::Object::VUpdate(in_fDt);
 
-        this->_actorManager.BeginUpdate(in_fDt);
-        {
-            this->_actorManager.Update(in_fDt);
+        this->_actorManager.Update(in_fDt);
+    }
 
-            // コリジョン処理(コリジョンしてActor追加が起きてもpendingするように)
-            // this->_Colision();
-            {
-        /*                for (Uint32 i = 0; i < this->_uiCollisionArray.Size(); ++i)
-                        {
-
-                        }
-         */           }
-        }
+    void Node::VLateUpdate(const Float32 in_fDt)
+    {
+        Actor::Object::VLateUpdate(in_fDt);
         this->_actorManager.LateUpdate(in_fDt);
     }
 
@@ -155,26 +152,22 @@ namespace Level
         ActorManagerDecorater* pDecotrater =
             reinterpret_cast<ActorManagerDecorater*>(this->_actorManager.GetDecorater());
         pDecotrater->ProcessInput(in_pInputMap);
-
-        // this->_actorManagerDecorater.ProcessInput(in_pInputMap);
     }
 
     /// <summary>
     /// 追加したコンポーネントのセットアップ
     /// </summary>
-    Bool Node::_VSetupComponent(const Core::Common::Handle& in_rHandle)
+    Bool Node::_VSetupComponent(Actor::Component* in_pComp)
     {
-        HE_ASSERT(in_rHandle.Null() == FALSE);
+        HE_ASSERT(in_pComp);
 
-        auto c = this->GetComponent<Actor::Component>(in_rHandle);
-
-        if (HE_GENERATED_CHECK_RTTI((*c), LevelBaseComponent) == FALSE)
+        if (HE_GENERATED_CHECK_RTTI((*in_pComp), LevelBaseComponent) == FALSE)
         {
             HE_ASSERT(0 && "レベル専用のコンポーネントではない");
             return FALSE;
         }
 
-        return Actor::Object::_VSetupComponent(in_rHandle);
+        return Actor::Object::_VSetupComponent(in_pComp);
     }
 
 }  // namespace Level

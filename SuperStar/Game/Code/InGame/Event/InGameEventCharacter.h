@@ -44,11 +44,11 @@ namespace InGame
         EventCharacterMove(const Float32 in_fTimeStamp, const EObjectTag in_eTag,
                            const Uint32 in_uId, const Core::Math::Vector2& in_rMove);
 
-        static Uint32 EventTypeHash();
+        static inline Uint32 EventTypeHash() { return s_uEventTypeHash; }
 
     public:
         Core::Math::Vector2 _move;
-        EObjectTag _eTag = EObjectTag_None;
+        EObjectTag _eTag = EObjectTag::EObjectTag_None;
         Uint32 _uId      = 0;
 
     private:
@@ -65,10 +65,10 @@ namespace InGame
         EventCharacterAttack(const Float32 in_fTimeStamp, const EObjectTag in_eTag,
                              const Uint32 in_uId);
 
-        static Uint32 EventTypeHash();
+        static inline Uint32 EventTypeHash() { return s_uEventTypeHash; }
 
     public:
-        EObjectTag _eTag = EObjectTag_None;
+        EObjectTag _eTag = EObjectTag::EObjectTag_None;
         Uint32 _uId      = 0;
 
     private:
@@ -76,4 +76,24 @@ namespace InGame
         static inline Uint32 s_uEventTypeHash           = s_szEventType.Hash();
     };
 
+    /// <summary>
+    /// 敵生成
+    /// </summary>
+    class EventCharacterPutEnemy final : public Event::BaseEventData
+    {
+    public:
+        EventCharacterPutEnemy(const Float32 in_fTimeStamp, const Core::Math::Vector2& in_rPos,
+                               const EEnemyTag in_eTag, const Uint32 in_uId);
+
+        static inline Uint32 EventTypeHash() { return s_uEventTypeHash; }
+
+    public:
+        Core::Math::Vector2 _pos;
+        EEnemyTag _eEnemyTag = EEnemyTag::EEnemyTag_None;
+        Uint32 _uId          = 0;
+
+    private:
+        static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterPutEnemy");
+        static inline Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+    };
 }  // namespace InGame

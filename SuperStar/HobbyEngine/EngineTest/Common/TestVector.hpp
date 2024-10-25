@@ -57,3 +57,17 @@ TEST_CASE("CustomVector Insert")
         CHECK(vector[i] == 999);
     }
 }
+
+TEST_CASE("CustomVector Copy")
+{
+    // vector同士のコピー
+    Core::Common::CustomFixVector<Sint32, 32> src;
+    src.PushBack(10);
+    src.PushBack(-10);
+
+    Core::Common::CustomFixVector<Sint32, 32> copy;
+    copy = src;
+
+    CHECK(copy[0] == 10);
+    CHECK(copy[1] == -10);
+}

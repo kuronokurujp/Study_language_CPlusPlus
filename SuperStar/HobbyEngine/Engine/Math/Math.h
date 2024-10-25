@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include <cmath>
 
 #include "Engine/Core.h"
@@ -95,7 +96,6 @@ namespace Core::Math
     /// <summary>
     /// Rounds the f.
     /// </summary>
-    /// <param name="in_value">The in value.</param>
     static inline Float32 RoundF(const Float32 in_fValue) HE_NOEXCEPT
     {
         // 四捨五入する時に+/-でずらす方向を変えている
@@ -106,7 +106,6 @@ namespace Core::Math
     /// <summary>
     /// Rounds the specified in r value.
     /// </summary>
-    /// <param name="in_rValue">The in r value.</param>
     static inline Sint32 Round(const Float32 in_fValue) HE_NOEXCEPT
     {
         return static_cast<Sint32>(RoundF(in_fValue));

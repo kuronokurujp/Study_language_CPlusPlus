@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <string.h>
-
 #include <initializer_list>
 #include <type_traits>
 

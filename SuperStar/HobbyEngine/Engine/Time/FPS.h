@@ -22,14 +22,11 @@ namespace Core::Time
         /// <summary>
         /// 指定時間待機(ミリ秒)
         /// </summary>
-        /// <param name="in_fps"></param>
-        /// <returns></returns>
         Bool UpdateWait(Platform::TimeInterface* in_pTimeInterface, const Uint32 in_uWaitMSec);
 
         /// <summary>
         /// 更新時間取得(秒)
         /// </summary>
-        /// <returns></returns>
         Float32 GetDeltaTimeSec(Platform::TimeInterface* in_pTimeInterface) const;
         Float32 GetDeltaTimeMSec(Platform::TimeInterface* in_pTimeInterface) const;
 

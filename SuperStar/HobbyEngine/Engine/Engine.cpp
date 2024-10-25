@@ -1,7 +1,6 @@
 ﻿#include "Engine.h"
 
 #include "Engine/Memory/Memory.h"
-#include "Engine/MiniEngine.h"
 #include "Engine/Module/Module.h"
 #include "Engine/Platform/PlatformModule.h"
 #include "Engine/Time/FPS.h"
@@ -97,7 +96,6 @@ Bool Engine::VRelease()
     HE_ASSERT(this->_bStart);
 
     if (this->_bStart == FALSE) return TRUE;
-
     if (this->_bInit == FALSE) return TRUE;
 
     // 確保したメモリを解放しないとEngineのデストラクタでエラーになる
@@ -120,7 +118,6 @@ Bool Engine::VRelease()
 /// <summary>
 /// ゲームウィンドウ生成.
 /// </summary>
-/// <returns></returns>
 Bool Engine::CreateMainWindow()
 {
     HE_ASSERT(this->_bStart);
@@ -137,7 +134,6 @@ Bool Engine::CreateMainWindow()
 /// <summary>
 /// ゲームウィンドウを解放.
 /// </summary>
-/// <returns></returns>
 void Engine::ReleseWindows()
 {
     auto pPlatform = this->_PlatformModule();
@@ -146,9 +142,9 @@ void Engine::ReleseWindows()
     pPlatform->VReleaseAllWindows();
 }
 
-Bool Engine::BeforeUpdateLoop(const Float32 in_fDeltaSec)
+Bool Engine::BeforeUpdateLoop(const Float32 in_fDt)
 {
-    this->_upModuleManager->BeforeUpdate(in_fDeltaSec);
+    this->_upModuleManager->BeforeUpdate(in_fDt);
     return TRUE;
 }
 
@@ -173,17 +169,22 @@ Bool Engine::WaitFrameLoop()
     return TRUE;
 }
 
-Bool Engine::MainUpdateLoop(const Float32 in_fDeltaSec)
+Bool Engine::MainUpdateLoop(const Float32 in_fDt)
 {
     // モジュール更新
-    this->_upModuleManager->Update(in_fDeltaSec);
+    HE_ASSERT(this->_upModuleManager);
+
+    this->_upModuleManager->Update(in_fDt);
 
     return TRUE;
 }
 
-Bool Engine::LateUpdateLoop(const Float32 in_fDeltaSec)
+Bool Engine::LateUpdateLoop(const Float32 in_fDt)
 {
-    this->_upModuleManager->LateUpdate(in_fDeltaSec);
+    HE_ASSERT(this->_upModuleManager);
+
+    this->_upModuleManager->LateUpdate(in_fDt);
+
     return TRUE;
 }
 
@@ -199,25 +200,24 @@ Float32 Engine::GetDeltaTimeSec()
 
 Bool Engine::IsAppQuit()
 {
+    // プラットフォームがない場合は閉じれない
     auto pPlatform = this->_PlatformModule();
-    if (pPlatform == NULL) return TRUE;
+    if (pPlatform == NULL) return FALSE;
 
     return pPlatform->VIsQuit();
 }
 
 Platform::PlatformModule* Engine::_PlatformModule()
 {
+    HE_ASSERT(this->_upModuleManager);
+
     return this->_upModuleManager->Get<Platform::PlatformModule>();
 }
 
 Bool Engine::_AddModule(class Module::ModuleBase* in_pModule)
 {
     HE_ASSERT(in_pModule);
+    HE_ASSERT(this->_upModuleManager);
 
-    if (this->_upModuleManager->RegistHeapModule(in_pModule) == FALSE)
-    {
-        return FALSE;
-    }
-
-    return TRUE;
+    return this->_upModuleManager->RegistHeapModule(in_pModule);
 }

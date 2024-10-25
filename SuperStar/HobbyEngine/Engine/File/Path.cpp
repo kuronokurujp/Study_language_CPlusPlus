@@ -13,6 +13,11 @@ namespace Core::File
         this->_szPath = in_rPath._szPath;
     }
 
+    void Path::operator=(const Char* in_szPath)
+    {
+        this->_szPath = in_szPath;
+    }
+
     Path& Path::operator+=(const Path& in_rPath)
     {
 #ifdef HE_WIN

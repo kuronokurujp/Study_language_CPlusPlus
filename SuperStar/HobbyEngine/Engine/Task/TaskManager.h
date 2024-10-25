@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <functional>
+
 #include "Engine/Common/CustomArray.h"
 #include "Engine/Common/PoolManager.h"
 #include "Engine/Core.h"
@@ -40,6 +42,11 @@ namespace Core
         void End();
 
         /// <summary>
+        /// 指定グループの全タスクのループ
+        /// </summary>
+        void ForeachByGroup(const Sint32 in_sGroupId, std::function<void(Task*)>);
+
+        /// <summary>
         /// 全タスク更新
         /// </summary>
         void UpdateAll(const Float32);
@@ -66,7 +73,8 @@ namespace Core
         template <class T>
         Common::Handle CreateAndAdd(const Sint32 in_sGroupId, const Bool in_bReleaseMem)
         {
-            static_assert(std::is_base_of<Task, T>::value, "TクラスはTaskクラスを継承していない");
+            HE_STATIC_ASSERT(std::is_base_of<Task, T>::value,
+                             "TクラスはTaskクラスを継承していない");
 
             HE_ASSERT(in_sGroupId < this->_iGroupNum);
 
@@ -115,9 +123,12 @@ namespace Core
         template <class T>
         T* GetTask(const Common::Handle& in_rTask)
         {
-            static_assert(std::is_base_of<Task, T>::value, "TクラスはTaskクラスを継承していない");
+            HE_STATIC_ASSERT(std::is_base_of<Task, T>::value,
+                             "TクラスはTaskクラスを継承していない");
 
             Task* pTask = this->GetTask(in_rTask);
+            HE_ASSERT(pTask);
+
             return reinterpret_cast<T*>(pTask);
         }
 

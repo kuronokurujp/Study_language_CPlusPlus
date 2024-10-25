@@ -1,52 +1,55 @@
 ﻿#pragma once
 
-#if 0
+// エンジンの最小インクルード
+#include "Engine/MiniEngine.h"
 
-//	インクルード
-#include "Base.h"
-#include "common/Man.h"
+// 利用モジュール
+#include "ActorModule.h"
 
 namespace InGame
 {
-/*
-        @brief	雑魚敵クラス
-*/
-class C_EnemyActorZako : public C_EnemyActorBase
-{
-public:
-    //	コンストラクタ
-    C_EnemyActorZako(const ABLITY_TYPE in_AblityType);
-    virtual ~C_EnemyActorZako();
+    /// <summary>
+    /// 雑魚敵
+    /// </summary>
+    class InGameEnemyZakoActor final : public Actor::Object
+    {
+        HE_GENERATED_CLASS_BODY_HEADER(InGameEnemyZakoActor, Actor::Object);
 
-    //	関数
-    virtual bool init(const int in_Handle);
-    virtual bool update(void);
-    virtual void draw(void);
+    public:
+        InGameEnemyZakoActor();
+        virtual ~InGameEnemyZakoActor();
 
-    //	データ通知
-    virtual void VOnCallbackSendMessage(const int in_DataType, void* in_pData);
+        Bool VBegin() override final;
 
-private:
-    //	関数
-    void _Clear();
+        void VUpdate(const Float32 in_fDt) override final;
+        // virtual bool update(void);
+        // virtual void draw(void);
 
-    virtual void _VOnCallbackOtherActorData(C_PaketSendActor* in_pOtherActor);
-    //	スクリプトで通知したデータを受け取る
-    virtual void _VOnCallbackScriptEvent(lua_State* in_pLuaState);
+        //	データ通知
+        // virtual void VOnCallbackSendMessage(const int in_DataType, void* in_pData);
 
-    //	アクション
-    virtual void _VNormalAct();
-    virtual void _VEscapeAct();
-    virtual void _VAttackAct() {}
+    private:
+        //	関数
+        void _Clear() { this->_fSpeed = 0.0f; }
+        /*
+                virtual void _VOnCallbackOtherActorData(C_PaketSendActor* in_pOtherActor);
+                //	スクリプトで通知したデータを受け取る
+                virtual void _VOnCallbackScriptEvent(lua_State* in_pLuaState);
 
-    virtual void _VDieAct();
-    virtual void _VDamageAct() {}
+                //	アクション
+                virtual void _VNormalAct();
+                virtual void _VEscapeAct();
+                virtual void _VAttackAct() {}
 
-    //	変数
-    float m_Speed;
-    Vec3 m_DirVec;
-    Vec3 m_Vec;
-};
-}
+                virtual void _VDieAct();
+                virtual void _VDamageAct() {}
 
-#endif
+                //	変数
+                float m_Speed;
+                //Vec3 m_DirVec;
+                //Vec3 m_Vec;
+                */
+    private:
+        Float32 _fSpeed = 0.0f;
+    };
+}  // namespace InGame

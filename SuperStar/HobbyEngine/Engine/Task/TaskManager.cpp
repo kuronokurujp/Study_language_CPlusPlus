@@ -83,6 +83,30 @@ namespace Core
         HE_SAFE_DELETE_ARRAY(this->_pTasks);
     }
 
+    void TaskManager::ForeachByGroup(const Sint32 in_sGroupId, std::function<void(Task*)> in_func)
+    {
+        HE_ASSERT(in_sGroupId < this->_iGroupNum);
+
+        // 登録タスクを全更新
+        TaskGroup* pGroup = &this->_pTasks[in_sGroupId];
+        Task* pTask       = pGroup->_pRootTask;
+
+        // グループにポーズフラグが付いてるなら何もしない
+        if ((pGroup->_uFlags & uFlagPause) == FALSE)
+        {
+            while (pTask->_pNext)
+            {
+                pTask = pTask->_pNext;
+
+                // 死亡フラグが付いてるのは更新しない
+                if (pTask->_bKill) continue;
+                if (pTask->_bStart == FALSE) continue;
+
+                in_func(pTask);
+            }
+        }
+    }
+
     void TaskManager::UpdateAll(const Float32 in_fDt)
     {
         for (Sint32 i = 0; i < this->_iGroupNum; ++i) this->UpdateByGroup(i, in_fDt);
@@ -108,11 +132,11 @@ namespace Core
 
                 // タスク実行開始
                 // 一度しか呼ばれない
-                if (pTask->_bStart)
+                if (pTask->_bStart == FALSE)
                 {
                     if (pTask->VBegin())
                     {
-                        pTask->_bStart = FALSE;
+                        pTask->_bStart = TRUE;
                     }
                 }
 
@@ -159,7 +183,7 @@ namespace Core
                 pTask = pTask->_pNext;
 
                 if (pTask->_bKill) continue;
-                if (pTask->_bStart) continue;
+                if (pTask->_bStart == FALSE) continue;
 
                 pTask->VEvent(in_rTaskData);
             }
@@ -174,7 +198,8 @@ namespace Core
         if (pTask == NULL) return;
 
         // 終了を呼ぶ
-        if (pTask->_bStart == FALSE) pTask->VEnd();
+        if (pTask->_bStart) pTask->VEnd();
+
         // タスクを破棄
         pTask->_VDestory();
 
@@ -327,7 +352,7 @@ namespace Core
         (*ppTask)->_pPrev        = pTailTask;
         (*ppTask)->_pNext        = NULL;
         (*ppTask)->_iGroupId     = in_groupId;
-        (*ppTask)->_bStart       = TRUE;
+        (*ppTask)->_bStart       = FALSE;
         (*ppTask)->_bKill        = FALSE;
         (*ppTask)->_pTaskManager = this;
 

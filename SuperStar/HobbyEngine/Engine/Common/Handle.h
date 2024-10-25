@@ -10,6 +10,9 @@ namespace Core::Common
     class Handle final
     {
     public:
+        static const Uint32 uNonMagic = 0;
+
+    public:
         Handle() { this->Clear(); }
         // 値をコピーする
         Handle(Handle& in_rHandle) { this->_ulHandle = in_rHandle._ulHandle; }

@@ -1,9 +1,13 @@
-﻿#include "Actor/Component/Component.h"
+﻿#pragma once
+
 #include "Engine/Common/CustomStack.h"
-#include "InGame/Component/Shot/InGameShotStrategyInterface.h"
+#include "InGame/Shot/InGameShotStrategyInterface.h"
 
 // エンジン最小インクルード
 #include "Engine/MiniEngine.h"
+
+// 利用モジュール
+#include "ActorModule.h"
 
 namespace InGame
 {

@@ -1,7 +1,9 @@
 ﻿#pragma once
 
 #include "Engine/MiniEngine.h"
-#include "Level/Component/LevelBaseComponent.h"
+
+// 利用モジュール
+#include "LevelModule.h"
 
 namespace InGame
 {

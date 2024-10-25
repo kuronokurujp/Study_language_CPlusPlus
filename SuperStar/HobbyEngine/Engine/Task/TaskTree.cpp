@@ -6,7 +6,7 @@ namespace Core
 {
     void TaskTree::VEvent(const TaskData& in_rEvent)
     {
-        this->_EachbyChildTask([this, in_rEvent](Task* in_pTask) { in_pTask->VEvent(in_rEvent); });
+        this->ForeachChildTask([this, in_rEvent](Task* in_pTask) { in_pTask->VEvent(in_rEvent); });
     }
 
     void TaskTree::_VDestory()
@@ -109,15 +109,15 @@ namespace Core
     void TaskTree::VUpdate(const Float32 in_fDt)
     {
         // 子タスクの実行
-        this->_EachbyChildTask(
+        this->ForeachChildTask(
             [this, in_fDt](Task* in_pTask)
             {
                 // 子タスクがまだ開始していない可能性がある
-                if (in_pTask->_bStart)
+                if (in_pTask->_bStart == FALSE)
                 {
                     if (in_pTask->VBegin())
                     {
-                        in_pTask->_bStart = FALSE;
+                        in_pTask->_bStart = TRUE;
                     }
                 }
 
@@ -137,7 +137,7 @@ namespace Core
         return pTaskTree;
     }
 
-    void TaskTree::_EachbyChildTask(std::function<void(Task*)> in_action)
+    void TaskTree::ForeachChildTask(std::function<void(Task*)> in_action)
     {
         for (auto it = this->_lstChildTask.BeginItr(); it != this->_lstChildTask.EndItr(); ++it)
         {

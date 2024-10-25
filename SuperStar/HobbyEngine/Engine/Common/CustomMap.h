@@ -46,7 +46,7 @@ namespace Core::Common
         public:
             Iterator(Node* in_pNode) : _pNode(in_pNode) {}
 
-            inline const Bool IsValid() const HE_NOEXCEPT { return this->_pNode != NULL; }
+            inline const Bool IsValid() const HE_NOEXCEPT { return (this->_pNode != NULL); }
 
             // ペアポインタ参照
             Pair* operator->() { return &this->_pNode->_pair; }
@@ -87,7 +87,7 @@ namespace Core::Common
             // 比較
             bool operator==(const Iterator& in_rIter) const HE_NOEXCEPT
             {
-                return this->_pNode == in_rIter._pNode;
+                return (this->_pNode == in_rIter._pNode);
             }
 
             // 比較
@@ -111,14 +111,14 @@ namespace Core::Common
         CustomFixMap() : _iteratorTail(&this->_tail) { this->_Init(); }
 
         // コピーのコンストラクタ
-        // ディープコピーにする
         CustomFixMap(const CustomFixMap& in_mrOther) : _iteratorTail(&this->_tail)
         {
             this->_Init();
             this->_DeepCopy(&in_mrOther);
         }
 
-        // コンストラクタ (initializer_listを受け取る)
+        // コンストラクタ
+        // 宣言と同時に初期化できるようにしている
         CustomFixMap(const std::initializer_list<std::pair<KEY, DATA>>& in_rInitList)
             : _iteratorTail(&this->_tail)
         {
@@ -236,7 +236,7 @@ namespace Core::Common
             this->_pRoot = this->_Erase(this->_pRoot, in_rKey);
 
             // まだツリーが存在するなら、ルートノードを黒にしておく
-            if (this->_pRoot) this->_pRoot->_uColor = Node::BLACK;
+            if (this->_pRoot) this->_pRoot->_uColor = Node::EColor::EColor_Black;
 
             return TRUE;
         }
@@ -253,7 +253,7 @@ namespace Core::Common
             this->_pRoot = this->_Erase(this->_pRoot, in_iter._pNode->_pair.key);
 
             // まだツリーが存在するなら、ルートノードを黒にしておく
-            if (this->_pRoot) this->_pRoot->_uColor = Node::BLACK;
+            if (this->_pRoot) this->_pRoot->_uColor = Node::EColor::EColor_Black;
 
             return TRUE;
         }
@@ -388,10 +388,10 @@ namespace Core::Common
         struct Node
         {
             // 赤黒木色定義
-            enum COLOR
+            enum EColor
             {
-                RED,
-                BLACK
+                EColor_Red = 0,
+                EColor_Black
             };
 
             // ツリー用
@@ -411,7 +411,7 @@ namespace Core::Common
             Core::Common::Handle handle;
         };
 
-        //! ノードメモリ確保と初期化
+        // ノードメモリ確保と初期化
         Node* _NewNode()
         {
             // ノードメモリ確保
@@ -424,7 +424,7 @@ namespace Core::Common
             pNewNode->_pLeft  = NULL;
             pNewNode->_pRight = NULL;
             // 新しいノードは常に赤
-            pNewNode->_uColor = Node::RED;
+            pNewNode->_uColor = Node::EColor::EColor_Red;
 
             // 線形アクセス用にPrev/Nextを繋ぐ
             Node* pTailNode           = this->_tail._pPrev;
@@ -472,7 +472,7 @@ namespace Core::Common
             // ルートを親として追加
             this->_pRoot = this->_Insert(this->_pRoot, pNode);
             // ルートは常に黒維持
-            this->_pRoot->_uColor = Node::BLACK;
+            this->_pRoot->_uColor = Node::EColor::EColor_Black;
 
             return Iterator(pNode);
         }
@@ -532,7 +532,8 @@ namespace Core::Common
         }
 
         // キーの大小比較
-        // クラスをキーにする場合、比較演算子( >, < )を用意してください。
+        // クラスをキーにする場合
+        // 比較演算子( >, < )を用意してください。
         Sint32 _CompareByKey(const KEY& in_rLeft, const KEY& in_rRight) const HE_NOEXCEPT
         {
             if (in_rLeft < in_rRight)
@@ -658,16 +659,15 @@ namespace Core::Common
                 {
                     // このノードを削除したいが、左右に別のノードがくっついている
                     // 自分の値に一番近いノードを探す
-                    Node* tpMinNode    = this->_FindMinNode(in_pNode->_pRight);
-                    tpMinNode->_pRight = this->_RemoveMinNode(in_pNode->_pRight);
-                    tpMinNode->_pLeft  = in_pNode->_pLeft;
-                    tpMinNode->_uColor = in_pNode->_uColor;
-                    // ノードを削除
-                    {
-                        this->_DeleteNode(in_pNode);
-                    }
+                    Node* pMinNode    = this->_FindMinNode(in_pNode->_pRight);
+                    pMinNode->_pRight = this->_RemoveMinNode(in_pNode->_pRight);
+                    pMinNode->_pLeft  = in_pNode->_pLeft;
+                    pMinNode->_uColor = in_pNode->_uColor;
 
-                    in_pNode = tpMinNode;
+                    // ノードを削除
+                    this->_DeleteNode(in_pNode);
+
+                    in_pNode = pMinNode;
                 }
                 else
                 {
@@ -714,7 +714,7 @@ namespace Core::Common
             tpNewParent->_pLeft = in_pNode;
 
             tpNewParent->_uColor = in_pNode->_uColor;
-            in_pNode->_uColor    = Node::RED;
+            in_pNode->_uColor    = Node::EColor::EColor_Red;
 
             return tpNewParent;
         }
@@ -729,7 +729,7 @@ namespace Core::Common
             pNewParent->_pRight = in_pNode;
 
             pNewParent->_uColor = in_pNode->_uColor;
-            in_pNode->_uColor   = Node::RED;
+            in_pNode->_uColor   = Node::EColor::EColor_Red;
 
             return pNewParent;
         }
@@ -816,6 +816,7 @@ namespace Core::Common
         }
 
         // ノードの平衡化
+        // 左のノードと右のノードが色が異なるようにする
         Node* _Fixup(Node* in_pNode)
         {
             HE_ASSERT(in_pNode);
@@ -825,6 +826,7 @@ namespace Core::Common
                 in_pNode = this->_RotateLeft(in_pNode);
             }
 
+            // 左ノードが赤 かつ 左ノードの更に左ノードが赤
             HE_ASSERT(in_pNode);
             if (this->_IsRed(in_pNode->_pLeft) && this->_IsRed(in_pNode->_pLeft->_pLeft))
             {
@@ -843,13 +845,13 @@ namespace Core::Common
         // ノードが赤かどうか
         Bool _IsRed(Node* in_pNode)
         {
-            if (in_pNode) return (in_pNode->_uColor == Node::RED);
+            if (in_pNode) return (in_pNode->_uColor == Node::EColor::EColor_Red);
 
             // 成立しないのでFALSEを返す
             return FALSE;
         }
 
-        inline void _Init() HE_NOEXCEPT
+        void _Init() HE_NOEXCEPT
         {
             // 線形アクセス用のリストを初期化
             this->_pRoot       = NULL;

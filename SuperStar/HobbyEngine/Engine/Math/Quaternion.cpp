@@ -31,18 +31,18 @@ namespace Core::Math
     void Quaternion::AngleUnitRadian(const Vector3& in_rAngle)
     {
         // オイラー角をクォータニオンとして設定
-        const Float32 cosXAxis = Cos(in_rAngle._fX * 0.5f);
-        const Float32 sinXAxis = Sin(in_rAngle._fX * 0.5f);
-        const Float32 cosYAxis = Cos(in_rAngle._fY * 0.5f);
-        const Float32 sinYAxis = Sin(in_rAngle._fY * 0.5f);
-        const Float32 cosZAxis = Cos(in_rAngle._fZ * 0.5f);
-        const Float32 sinZAxis = Sin(in_rAngle._fZ * 0.5f);
+        const Float32 fCosXAxis = Cos(in_rAngle._fX * 0.5f);
+        const Float32 fSinXAxis = Sin(in_rAngle._fX * 0.5f);
+        const Float32 fCosYAxis = Cos(in_rAngle._fY * 0.5f);
+        const Float32 fSinYAxis = Sin(in_rAngle._fY * 0.5f);
+        const Float32 fCosZAxis = Cos(in_rAngle._fZ * 0.5f);
+        const Float32 fSinZAxis = Sin(in_rAngle._fZ * 0.5f);
 
         // ローカル座標系からワールド座標系への変換
-        this->_fW = cosYAxis * cosXAxis * cosZAxis + sinYAxis * sinXAxis * sinZAxis;
-        this->_fX = cosYAxis * sinXAxis * cosZAxis + sinYAxis * cosXAxis * sinZAxis;
-        this->_fY = sinYAxis * cosXAxis * cosZAxis - cosYAxis * sinXAxis * sinZAxis;
-        this->_fZ = cosYAxis * cosXAxis * sinZAxis - sinYAxis * sinXAxis * cosZAxis;
+        this->_fW = fCosYAxis * fCosXAxis * fCosZAxis + fSinYAxis * fSinXAxis * fSinZAxis;
+        this->_fX = fCosYAxis * fSinXAxis * fCosZAxis + fSinYAxis * fCosXAxis * fSinZAxis;
+        this->_fY = fSinYAxis * fCosXAxis * fCosZAxis - fCosYAxis * fSinXAxis * fSinZAxis;
+        this->_fZ = fCosYAxis * fCosXAxis * fSinZAxis - fSinYAxis * fSinXAxis * fCosZAxis;
     }
 
     void Quaternion::Set(const Float32 in_fX, const Float32 in_fY, const Float32 in_fZ,

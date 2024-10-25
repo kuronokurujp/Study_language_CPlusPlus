@@ -1,7 +1,10 @@
 ﻿#pragma once
 
+#include <string>
+
 #include "Type.h"
 
+// プラットフォームがWindows
 #ifdef HE_WIN
 
 #include <wchar.h>
@@ -24,9 +27,8 @@
 // 1文字を小文字に変える
 #define HE_CHAR_LOWWER(c) ::towlower(c)
 
+// プラットフォームがCLI
 #else
-
-#include <string.h>
 
 #define HE_STR_LEN(t) static_cast<Uint32>(::strlen(t))
 #define HE_STR_CMP(a, b) ::strcmp(a, b)

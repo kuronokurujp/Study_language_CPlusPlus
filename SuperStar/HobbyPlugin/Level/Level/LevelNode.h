@@ -23,11 +23,9 @@ namespace Level
         {
             // 入力更新
             ETaskUpdateId_Input = Task::uNoneId + 1,
-            // Actor更新
-            ETaskUpdateId_Actor,
         };
 
-        Node();  // : Actor::Object(), _actorManager(&this->_actorManagerDecorater) {}
+        Node();
         virtual ~Node() = default;
 
         /// <summary>
@@ -40,10 +38,20 @@ namespace Level
         /// </summary>
         Bool VEnd() override;
 
+        /// <summar>
+        /// 更新
+        /// </summary>
+        void VBeginUpdate(const Float32 in_fDt) override final;
+
         /// <summary>
         /// 更新
         /// </summary>
         void VUpdate(const Float32 in_fDt) override;
+
+        /// <summar>
+        /// 更新
+        /// </summary>
+        void VLateUpdate(const Float32 in_fDt) override final;
 
         /// <summary>
         /// イベント
@@ -56,8 +64,8 @@ namespace Level
         template <class T>
         Core::Common::Handle AddActor()
         {
-            static_assert(std::is_base_of<Actor::Object, T>::value,
-                          "TクラスはアクターのObjectクラスを継承していない");
+            HE_STATIC_ASSERT(std::is_base_of<Actor::Object, T>::value,
+                             "TクラスはアクターのObjectクラスを継承していない");
 
             Core::Common::Handle handle = this->_actorManager.Add<T>();
             HE_ASSERT(handle.Null() == FALSE);
@@ -74,7 +82,7 @@ namespace Level
         template <class T>
         const Core::Common::Handle AddLevel()
         {
-            static_assert(std::is_base_of<Node, T>::value,
+            HE_STATIC_ASSERT(std::is_base_of<Node, T>::value,
                           "Tクラスはレベルのノードクラスを継承していない");
 
             // ノード管理にレベルを追加
@@ -94,7 +102,7 @@ namespace Level
         template <class T>
         T* GetActor(const Core::Common::Handle& in_rHandle)
         {
-            static_assert(std::is_base_of<Actor::Object, T>::value,
+            HE_STATIC_ASSERT(std::is_base_of<Actor::Object, T>::value,
                           "Tクラスはアクターのクラスを継承していない");
 
             HE_ASSERT(in_rHandle.Null() == FALSE);
@@ -113,13 +121,12 @@ namespace Level
         /// <summary>
         /// 追加したコンポーネントのセットアップ
         /// </summary>
-        Bool _VSetupComponent(const Core::Common::Handle&) final override;
+        Bool _VSetupComponent(Actor::Component*) override final;
 
     private:
         /// <summary>
         /// レベルに紐づけるアクター管理
         /// </summary>
         Actor::ActorManager _actorManager;
-        // ActorMaanagerDecorater _actorManagerDecorater;
     };
 }  // namespace Level

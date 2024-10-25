@@ -77,8 +77,8 @@ namespace Actor
         template <class T>
         Core::Common::Handle Add()
         {
-            static_assert(std::is_base_of<Object, T>::value,
-                          "TクラスはアクターのObjectクラスを継承していない");
+            HE_STATIC_ASSERT(std::is_base_of<Object, T>::value,
+                             "TクラスはアクターのObjectクラスを継承していない");
 
             // Actorが更新中の場合は保留グループIDに一旦登録
             // Actorは確保したメモリを使いまわさない

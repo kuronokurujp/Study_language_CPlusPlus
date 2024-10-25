@@ -15,10 +15,6 @@ namespace Core::Math
         /// <summary>
         /// Sets the specified in x.
         /// </summary>
-        /// <param name="in_x">The in x.</param>
-        /// <param name="in_y">The in y.</param>
-        /// <param name="in_z">The in z.</param>
-        /// <param name="in_w">The in w.</param>
         void Set(const Float32 in_fX, const Float32 in_fY, const Float32 in_fZ,
                  const Float32 in_fW);
 
@@ -30,8 +26,6 @@ namespace Core::Math
         /// <summary>
         /// Concatenates the specified in q.
         /// </summary>
-        /// <param name="in_q">The in q.</param>
-        /// <param name="in_p">The in p.</param>
         static Quaternion Concatenate(const Quaternion& in_fQ, const Quaternion& in_fP);
 
         static const Quaternion Identity;

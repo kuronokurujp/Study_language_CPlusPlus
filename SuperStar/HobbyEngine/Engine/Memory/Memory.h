@@ -288,10 +288,10 @@ namespace Core::Memory
 // 利用箇所のファイル名とファイル行数を設定できるのでメモリリーク調査を少しでも進めるようにしている
 #ifdef HE_ENGINE_DEBUG
 
-#define HE_MAKE_CUSTOM_SHARED_PTR(T, ...) \
-    Core::Memory::MakeCustomSharedPtr<T>(HE_FILE, __LINE__, ##__VA_ARGS__)
-#define HE_MAKE_CUSTOM_UNIQUE_PTR(T, ...) \
-    Core::Memory::MakeCustomUniquePtr<T>(HE_FILE, __LINE__, ##__VA_ARGS__)
+#define HE_MAKE_CUSTOM_SHARED_PTR(__T__, ...) \
+    Core::Memory::MakeCustomSharedPtr<__T__>(HE_FILE, __LINE__, ##__VA_ARGS__)
+#define HE_MAKE_CUSTOM_UNIQUE_PTR(__T__, ...) \
+    Core::Memory::MakeCustomUniquePtr<__T__>(HE_FILE, __LINE__, ##__VA_ARGS__)
 
 #else
 

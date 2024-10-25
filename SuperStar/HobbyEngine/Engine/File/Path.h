@@ -13,19 +13,16 @@ namespace Core::File
     /// </summary>
     class Path final
     {
+        HE_CLASS_MOVE_NG(Path);
+
     public:
-        /// <summary>
-        /// パス未設定
-        /// </summary>
-        Path() {}
+        Path() = default;
 
         /// <summary>
         /// パス文字列を一つのみ設定
         /// </summary>
-        /// <param name="in_pPath"></param>
         Path(const Char* in_szPath) { this->_Set(in_szPath); }
-        // Path(const Core::Common::FixStringBase* in_szrName) { this->_Set(in_szrName->Str());
-        // }
+        Path(const Path& in_rPath) { this->_Set(in_rPath.Str()); }
 
         /// <summary>
         /// パス文字列を複数設定
@@ -42,8 +39,10 @@ namespace Core::File
         Path(const UTF8* in_szPathUTF8) : _szPath(in_szPathUTF8) {}
 #endif
 
-        void operator=(const Path& in_crPath);
-        Path& operator+=(const Path& in_crPath);
+        void operator=(const Path&);
+        void operator=(const Char*);
+
+        Path& operator+=(const Path&);
 
         inline const Char* Str() const { return this->_szPath.Str(); }
         inline Bool Empty() const { return this->_szPath.Empty(); }

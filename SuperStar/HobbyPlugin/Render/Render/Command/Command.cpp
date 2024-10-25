@@ -46,7 +46,7 @@ namespace Render
         {
             cmd.uType              = ECmdType_2DRectDraw;
             Cmd2DRectDraw* pRect2D = &cmd.data.rect2DDraw;
-            static_assert(sizeof(cmd.data.rect2DDraw) <= sizeof(cmd.data.ulaWork));
+            HE_STATIC_ASSERT(sizeof(cmd.data.rect2DDraw) <= sizeof(cmd.data.ulaWork));
 
             pRect2D->fLeftX  = in_rRect._fLeft;
             pRect2D->fLeftY  = in_rRect._fTop;
@@ -72,7 +72,7 @@ namespace Render
         {
             cmd.uType                   = ECmdType_2DPointDraw;
             Cmd2DPointDraw* pCmdPoint2D = &cmd.data.point2DDraw;
-            static_assert(sizeof(cmd.data.point2DDraw) <= sizeof(cmd.data.ulaWork));
+            HE_STATIC_ASSERT(sizeof(cmd.data.point2DDraw) <= sizeof(cmd.data.ulaWork));
 
             Point2D* pPoint2D = &pCmdPoint2D->point;
             pPoint2D->fX      = in_rPos._fX;
@@ -104,7 +104,7 @@ namespace Render
         {
             cmd.uType                = ECmdType_ClsScreen;
             CmdClsScreen* pClsScreen = &cmd.data.clsScree;
-            static_assert(sizeof(cmd.data.clsScree) <= sizeof(cmd.data.ulaWork));
+            HE_STATIC_ASSERT(sizeof(cmd.data.clsScree) <= sizeof(cmd.data.ulaWork));
         }
 
         auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
@@ -127,7 +127,7 @@ namespace Render
         {
             cmd.uType             = ECmdType_2DCircleDraw;
             Cmd2DCircleDraw* pCmd = &cmd.data.circle2DDraw;
-            static_assert(sizeof(cmd.data.circle2DDraw) <= sizeof(cmd.data.ulaWork));
+            HE_STATIC_ASSERT(sizeof(cmd.data.circle2DDraw) <= sizeof(cmd.data.ulaWork));
             pCmd->point.fX = in_rPos._fX;
             pCmd->point.fY = in_rPos._fY;
             pCmd->color    = in_rColor;

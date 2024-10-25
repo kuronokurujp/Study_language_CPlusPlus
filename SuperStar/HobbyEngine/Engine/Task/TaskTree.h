@@ -45,7 +45,10 @@ namespace Core
 
             inline Bool Empty() const
             {
-                return (this->_handle.Null()) && (this->_parentHandle.Null());
+                if (this->_handle.Null() == FALSE) return FALSE;
+                if (this->_parentHandle.Null() == FALSE) return FALSE;
+
+                return TRUE;
             }
 
         private:
@@ -63,7 +66,7 @@ namespace Core
         virtual void VUpdate(const Float32) override;
         virtual void VEvent(const TaskData& in_rEvent) override;
 
-        inline const ChildTaskNode GetChildTaskNode() const { return this->_chainNode; }
+        inline const ChildTaskNode& GetChildTaskNode() const { return this->_chainNode; }
         inline Bool IsChild() const { return this->_bChild; }
 
         /// <summary>
@@ -76,6 +79,11 @@ namespace Core
         /// </summary>
         const ChildTaskNodeIterator RemoveChildTask(Core::Common::Handle*);
 
+        /// <summary>
+        /// 子タスクのループ
+        /// </summary>
+        void ForeachChildTask(std::function<void(Task*)>);
+
     protected:
         /// <summary>
         /// タスク破棄
@@ -84,11 +92,6 @@ namespace Core
 
     private:
         TaskTree* _GetTaskTree(const Core::Common::Handle& in_rHandle);
-
-        /// <summary>
-        /// 子タスクのループ
-        /// </summary>
-        void _EachbyChildTask(std::function<void(Task*)>);
 
         void _Clear()
         {

@@ -20,6 +20,13 @@ namespace Actor
         HE_GENERATED_CLASS_BODY_HEADER(Component, Core::Task);
 
     public:
+        enum EPriorty
+        {
+            EPriorty_Main = 0,
+            EPriorty_Late,
+        };
+
+    public:
         Component();
         virtual ~Component() = default;
 
@@ -31,11 +38,6 @@ namespace Actor
         virtual void VSetup(const Bool in_bReleaseMem) override;
 
         /// <summary>
-        /// コンポーネントの更新
-        /// </summary>
-        virtual void VUpdate(const Float32 in_fDt) override {}
-
-        /// <summary>
         /// コンポーネントのオーターアクターを設定
         /// TODO: コンストラクタで初回のみ設定に変えたほうがいいかも
         /// TODO: ランタイム中に変えるものじゃないから
@@ -45,14 +47,9 @@ namespace Actor
         inline Object* Owner() const { return this->_pOwner; }
 
     private:
-        void _Clear()
-        {
-            this->_pOwner       = NULL;
-            this->_iUpdateOrder = 0;
-        }
+        void _Clear() { this->_pOwner = NULL; }
 
     protected:
-        Object* _pOwner      = NULL;
-        Sint32 _iUpdateOrder = 0;
+        Object* _pOwner = NULL;
     };
 }  // namespace Actor

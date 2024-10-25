@@ -11,11 +11,6 @@ namespace InGame
     {
     }
 
-    Uint32 EventCharacterMove::EventTypeHash()
-    {
-        return s_uEventTypeHash;
-    }
-
     EventCharacterAttack::EventCharacterAttack(const Float32 in_fTimeStamp,
                                                const EObjectTag in_eTag, const Uint32 in_uId)
         : Event::BaseEventData(INGAME_CHARACTER_EVENT_TYPE_NAME, s_szEventType, in_fTimeStamp),
@@ -25,8 +20,14 @@ namespace InGame
     {
     }
 
-    Uint32 EventCharacterAttack::EventTypeHash()
+    EventCharacterPutEnemy::EventCharacterPutEnemy(const Float32 in_fTimeStamp,
+                                                   const Core::Math::Vector2& in_rPos,
+                                                   const EEnemyTag in_eTag, const Uint32 in_uId)
+        : Event::BaseEventData(INGAME_CHARACTER_EVENT_TYPE_NAME, s_szEventType, in_fTimeStamp),
+          _pos(in_rPos),
+          _eEnemyTag(in_eTag),
+          _uId(in_uId)
     {
-        return s_uEventTypeHash;
     }
+
 }  // namespace InGame

@@ -29,9 +29,12 @@ set(TARGET_FILES
 	Code/InGame/Component/InGameCollisionComponent.h
 	Code/InGame/Component/InGameShotComponent.cpp
 	Code/InGame/Component/InGameShotComponent.h
-	Code/InGame/Component/Shot/InGameShotStrategy.cpp
-	Code/InGame/Component/Shot/InGameShotStrategy.h
-	Code/InGame/Component/Shot/InGameShotStrategyInterface.h
+	Code/InGame/Component/Renderer/InGameRendererUserShipComponent.cpp
+	Code/InGame/Component/Renderer/InGameRendererUserShipComponent.h
+
+	Code/InGame/Shot/InGameShotStrategy.cpp
+	Code/InGame/Shot/InGameShotStrategy.h
+	Code/InGame/Shot/InGameShotStrategyInterface.h
 
 	Code/InGame/Actor/Player/InGamePlayerActor.cpp
 	Code/InGame/Actor/Player/InGamePlayerActor.h

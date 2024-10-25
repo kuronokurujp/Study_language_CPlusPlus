@@ -47,8 +47,14 @@ namespace Core::Common
             this->_pBuff[in_uIndex] = std::move(in_data);
         }
 
+        /// <summary>
+        /// 配列をコピー
+        /// </summary>
         void DeepCopy(const ArrayBase& in_arArray)
         {
+            HE_ASSERT(0 < this->_uCapacity);
+            HE_ASSERT(0 < in_arArray._uCapacity);
+
             const Uint32 uMinCapacity = HE_MIN(this->_uCapacity, in_arArray._uCapacity);
             std::copy(this->_pBuff, this->_pBuff + uMinCapacity, this->_pBuff);
         }
@@ -74,7 +80,8 @@ namespace Core::Common
     public:
         explicit CustomArray() : ArrayBase<TYPE>(this->_aBuff, CAPACITY) {}
 
-        // コンストラクタ (initializer_listを受け取る)
+        // コンストラクタ
+        // 配列宣言と同時に値を初期化できるようにしている
         CustomArray(std::initializer_list<TYPE>& in_rInitList)
             : ArrayBase<TYPE>(this->_aBuff, CAPACITY)
         {

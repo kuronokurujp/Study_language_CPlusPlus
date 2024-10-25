@@ -19,36 +19,36 @@ namespace Core::Math
         explicit Matrix4() { *this = Matrix4::Identity; }
         explicit Matrix4(const Float32 in_faaMat[4][4])
         {
-            ::memcpy(this->_faaMat, in_faaMat, 4 * 4 * sizeof(Float32));
+            ::memcpy(this->_faMat, in_faaMat, 4 * 4 * sizeof(Float32));
         }
 
         // Floatのポインタとして取得
         const Float32* GetAsFloatPtr() const
         {
-            return reinterpret_cast<const Float32*>(&this->_faaMat[0][0]);
+            return reinterpret_cast<const Float32*>(&this->_faMat[0][0]);
         }
 
         void Mul(const Matrix4& in_rSrcMat)
         {
             // 行列同士の計算で行側と列側でそれぞれVector4クラスに格納
             // Vector4クラス同士の掛け算で行列の各行を作成
-            auto row01 = Vector4(this->_faaMat[0][0], this->_faaMat[0][1], this->_faaMat[0][2],
-                                 this->_faaMat[0][3]);
-            auto row02 = Vector4(this->_faaMat[1][0], this->_faaMat[1][1], this->_faaMat[1][2],
-                                 this->_faaMat[1][3]);
-            auto row03 = Vector4(this->_faaMat[2][0], this->_faaMat[2][1], this->_faaMat[2][2],
-                                 this->_faaMat[2][3]);
-            auto row04 = Vector4(this->_faaMat[3][0], this->_faaMat[3][1], this->_faaMat[3][2],
-                                 this->_faaMat[3][3]);
+            auto row01 = Vector4(this->_faMat[0][0], this->_faMat[0][1], this->_faMat[0][2],
+                                 this->_faMat[0][3]);
+            auto row02 = Vector4(this->_faMat[1][0], this->_faMat[1][1], this->_faMat[1][2],
+                                 this->_faMat[1][3]);
+            auto row03 = Vector4(this->_faMat[2][0], this->_faMat[2][1], this->_faMat[2][2],
+                                 this->_faMat[2][3]);
+            auto row04 = Vector4(this->_faMat[3][0], this->_faMat[3][1], this->_faMat[3][2],
+                                 this->_faMat[3][3]);
 
-            auto col01 = Vector4(in_rSrcMat._faaMat[0][0], in_rSrcMat._faaMat[1][0],
-                                 in_rSrcMat._faaMat[2][0], in_rSrcMat._faaMat[3][0]);
-            auto col02 = Vector4(in_rSrcMat._faaMat[0][1], in_rSrcMat._faaMat[1][1],
-                                 in_rSrcMat._faaMat[2][1], in_rSrcMat._faaMat[3][1]);
-            auto col03 = Vector4(in_rSrcMat._faaMat[0][2], in_rSrcMat._faaMat[1][2],
-                                 in_rSrcMat._faaMat[2][2], in_rSrcMat._faaMat[3][2]);
-            auto col04 = Vector4(in_rSrcMat._faaMat[0][3], in_rSrcMat._faaMat[1][3],
-                                 in_rSrcMat._faaMat[2][3], in_rSrcMat._faaMat[3][3]);
+            auto col01 = Vector4(in_rSrcMat._faMat[0][0], in_rSrcMat._faMat[1][0],
+                                 in_rSrcMat._faMat[2][0], in_rSrcMat._faMat[3][0]);
+            auto col02 = Vector4(in_rSrcMat._faMat[0][1], in_rSrcMat._faMat[1][1],
+                                 in_rSrcMat._faMat[2][1], in_rSrcMat._faMat[3][1]);
+            auto col03 = Vector4(in_rSrcMat._faMat[0][2], in_rSrcMat._faMat[1][2],
+                                 in_rSrcMat._faMat[2][2], in_rSrcMat._faMat[3][2]);
+            auto col04 = Vector4(in_rSrcMat._faMat[0][3], in_rSrcMat._faMat[1][3],
+                                 in_rSrcMat._faMat[2][3], in_rSrcMat._faMat[3][3]);
 
             auto newRow01 = Vector4(row01.AddMul(col01), row01.AddMul(col02), row01.AddMul(col03),
                                     row01.AddMul(col04));
@@ -66,7 +66,7 @@ namespace Core::Math
                 {newRow04._fX, newRow04._fY, newRow04._fZ, newRow04._fW},
             };
 
-            ::memcpy(this->_faaMat, temp, sizeof(Float32) * 4 * 4);
+            ::memcpy(this->_faMat, temp, sizeof(Float32) * 4 * 4);
         }
 
         // 平行移動ベクトル取得
@@ -90,7 +90,7 @@ namespace Core::Math
         /// <summary>
         /// 行と列を指定した3x3の余因子行列を出力.
         /// </summary>
-        void OutputYoinshi3x3(Matrix3* out_pMat, Sint32 in_iRow, Sint32 in_iCol);
+        void OutputYoinshi3x3(Matrix3* out_pMat, const Sint32 in_iRow, const Sint32 in_iCol);
 
         /// <summary>
         /// 転置行列に変換.
@@ -107,14 +107,14 @@ namespace Core::Math
         /// </summary>
         static Matrix4 CreateScale(const Float32 in_fX, const Float32 in_fY, const Float32 in_fZ)
         {
-            Float32 faaTemp[4][4] = {
+            const Float32 faTemp[4][4] = {
                 {in_fX, 0.0f, 0.0f, 0.0f},
                 {0.0f, in_fY, 0.0f, 0.0f},
                 {0.0f, 0.0f, in_fZ, 0.0f},
                 {0.0f, 0.0f, 0.0f, 1.0f},
             };
 
-            return Matrix4(faaTemp);
+            return Matrix4(faTemp);
         }
 
         /// <summary>
@@ -167,6 +167,6 @@ namespace Core::Math
         // 単位行列定義
         static const Matrix4 Identity;
 
-        Float32 _faaMat[4][4];
+        Float32 _faMat[4][4];
     };
 }  // namespace Core::Math

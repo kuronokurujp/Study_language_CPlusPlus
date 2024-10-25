@@ -7,10 +7,12 @@ namespace Core::Common
     /// <summary>
     /// Vectorの基本クラス
     /// </summary>
-    template <class TYPE>
+    template <typename TYPE>
     class VectorBase
     {
+        HE_CLASS_DEFAULT_CONSTRUCT_NG(VectorBase);
         HE_CLASS_COPY_CONSTRUCT_NG(VectorBase);
+        HE_CLASS_MOVE_CONSTRUCT_NG(VectorBase);
 
     public:
         VectorBase(TYPE* in_tpArrayAddr, Uint32 in_uSize)
@@ -72,8 +74,6 @@ namespace Core::Common
         /// 引数の要素と一致したのを削除
         /// クラスの場合だと==の定義が必要
         /// </summary>
-        /// <param name="in_tData"></param>
-        /// <returns></returns>
         Bool Remove(const TYPE& in_rData)
         {
             Bool bRet = FALSE;
@@ -156,9 +156,11 @@ namespace Core::Common
     /// 固定長のカスタムVector
     /// テンプレートで要素を決めている
     /// </summary>
-    template <class TYPE, Uint32 CAPACITY>
+    template <typename TYPE, Uint32 CAPACITY>
     class CustomFixVector : public VectorBase<TYPE>
     {
+        HE_CLASS_MOVE_NG(CustomFixVector);
+
     public:
         CustomFixVector() : VectorBase<TYPE>(this->_aBuff, CAPACITY) {}
         CustomFixVector(CustomFixVector& in_rSrc) : VectorBase<TYPE>(this->_aBuff, CAPACITY)
@@ -171,7 +173,8 @@ namespace Core::Common
             this->_DeepCopy(in_rSrc);
         }
 
-        // コンストラクタ (initializer_listを受け取る)
+        // コンストラクタ
+        // 宣言と同時に初期化できるようにしている
         CustomFixVector(const std::initializer_list<TYPE>& in_rInitList)
             : VectorBase<TYPE>(this->_aBuff, CAPACITY)
         {
@@ -190,6 +193,9 @@ namespace Core::Common
         }
 
         virtual ~CustomFixVector() = default;
+
+        void operator=(CustomFixVector& in_vrData) { this->_DeepCopy(in_vrData); }
+        void operator=(const CustomFixVector& in_vrData) { this->_DeepCopy(in_vrData); }
 
     private:
         TYPE _aBuff[CAPACITY];

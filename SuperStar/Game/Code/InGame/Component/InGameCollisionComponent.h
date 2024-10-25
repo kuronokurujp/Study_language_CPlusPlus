@@ -2,10 +2,12 @@
 
 #include <functional>
 
-#include "Actor/Component/Component.h"
 #include "Engine/Common/CustomVector.h"
 #include "Engine/Math/Vector3.h"
 #include "Engine/MiniEngine.h"
+
+// 利用モジュール
+#include "ActorModule.h"
 
 namespace InGame
 {

@@ -75,7 +75,17 @@ namespace Actor
         /// <summar>
         /// 更新
         /// </summary>
+        virtual void VBeginUpdate(const Float32 in_fDt);
+
+        /// <summar>
+        /// 更新
+        /// </summary>
         void VUpdate(const Float32 in_fDt) override;
+
+        /// <summar>
+        /// 更新
+        /// </summary>
+        virtual void VLateUpdate(const Float32 in_fDt);
 
         /// <summary>
         /// コンポーネントを追加
@@ -83,11 +93,22 @@ namespace Actor
         /// コンポーネントの型をチェックしてアクターにつけていいコンポーネントかチェック機能を入れる
         /// </summary>
         template <class T>
-        Core::Common::Handle AddComponent(const Sint32 in_uUpdateOrder)
+        Core::Common::Handle AddComponent(
+            const Sint32 in_uUpdateOrder,
+            const Component::EPriorty in_ePriorty = Component::EPriorty_Main)
         {
-            static_assert(std::is_base_of<Component, T>::value,
-                          "TクラスはComponentクラスを継承していない");
+            HE_STATIC_ASSERT(std::is_base_of<Component, T>::value,
+                             "TクラスはComponentクラスを継承していない");
 
+            auto [h, c] = this->AddComponentByHandleAndComp<T>(in_uUpdateOrder, in_ePriorty);
+            if (h.Null())
+            {
+                return NullHandle;
+            }
+
+            return h;
+
+            /*
             // TODO: アクターの準備が整う前に呼ばれるケースもある
             // その場合はペンディングリストに追加して準備が整った時にコンポーネントを追加する
             HE_ASSERT(0 <= in_uUpdateOrder);
@@ -96,14 +117,14 @@ namespace Actor
             // TODO: 更新優先準備による追加処理を指定が必要
             // コンポーネントは確保したメモリを使いまわす
             auto handle = this->_components.CreateAndAdd<T>(in_uUpdateOrder, FALSE);
-            if (this->_VSetupComponent(handle) == FALSE)
+            if (this->_VSetupComponent(this->_components.GetTask<Component>(handle)) == FALSE)
             {
                 this->_components.RemoveTask(&handle);
                 return NullHandle;
             }
-            auto [h, p] = std::make_tuple(handle, NULL);
 
             return handle;
+            */
         }
 
         /// <summary>
@@ -112,24 +133,31 @@ namespace Actor
         /// </summary>
         template <class T>
         std::tuple<Core::Common::Handle, T*> AddComponentByHandleAndComp(
-            const Sint32 in_uUpdateOrder)
+            const Sint32 in_uUpdateOrder,
+            const Component::EPriorty in_ePriorty = Component::EPriorty::EPriorty_Main)
         {
-            static_assert(std::is_base_of<Component, T>::value,
-                          "TクラスはComponentクラスを継承していない");
+            HE_STATIC_ASSERT(std::is_base_of<Component, T>::value,
+                             "TクラスはComponentクラスを継承していない");
 
             // TODO: アクターの準備が整う前に呼ばれるケースもある
             // その場合はペンディングリストに追加して準備が整った時にコンポーネントを追加する
             HE_ASSERT(0 <= in_uUpdateOrder);
-            HE_ASSERT(in_uUpdateOrder < static_cast<Sint32>(this->_components.GetMaxGroup()));
 
             // TODO: 更新優先準備による追加処理を指定が必要
             // コンポーネントは確保したメモリを使いまわす
-            auto handle   = this->_components.CreateAndAdd<T>(in_uUpdateOrder, FALSE);
-            T* pComponent = this->GetComponent<T>(handle);
-
-            if (this->_VSetupComponent(handle) == FALSE)
+            auto* pCurrentComponents = &this->_components;
+            if (in_ePriorty == Component::EPriorty::EPriorty_Late)
             {
-                this->_components.RemoveTask(&handle);
+                pCurrentComponents = &this->_lateComponents;
+            }
+
+            HE_ASSERT(in_uUpdateOrder < static_cast<Sint32>(pCurrentComponents->GetMaxGroup()));
+
+            auto handle     = pCurrentComponents->CreateAndAdd<T>(in_uUpdateOrder, FALSE);
+            auto pComponent = this->GetComponent<T>(handle);
+            if (this->_VSetupComponent(pComponent) == FALSE)
+            {
+                pCurrentComponents->RemoveTask(&handle);
                 return std::make_tuple(NullHandle, pComponent);
             }
 
@@ -152,8 +180,8 @@ namespace Actor
         template <class T>
         T* GetParentComponent()
         {
-            static_assert(std::is_base_of<Component, T>::value,
-                          "TクラスはComponentクラスを継承していない");
+            HE_STATIC_ASSERT(std::is_base_of<Component, T>::value,
+                             "TクラスはComponentクラスを継承していない");
 
             // 親アクターがないなら即終了
             if (this->_parentActorHandle.Null()) return NULL;
@@ -198,13 +226,14 @@ namespace Actor
         template <class T>
         T* GetComponent(const Core::Common::Handle& in_rHandle)
         {
-            static_assert(std::is_base_of<Component, T>::value,
-                          "TクラスはComponentクラスを継承していない");
+            HE_STATIC_ASSERT(std::is_base_of<Component, T>::value,
+                             "TクラスはComponentクラスを継承していない");
 
-            T* p = reinterpret_cast<T*>(this->_components.GetTask(in_rHandle));
+            Task* p = this->_components.GetTask(in_rHandle);
+            if (p == NULL) p = this->_lateComponents.GetTask(in_rHandle);
             HE_ASSERT(p);
 
-            return p;
+            return reinterpret_cast<T*>(p);
         }
 
         /// <summary>
@@ -214,33 +243,36 @@ namespace Actor
         template <class T>
         T* GetComponent()
         {
-            static_assert(std::is_base_of<Component, T>::value,
-                          "TクラスはComponentクラスを継承していない");
+            HE_STATIC_ASSERT(std::is_base_of<Component, T>::value,
+                             "TクラスはComponentクラスを継承していない");
 
-            auto handle = this->GetComponentHandle(&T::CLASS_RTTI);
+            auto [handle, p] = this->GetComponentHandleAndComponent(&T::CLASS_RTTI);
             if (handle.Null()) return NULL;
 
-            T* p = reinterpret_cast<T*>(this->_components.GetTask(handle));
-            HE_ASSERT(p);
-
-            return p;
+            return reinterpret_cast<T*>(p);
         }
 
         /// <summary>
-        /// RTTIから目的のコンポーネントのハンドルを取得
+        /// RTTIから目的のコンポーネントのハンドルとコンポーネントを取得
         /// </summary>
-        Core::Common::Handle GetComponentHandle(const Core::Common::RTTI*);
+        std::tuple<Core::Common::Handle, Actor::Component*> GetComponentHandleAndComponent(
+            const Core::Common::RTTI*);
 
+        void ForeachComponents(
+            std::function<Bool(const Core::Common::Handle&, Component*)> in_func);
+        /*
         inline const std::unordered_map<Core::Common::Handle, Core::Task*>* GetComponents() const
         {
             return this->_components.GetUserDataList();
         }
+        */
 
         inline Bool ValidComponent(const Core::Common::Handle& in_h)
         {
             if (in_h.Null()) return FALSE;
 
-            return this->_components.Valid(in_h);
+            if (this->_components.Valid(in_h)) return TRUE;
+            return this->_lateComponents.Valid(in_h);
         }
 
         /// <summary>
@@ -315,15 +347,23 @@ namespace Actor
         /// <summary>
         /// 追加したコンポーネントのセットアップ
         /// </summary>
-        virtual Bool _VSetupComponent(const Core::Common::Handle&);
+        virtual Bool _VSetupComponent(Component* in_pComp);
 
     private:
+        /// <summary>
+        /// くっつている全てのコンポーネント外す
+        /// </summary>
+        void _RemoveAllComponent(Core::TaskManager*);
+
+        Bool _RemoveComponent(Core::Common::Handle*, Core::TaskManager*);
+
         void _Clear()
         {
             // Actorの状態
             this->_eState = EState_Active;
             this->_pOwner = NULL;
             this->_components.RemoveAll();
+            this->_lateComponents.RemoveAll();
         }
 
     protected:
@@ -334,5 +374,6 @@ namespace Actor
         EState _eState = EState_Active;
 
         Core::TaskManager _components;
+        Core::TaskManager _lateComponents;
     };
 }  // namespace Actor

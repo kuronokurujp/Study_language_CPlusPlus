@@ -1,6 +1,6 @@
 ﻿#include "InGameZakoEnemyActor.h"
 
-#if 0
+/*
 #include "actor/ActorCommon.h"
 #include "actor/shot/Manager.h"
 #include "event/data/EnemyZako.h"
@@ -9,32 +9,50 @@
 #include "system/System.h"
 #include "tips/Collsion.h"
 #include "tips/Primitive.h"
+*/
+
+// 利用モジュール一覧
+#include "RenderModule.h"
 
 namespace InGame
 {
-    //	変数
-    static const char* s_aEnemyZakoScriptFileName[C_EnemyActorBase::TYPE_MAX] = {
-        "./resource/script/enemy/zako.lua",
-        "./resource/script/enemy/zako_knight.lua",
-    };
-
     /*
-            @brief	コンストラクタ
+        //	変数
+        static const char* s_aEnemyZakoScriptFileName[C_EnemyActorBase::TYPE_MAX] = {
+            "./resource/script/enemy/zako.lua",
+            "./resource/script/enemy/zako_knight.lua",
+        };
     */
-    C_EnemyActorZako::C_EnemyActorZako(const C_EnemyActorZako::ABLITY_TYPE in_AblityType)
-        : C_EnemyActorBase(in_AblityType)
+    InGameEnemyZakoActor::InGameEnemyZakoActor() : Actor::Object()
     {
-        _Clear();
+        this->_Clear();
 
-        m_size = 16.f;
+        // m_size = 16.f;
     }
 
-    /*
-     */
-    C_EnemyActorZako::~C_EnemyActorZako(void)
+    InGameEnemyZakoActor::~InGameEnemyZakoActor()
     {
     }
 
+    Bool InGameEnemyZakoActor::VBegin()
+    {
+        if (Actor::Object::VBegin() == FALSE) return FALSE;
+
+        return TRUE;
+    }
+
+    void InGameEnemyZakoActor::VUpdate(const Float32 in_fDt)
+    {
+        Actor::Object::VUpdate(in_fDt);
+
+        /*
+                // TODO: 描画
+                // 描画コマンド追加
+                Render::Command2DRectDraw(this->_viewHandle, rect, Render::RGB::White);
+                */
+    }
+
+#if 0
     /*
             @brief	初期化
     */
@@ -279,5 +297,6 @@ namespace InGame
     {
         SystemProprtyInterfaceInGame::AddPoint(m_Point);
     }
-}  // namespace InGame
+
 #endif
+}  // namespace InGame

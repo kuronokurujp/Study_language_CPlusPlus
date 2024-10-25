@@ -2,7 +2,6 @@
 
 // 要素の数が動的に変わるので以下のデータ構造クラスを使っている
 // TODO: 自前で動的対応したのを作るのでそれまでの利用
-#include <list>
 #include <unordered_map>
 #include <vector>
 
@@ -38,25 +37,22 @@ namespace Core::Common
         /// <summary>
         /// データ使用個数
         /// </summary>
-        /// <returns></returns>
         const Uint32 UseCount() const
         {
-            if (this->_spUserSlot == NULL) return 0;
+            if (this->_upUserSlot == NULL) return 0;
 
-            return static_cast<Uint32>(this->_spUserSlot->size());
+            return static_cast<Uint32>(this->_upUserSlot->size());
         }
 
         /// <summary>
         /// データ最大数
         /// </summary>
-        /// <returns></returns>
-        const Uint32 Max() const { return static_cast<Uint32>(this->_spCacheDatas->capacity()); }
+        const Uint32 Max() const { return static_cast<Uint32>(this->_upCacheDatas->capacity()); }
 
         /// <summary>
         /// キャッシュしたデータが現在いくつか
         /// </summary>
-        /// <returns></returns>
-        const Uint32 CacheCount() const { return static_cast<Uint32>(this->_spCacheDatas->size()); }
+        const Uint32 CacheCount() const { return static_cast<Uint32>(this->_upCacheDatas->size()); }
 
         const bool Empty() const { return (this->UseCount() <= 0); }
 
@@ -64,8 +60,8 @@ namespace Core::Common
         // 参照にするとデータをコピーして遅くなるので注意
         inline const std::unordered_map<Core::Common::Handle, T*>* GetUserDataList() const
         {
-            HE_ASSERT(this->_spUserSlot);
-            return this->_spUserSlot.get();
+            HE_ASSERT(this->_upUserSlot);
+            return this->_upUserSlot.get();
         }
 
         /// <summary>
@@ -73,12 +69,12 @@ namespace Core::Common
         /// </summary>
         Bool Valid(const Core::Common::Handle& in_h)
         {
-            return (this->_spUserSlot->at(in_h) != NULL);
+            if (this->_upUserSlot->at(in_h)) return TRUE;
+
+            return FALSE;
         }
 
     protected:
-        static const Uint32 NON_MAGIC_NUMBER = 0;
-
         /// <summary>
         /// プールのバッファ予約
         /// プールするためのデータバッファ数を指定して確保
@@ -86,43 +82,46 @@ namespace Core::Common
         /// </summary>
         void _Reserve(const Uint32 in_uMax)
         {
-            if (this->_spCacheDatas == NULL)
-                this->_spCacheDatas = std::make_unique<std::vector<T*>>();
+            if (this->_upCacheDatas == NULL)
+                this->_upCacheDatas = HE_MAKE_CUSTOM_UNIQUE_PTR(std::vector<T*>);
 
-            if (this->_spUserSlot == NULL)
+            if (this->_upUserSlot == NULL)
             {
-                this->_spUserSlot =
-                    std::make_unique<std::unordered_map<Core::Common::Handle, T*>>();
+                // this->_upUserSlot =
+                // HE_MAKE_CUSTOM_UNIQUE_PTR(std::unordered_map<Core::Common::Handle, T*>);
+                // 上記のやり方だとエラーになるので代替え方法
+                this->_upUserSlot =
+                    Core::Memory::MakeCustomUniquePtr<std::unordered_map<Core::Common::Handle, T*>>(
+                        HE_FILE, __LINE__);
             }
 
-            this->_spCacheDatas->reserve(in_uMax);
+            this->_upCacheDatas->reserve(in_uMax);
         }
 
         void _Release()
         {
-            if (this->_spCacheDatas) this->_spCacheDatas.release();
+            if (this->_upCacheDatas) this->_upCacheDatas.release();
 
-            if (this->_spUserSlot) this->_spUserSlot.release();
+            if (this->_upUserSlot) this->_upUserSlot.release();
         }
 
         /// <summary>
         /// プールしているデータの中で利用できるデータ枠を取得
         /// 利用するデータとそのデータを紐づけたハンドルを返す
         /// </summary>
-        /// <returns></returns>
         template <class S>
         AllocData _Alloc()
         {
-            static_assert(std::is_base_of<T, S>::value, "SクラスはTクラスを継承していない");
+            HE_STATIC_ASSERT(std::is_base_of<T, S>::value, "SクラスはTクラスを継承していない");
 
-            HE_ASSERT(this->_spCacheDatas);
-            HE_ASSERT(this->_spUserSlot);
+            HE_ASSERT(this->_upCacheDatas);
+            HE_ASSERT(this->_upUserSlot);
 
             AllocData allocData;
-            HE_ASSERT(0 < this->_spCacheDatas->capacity());
+            HE_ASSERT(0 < this->_upCacheDatas->capacity());
 
             // 割り当てられなかったら空の枠を返す
-            if (this->UseCount() >= this->_spCacheDatas->capacity())
+            if (this->UseCount() >= this->_upCacheDatas->capacity())
             {
                 HE_ASSERT(FALSE && "オブジェクトを割り当てる数が足りない");
                 return allocData;
@@ -133,7 +132,7 @@ namespace Core::Common
             Bool bNewSlot = FALSE;
             S* pObject    = NULL;
 
-            if (this->_spCacheDatas->empty())
+            if (this->_upCacheDatas->empty())
             {
                 bNewSlot = TRUE;
             }
@@ -144,7 +143,7 @@ namespace Core::Common
                 // フリー領域にあるのがSクラスかどうかチェックしてあればそれを使う,
                 // なければ新規作成する すでに生成したTクラスのインスタンスを再利用
                 Uint32 uChkIndex = 0;
-                for (auto b = this->_spCacheDatas->begin(); b != this->_spCacheDatas->end(); ++b)
+                for (auto b = this->_upCacheDatas->begin(); b != this->_upCacheDatas->end(); ++b)
                 {
                     // 再利用可能なデータかチェック
                     pObject = dynamic_cast<S*>(*b);
@@ -154,7 +153,7 @@ namespace Core::Common
                         bFreeSlot = TRUE;
 
                         // キャッシュデータを利用したのでキャッシュリストから外す
-                        this->_spCacheDatas->erase(b);
+                        this->_upCacheDatas->erase(b);
                         handle.Init(uChkIndex);
 
                         break;
@@ -183,7 +182,7 @@ namespace Core::Common
             allocData._pItem  = pObject;
 
             // 利用リストに追加
-            this->_spUserSlot->insert(std::make_pair(handle, pObject));
+            this->_upUserSlot->insert(std::make_pair(handle, pObject));
 
             return allocData;
         }
@@ -191,24 +190,23 @@ namespace Core::Common
         /// <summary>
         /// 割り当てデータを解放
         /// </summary>
-        /// <param name="handle"></param>
         void _Free(const Handle& in_rHandle, const Bool in_bCache)
         {
             HE_ASSERT(in_rHandle.Null() == FALSE && "解放するデータがないとだめ");
 
-            T* tpRemoveObj = this->_spUserSlot->at(in_rHandle);
-            HE_ASSERT(tpRemoveObj != NULL);
-            this->_spUserSlot->erase(in_rHandle);
+            T* pRemoveObj = this->_upUserSlot->at(in_rHandle);
+            HE_ASSERT(pRemoveObj != NULL);
+            this->_upUserSlot->erase(in_rHandle);
 
             if (in_bCache)
             {
                 // メモリ確保した要素をキャッシュして使いまわす
-                this->_spCacheDatas->push_back(tpRemoveObj);
+                this->_upCacheDatas->push_back(pRemoveObj);
             }
             else
             {
                 // キャッシュしたのを破棄する
-                HE_SAFE_DELETE(tpRemoveObj);
+                HE_SAFE_DELETE(pRemoveObj);
             }
         }
 
@@ -217,8 +215,8 @@ namespace Core::Common
         {
             if (in_rHandle.Null()) return NULL;
             // 要素があるかチェック
-            if (this->_spUserSlot->find(in_rHandle) != this->_spUserSlot->end())
-                return this->_spUserSlot->at(in_rHandle);
+            if (this->_upUserSlot->find(in_rHandle) != this->_upUserSlot->end())
+                return this->_upUserSlot->at(in_rHandle);
 
             return NULL;
         }
@@ -232,11 +230,11 @@ namespace Core::Common
 
     private:
         // 利用中のデータスロット
-        std::unique_ptr<std::unordered_map<Core::Common::Handle, T*>> _spUserSlot = NULL;
+        Core::Memory::UniquePtr<std::unordered_map<Core::Common::Handle, T*>> _upUserSlot = NULL;
 
         // 再利用するキャッシュデータリスト
-        std::unique_ptr<std::vector<T*>> _spCacheDatas = NULL;
-        Uint32 _uIndexCount                            = 0;
+        Core::Memory::UniquePtr<std::vector<T*>> _upCacheDatas = NULL;
+        Uint32 _uIndexCount                                    = 0;
     };
 
     /// <summary>
@@ -250,9 +248,6 @@ namespace Core::Common
     template <typename T, Uint32 CAPACITY>
     class FixPoolManager final
     {
-    private:
-        static const Uint32 NON_MAGIC_NUMBER = 0;
-
     public:
         /// <summary>
         /// データ使用個数
@@ -287,12 +282,12 @@ namespace Core::Common
                 (*this->_vMagicNum.GetPtr(uIndex)) = out->Magic();
             }
 
-            HE_ASSERT(uIndex < this->_vUserSlot.Capacity() &&
+            HE_ASSERT(uIndex < this->_aUserSlot.Capacity() &&
                       "プールオブジェクトのフリーインデックス値が確保数を超えている");
 
             ++this->_uUseCount;
             // 空きのあるスロットを使用する
-            return &this->_vUserSlot[uIndex];
+            return &this->_aUserSlot[uIndex];
         }
 
         /// <summary>
@@ -304,10 +299,10 @@ namespace Core::Common
             if (in_rHandle.Null()) return FALSE;
 
             const Uint32 uIndex = in_rHandle.Index();
-            HE_ASSERT(this->_vMagicNum[uIndex] != NON_MAGIC_NUMBER);
+            HE_ASSERT(this->_vMagicNum[uIndex] != Handle::uNonMagic);
             HE_ASSERT(this->_vMagicNum[uIndex] == in_rHandle.Magic());
 
-            (*this->_vMagicNum.GetPtr(uIndex)) = NON_MAGIC_NUMBER;
+            (*this->_vMagicNum.GetPtr(uIndex)) = Handle::uNonMagic;
             this->_sFreeSlot.PushBack(uIndex);
 
             return TRUE;
@@ -320,10 +315,10 @@ namespace Core::Common
 
             Uint32 uIndex = in_rHandle.Index();
             // マジックナンバーが空値ならハンドルは解放済み
-            if ((this->_vMagicNum[uIndex] == NON_MAGIC_NUMBER)) return NULL;
+            if ((this->_vMagicNum[uIndex] == Handle::uNonMagic)) return NULL;
             if ((this->_vMagicNum[uIndex] != in_rHandle.Magic())) return NULL;
 
-            return &this->_vUserSlot[uIndex];
+            return &this->_aUserSlot[uIndex];
         }
 
         // データの参照(const版)
@@ -336,7 +331,7 @@ namespace Core::Common
     private:
         // TODO: 使う場所によってはスタックメモリを利用することになる
         // ヒープ利用版も用意すべきか
-        CustomArray<T, CAPACITY> _vUserSlot;
+        CustomArray<T, CAPACITY> _aUserSlot;
         CustomFixStack<Uint32, CAPACITY> _sFreeSlot;
         CustomFixVector<Uint32, CAPACITY> _vMagicNum;
 

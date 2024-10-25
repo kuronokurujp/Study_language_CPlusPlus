@@ -16,14 +16,32 @@ namespace Core::Common
         template <typename T>
         friend class LinkedListBase;
 
+        HE_CLASS_COPY_CONSTRUCT_NG(LinkedListNode);
+        HE_CLASS_MOVE_CONSTRUCT_NG(LinkedListNode);
+
     public:
         static const Uint32 uFlagLinked = 0x00000001;
 
     public:
+        LinkedListNode()          = default;
         virtual ~LinkedListNode() = default;
 
         inline LinkedListNode* GetPrev() const { return this->_pPrev; }
         inline LinkedListNode* GetNext() const { return this->_pNext; }
+
+        void operator=(LinkedListNode& in_rNode)
+        {
+            this->_pNext = in_rNode._pNext;
+            this->_pPrev = in_rNode._pPrev;
+            this->_uFlag = in_rNode._uFlag;
+        }
+
+        void operator=(const LinkedListNode& in_rNode)
+        {
+            this->_pNext = in_rNode._pNext;
+            this->_pPrev = in_rNode._pPrev;
+            this->_uFlag = in_rNode._uFlag;
+        }
 
         // TODO: イテレーターを生成
 
@@ -44,7 +62,13 @@ namespace Core::Common
     public:
         ListNodeIterator() = default;
         ListNodeIterator(NODETYPE* in_pNode) : _pNode(in_pNode) {}
+
         ListNodeIterator(const ListNodeIterator<DATATYPE, NODETYPE>& in_rIt) : _pNode(in_rIt._pNode)
+        {
+        }
+
+        ListNodeIterator(const ListNodeIterator<DATATYPE, NODETYPE>&& in_rIt)
+            : _pNode(in_rIt._pNode)
         {
         }
 
@@ -64,7 +88,6 @@ namespace Core::Common
         /// <summary>
         /// データ参照
         /// </summary>
-        /// <returns></returns>
         const DATATYPE& operator*() const { return static_cast<DATATYPE&>(*this->_pNode); }
 
         /// <summary>
@@ -163,7 +186,13 @@ namespace Core::Common
     public:
         ListNodeReverseIterator() = default;
         ListNodeReverseIterator(NODETYPE* in_pNode) : _pNode(in_pNode) {}
+
         ListNodeReverseIterator(const ListNodeReverseIterator<DATATYPE, NODETYPE>& it)
+            : _pNode(it._pNode)
+        {
+        }
+
+        ListNodeReverseIterator(const ListNodeReverseIterator<DATATYPE, NODETYPE>&& it)
             : _pNode(it._pNode)
         {
         }
@@ -331,8 +360,8 @@ namespace Core::Common
     };
 
     /// <summary>
-    /// 線形双方向リスト
-    /// リストのノードは利用者がListNodeクラスを継承して作成しなければいけない
+    /// 双方向リスト
+    /// リストのノードは利用者がLinkedListNodeを継承して作成したのが対象になる
     /// </summary>
     /// <typeparam name="T">ノードで管理するデータ型</typeparam>
     template <typename T>
@@ -383,10 +412,7 @@ namespace Core::Common
         /// </summary>
         Bool PopBack()
         {
-            if (this->Empty())
-            {
-                return FALSE;
-            }
+            if (this->Empty()) return FALSE;
 
             return LinkedListBase<T>::Erase(this->_tail.GetPrev());
         }
@@ -396,10 +422,7 @@ namespace Core::Common
         /// </summary>
         Bool PopFront()
         {
-            if (this->Empty())
-            {
-                return FALSE;
-            }
+            if (this->Empty()) return FALSE;
 
             return LinkedListBase<T>::Erase(this->_head.GetNext());
         }
@@ -450,6 +473,9 @@ namespace Core::Common
         /// </summary>
         RevIterator EndRevItr() { return RevIterator(&this->_head); }
 
+        /// <summary>
+        /// リストが空かどうか
+        /// </summary>
         Bool Empty() const { return this->_head.GetNext() == &this->_tail; }
 
     private:

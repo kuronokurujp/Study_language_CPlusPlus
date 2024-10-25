@@ -19,7 +19,7 @@ public:
     /// ゲーム更新
     /// エンジン側が呼ぶ
     /// </summary>
-    virtual Bool VUpdate(const Float32 in_fDeltaTime) = 0;
+    virtual Bool VUpdate(const Float32 in_fDt) = 0;
 
     /// <summary>
     /// ゲーム終了

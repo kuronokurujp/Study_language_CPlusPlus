@@ -9,21 +9,21 @@ namespace Core::Math
     // なのでシェーダーは左から右へ行列掛け算出来る
 
     // 単位行列の値
-    static const Float32 faaIdent[4][4] = {
+    static const Float32 faIdent[4][4] = {
         {1.0f, 0.0f, 0.0f, 0.0f},
         {0.0f, 1.0f, 0.0f, 0.0f},
         {0.0f, 0.0f, 1.0f, 0.0f},
         {0.0f, 0.0f, 0.0f, 1.0f},
     };
 
-    const Matrix4 Matrix4::Identity = Matrix4(faaIdent);
+    const Matrix4 Matrix4::Identity = Matrix4(faIdent);
 
     // 平行移動ベクトル取得
     void Matrix4::OutputTranslation(Vector3* out)
     {
-        out->_fX = this->_faaMat[3][0];
-        out->_fY = this->_faaMat[3][1];
-        out->_fZ = this->_faaMat[3][2];
+        out->_fX = this->_faMat[3][0];
+        out->_fY = this->_faMat[3][1];
+        out->_fZ = this->_faMat[3][2];
     }
 
     /// <summary>
@@ -33,7 +33,8 @@ namespace Core::Math
     {
         // 行列式を作る
         const Float32 fDet = this->GetDet();
-        if (fDet == 0.0) return;
+        // TODO: 近似値の比較をしないとまずい
+        if (fDet == 0.0f) return;
 
         // 余因子行列を作る
         this->OutputYoinshi(out);
@@ -48,7 +49,6 @@ namespace Core::Math
     /// <summary>
     /// 行列式を取得.
     /// </summary>
-    /// <returns></returns>
     Float32 Matrix4::GetDet()
     {
         //	行と列を指定した余因子行列を求める(3x3)行列
@@ -65,10 +65,10 @@ namespace Core::Math
         this->OutputYoinshi3x3(&m14, 0, 3);
 
         //  余因子行列から行列式を求める
-        const Float32 a = this->_faaMat[0][0] * m11.GetDet();
-        const Float32 b = this->_faaMat[0][1] * m12.GetDet();
-        const Float32 c = this->_faaMat[0][2] * m13.GetDet();
-        const Float32 d = this->_faaMat[0][3] * m14.GetDet();
+        const Float32 a = this->_faMat[0][0] * m11.GetDet();
+        const Float32 b = this->_faMat[0][1] * m12.GetDet();
+        const Float32 c = this->_faMat[0][2] * m13.GetDet();
+        const Float32 d = this->_faMat[0][3] * m14.GetDet();
 
         return (a - b + c - d);
     }
@@ -76,18 +76,17 @@ namespace Core::Math
     /// <summary>
     /// 余因子行列を出力.
     /// </summary>
-    /// <param name="out_pMat">The out p mat.</param>
     void Matrix4::OutputYoinshi(Matrix4* out)
     {
         Matrix3 tmpMat3;
-        Float32 s = 1;
+        Float32 s = 1.0f;
         for (Sint32 i = 0; i < 4; ++i)
         {
             for (Sint32 j = 0; j < 4; ++j)
             {
                 this->OutputYoinshi3x3(&tmpMat3, i, j);
-                out->_faaMat[i][j] = s * tmpMat3.GetDet();
-                s *= -1;
+                out->_faMat[i][j] = s * tmpMat3.GetDet();
+                s *= -1.0f;
             }
         }
     }
@@ -95,23 +94,23 @@ namespace Core::Math
     /// <summary>
     /// 行と列を指定した3x3の余因子行列を出力.
     /// </summary>
-    void Matrix4::OutputYoinshi3x3(Matrix3* out, Sint32 in_iRow, Sint32 in_iCol)
+    void Matrix4::OutputYoinshi3x3(Matrix3* out, const Sint32 in_iRow, const Sint32 in_iCol)
     {
-        Sint32 row = 0;
+        Sint32 iRow = 0;
         for (Sint32 i = 0; i < 4; ++i)
         {
             if (in_iRow == i) continue;
 
-            Sint32 col = 0;
+            Sint32 iCol = 0;
             for (Sint32 j = 0; j < 4; ++j)
             {
                 if (in_iCol == j) continue;
 
-                out->_faaMat[row][col] = this->_faaMat[i][j];
-                ++col;
+                out->_faaMat[iRow][iCol] = this->_faMat[i][j];
+                ++iCol;
             }
 
-            ++row;
+            ++iRow;
         }
     }
 
@@ -121,13 +120,13 @@ namespace Core::Math
     void Matrix4::ChangeTentsu()
     {
         Matrix4 tmp;
-        ::memcpy(&tmp, &this->_faaMat[0][0], sizeof(Float32) * 4 * 4);
+        ::memcpy(&tmp, &this->_faMat[0][0], sizeof(Float32) * 4 * 4);
 
         for (Uint32 i = 0; i < 4; ++i)
         {
             for (Uint32 j = 0; j < 4; ++j)
             {
-                this->_faaMat[i][j] = tmp._faaMat[j][i];
+                this->_faMat[i][j] = tmp._faMat[j][i];
             }
         }
     }
@@ -141,7 +140,7 @@ namespace Core::Math
         {
             for (Uint32 j = 0; j < 4; ++j)
             {
-                this->_faaMat[i][j] *= in_fScale;
+                this->_faMat[i][j] *= in_fScale;
             }
         }
     }
@@ -157,44 +156,43 @@ namespace Core::Math
     {
         // cos(a) * x - sin(a) * y
         // sin(a) * x + cos(a) * y
-        Float32 faaTtemp[4][4] = {
+        const Float32 faTtemp[4][4] = {
             {Cos(in_fRadian), Sin(in_fRadian), 0.0f, 0.0f},
             {-Sin(in_fRadian), Cos(in_fRadian), 0.0f, 0.0f},
             {0.0f, 0.0f, 1.0f, 0.0f},
             {0.0f, 0.0f, 0.0f, 1.0f},
         };
 
-        return Matrix4(faaTtemp);
+        return Matrix4(faTtemp);
     }
 
     /// <summary>
     /// Creates the translation.
     /// </summary>
     /// <param name="in_rPos">The in r position.</param>
-    /// <returns></returns>
     Matrix4 Matrix4::CreateTranslation(const Vector3& in_rPos)
     {
-        Float32 faaTemp[4][4] = {
+        const Float32 faTemp[4][4] = {
             {1.0f, 0.0f, 0.0f, 0.0f},
             {0.0f, 1.0f, 0.0f, 0.0f},
             {0.0f, 0.0f, 1.0f, 0.0f},
             {in_rPos._fX, in_rPos._fY, in_rPos._fZ, 1.0f},
         };
 
-        return Matrix4(faaTemp);
+        return Matrix4(faTemp);
     }
 
     // 縦横のサイズを元に単位正方形の座標系に行列変換する行列作成
     Matrix4 Matrix4::CreateSimpleViewProj(const Float32 in_fWidth, const Float32 in_fHeight)
     {
-        Float32 faaTemp[4][4] = {
+        const Float32 faTemp[4][4] = {
             {2.0f / in_fWidth, 0.0f, 0.0f, 0.0f},
             {0.0f, 2.0f / in_fHeight, 0.0f, 0.0f},
             {0.0f, 0.0f, 1.0f, 0.0f},
             {0.0f, 0.0f, 1.0f, 1.0f},
         };
 
-        return Matrix4(faaTemp);
+        return Matrix4(faTemp);
     }
 
     // カメラ情報からビュー行列生成
@@ -216,28 +214,28 @@ namespace Core::Math
         trans._fY = -Vector3::Dot(yAxis, in_rEye);
         trans._fZ = -Vector3::Dot(zAxis, in_rEye);
 
-        Float32 faaTemp[4][4] = {
+        const Float32 faTemp[4][4] = {
             {xAxis._fX, yAxis._fX, zAxis._fX, 0.0f},
             {xAxis._fY, yAxis._fY, zAxis._fY, 0.0f},
             {xAxis._fZ, yAxis._fZ, zAxis._fZ, 0.0f},
             {trans._fX, trans._fY, trans._fZ, 1.0f},
         };
 
-        return Matrix4(faaTemp);
+        return Matrix4(faTemp);
     }
 
     // 正射影行列作成
     Matrix4 Matrix4::CreateOrtho(const Float32 in_fWidth, const Float32 in_fHeight,
                                  const Float32 in_fNear, const Float32 in_fFar)
     {
-        const Float32 faaTemp[4][4] = {
+        const Float32 faTemp[4][4] = {
             {2.0f / in_fWidth, 0.0f, 0.0f, 0.0f},
             {0.0f, 2.0f / in_fHeight, 0.0f, 0.0f},
             {0.0f, 0.0f, 1.0f / (in_fFar - in_fNear), 0.0f},
             {0.0f, 0.0f, in_fNear / (in_fNear - in_fFar), 1.0f},
         };
 
-        return Matrix4(faaTemp);
+        return Matrix4(faTemp);
     }
 
     // 透視射影行列作成
@@ -249,16 +247,16 @@ namespace Core::Math
         HE_ASSERT(in_fHeight != 0.0f);
         HE_ASSERT(in_fFov != 0.0f);
 
-        const Float32 yScale = Math::Cot(in_fFov / 2.0f);
-        const Float32 xScale = yScale * in_fHeight / in_fWidth;
+        const Float32 fYScale = Math::Cot(in_fFov / 2.0f);
+        const Float32 fXScale = fYScale * in_fHeight / in_fWidth;
 
-        const Float32 temp[4][4] = {
-            {xScale, 0.0f, 0.0f, 0.0f},
-            {0.0f, yScale, 0.0f, 0.0f},
+        const Float32 faTemp[4][4] = {
+            {fXScale, 0.0f, 0.0f, 0.0f},
+            {0.0f, fYScale, 0.0f, 0.0f},
             {0.0f, 0.0f, in_fFar / (in_fFar - in_fNear), 1.0f},
             {0.0f, 0.0f, -in_fNear * in_fFar / (in_fFar - in_fNear), 0.0f},
         };
 
-        return Matrix4(temp);
+        return Matrix4(faTemp);
     }
 }  // namespace Core::Math

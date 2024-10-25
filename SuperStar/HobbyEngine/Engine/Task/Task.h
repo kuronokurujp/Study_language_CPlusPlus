@@ -61,7 +61,7 @@ namespace Core
         /// <summary>
         /// 更新
         /// </summary>
-        virtual void VUpdate(const Float32) = 0;
+        virtual void VUpdate(const Float32) {}
 
         /// <summary>
         /// イベント通知
@@ -93,7 +93,7 @@ namespace Core
     private:
         void _Clear()
         {
-            this->_bStart = TRUE;
+            this->_bStart = FALSE;
             this->_bKill  = FALSE;
 
             this->_iGroupId    = Task::iNoneGroupId;
@@ -108,7 +108,7 @@ namespace Core
 
     private:
         Sint32 _iGroupId = Task::iNoneGroupId;
-        Bool _bStart     = TRUE;
+        Bool _bStart     = FALSE;
         Bool _bKill      = FALSE;
         Common::Handle _selfHandle;
 

@@ -9,7 +9,7 @@
 #else
 
 #include <stdarg.h>
-include<stdio.h>
+#include <stdio.h>
 
 #endif
 
@@ -210,7 +210,6 @@ namespace Core::Common
     /// <summary>
     /// 文字列をハッシュ化して返す
     /// </summary>
-    /// <returns></returns>
     Uint64 StringBase::Hash() const
     {
         return HashName(this->Str());
@@ -220,8 +219,6 @@ namespace Core::Common
     /// UTF8として出力
     /// 文字列をUTF-8として利用したい場合に利用
     /// </summary>
-    /// <param name="out"></param>
-    /// <param name="in_size"></param>
     void StringBase::OutputUTF8(UTF8* out, const Uint32 in_uSize) const
     {
         HE_ASSERT(out);
@@ -298,5 +295,4 @@ namespace Core::Common
 
         return *this;
     }
-
 }  // namespace Core::Common

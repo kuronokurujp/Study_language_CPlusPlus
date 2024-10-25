@@ -199,11 +199,14 @@ namespace UI
                                           .GetActor<Actor::Object>(h._widgetHandle);
                             HE_ASSERT(pWidget);
 
-                            auto handle =
-                                pWidget->GetComponentHandle(&UI::UIButtonComponent::CLASS_RTTI);
-                            HE_ASSERT(handle.Null() == FALSE);
+                            auto [widgetHandle, pWidgetCmp] =
+                                pWidget->GetComponentHandleAndComponent(
+                                    &UI::UIButtonComponent::CLASS_RTTI);
+                            HE_ASSERT(widgetHandle.Null() == FALSE);
+
                             UI::UIButtonComponent* pBtnComp =
-                                pWidget->GetComponent<UI::UIButtonComponent>(handle);
+                                reinterpret_cast<UI::UIButtonComponent*>(pWidgetCmp);
+                            //                                pWidget->GetComponent<UI::UIButtonComponent>(handle);
 
                             auto handler = HE_MAKE_CUSTOM_UNIQUE_PTR(
                                 UI::UIButtonMessageHandlerDefault, pNodeData->szId,
@@ -214,16 +217,20 @@ namespace UI
                                     HE_ASSERT(pLevelModule);
 
                                     // ボタン入力をレベルのコンポーネントに通知
-                                    auto handle =
+                                    auto [handle, c] =
                                         pLevelModule->GetLevel(widgetHandlePack._levelHandle)
-                                            .GetComponentHandle(
+                                            .GetComponentHandleAndComponent(
                                                 &Level::LevelUserInputReceiveComponent::CLASS_RTTI);
                                     if (handle.Null() == FALSE)
                                     {
                                         Level::LevelUserInputReceiveComponent* pUserInputEventComp =
+                                            reinterpret_cast<
+                                                Level::LevelUserInputReceiveComponent*>(c);
+                                        /*
                                             pLevelModule->GetLevel(widgetHandlePack._levelHandle)
                                                 .GetComponent<
                                                     Level::LevelUserInputReceiveComponent>(handle);
+                                                    */
                                         pUserInputEventComp->Message(in_msg.Str());
                                     }
                                 });

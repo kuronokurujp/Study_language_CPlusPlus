@@ -4,7 +4,7 @@
 #include "Actor/Component/TransformComponent.h"
 #include "InGame/Component/InGameCollisionComponent.h"
 #include "InGame/Component/InGameShotComponent.h"
-#include "InGame/Component/Shot/InGameShotStrategy.h"
+#include "InGame/Shot/InGameShotStrategy.h"
 
 // 依存するモジュール一覧
 #include "RenderModule.h"
@@ -137,20 +137,22 @@ namespace InGame
             this->SetPos(newPos);
         }
 
-        // 描画座標取得
-        Core::Math::Rect2 rect;
-        {
-            auto pTrans = this->GetComponent<Actor::TransformComponent>(this->_transformHandle);
-            HE_ASSERT(pTrans);
+        /*
+                // 描画座標取得
+                Core::Math::Rect2 rect;
+                {
+                    auto pTrans =
+           this->GetComponent<Actor::TransformComponent>(this->_transformHandle); HE_ASSERT(pTrans);
 
-            Core::Math::Rect2 srcRect(0.0f, 0.0f, this->_size._fX, this->_size._fY,
-                                      Core::Math::Rect2::EAnchor_Center);
-            pTrans->TransformLocalToWorldRect2D(&rect, srcRect);
-        }
+                    Core::Math::Rect2 srcRect(0.0f, 0.0f, this->_size._fX, this->_size._fY,
+                                              Core::Math::Rect2::EAnchor_Center);
+                    pTrans->TransformLocalToWorldRect2D(&rect, srcRect);
+                }
 
-        // 描画コマンド追加
-        // TODO: 画像表示に切り替えるかも
-        Render::Command2DRectDraw(this->_viewHandle, rect, Render::RGB::White);
+                // 描画コマンド追加
+                // TODO: 画像表示に切り替えるかも
+                Render::Command2DRectDraw(this->_viewHandle, rect, Render::RGB::White);
+                */
     }
 
     void InGamePlayerActor::SetPos(const Core::Math::Vector2& in_rPos)
@@ -170,13 +172,13 @@ namespace InGame
     {
         this->_size = in_rSize;
     }
-
-    void InGamePlayerActor::SetViewHandle(const Core::Common::Handle& in_rHandle)
-    {
-        HE_ASSERT(in_rHandle.Null() == FALSE);
-        this->_viewHandle = in_rHandle;
-    }
-
+    /*
+        void InGamePlayerActor::SetViewHandle(const Core::Common::Handle& in_rHandle)
+        {
+            HE_ASSERT(in_rHandle.Null() == FALSE);
+            //this->_viewHandle = in_rHandle;
+        }
+    */
     void InGamePlayerActor::Move(const Core::Math::Vector2& in_rMove)
     {
         this->_move.Zero();

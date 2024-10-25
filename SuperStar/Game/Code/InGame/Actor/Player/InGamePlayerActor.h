@@ -1,15 +1,13 @@
 ﻿#pragma once
 
-#include "Actor/Actor.h"
 #include "Engine/Common/CustomMap.h"
+#include "InGame/Shot/InGameShotStrategyInterface.h"
+
+// エンジンの最小インクルード
 #include "Engine/MiniEngine.h"
-#include "InGame/Component/Shot/InGameShotStrategyInterface.h"
 
-#if 0
-
-#include "actor/ActorSystem.h"
-#include "actor/Shot/Manager.h"
-#endif
+// 利用モジュール
+#include "ActorModule.h"
 
 namespace InGame
 {
@@ -40,19 +38,19 @@ namespace InGame
         /// 開始
         /// 継承したクラスで必ず基本クラスのメソッドを呼ぶ
         /// </summary>
-        Bool VBegin() final override;
+        Bool VBegin() override final;
 
         /// <summary>
         /// 終了
         /// 継承したクラスで必ず基本クラスのメソッドを呼ぶ
         /// </summary>
-        Bool VEnd() final override;
+        Bool VEnd() override final;
 
-        void VUpdate(const Float32 in_fDt) final override;
+        void VUpdate(const Float32 in_fDt) override final;
 
         void SetPos(const Core::Math::Vector2&);
         void SetSize(const Core::Math::Vector2&);
-        void SetViewHandle(const Core::Common::Handle&);
+//        void SetViewHandle(const Core::Common::Handle&);
 
         void Move(const Core::Math::Vector2&);
         void Shot();
@@ -81,7 +79,7 @@ namespace InGame
             this->_move.Zero();
 
             this->_transformHandle.Clear();
-            this->_viewHandle.Clear();
+            //            this->_viewHandle.Clear();
         }
 
     private:
@@ -106,7 +104,7 @@ namespace InGame
 
         Core::Common::Handle _transformHandle;
         Core::Common::Handle _collisoinHandle;
-        Core::Common::Handle _viewHandle;
+        //        Core::Common::Handle _viewHandle;
         Core::Common::Handle _shotHandle;
 
         // ランタイム中に変化するパラメータ

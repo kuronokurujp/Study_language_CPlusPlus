@@ -65,8 +65,8 @@ namespace Level
         template <class T>
         Bool StartLevel()
         {
-            static_assert(std::is_base_of<Node, T>::value,
-                          "Tクラスはレベルのノードクラスを継承していない");
+            HE_STATIC_ASSERT(std::is_base_of<Node, T>::value,
+                             "Tクラスはレベルのノードクラスを継承していない");
 
             // レベルのノードは使いまわさない
             Core::Common::Handle handle = this->_upNodeManager->Add<T>();

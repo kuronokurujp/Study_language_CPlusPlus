@@ -33,28 +33,28 @@ namespace Core::Math
         auto q = in_rQuaternion;
 
         // 1行n列
-        mat4._faaMat[0][0] = 1.0f - 2.0f * q._fY * q._fY - 2.0f * q._fZ * q._fZ;
-        mat4._faaMat[0][1] = 2.0f * q._fX * q._fY + 2.0f * q._fW * q._fZ;
-        mat4._faaMat[0][2] = 2.0f * q._fX * q._fZ - 2.0f * q._fW * q._fY;
-        mat4._faaMat[0][3] = 0.0f;
+        mat4._faMat[0][0] = 1.0f - 2.0f * q._fY * q._fY - 2.0f * q._fZ * q._fZ;
+        mat4._faMat[0][1] = 2.0f * q._fX * q._fY + 2.0f * q._fW * q._fZ;
+        mat4._faMat[0][2] = 2.0f * q._fX * q._fZ - 2.0f * q._fW * q._fY;
+        mat4._faMat[0][3] = 0.0f;
 
         // 2行n列
-        mat4._faaMat[1][0] = 2.0f * q._fX * q._fY - 2.0f * q._fW * q._fZ;
-        mat4._faaMat[1][1] = 1.0f - 2.0f * q._fX * q._fX - 2.0f * q._fZ * q._fZ;
-        mat4._faaMat[1][2] = 2.0f * q._fY * q._fZ + 2.0f * q._fW * q._fX;
-        mat4._faaMat[1][3] = 0.0f;
+        mat4._faMat[1][0] = 2.0f * q._fX * q._fY - 2.0f * q._fW * q._fZ;
+        mat4._faMat[1][1] = 1.0f - 2.0f * q._fX * q._fX - 2.0f * q._fZ * q._fZ;
+        mat4._faMat[1][2] = 2.0f * q._fY * q._fZ + 2.0f * q._fW * q._fX;
+        mat4._faMat[1][3] = 0.0f;
 
         // 3行n列
-        mat4._faaMat[2][0] = 2.0f * q._fX * q._fZ + 2.0f * q._fW * q._fY;
-        mat4._faaMat[2][1] = 2.0f * q._fY * q._fZ - 2.0f * q._fW * q._fX;
-        mat4._faaMat[2][2] = 1.0f - 2.0f * q._fX * q._fX - 2.0f * q._fY * q._fY;
-        mat4._faaMat[2][3] = 0.0f;
+        mat4._faMat[2][0] = 2.0f * q._fX * q._fZ + 2.0f * q._fW * q._fY;
+        mat4._faMat[2][1] = 2.0f * q._fY * q._fZ - 2.0f * q._fW * q._fX;
+        mat4._faMat[2][2] = 1.0f - 2.0f * q._fX * q._fX - 2.0f * q._fY * q._fY;
+        mat4._faMat[2][3] = 0.0f;
 
         // 4行n列
-        mat4._faaMat[3][0] = 0;
-        mat4._faaMat[3][1] = 0;
-        mat4._faaMat[3][2] = 0;
-        mat4._faaMat[3][3] = 1.0f;
+        mat4._faMat[3][0] = 0;
+        mat4._faMat[3][1] = 0;
+        mat4._faMat[3][2] = 0;
+        mat4._faMat[3][3] = 1.0f;
 
         return mat4;
     }

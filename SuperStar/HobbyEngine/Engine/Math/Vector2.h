@@ -31,6 +31,7 @@ namespace Core::Math
         {
             if (this->_fX != 0.0f) return FALSE;
             if (this->_fY != 0.0f) return FALSE;
+
             return TRUE;
         }
 

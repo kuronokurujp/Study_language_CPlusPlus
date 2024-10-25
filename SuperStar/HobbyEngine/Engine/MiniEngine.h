@@ -2,6 +2,7 @@
 
 // エンジンを扱うアプリやプラグインのモジュールヘッダーファイルで
 // 必ずインクルードするファイル
+// TODO: PCH対応するかも
 
 #include "Engine/Common/CustomString.h"
 #include "Engine/Common/Handle.h"

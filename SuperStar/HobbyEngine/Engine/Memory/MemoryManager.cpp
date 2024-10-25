@@ -4,10 +4,6 @@
 
 namespace Core::Memory
 {
-    Manager::Manager()
-    {
-    }
-
     Bool Manager::VRelease()
     {
         if (this->_IsReady() == FALSE) return TRUE;

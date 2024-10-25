@@ -1,12 +1,9 @@
 ﻿#pragma once
 
-#include "Engine/Common/CustomArray.h"
-#include "Engine/Common/Handle.h"
 #include "Engine/Common/Singleton.h"
 #include "Engine/MiniEngine.h"
 
 // 前方宣言
-
 namespace Core::Time
 {
     class FPS;
@@ -76,10 +73,10 @@ public:
     void ReleseWindows();
 
     // エンジンを稼働させるためのループ用メソッド
-    Bool BeforeUpdateLoop(const Float32 in_fDeltaSec);
+    Bool BeforeUpdateLoop(const Float32 in_fDt);
     Bool WaitFrameLoop();
-    Bool MainUpdateLoop(const Float32 in_fDeltaSec);
-    Bool LateUpdateLoop(const Float32 in_fDeltaSec);
+    Bool MainUpdateLoop(const Float32 in_fDt);
+    Bool LateUpdateLoop(const Float32 in_fDt);
 
     /// <summary>
     /// メモリ管理を取得

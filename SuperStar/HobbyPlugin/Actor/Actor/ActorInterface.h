@@ -14,8 +14,7 @@ namespace Actor
     class ActorManagerDecoraterlnterface
     {
     public:
-        virtual Bool VStart(ActorManager*)                            = 0;
-        virtual void VLateUpdate(const Float32 in_fDt, ActorManager*) = 0;
+        virtual Bool VStart(ActorManager*)                             = 0;
 
         /// <summary>
         /// アクターのコンポーネントの登録・解除イベント

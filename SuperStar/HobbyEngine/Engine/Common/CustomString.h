@@ -46,15 +46,12 @@ namespace Core::Common
         /// <summary>
         /// 文字列をハッシュ化して返す
         /// </summary>
-        /// <returns></returns>
         Uint64 Hash() const;
 
         /// <summary>
         /// UTF8として出力
         /// 文字列をUTF-8として利用したい場合に利用
         /// </summary>
-        /// <param name="out"></param>
-        /// <param name="in_size"></param>
         void OutputUTF8(UTF8* out, const Uint32 in_uSize) const;
 
         // 大文字 / 小文字にする
@@ -151,10 +148,7 @@ namespace Core::Common
 
         Char operator[](const Uint32 in_uCuIndex) const
         {
-            if (this->_uCapacity <= in_uCuIndex)
-            {
-                return '\0';
-            }
+            if (this->_uCapacity <= in_uCuIndex) return '\0';
 
             return this->_szBuff[in_uCuIndex];
         }

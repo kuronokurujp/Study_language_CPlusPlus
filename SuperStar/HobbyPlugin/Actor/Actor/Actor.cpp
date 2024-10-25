@@ -11,11 +11,17 @@ namespace Actor
         {
             HE_ASSERT(FALSE && "コンポーネントのタスク管理の初期化失敗");
         }
+
+        if (this->_lateComponents.Init(32, 32) == FALSE)
+        {
+            HE_ASSERT(FALSE && "コンポーネントのタスク管理の初期化失敗");
+        }
     }
 
     Object::~Object()
     {
         this->_components.End();
+        this->_lateComponents.End();
         this->_pOwner = NULL;
     }
 
@@ -53,9 +59,18 @@ namespace Actor
         return TaskTree::VEnd();
     }
 
-    /// <summary>
-    /// Updates the specified in delta time.
-    /// </summary>
+    void Object::VBeginUpdate(const Float32 in_fDt)
+    {
+        if (this->_eState != EState_Active) return;
+
+        this->ForeachChildTask(
+            [in_fDt](Core::Task* in_pChildTask)
+            {
+                auto pObject = reinterpret_cast<Object*>(in_pChildTask);
+                pObject->VBeginUpdate(in_fDt);
+            });
+    }
+
     void Object::VUpdate(const Float32 in_fDt)
     {
         if (this->_eState != EState_Active) return;
@@ -67,43 +82,43 @@ namespace Actor
         Core::TaskTree::VUpdate(in_fDt);
     }
 
+    void Object::VLateUpdate(const Float32 in_fDt)
+    {
+        if (this->_eState != EState_Active) return;
+
+        // コンポーネント更新
+        this->_lateComponents.UpdateAll(in_fDt);
+
+        this->ForeachChildTask(
+            [in_fDt](Core::Task* in_pChildTask)
+            {
+                auto pObject = reinterpret_cast<Object*>(in_pChildTask);
+                pObject->VLateUpdate(in_fDt);
+            });
+    }
+
     /// <summary>
     /// くっつている全てのコンポーネント削除.
     /// </summary>
     void Object::RemoveAllComponent()
     {
-        // コンポーネント解除をオーナーに通知
-        auto components = this->_components.GetUserDataList();
-        for (auto itr = components->begin(); itr != components->end(); ++itr)
-        {
-            auto pComponent = reinterpret_cast<Component*>(itr->second);
-            this->_pOwner->VOnActorUnRegistComponent(pComponent);
-        }
-
-        this->_components.RemoveAll();
+        this->_RemoveAllComponent(&this->_components);
+        this->_RemoveAllComponent(&this->_lateComponents);
     }
 
-    /// <summary>
-    /// Removes the component.
-    /// </summary>
     Bool Object::RemoveComponent(Core::Common::Handle* in_pHandle)
     {
-        HE_ASSERT(in_pHandle);
-        HE_ASSERT(in_pHandle->Null() == FALSE);
-
-        // コンポーネント解除をオーナーに通知
-        auto pComponent = reinterpret_cast<Component*>(this->_components.GetTask(*in_pHandle));
-        if (pComponent == NULL)
+        if (this->_RemoveComponent(in_pHandle, &this->_components))
         {
-            in_pHandle->Null();
             return TRUE;
         }
 
-        this->_pOwner->VOnActorUnRegistComponent(pComponent);
+        if (this->_RemoveComponent(in_pHandle, &this->_lateComponents))
+        {
+            return TRUE;
+        }
 
-        this->_components.RemoveTask(in_pHandle);
-
-        return TRUE;
+        return FALSE;
     }
 
     /// <summary>
@@ -112,10 +127,10 @@ namespace Actor
     void Object::OutputChildrenComponent(Core::Common::StackBase<Component*>* out,
                                          const Core::Common::RTTI* in_pRtti)
     {
-        auto c = this->GetComponentHandle(in_pRtti);
-        if (c.Null() == FALSE)
+        auto [h, c] = this->GetComponentHandleAndComponent(in_pRtti);
+        if (h.Null() == FALSE)
         {
-            out->PushBack(this->GetComponent<Component>(c));
+            out->PushBack(c);
         }
 
         if (this->_lstChildTask.Empty()) return;
@@ -130,15 +145,27 @@ namespace Actor
             auto pChildActor = this->_pTaskManager->GetTask<Object>(itr->GetHandle());
             HE_ASSERT(pChildActor);
 
-            auto slot = pChildActor->_components.GetUserDataList();
-            for (auto b = slot->begin(); b != slot->end(); ++b)
-            {
-                auto c = reinterpret_cast<Actor::Component*>(b->second);
-                if (c->VGetRTTI().DerivesFrom(in_pRtti))
+            pChildActor->ForeachComponents(
+                [in_pRtti, out](const Core::Common::Handle& in_rHandle, Actor::Component* in_pCmp)
                 {
-                    out->PushBack(c);
-                }
-            }
+                    if (in_pCmp->VGetRTTI().DerivesFrom(in_pRtti))
+                    {
+                        out->PushBack(in_pCmp);
+                    }
+
+                    return TRUE;
+                });
+            /*
+                        auto slot = pChildActor->_components.GetUserDataList();
+                        for (auto b = slot->begin(); b != slot->end(); ++b)
+                        {
+                            auto c = reinterpret_cast<Actor::Component*>(b->second);
+                            if (c->VGetRTTI().DerivesFrom(in_pRtti))
+                            {
+                                out->PushBack(c);
+                            }
+                        }
+                        */
 
             ++itr;
 
@@ -169,27 +196,95 @@ namespace Actor
         }
     }
 
-    Core::Common::Handle Object::GetComponentHandle(const Core::Common::RTTI* in_pRtti)
+    std::tuple<Core::Common::Handle, Actor::Component*> Object::GetComponentHandleAndComponent(
+        const Core::Common::RTTI* in_pRtti)
     {
-        auto list = this->GetComponents();
+        /*
+            auto list = this->GetComponents();
+            auto end  = list->end();
+            for (auto itr = list->begin(); itr != end; ++itr)
+            {
+                Component* target = reinterpret_cast<Component*>(itr->second);
+                if (target->VGetRTTI().DerivesFrom(in_pRtti)) return itr->first;
+            }
+            */
+        Core::Common::Handle handle;
+        Actor::Component* pCmp = NULL;
+        this->ForeachComponents(
+            [in_pRtti, &handle, &pCmp](const Core::Common::Handle& in_rHandle, Component* in_pCmp)
+            {
+                if (in_pCmp->VGetRTTI().DerivesFrom(in_pRtti))
+                {
+                    handle = in_rHandle;
+                    pCmp   = in_pCmp;
+                    return FALSE;
+                }
+
+                return TRUE;
+            });
+
+        return std::tuple<Core::Common::Handle, Actor::Component*>(handle, pCmp);
+    }
+
+    void Object::ForeachComponents(
+        std::function<Bool(const Core::Common::Handle&, Component*)> in_func)
+    {
+        auto list = this->_components.GetUserDataList();
         auto end  = list->end();
         for (auto itr = list->begin(); itr != end; ++itr)
         {
-            Component* target = reinterpret_cast<Component*>(itr->second);
-            if (target->VGetRTTI().DerivesFrom(in_pRtti)) return itr->first;
+            if (in_func(itr->first, reinterpret_cast<Component*>(itr->second)) == FALSE) break;
         }
 
-        return NullHandle;
+        list = this->_lateComponents.GetUserDataList();
+        end  = list->end();
+        for (auto itr = list->begin(); itr != end; ++itr)
+        {
+            if (in_func(itr->first, reinterpret_cast<Component*>(itr->second)) == FALSE) break;
+        }
     }
 
-    Bool Object::_VSetupComponent(const Core::Common::Handle& in_rHandle)
+    Bool Object::_VSetupComponent(Component* in_pComp)
     {
-        HE_ASSERT(in_rHandle.Null() == FALSE);
-        Component* pComp = this->_components.GetTask<Component>(in_rHandle);
+        HE_ASSERT(in_pComp);
 
         // コンポーネントを付けた自身を設定
-        pComp->SetOwner(this);
-        this->_pOwner->VOnActorRegistComponent(pComp);
+        in_pComp->SetOwner(this);
+        this->_pOwner->VOnActorRegistComponent(in_pComp);
+
+        return TRUE;
+    }
+
+    void Object::_RemoveAllComponent(Core::TaskManager* in_pComponents)
+    {
+        // コンポーネント解除をオーナーに通知
+        auto components = in_pComponents->GetUserDataList();
+        for (auto itr = components->begin(); itr != components->end(); ++itr)
+        {
+            auto pComponent = reinterpret_cast<Component*>(itr->second);
+            this->_pOwner->VOnActorUnRegistComponent(pComponent);
+        }
+
+        in_pComponents->RemoveAll();
+    }
+
+    Bool Object::_RemoveComponent(Core::Common::Handle* in_pHandle,
+                                  Core::TaskManager* in_pComponents)
+    {
+        HE_ASSERT(in_pHandle);
+        HE_ASSERT(in_pHandle->Null() == FALSE);
+
+        // コンポーネント解除をオーナーに通知
+        auto pComponent = reinterpret_cast<Component*>(in_pComponents->GetTask(*in_pHandle));
+        if (pComponent == NULL)
+        {
+            in_pHandle->Null();
+            return FALSE;
+        }
+
+        this->_pOwner->VOnActorUnRegistComponent(pComponent);
+
+        in_pComponents->RemoveTask(in_pHandle);
 
         return TRUE;
     }

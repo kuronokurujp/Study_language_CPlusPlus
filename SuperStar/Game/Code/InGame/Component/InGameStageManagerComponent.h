@@ -2,10 +2,10 @@
 
 #include "Engine/MiniEngine.h"
 #include "InGame/Event/InGameEventCharacter.h"
-#include "Level/Component/LevelBaseComponent.h"
 
-// イベントモジュールを使う
+// 利用モジュール
 #include "EventModule.h"
+#include "LevelModule.h"
 
 namespace InGame
 {

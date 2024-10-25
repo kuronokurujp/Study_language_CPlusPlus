@@ -123,8 +123,11 @@ namespace Core::Math
     void Vector3::SetInterporation(const Vector3& a, const Vector3& ab, const Vector3& ac,
                                    Float32 u, Float32 v)
     {
-        this->SetMadd(ab, u, a);  // a + u(b - a)
-        this->Madd(ac, v);        // a + u(b - a) + v(c - a)
+        // a + u(b - a)
+        this->SetMadd(ab, u, a);
+
+        // a + u(b - a) + v(c - a)
+        this->Madd(ac, v);
     }
 
     //	正規化

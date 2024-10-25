@@ -16,7 +16,7 @@ namespace Core::Memory
         HE_CLASS_MOVE_NG(Manager);
 
     public:
-        explicit Manager();
+        explicit Manager() = default;
 
     public:
         // 最低アラインサイズ（ヘッダもこのアラインである必要あり）
@@ -190,7 +190,6 @@ namespace Core::Memory
         /// <summary>
         /// 全ページ内に利用中のメモリがあるか
         /// </summary>
-        /// <returns></returns>
         Bool UsedAllMemoryBlock() const;
 
         /// <summary>
@@ -215,13 +214,11 @@ namespace Core::Memory
         /// <summary>
         /// メモリブロックのヘッダーサイズを取得
         /// </summary>
-        /// <returns></returns>
         inline Uint32 _GetMemoryBlockHeaderSize() const { return (sizeof(BlockHeader)); }
 
         /// <summary>
         /// メモリブロックのフッターサイズを取得
         /// </summary>
-        /// <returns></returns>
         inline Uint32 _GetMemoryBlockFooterSize() const
         {
             // フッターはデバッグ用のしかないから
@@ -235,7 +232,6 @@ namespace Core::Memory
         /// <summary>
         /// メモリブロックのシステム利用サイズを取得
         /// </summary>
-        /// <returns></returns>
         inline Uint32 _GetMemoryBlockSystemDataSize() const
         {
             return (this->_GetMemoryBlockHeaderSize() + this->_GetMemoryBlockFooterSize());

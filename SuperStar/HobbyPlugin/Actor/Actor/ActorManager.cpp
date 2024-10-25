@@ -48,15 +48,14 @@ namespace Actor
             return;
         }
 
-        auto components = pObject->GetComponents();
-        for (auto itr = components->begin(); itr != components->end(); ++itr)
-        {
-            if (itr->first.Null()) continue;
+        pObject->ForeachComponents(
+            [this](const Core::Common::Handle& in_rHandle, Actor::Component* in_pCmp)
+            {
+                if (in_rHandle.Null()) return TRUE;
 
-            Component* pTarget = reinterpret_cast<Component*>(itr->second);
-            HE_ASSERT(pTarget);
-            this->VOnActorUnRegistComponent(pTarget);
-        }
+                this->VOnActorUnRegistComponent(in_pCmp);
+                return TRUE;
+            });
 
         this->_taskManager.RemoveTask(in_pActorHandle);
     }
@@ -83,6 +82,19 @@ namespace Actor
 
     void ActorManager::BeginUpdate(const Float32 in_fDt)
     {
+        {
+            const Uint32 uMax = this->_GetUpdateGroupMax();
+            for (Uint32 i = 0; i < uMax; ++i)
+            {
+                this->_taskManager.ForeachByGroup(i,
+                                                  [in_fDt](Core::Task* in_pTask)
+                                                  {
+                                                      auto pObj =
+                                                          reinterpret_cast<Object*>(in_pTask);
+                                                      pObj->VBeginUpdate(in_fDt);
+                                                  });
+            }
+        }
     }
 
     void ActorManager::Update(const Float32 in_fDt)
@@ -103,7 +115,19 @@ namespace Actor
     {
         this->_UpdatePending();
 
-        if (this->_upDecorator) this->_upDecorator->VLateUpdate(in_fDt, this);
+        {
+            const Uint32 uMax = this->_GetUpdateGroupMax();
+            for (Uint32 i = 0; i < uMax; ++i)
+            {
+                this->_taskManager.ForeachByGroup(i,
+                                                  [in_fDt](Core::Task* in_pTask)
+                                                  {
+                                                      auto pObj =
+                                                          reinterpret_cast<Object*>(in_pTask);
+                                                      pObj->VLateUpdate(in_fDt);
+                                                  });
+            }
+        }
     }
 
     void ActorManager::Event(const Core::TaskData& in_rTaskData)

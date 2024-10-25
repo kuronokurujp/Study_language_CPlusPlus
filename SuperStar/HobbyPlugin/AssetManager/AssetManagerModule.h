@@ -67,7 +67,6 @@ namespace AssetManager
         /// <summary>
         /// アセット格納ディレクトリ設定
         /// </summary>
-        /// <param name="in_szMountDir"></param>
         void SetMountDir(const Char* in_szMountDir) { this->_mountDirPath = in_szMountDir; }
 
     protected:

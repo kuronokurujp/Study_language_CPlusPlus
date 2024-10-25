@@ -23,8 +23,6 @@
 
 #include <Windows.h>
 
-#include <string>
-
 #define HE_LOG_MSG_SIZE (2046)
 #define HE_FILE __FILEW__
 
@@ -93,7 +91,8 @@ void HE_LOG(const Char* in_szFormat, Args... in_args)
     static Char szText[HE_LOG_MSG_SIZE] = {};
     if (HE_LOG_CREATE_FORMATERD_STRING(szText, in_szFormat, in_args...) == FALSE)
     {
-        return;  // エラーが発生した場合は何もしない
+        // エラーが発生した場合は何もしない
+        return;
     }
 
     // コンソールなどデバッグ画面で出力
@@ -121,7 +120,8 @@ void HE_LOG_LINE(const Char* in_szFormat, Args... in_args)
     static Char szText[HE_LOG_MSG_SIZE] = {};
     if (HE_LOG_CREATE_FORMATERD_STRING(szText, in_szFormat, in_args...) == FALSE)
     {
-        return;  // エラーが発生した場合は何もしない
+        // エラーが発生した場合は何もしない
+        return;
     }
 
     // コンソールなどデバッグ画面で出力
@@ -204,22 +204,22 @@ void HE_LOG_LINE(const Char* in_szFormat, Args... in_args)
 
 #endif
 
-// 配列の要素数を返す
+// 配列の要素数
 // 配列のポイントでは利用できない
 #define HE_ARRAY_NUM(_array_) (sizeof((_array_)) / sizeof(((_array_)[0])))
 
-// 配列の全データサイズ取得
+// 配列の全データサイズ
 // 配列のポイントでは利用できない
 #define HE_ARRAY_SIZE(_tbl_) (sizeof(_tbl_))
 
 // コンパイル時のアサート
-// exprがFALSEになると, コンパイル時にエラー
-// コンパイル時に値を決定出来ない式には使えない
-#define HE_STATIC_ASSERT(_expr_)                     \
-    {                                                \
-        Sint8 static_assert_error[(_expr_) ? 1 : 0]; \
-        (void)static_assert_error;                   \
-    }
+#define HE_STATIC_ASSERT(...)                                                      \
+    static_assert(__VA_ARGS__) /*                                                  \
+                                  {                                                \
+                                      Sint8 static_assert_error[(_expr_) ? 1 : 0]; \
+                                      (void)static_assert_error;                   \
+                                  }                                                \
+                              */
 
 // デフォルトコンストラクタを封印
 #define HE_CLASS_DEFAULT_CONSTRUCT_NG(_x_) _x_() = delete;

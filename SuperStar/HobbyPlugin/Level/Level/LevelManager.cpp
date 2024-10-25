@@ -51,7 +51,6 @@ namespace Level
             this->_nextLevelHandle.Clear();
         }
 
-        // TODO: 各レベルノードに登録したアクターはコリジョン処理する
         this->_upNodeManager->BeginUpdate(in_fDt);
     }
 
