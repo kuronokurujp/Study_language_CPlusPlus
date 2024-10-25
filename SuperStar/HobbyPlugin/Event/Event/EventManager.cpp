@@ -5,7 +5,7 @@
 namespace Event
 {
     EventManager::EventManager(Core::Memory::UniquePtr<EventManagerStrategyInterface> in_upStrategy)
-        : _sActiveQueue(0)
+        : _iActiveQueue(0)
     {
         this->_upStrategy = std::move(in_upStrategy);
     }
@@ -13,7 +13,7 @@ namespace Event
     EventManager::~EventManager()
     {
         this->Release();
-        this->_sActiveQueue = 0;
+        this->_iActiveQueue = 0;
     }
 
     Bool EventManager::EmptyEvent() const
@@ -195,12 +195,12 @@ namespace Event
 
     Bool EventManager::QueueEvent(EventDataInterfacePtr const& in_spEvent)
     {
-        HE_ASSERT(0 <= this->_sActiveQueue);
-        HE_ASSERT(this->_sActiveQueue < EConstants_NumQueues);
+        HE_ASSERT(0 <= this->_iActiveQueue);
+        HE_ASSERT(this->_iActiveQueue < EConstants_NumQueues);
 
         if (this->ValidateHash(in_spEvent->VEventTypeHash()) == FALSE) return FALSE;
 
-        this->_aQueue[this->_sActiveQueue].push_back(in_spEvent);
+        this->_aQueue[this->_iActiveQueue].push_back(in_spEvent);
 
         return TRUE;
     }
@@ -244,11 +244,11 @@ namespace Event
 
         // アクティブなキューを交換する。
         // 交換後の新しいキューは空でなければならない。
-        Sint32 sQueueToProcess = this->_sActiveQueue;
+        Sint32 sQueueToProcess = this->_iActiveQueue;
 
         // 新しいキューのイベントはクリア
-        this->_sActiveQueue = (this->_sActiveQueue + 1) % EConstants_NumQueues;
-        this->_aQueue[this->_sActiveQueue].clear();
+        this->_iActiveQueue = (this->_iActiveQueue + 1) % EConstants_NumQueues;
+        this->_aQueue[this->_iActiveQueue].clear();
 
         // 特殊イベントをリスナーが受け取り処理
         auto itSpecalEventListener = this->_mRegistry.FindKey(BaseEventData::EType_SpecalEvent);
@@ -311,11 +311,12 @@ namespace Event
         const Bool bQueueFlushed = (this->_aQueue[sQueueToProcess].size() == 0);
         {
             // キュー内にイベントが残っている場合は次のフレームでイベントを処理するようにアクティブリストに入れる
+            // TODO: 数が多くなると負荷が高い
             while (0 < this->_aQueue[sQueueToProcess].size())
             {
                 EventDataInterfacePtr spEvent = this->_aQueue[sQueueToProcess].back();
                 this->_aQueue[sQueueToProcess].pop_back();
-                this->_aQueue[this->_sActiveQueue].push_front(spEvent);
+                this->_aQueue[this->_iActiveQueue].push_front(spEvent);
             }
         }
 

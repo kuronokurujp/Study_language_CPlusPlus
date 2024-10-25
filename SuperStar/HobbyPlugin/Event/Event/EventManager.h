@@ -11,7 +11,6 @@
 namespace Event
 {
     using EventListenerList = std::vector<EventListenerPtr>;
-    using EventTypeStrList  = Core::Common::CustomFixVector<EventTypeStr, 256>;
 
     /// <summary>
     /// イベント管理のストラテジーインターフェイス
@@ -89,8 +88,6 @@ namespace Event
         using EventListenerTable = std::list<EventListenerPtr>;
         // イベント識別子をリスナーリストにマッピング
         using EventListenerMap = Core::Common::CustomFixMap<Uint64, EventListenerTable, 512>;
-        // イベントリスナーマップのエントリ
-        using EventListenerMapEnt = std::pair<Uint32, EventListenerTable>;
         // 処理待ちイベントのキュー、または処理中のイベントのキュー
         using EventQueue = std::list<EventDataInterfacePtr>;
 
@@ -102,9 +99,8 @@ namespace Event
 
         // どのキューがアクティブ処理されているか？
         // キューに入ろうとするイベントは他方のキューに置かれる
-        Sint32 _sActiveQueue = 0;
+        Sint32 _iActiveQueue = 0;
 
         Core::Memory::UniquePtr<EventManagerStrategyInterface> _upStrategy;
     };
-
 }  // namespace Event
