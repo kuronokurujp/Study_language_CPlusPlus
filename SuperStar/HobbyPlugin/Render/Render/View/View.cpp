@@ -8,12 +8,22 @@ namespace Render
         return TRUE;
     }
 
-    Bool View::AddCmd(const Command&& in_rrCmd)
+    Bool View::PushCmd(const Command&& in_rrCmd)
     {
         // コマンドをコピー
-        this->_commandBuff.PushBack(in_rrCmd);
+        // 要素を先頭に追加
+        // 最後に追加したコマンドは配列先頭に
+        // 最初に追加したコマンドは配列末尾に
+        this->_commandBuff.PushFront(in_rrCmd);
 
         return TRUE;
+    }
+
+    // 描画コマンドを排出
+    const Command* View::PopCmd()
+    {
+        // 古いコマンドを優先に排出
+        return this->_commandBuff.PopBack();
     }
 
 }  // namespace Render

@@ -26,7 +26,7 @@ namespace Render
         // 点描画
         ECmdType_2DPointDraw,
         // TODO: 点群描画
-        ECmdType_2DPointCloudDraw,
+        ECmdType_2DPointArrayDraw,
         // 円の描画
         ECmdType_2DCircleDraw
     };
@@ -69,10 +69,10 @@ namespace Render
     /// <summary>
     /// 2D上で点群を描画
     /// </summary>
-    struct Cmd2DPointCloudDraw
+    struct Cmd2DPointArrayDraw
     {
-        Point2D* pPoints = NULL;
-        Uint32 uNum      = 0;
+        const Point2D* aPoint = NULL;
+        Uint32 uCount         = 0;
     };
 
     /// <summary>
@@ -108,7 +108,7 @@ namespace Render
             Cmd2DTextDraw text2DDraw;
             Cmd2DRectDraw rect2DDraw;
             Cmd2DPointDraw point2DDraw;
-            Cmd2DPointCloudDraw pointCloud2DDraw;
+            Cmd2DPointArrayDraw pointCloud2DDraw;
             Cmd2DCircleDraw circle2DDraw;
 
         } data;
@@ -136,8 +136,8 @@ namespace Render
     /// <summary>
     /// 2D点群描画
     /// </summary>
-    extern void Command2DPointCloudDraw(const Core::Common::Handle& in_rViewHandle,
-                                        const Point2D* in_pPoints, const Uint32 in_uCount);
+    extern void Command2DPointArrayDraw(const Core::Common::Handle& in_rViewHandle,
+                                        const Point2D* in_aPoint, const Uint32 in_uCount);
 
     /// <summary>
     /// 画面クリア

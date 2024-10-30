@@ -1,17 +1,17 @@
-﻿#include "InGameRendererUserShipComponent.h"
+﻿#include "InGameRendererEnemyZakoComponent.h"
 
 // 利用するモジュール一覧
 #include "RenderModule.h"
 
 namespace InGame
 {
-    void InGameRendererUserShipComponent::SetSize(Core::Math::Vector2& in_rSize)
+    void InGameRendererEnemyZakoComponent::SetSize(Core::Math::Vector2& in_rSize)
     {
         this->_size = in_rSize;
     }
 
-    void InGameRendererUserShipComponent::_VRenderer(Core::Common::Handle& in_rViewHandle,
-                                                     Actor::TransformComponent* in_pTrans)
+    void InGameRendererEnemyZakoComponent::_VRenderer(Core::Common::Handle& in_rViewHandle,
+                                                      Actor::TransformComponent* in_pTrans)
     {
         // 描画座標取得
         Core::Math::Rect2 rect;

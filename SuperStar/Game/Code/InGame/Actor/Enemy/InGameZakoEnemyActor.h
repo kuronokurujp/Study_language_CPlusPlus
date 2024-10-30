@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "InGame/Actor/InGameScene2DActor.h"
+
 // エンジンの最小インクルード
 #include "Engine/MiniEngine.h"
 
@@ -11,9 +13,9 @@ namespace InGame
     /// <summary>
     /// 雑魚敵
     /// </summary>
-    class InGameEnemyZakoActor final : public Actor::Object
+    class InGameEnemyZakoActor final : public InGameScene2DActor
     {
-        HE_GENERATED_CLASS_BODY_HEADER(InGameEnemyZakoActor, Actor::Object);
+        HE_GENERATED_CLASS_BODY_HEADER(InGameEnemyZakoActor, InGameScene2DActor);
 
     public:
         InGameEnemyZakoActor();
@@ -22,6 +24,7 @@ namespace InGame
         Bool VBegin() override final;
 
         void VUpdate(const Float32 in_fDt) override final;
+
         // virtual bool update(void);
         // virtual void draw(void);
 

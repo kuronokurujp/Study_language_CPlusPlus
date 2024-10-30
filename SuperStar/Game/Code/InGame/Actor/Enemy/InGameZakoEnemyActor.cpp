@@ -23,7 +23,7 @@ namespace InGame
             "./resource/script/enemy/zako_knight.lua",
         };
     */
-    InGameEnemyZakoActor::InGameEnemyZakoActor() : Actor::Object()
+    InGameEnemyZakoActor::InGameEnemyZakoActor() : InGameScene2DActor()
     {
         this->_Clear();
 
@@ -36,20 +36,14 @@ namespace InGame
 
     Bool InGameEnemyZakoActor::VBegin()
     {
-        if (Actor::Object::VBegin() == FALSE) return FALSE;
+        if (InGameScene2DActor::VBegin() == FALSE) return FALSE;
 
         return TRUE;
     }
 
     void InGameEnemyZakoActor::VUpdate(const Float32 in_fDt)
     {
-        Actor::Object::VUpdate(in_fDt);
-
-        /*
-                // TODO: 描画
-                // 描画コマンド追加
-                Render::Command2DRectDraw(this->_viewHandle, rect, Render::RGB::White);
-                */
+        InGameScene2DActor::VUpdate(in_fDt);
     }
 
 #if 0

@@ -33,7 +33,7 @@ namespace Render
         HE_ASSERT(pView);
         if (pView == NULL) return;
 
-        pView->AddCmd(std::move(cmd));
+        pView->PushCmd(std::move(cmd));
     }
 
     void Command2DRectDraw(const Core::Common::Handle& in_rViewHandle,
@@ -60,7 +60,7 @@ namespace Render
         HE_ASSERT(pView);
         if (pView == NULL) return;
 
-        pView->AddCmd(std::move(cmd));
+        pView->PushCmd(std::move(cmd));
     }
 
     void Command2DPointDraw(const Core::Common::Handle& in_rViewHandle,
@@ -85,14 +85,30 @@ namespace Render
         HE_ASSERT(pView);
         if (pView == NULL) return;
 
-        pView->AddCmd(std::move(cmd));
+        pView->PushCmd(std::move(cmd));
     }
 
-    void Command2DPointCloudDraw(const Core::Common::Handle& in_rViewHandle,
-                                 const Point2D* in_pPoints, const Uint32 in_uCount)
+    void Command2DPointArrayDraw(const Core::Common::Handle& in_rViewHandle,
+                                 const Point2D* in_aPoint, const Uint32 in_uCount)
     {
         // TODO: 点群描画コマンドを作る
         HE_ASSERT(in_rViewHandle.Null() == FALSE);
+        auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
+        auto pView   = pModule->GetView(in_rViewHandle);
+        HE_ASSERT(pView);
+        if (pView == NULL) return;
+
+        // 必要なコマンド情報を作る
+        Command cmd;
+        {
+            cmd.uType                 = ECmdType_2DPointArrayDraw;
+            Cmd2DPointArrayDraw* pCmd = &cmd.data.pointCloud2DDraw;
+            HE_STATIC_ASSERT(sizeof(cmd.data.pointCloud2DDraw) <= sizeof(cmd.data.ulaWork));
+            // 引数のポインタをそのまま使用している
+            pCmd->aPoint = in_aPoint;
+            pCmd->uCount = in_uCount;
+        }
+        pView->PushCmd(std::move(cmd));
     }
 
     void CommandClsScreen(const Core::Common::Handle& in_rViewHandle, const Color& in_rColor)
@@ -112,7 +128,7 @@ namespace Render
         HE_ASSERT(pView);
         if (pView == NULL) return;
 
-        pView->AddCmd(std::move(cmd));
+        pView->PushCmd(std::move(cmd));
     }
 
     void Command2DCircleDraw(const Core::Common::Handle& in_rViewHandle,
@@ -140,7 +156,7 @@ namespace Render
 
         if (pView == NULL) return;
 
-        pView->AddCmd(std::move(cmd));
+        pView->PushCmd(std::move(cmd));
     }
 
 }  // namespace Render

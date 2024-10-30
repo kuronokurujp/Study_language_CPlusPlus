@@ -83,7 +83,7 @@ namespace Level
         const Core::Common::Handle AddLevel()
         {
             HE_STATIC_ASSERT(std::is_base_of<Node, T>::value,
-                          "Tクラスはレベルのノードクラスを継承していない");
+                             "Tクラスはレベルのノードクラスを継承していない");
 
             // ノード管理にレベルを追加
             auto pNodeManager = this->_pOwner;
@@ -103,7 +103,7 @@ namespace Level
         T* GetActor(const Core::Common::Handle& in_rHandle)
         {
             HE_STATIC_ASSERT(std::is_base_of<Actor::Object, T>::value,
-                          "Tクラスはアクターのクラスを継承していない");
+                             "Tクラスはアクターのクラスを継承していない");
 
             HE_ASSERT(in_rHandle.Null() == FALSE);
             return reinterpret_cast<T*>(this->_actorManager.Get(in_rHandle));

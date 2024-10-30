@@ -1,13 +1,8 @@
 ﻿#include "InGamePlayerActor.h"
 
-#include "Actor/Component/InputComponent.h"
-#include "Actor/Component/TransformComponent.h"
 #include "InGame/Component/InGameCollisionComponent.h"
 #include "InGame/Component/InGameShotComponent.h"
 #include "InGame/Shot/InGameShotStrategy.h"
-
-// 依存するモジュール一覧
-#include "RenderModule.h"
 
 #if 0
 
@@ -20,28 +15,19 @@
 #include "shot/WayBulletEmit.h"
 #include "system/System.h"
 #include "tips/Primitive.h"
+
 #endif
 
 namespace InGame
 {
-    InGamePlayerActor::InGamePlayerActor() : Actor::Object()
+    InGamePlayerActor::InGamePlayerActor() : InGameScene2DActor()
     {
         this->_Clear();
     }
 
     Bool InGamePlayerActor::VBegin()
     {
-        if (Actor::Object::VBegin() == FALSE) return FALSE;
-
-        // 座標関連のコンポーネント追加
-        {
-            this->_transformHandle = this->AddComponent<Actor::TransformComponent>(1);
-            HE_ASSERT((this->_transformHandle.Null() == FALSE) &&
-                      "トランスフォームコンポーネントの追加失敗");
-
-            // 事前に設定していた座標をトランスフォームコンポーネントに設定
-            this->SetPos(this->_pos);
-        }
+        if (InGameScene2DActor::VBegin() == FALSE) return FALSE;
 
         // 当たり判定コンポーネント追加
         {
@@ -51,6 +37,7 @@ namespace InGame
 
             pComponent->SetRadius(HE_MIN(this->_size._fX, this->_size._fY));
             pComponent->SetCollisionHashCode(HE_STR_TEXT("Player"));
+
             //  TODO: 当たった時の処理を追加
             pComponent->SetHitAction([](const CollisionData& in_rSelf, const CollisionData& in_rHit)
                                      { HE_LOG_LINE(HE_STR_TEXT("Hit")); });
@@ -121,12 +108,12 @@ namespace InGame
             itr->data.reset();
         }
 
-        return Actor::Object::VEnd();
+        return InGameScene2DActor::VEnd();
     }
 
     void InGamePlayerActor::VUpdate(const Float32 in_fDt)
     {
-        Actor::Object::VUpdate(in_fDt);
+        InGameScene2DActor::VUpdate(in_fDt);
 
         // 移動情報による座標更新
         {
@@ -136,49 +123,13 @@ namespace InGame
 
             this->SetPos(newPos);
         }
-
-        /*
-                // 描画座標取得
-                Core::Math::Rect2 rect;
-                {
-                    auto pTrans =
-           this->GetComponent<Actor::TransformComponent>(this->_transformHandle); HE_ASSERT(pTrans);
-
-                    Core::Math::Rect2 srcRect(0.0f, 0.0f, this->_size._fX, this->_size._fY,
-                                              Core::Math::Rect2::EAnchor_Center);
-                    pTrans->TransformLocalToWorldRect2D(&rect, srcRect);
-                }
-
-                // 描画コマンド追加
-                // TODO: 画像表示に切り替えるかも
-                Render::Command2DRectDraw(this->_viewHandle, rect, Render::RGB::White);
-                */
-    }
-
-    void InGamePlayerActor::SetPos(const Core::Math::Vector2& in_rPos)
-    {
-        this->_pos = in_rPos;
-
-        if (this->_transformHandle.Null()) return;
-
-        // 事前に設定していた座標をトランスフォームコンポーネントに設定
-        auto pTrans = this->GetComponent<Actor::TransformComponent>(this->_transformHandle);
-        HE_ASSERT(pTrans);
-
-        pTrans->SetPos(Core::Math::Vector3(this->_pos));
     }
 
     void InGamePlayerActor::SetSize(const Core::Math::Vector2& in_rSize)
     {
         this->_size = in_rSize;
     }
-    /*
-        void InGamePlayerActor::SetViewHandle(const Core::Common::Handle& in_rHandle)
-        {
-            HE_ASSERT(in_rHandle.Null() == FALSE);
-            //this->_viewHandle = in_rHandle;
-        }
-    */
+
     void InGamePlayerActor::Move(const Core::Math::Vector2& in_rMove)
     {
         this->_move.Zero();

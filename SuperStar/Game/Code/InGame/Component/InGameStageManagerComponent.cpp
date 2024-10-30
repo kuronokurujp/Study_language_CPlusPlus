@@ -1,6 +1,8 @@
 ﻿#include "InGameStageManagerComponent.h"
 
+#include "InGame/Actor/Enemy/InGameZakoEnemyActor.h"
 #include "InGame/Actor/Player/InGamePlayerActor.h"
+#include "InGame/Component/Renderer/InGameRendererEnemyZakoComponent.h"
 #include "InGame/Component/Renderer/InGameRendererUserShipComponent.h"
 
 // ゲームキャラクター用のイベント
@@ -85,13 +87,13 @@ namespace InGame
             this->_characterEventHandle = pEventModule->AddEventManager(std::move(upStrategy));
             HE_ASSERT(this->_characterEventHandle.Null() == FALSE);
 
-            this->_characterEventListener =
+            this->_spCharacterEventListener =
                 HE_MAKE_CUSTOM_SHARED_PTR(Event::EventListenerWithRegistEventFunc,
                                           HE_STR_TEXT("LevelInGameCharacterListener"),
                                           [this](Event::EventDataInterfacePtr const& in_spEventData)
                                           { return this->_HandleCharacterEvent(in_spEventData); });
 
-            if (pEventModule->AddListener(this->_characterEventListener,
+            if (pEventModule->AddListener(this->_spCharacterEventListener,
                                           INGAME_CHARACTER_EVENT_TYPE_NAME) == FALSE)
             {
                 HE_ASSERT(0 && "キャラクターイベントリスナー設定に失敗");
@@ -181,9 +183,29 @@ namespace InGame
             auto pEvent = reinterpret_cast<EventCharacterPutEnemy*>(in_spEventData.get());
             HE_ASSERT(pEvent != NULL);
 
+            // idはかぶらないようにする
+            static Uint32 s_uEnemyId = 0;
+
             // TODO: タグに応じた敵を生成する
             switch (pEvent->_eEnemyTag)
             {
+                case EEnemyTag::EEnemyTag_Zako:
+                {
+                    auto [actorHandle, pActor] =
+                        this->AddActorByHandleAndActor<InGameEnemyZakoActor>();
+                    auto [compHandle, pComp] =
+                        pActor->AddComponentByHandleAndComp<InGameRendererEnemyZakoComponent>(0);
+                    pComp->SetViewHandle(this->_viewHandle);
+                    // TODO: パラメータはテスト
+                    pComp->SetSize(Core::Math::Vector2(32.0f, 32.0f));
+                    pActor->SetPos(pEvent->_pos);
+
+                    ++s_uEnemyId;
+                    this->_mEnemyMap.Add(s_uEnemyId, pActor);
+
+                    break;
+                }
+
                 default:
                     break;
             }

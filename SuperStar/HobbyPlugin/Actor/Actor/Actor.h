@@ -1,12 +1,12 @@
 ﻿#pragma once
 
 #include "Actor/Component/Component.h"
-#include "Engine/Common/CustomList.h"
 #include "Engine/Common/CustomStack.h"
-#include "Engine/Math/Math.h"
-#include "Engine/MiniEngine.h"
 #include "Engine/Task/TaskManager.h"
 #include "Engine/Task/TaskTree.h"
+
+// 最小エンジンのインクルード
+#include "Engine/MiniEngine.h"
 
 // 前方宣言
 namespace Platform
@@ -57,7 +57,6 @@ namespace Actor
         /// 生成直後の設定処理
         /// データ初期化はここで行う
         /// </summary>
-        /// <param name="in_bAutoDelete"></param>
         virtual void VSetup(const Bool in_bAutoDelete) override;
 
         /// <summary>
@@ -107,24 +106,6 @@ namespace Actor
             }
 
             return h;
-
-            /*
-            // TODO: アクターの準備が整う前に呼ばれるケースもある
-            // その場合はペンディングリストに追加して準備が整った時にコンポーネントを追加する
-            HE_ASSERT(0 <= in_uUpdateOrder);
-            HE_ASSERT(in_uUpdateOrder < static_cast<Sint32>(this->_components.GetMaxGroup()));
-
-            // TODO: 更新優先準備による追加処理を指定が必要
-            // コンポーネントは確保したメモリを使いまわす
-            auto handle = this->_components.CreateAndAdd<T>(in_uUpdateOrder, FALSE);
-            if (this->_VSetupComponent(this->_components.GetTask<Component>(handle)) == FALSE)
-            {
-                this->_components.RemoveTask(&handle);
-                return NullHandle;
-            }
-
-            return handle;
-            */
         }
 
         /// <summary>
@@ -260,12 +241,6 @@ namespace Actor
 
         void ForeachComponents(
             std::function<Bool(const Core::Common::Handle&, Component*)> in_func);
-        /*
-        inline const std::unordered_map<Core::Common::Handle, Core::Task*>* GetComponents() const
-        {
-            return this->_components.GetUserDataList();
-        }
-        */
 
         inline Bool ValidComponent(const Core::Common::Handle& in_h)
         {

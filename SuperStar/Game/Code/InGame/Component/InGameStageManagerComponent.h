@@ -1,7 +1,10 @@
 ﻿#pragma once
 
-#include "Engine/MiniEngine.h"
+#include "Engine/Common/CustomMap.h"
 #include "InGame/Event/InGameEventCharacter.h"
+
+// 最小エンジンのインクルード
+#include "Engine/MiniEngine.h"
 
 // 利用モジュール
 #include "EventModule.h"
@@ -103,7 +106,9 @@ namespace InGame
                 std::vector<class C_EnemyActorBase*> m_aMapSettingEnemyList;
                 */
         Core::Common::Handle _characterEventHandle;
-        Core::Memory::SharedPtr<Event::EventListenerInterface> _characterEventListener;
+        Core::Memory::SharedPtr<Event::EventListenerInterface> _spCharacterEventListener;
+
+        Core::Common::CustomFixMap<Uint32, Actor::Object*, 256> _mEnemyMap;
     };
 
 }  // namespace InGame

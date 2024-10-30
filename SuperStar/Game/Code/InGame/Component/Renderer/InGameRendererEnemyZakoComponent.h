@@ -8,15 +8,15 @@ namespace InGame
     /// <summary>
     /// ユーザー船のレンダリングコンポーネント
     /// </summary>
-    class InGameRendererUserShipComponent final : public InGameRendererBaseComponent
+    class InGameRendererEnemyZakoComponent final : public InGameRendererBaseComponent
     {
-        HE_CLASS_COPY_NG(InGameRendererUserShipComponent);
-        HE_CLASS_MOVE_NG(InGameRendererUserShipComponent);
-        HE_GENERATED_CLASS_BODY_HEADER(InGameRendererUserShipComponent,
+        HE_CLASS_COPY_NG(InGameRendererEnemyZakoComponent);
+        HE_CLASS_MOVE_NG(InGameRendererEnemyZakoComponent);
+        HE_GENERATED_CLASS_BODY_HEADER(InGameRendererEnemyZakoComponent,
                                        InGameRendererBaseComponent);
 
     public:
-        InGameRendererUserShipComponent() = default;
+        InGameRendererEnemyZakoComponent() = default;
 
         void SetSize(Core::Math::Vector2&);
 

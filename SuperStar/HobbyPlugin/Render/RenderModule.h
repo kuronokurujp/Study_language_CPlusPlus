@@ -34,7 +34,6 @@ namespace Render
         /// <summary>
         /// レンダリングビューを追加
         /// </summary>
-        /// <returns></returns>
         const Core::Common::Handle AddView(const Uint32 in_uPriority = EPriority_None);
 
         /// <summary>
@@ -55,7 +54,6 @@ namespace Render
         /// <summary>
         /// ビューのハンドル群を取得
         /// </summary>
-        /// <returns></returns>
         inline const ViewHandleVector& ViewHandles() const { return this->_vViewHandle; }
 
     protected:

@@ -7,6 +7,11 @@
 // 外部モジュール
 #include "LevelModule.h"
 
+namespace Render
+{
+    struct Point2D;
+};
+
 namespace Level
 {
     class LevelInGame_BG : public Level::Node
@@ -26,7 +31,9 @@ namespace Level
         void VUpdate(const Float32 in_fDt) override final;
 
     private:
-        Core::Common::CustomArray<Core::Math::Vector2, 64> _aPointPos;
+        Render::Point2D* _aPoint  = NULL;
+        const Uint32 _uPointCount = 64;
+
         Core::Common::Handle _viewHandle;
     };
 }  // namespace Level

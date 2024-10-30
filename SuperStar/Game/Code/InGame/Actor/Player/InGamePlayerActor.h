@@ -1,19 +1,17 @@
 ﻿#pragma once
 
 #include "Engine/Common/CustomMap.h"
+#include "InGame/Actor/InGameScene2DActor.h"
 #include "InGame/Shot/InGameShotStrategyInterface.h"
 
 // エンジンの最小インクルード
 #include "Engine/MiniEngine.h"
 
-// 利用モジュール
-#include "ActorModule.h"
-
 namespace InGame
 {
-    class InGamePlayerActor final : public Actor::Object
+    class InGamePlayerActor final : public InGameScene2DActor
     {
-        HE_GENERATED_CLASS_BODY_HEADER(InGamePlayerActor, Actor::Object);
+        HE_GENERATED_CLASS_BODY_HEADER(InGamePlayerActor, InGameScene2DActor);
 
     public:
         /// <summary>
@@ -48,9 +46,7 @@ namespace InGame
 
         void VUpdate(const Float32 in_fDt) override final;
 
-        void SetPos(const Core::Math::Vector2&);
         void SetSize(const Core::Math::Vector2&);
-//        void SetViewHandle(const Core::Common::Handle&);
 
         void Move(const Core::Math::Vector2&);
         void Shot();
@@ -74,12 +70,8 @@ namespace InGame
     private:
         void _Clear()
         {
-            this->_pos.Zero();
             this->_size.Zero();
             this->_move.Zero();
-
-            this->_transformHandle.Clear();
-            //            this->_viewHandle.Clear();
         }
 
     private:
@@ -98,13 +90,10 @@ namespace InGame
             Sint32 m_aShotHandle[eSHOT_MAX];
             */
 
-        Core::Math::Vector2 _pos;
         Core::Math::Vector2 _size;
         Core::Math::Vector2 _move;
 
-        Core::Common::Handle _transformHandle;
         Core::Common::Handle _collisoinHandle;
-        //        Core::Common::Handle _viewHandle;
         Core::Common::Handle _shotHandle;
 
         // ランタイム中に変化するパラメータ

@@ -1,8 +1,10 @@
 ﻿#pragma once
 
 #include "Engine/Math/Rect2.h"
-#include "Engine/MiniEngine.h"
 #include "Engine/Task/Task.h"
+
+// 最小エンジンのインクルード
+#include "Engine/MiniEngine.h"
 
 namespace Actor
 {

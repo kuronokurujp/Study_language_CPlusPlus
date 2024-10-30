@@ -31,10 +31,17 @@ set(TARGET_FILES
 	Code/InGame/Component/InGameShotComponent.h
 	Code/InGame/Component/Renderer/InGameRendererUserShipComponent.cpp
 	Code/InGame/Component/Renderer/InGameRendererUserShipComponent.h
+	Code/InGame/Component/Renderer/InGameRendererEnemyZakoComponent.cpp
+	Code/InGame/Component/Renderer/InGameRendererEnemyZakoComponent.h
+	Code/InGame/Component/Renderer/InGameRendererBaseComponent.cpp
+	Code/InGame/Component/Renderer/InGameRendererBaseComponent.h
 
 	Code/InGame/Shot/InGameShotStrategy.cpp
 	Code/InGame/Shot/InGameShotStrategy.h
 	Code/InGame/Shot/InGameShotStrategyInterface.h
+
+	Code/InGame/Actor/InGameScene2DActor.cpp
+	Code/InGame/Actor/InGameScene2DActor.h
 
 	Code/InGame/Actor/Player/InGamePlayerActor.cpp
 	Code/InGame/Actor/Player/InGamePlayerActor.h

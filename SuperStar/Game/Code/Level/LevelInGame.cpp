@@ -170,9 +170,16 @@ namespace Level
         if (in_pInputMap->Contains(Local::szInputShot))
         {
             // TODO: イベントを作成処理は重いかも
-            // 自前ロケーターを使っているが, それでも毎回メモリ確保しているのはまずいか
+            // 自前アロケーターを使っているが, それでも毎回メモリ確保しているのはまずいか
             auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR(InGame::EventCharacterAttack, 0,
                                                      InGame::EObjectTag_Player, 0);
+            pEventModule->QueueEvent(spEvent);
+            /*
+            // TODO: 敵を出してみる
+            auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR(InGame::EventCharacterPutEnemy, 0,
+                                                     Core::Math::Vector2(320.0f, 110.0f),
+                                                     InGame::EEnemyTag::EEnemyTag_Zako, 0);
+            */
             pEventModule->QueueEvent(spEvent);
         }
 

@@ -16,7 +16,10 @@ namespace Render
 
         // 描画コマンドを追加
         // コマンドデータは呼び出し元のものにするためにstd::move()で渡す
-        Bool AddCmd(const Command&& in_rrCmd);
+        Bool PushCmd(const Command&& in_rrCmd);
+
+        // 描画コマンドを排出
+        const Command* PopCmd();
 
         /// <summary>
         /// コマンドをクリア

@@ -25,13 +25,17 @@ namespace Level
             auto pScreen   = pPlatform->VScreen();
             auto pSystem   = pPlatform->VSystem();
 
-            Uint32 uW = pScreen->VWidth();
-            Uint32 uH = pScreen->VHeight();
-            for (Uint32 i = 0; i < this->_aPointPos.Capacity(); ++i)
+            Uint32 uW     = pScreen->VWidth();
+            Uint32 uH     = pScreen->VHeight();
+            this->_aPoint = HE_NEW_ARRAY(Render::Point2D, this->_uPointCount, 0);
+            for (Uint32 i = 0; i < this->_uPointCount; ++i)
             {
-                const Float32 fX = static_cast<Float32>(pSystem->VGetRand(uW));
-                const Float32 fY = static_cast<Float32>(pSystem->VGetRand(uH));
-                this->_aPointPos[i].Set(fX, fY);
+                const Float32 fX   = static_cast<Float32>(pSystem->VGetRand(uW));
+                const Float32 fY   = static_cast<Float32>(pSystem->VGetRand(uH));
+                Render::Point2D* p = &this->_aPoint[i];
+                p->fX              = fX;
+                p->fY              = fY;
+                p->color           = Render::RGB::White;
             }
         }
 
@@ -40,6 +44,8 @@ namespace Level
 
     Bool LevelInGame_BG::VEnd()
     {
+        HE_SAFE_DELETE_ARRAY(this->_aPoint);
+
         auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
         pRenderModule->RemoveView(this->_viewHandle);
 
@@ -60,23 +66,20 @@ namespace Level
 
         const Float32 fMaxXPos = static_cast<Float32>(uW);
         // 左から右へ動かす
-        for (Uint32 i = 0; i < this->_aPointPos.Capacity(); ++i)
+        for (Uint32 i = 0; i < this->_uPointCount; ++i)
         {
-            this->_aPointPos[i]._fX -= 0.5f;
-            if (0 > this->_aPointPos[i]._fX)
+            this->_aPoint[i].fX -= 0.5f;
+            if (this->_aPoint[i].fX < 0)
             {
-                this->_aPointPos[i]._fX = fMaxXPos;
-                this->_aPointPos[i]._fY = pSystem->VGetRand(uH);
+                this->_aPoint[i].fX = fMaxXPos;
+                this->_aPoint[i].fY = pSystem->VGetRand(uH);
             }
         }
 
         // 背景を黒くする
         Render::CommandClsScreen(this->_viewHandle, Render::RGB::Black);
 
-        // 点を描画
-        for (Uint32 i = 0; i < this->_aPointPos.Capacity(); ++i)
-        {
-            Render::Command2DPointDraw(this->_viewHandle, this->_aPointPos[i], Render::RGB::White);
-        }
+        // 点をまとめて設定して描画
+        Render::Command2DPointArrayDraw(this->_viewHandle, this->_aPoint, this->_uPointCount);
     }
 }  // namespace Level

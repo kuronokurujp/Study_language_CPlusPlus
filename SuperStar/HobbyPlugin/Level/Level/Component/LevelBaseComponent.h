@@ -1,10 +1,12 @@
 ﻿#pragma once
 
-#include "Actor/Component/Component.h"
 #include "Level/LevelNode.h"
 
 // エンジン最小インクルード
 #include "Engine/MiniEngine.h"
+
+// 利用モジュール
+#include "ActorModule.h"
 
 namespace Level
 {
@@ -31,6 +33,13 @@ namespace Level
             auto pNode = reinterpret_cast<Node*>(this->_pOwner);
             HE_ASSERT(pNode);
             return pNode->AddActor<T>();
+        }
+
+        template <class T>
+        std::tuple<Core::Common::Handle, T*> AddActorByHandleAndActor()
+        {
+            auto handle = this->AddActor<T>();
+            return std::make_tuple(handle, this->GetActor<T>(handle));
         }
 
         // レベルに追加されたアクターを削除

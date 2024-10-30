@@ -1,12 +1,19 @@
 ﻿#include "DXLibModule.h"
 
+#include <algorithm>
+
 #include "DxLib.h"
+#include "Engine/Memory/Memory.h"
 
 // 依存モジュール一覧
 #include "RenderModule.h"
 
 namespace DXLib
 {
+    // 2Dの点群を表示するために必要
+    static ::POINTDATA* s_a2DPoint      = NULL;
+    static const Uint32 s_u2DPointCount = 500;
+
     DXLibModule::DXLibModule() : PlatformModule()
     {
         this->_AppendDependenceModule<Render::RenderModule>();
@@ -46,11 +53,16 @@ namespace DXLib
             this->_input.VInit();
         }
 
+        HE_ASSERT(s_a2DPoint == NULL && "モジュールが重複生成されている");
+        s_a2DPoint = HE_NEW_ARRAY(::POINTDATA, s_u2DPointCount, 0);
+
         return bRet;
     }
 
     Bool DXLibModule::_VRelease()
     {
+        HE_SAFE_DELETE_ARRAY(s_a2DPoint);
+
         // DxLibの後始末
         ::DxLib_End();
 
@@ -113,21 +125,18 @@ namespace DXLib
         auto vViewHandles = pRenderModule->ViewHandles();
         for (Uint32 i = 0; i < vViewHandles.Size(); ++i)
         {
-            auto pView    = pRenderModule->GetView(vViewHandles[i]);
-            auto pCmdBuff = pView->GetCmdBuff();
-            HE_ASSERT(pCmdBuff);
-            if (pCmdBuff == NULL) continue;
+            auto pView = pRenderModule->GetView(vViewHandles[i]);
 
-            for (Uint32 i = 0; i < pCmdBuff->Size(); ++i)
+            const Render::Command* pCommand = pView->PopCmd();
+            while (pCommand != NULL)
             {
-                const Render::Command& pCmd = (*pCmdBuff)[i];
-
                 // コマンドに応じた描画処理をする
-                switch (pCmd.uType)
+                switch (pCommand->uType)
                 {
+                    // 画面クリア
                     case Render::ECmdType_ClsScreen:
                     {
-                        const Render::CmdClsScreen* pClsScreen = &pCmd.data.clsScree;
+                        const Render::CmdClsScreen* pClsScreen = &pCommand->data.clsScree;
                         const auto& rColor                     = pClsScreen->color;
 
                         // 画面全体の色を初期化
@@ -142,7 +151,7 @@ namespace DXLib
                     // 矩形を描画
                     case Render::ECmdType_2DRectDraw:
                     {
-                        const Render::Cmd2DRectDraw* pRect2D = &pCmd.data.rect2DDraw;
+                        const Render::Cmd2DRectDraw* pRect2D = &pCommand->data.rect2DDraw;
 
                         const Uint32 uColor = ::GetColor(pRect2D->color.c32.r, pRect2D->color.c32.g,
                                                          pRect2D->color.c32.b);
@@ -155,7 +164,7 @@ namespace DXLib
                     // 2Dテキストを描画
                     case Render::ECmdType_2DTextDraw:
                     {
-                        const Render::Cmd2DTextDraw* pText2D = &pCmd.data.text2DDraw;
+                        const Render::Cmd2DTextDraw* pText2D = &pCommand->data.text2DDraw;
 
                         const Uint32 uColor = ::GetColor(pText2D->color.c32.r, pText2D->color.c32.g,
                                                          pText2D->color.c32.b);
@@ -174,8 +183,8 @@ namespace DXLib
                                 const int sHeight = ::GetDrawStringWidth(pText2D->szChars, 1);
                                 if ((sWidth != -1) && (sHeight != -1))
                                 {
-                                    x -= sWidth / 2;
-                                    y -= sHeight / 2;
+                                    x -= (sWidth >> 1);
+                                    y -= (sHeight >> 1);
                                 }
                                 break;
                             }
@@ -190,9 +199,38 @@ namespace DXLib
                         break;
                     }
 
+                    // 点群描画
+                    case Render::ECmdType_2DPointArrayDraw:
+                    {
+                        // データ置換
+                        const Render::Cmd2DPointArrayDraw* pCmdPoint2DCloud =
+                            &pCommand->data.pointCloud2DDraw;
+                        if (0 < pCmdPoint2DCloud->uCount)
+                        {
+                            const Uint32 num = HE_MIN(pCmdPoint2DCloud->uCount, 500);
+                            std::transform(pCmdPoint2DCloud->aPoint, pCmdPoint2DCloud->aPoint + num,
+                                           s_a2DPoint,
+                                           [](const Render::Point2D& src)
+                                           {
+                                               const auto& rColor = src.color;
+                                               const auto uColor =
+                                                   ::GetColor(rColor.c32.r, rColor.c32.g,
+                                                              rColor.c32.b);
+                                               return ::POINTDATA{static_cast<int>(src.fX),
+                                                                  static_cast<int>(src.fY), uColor,
+                                                                  0};
+                                           });
+
+                            // 点の集合を描画する
+                            ::DrawPixelSet(s_a2DPoint, num);
+                        }
+                        break;
+                    }
+
+                    // 点描画
                     case Render::ECmdType_2DPointDraw:
                     {
-                        const Render::Cmd2DPointDraw* pCmdPoint2D = &pCmd.data.point2DDraw;
+                        const Render::Cmd2DPointDraw* pCmdPoint2D = &pCommand->data.point2DDraw;
 
                         const Render::Point2D* pPoint2D = &pCmdPoint2D->point;
                         const auto& rColor              = pPoint2D->color;
@@ -206,7 +244,7 @@ namespace DXLib
                     // 2次元の円描画
                     case Render::ECmdType_2DCircleDraw:
                     {
-                        const Render::Cmd2DCircleDraw* pCmdCircle = &pCmd.data.circle2DDraw;
+                        const Render::Cmd2DCircleDraw* pCmdCircle = &pCommand->data.circle2DDraw;
                         const Render::Color* pColor               = &pCmdCircle->color;
                         const Uint32 uColor =
                             ::GetColor(pColor->c32.r, pColor->c32.g, pColor->c32.b);
@@ -221,6 +259,8 @@ namespace DXLib
                     default:
                         HE_ASSERT(0 && "存在しないコマンド");
                 }
+
+                pCommand = pView->PopCmd();
             }
         }
 

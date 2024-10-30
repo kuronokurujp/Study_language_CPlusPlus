@@ -42,9 +42,38 @@ namespace Core::Common
             return this->_pBuff[this->_uSize - 1];
         }
 
-        void PopBack()
+        /// <summary>
+        /// 配列の先頭に要素を追加
+        /// </summary>
+        TYPE& PushFront(const TYPE& in_rData)
         {
-            if (0 < this->_uSize) --this->_uSize;
+            HE_ASSERT(this->_uSize < this->Capacity());
+
+            if (0 < this->_uSize)
+            {
+                // 配列先頭からのデータを一つ横にずらしてインデックス0に空きを作る
+                Uint32 uSize = this->_uSize * sizeof(TYPE);
+                ::memmove(&this->_pBuff[1], &this->_pBuff[0], uSize);
+            }
+
+            // コピー処理が発生
+            this->_pBuff[0] = in_rData;
+
+            ++this->_uSize;
+
+            return this->_pBuff[0];
+        }
+
+        TYPE* PopBack()
+        {
+            const Uint32 uPopItemIndex = this->_uSize - 1;
+            if (0 < this->_uSize)
+            {
+                --this->_uSize;
+                return &this->_pBuff[uPopItemIndex];
+            }
+
+            return NULL;
         }
 
         /// <summary>
