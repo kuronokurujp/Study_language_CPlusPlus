@@ -20,30 +20,9 @@ void* operator new(size_t in_size, Uint8 in_page, Uint8 in_alignSize,
     // VSのx64だとsize_tがunsigned int64になるが, 8byteフルサイズでの確保はないと思うので,
     // Uint32でサイズを調整した
     Uint32 uMemSize = static_cast<Uint32>(in_size);
-    void* pMem      = (Core::Memory::Manager::I().AllocateMemory(uMemSize, in_page, in_alignSize,
-                                                                 in_eLocateType, in_pFile, in_uLine));
+    void* pMem      = (Core::Memory::Manager::I().Allocate(uMemSize, in_page, in_alignSize,
+                                                           in_eLocateType, in_pFile, in_uLine));
     return pMem;
-}
-
-/// <summary>
-/// メモリ解放
-/// </summary>
-
-void FreeMemory(void* in_pPtr)
-{
-    // 初回の共有ポインターを生成したらここが呼ばれてin_pPtrが0になっている
-    // ポインターがないのはおかしいので即終了している
-    if (in_pPtr == 0) return;
-
-    if (Core::Memory::Manager::Exist())
-    {
-        Core::Memory::Manager::I().FreeMemory(in_pPtr);
-    }
-    else
-    {
-        // メモリアロケーターがないという警告を出す
-        HE_LOG_LINE(HE_STR_TEXT("警告: メモリアロケーターが存在しないかすでに破棄されている"));
-    }
 }
 
 /// <summary>
@@ -63,8 +42,17 @@ void* ::operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
     // VSのx64だとsize_tがunsigned int64になるが, 8byteフルサイズでの確保はないと思うので,
     // Uint32でサイズを調整した
     Uint32 uMemSize = static_cast<Uint32>(in_size);
-    void* pMem      = (Core::Memory::Manager::I().AllocateMemory(uMemSize, in_page, in_alignSize,
-                                                                 in_eLocateType, in_pFile, in_uLine));
+    void* pMem      = (Core::Memory::Manager::I().Allocate(uMemSize, in_page, in_alignSize,
+                                                           in_eLocateType, in_pFile, in_uLine));
+    return pMem;
+}
+
+void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page, const Uint8 in_alignSize,
+                     const Core::Memory::Manager::EAllocateLocateType in_eLocateType,
+                     const UTF8* in_pFile, Uint32 in_uLine)
+{
+    void* pMem = (Core::Memory::Manager::I().Allocate(in_uAllocateSize, in_page, in_alignSize,
+                                                      in_eLocateType, in_pFile, in_uLine));
     return pMem;
 }
 
@@ -110,4 +98,34 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
     return (
         Core::Memory::Manager::I().AllocateMemory(uMemSize, in_page, in_alignSize, in_eLocateType));
 }
+
+// メモリ確保
+void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page, const Uint8 in_alignSize,
+                     const Core::Memory::Manager::EAllocateLocateType in_eLocateType)
+{
+    void* pMem = (Core::Memory::Manager::I().AllocateMemory(in_uAllocateSize, in_page, in_alignSize,
+                                                            in_eLocateType);
+    return pMem;
+}
+
 #endif
+
+/// <summary>
+/// メモリ解放
+/// </summary>
+void FreeMemory(void* in_pPtr)
+{
+    // 初回の共有ポインターを生成したらここが呼ばれてin_pPtrが0になっている
+    // ポインターがないのはおかしいので即終了している
+    if (in_pPtr == 0) return;
+
+    if (Core::Memory::Manager::Exist())
+    {
+        Core::Memory::Manager::I().Free(in_pPtr);
+    }
+    else
+    {
+        // メモリアロケーターがないという警告を出す
+        HE_LOG_LINE(HE_STR_TEXT("警告: メモリアロケーターが存在しないかすでに破棄されている"));
+    }
+}

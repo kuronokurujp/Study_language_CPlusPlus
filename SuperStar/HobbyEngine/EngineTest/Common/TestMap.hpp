@@ -39,7 +39,7 @@ TEST_CASE("FixMap Test")
     srand((unsigned int)time(NULL));
 
     // データを用意しておく
-    Sint32* pDataArray = HE_NEW_ARRAY(Sint32, ARRAY_NUM, 0);
+    Sint32* pDataArray = HE_NEW_MEM_ARRAY(Sint32, ARRAY_NUM, 0);
     for (Sint32 ii = 0; ii < ARRAY_NUM; ii++)
     {
         pDataArray[ii] = (Sint32)ii;
@@ -105,7 +105,7 @@ TEST_CASE("FixMap Test")
     // イテレータテスト
     {
         // イテレータ用のチェックリスト配列を作る
-        Bool* pCheckArray    = HE_NEW_ARRAY(Bool, ARRAY_NUM, 0);
+        Bool* pCheckArray    = HE_NEW_MEM_ARRAY(Bool, ARRAY_NUM, 0);
         Uint32 checked_count = 0;
         for (Sint32 ii = 0; ii < ARRAY_NUM; ii++)
         {
@@ -129,7 +129,7 @@ TEST_CASE("FixMap Test")
         HE_LOG_LINE(HE_STR_TEXT("iterator ctime=%f sec"),
                     (double)(clock() - ctime) / CLOCKS_PER_SEC);
 
-        HE_SAFE_DELETE_ARRAY(pCheckArray);
+        HE_SAFE_DELETE_MEM_ARRAY(pCheckArray);
     }
 
     // 削除
@@ -178,7 +178,7 @@ TEST_CASE("FixMap Test")
     CHECK(testmap.Empty());
 
     // データの削除
-    HE_SAFE_DELETE_ARRAY(pDataArray);
+    HE_SAFE_DELETE_MEM_ARRAY(pDataArray);
 
     CHECK(memoryManager.VRelease());
     memoryManager.Reset();

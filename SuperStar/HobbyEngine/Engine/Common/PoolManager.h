@@ -175,7 +175,7 @@ namespace Core::Common
 
                 // Tを継承したSクラスのインスタンスを生成
                 // NEWは用意したマクロを使う
-                pObject = HE_NEW(S, 0);
+                pObject = HE_NEW_MEM(S, 0);
             }
 
             allocData._handle = handle;
@@ -206,7 +206,7 @@ namespace Core::Common
             else
             {
                 // キャッシュしたのを破棄する
-                HE_SAFE_DELETE(pRemoveObj);
+                HE_SAFE_DELETE_MEM(pRemoveObj);
             }
         }
 

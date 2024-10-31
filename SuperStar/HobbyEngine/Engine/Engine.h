@@ -41,10 +41,10 @@ public:
     {
         HE_ASSERT(this->_bInit);
 
-        T* pModule = HE_NEW_LAST(T, 0);
+        T* pModule = HE_NEW_MEM_LAST(T, 0);
         if (this->_AddModule(pModule) == FALSE)
         {
-            HE_DELETE(pModule);
+            HE_DELETE_MEM(pModule);
             return FALSE;
         }
 

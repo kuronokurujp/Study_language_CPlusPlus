@@ -52,19 +52,19 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
 // NEWマクロ
 // メモリアライメント設定版
 // 通常はこちらを利用
-#define HE_NEW(type, page)                              \
+#define HE_NEW_MEM(type, page)                          \
     new (page, Core::Memory::Manager::MinimumAlignSize, \
          Core::Memory::Manager::EAllocateLocateType_Top, __FILE__, __LINE__)(type)
 
 // マクロの引数で__FILE__と__LINE__を指定
-#define HE_NEW_INFO(type, page, file, line)             \
+#define HE_NEW_MEM_INFO(type, page, file, line)         \
     new (page, Core::Memory::Manager::MinimumAlignSize, \
          Core::Memory::Manager::EAllocateLocateType_Top, file, line)(type)
 
 // NEWの配列マクロ
 // メモリアライメント設定版
 // 通常はこちらを利用
-#define HE_NEW_ARRAY(type, num, page)                   \
+#define HE_NEW_MEM_ARRAY(type, num, page)               \
     new (page, Core::Memory::Manager::MinimumAlignSize, \
          Core::Memory::Manager::EAllocateLocateType_Top, __FILE__, __LINE__)(type[num])
 
@@ -72,61 +72,77 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
 // 細かなメモリ確保で使用
 // アライメント指定を間違えるとバグになるので蔵人向け
-#define HE_NEW_ALIENT(type, page, alignSize) \
+#define HE_NEW_MEM_ALIENT(type, page, alignSize) \
     new (page, alignSize, Core::Memory::Manager::EAllocateLocateType_Top, __FILE__, __LINE__)(type)
 
 // NEW配列マクロ
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
 // 細かなメモリ確保で使用
 // アライメント指定を間違えるとバグになるので蔵人向け
-#define HE_NEW_ARRAY_ALIENT(type, num, page, alignSize)                             \
+#define HE_NEW_MEM_ARRAY_ALIENT(type, num, page, alignSize)                         \
     new (page, alignSize, Core::Memory::Manager::EAllocateLocateType_Top, __FILE__, \
          __LINE__)(type[num])
 
 // NEWマクロ
 // メモリをページの後ろから確保する
 // アライメント設定版
-#define HE_NEW_LAST(type, page)                         \
+#define HE_NEW_MEM_LAST(type, page)                     \
     new (page, Core::Memory::Manager::MinimumAlignSize, \
-         Core::Memory::Manager::EAllocateLocteType_Last, __FILE__, __LINE__)(type)
+         Core::Memory::Manager::EAllocateLocateType_Last, __FILE__, __LINE__)(type)
 
 // NEW配列のマクロ
 // メモリをページの後ろから確保する
 // アライメント設定版
-#define HE_NEW_ARRAY_LAST(type, num, page)              \
+#define HE_NEW_MEM_ARRAY_LAST(type, num, page)          \
     new (page, Core::Memory::Manager::MinimumAlignSize, \
-         Core::Memory::Manager::EAllocateLocteType_Last, __FILE__, __LINE__)(type[num])
+         Core::Memory::Manager::EAllocateLocateType_Last, __FILE__, __LINE__)(type[num])
 
 // NEWマクロ
 // メモリをページの後ろから確保する
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
 // 細かなメモリ確保で使用
 // アライメント指定を間違えるとバグになるので蔵人向け
-#define HE_NEW_LAST_ALIENT(type, page, alignSize) \
-    new (page, alignSize, Core::Memory::Manager::EAllocateLocteType_Last, __FILE__, __LINE__)(type)
+#define HE_NEW_MEM_LAST_ALIENT(type, page, alignSize) \
+    new (page, alignSize, Core::Memory::Manager::EAllocateLocateType_Last, __FILE__, __LINE__)(type)
 
 // NEW配列マクロ
 // メモリをページの後ろから確保する
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
 // 細かなメモリ確保で使用
 // アライメント指定を間違えるとバグになるので蔵人向け
-#define HE_NEW_ARRAY_LAST_ALIENT(type, num, page, alignSize)                        \
-    new (page, alignSize, Core::Memory::Manager::EAllocateLocteType_Last, __FILE__, \
+#define HE_NEW_MEM_ARRAY_LAST_ALIENT(type, num, page, alignSize)                     \
+    new (page, alignSize, Core::Memory::Manager::EAllocateLocateType_Last, __FILE__, \
          __LINE__)(type[num])
+
+/// <summary>
+/// メモリ確保
+/// </summary>
+extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
+                            const Uint8 in_alignSize,
+                            const Core::Memory::Manager::EAllocateLocateType in_eLocateType,
+                            const UTF8* in_pFile, Uint32 in_uLine);
+
+#define HE_ALLOC_MEM(size, page)                                          \
+    ::AllocateMemory(size, page, Core::Memory::Manager::MinimumAlignSize, \
+                     Core::Memory::Manager::EAllocateLocateType_Top, __FILE__, __LINE__);
+
+#define HE_ALLOC_MEM_LAST(size, page)                                     \
+    ::AllocateMemory(size, page, Core::Memory::Manager::MinimumAlignSize, \
+                     Core::Memory::Manager::EAllocateLocateType_Last, __FILE__, __LINE__);
 
 #else
 
 // NEWマクロ
 // メモリアライメント設定版
 // 通常はこちらを利用
-#define HE_NEW(type, page)                              \
+#define HE_NEW_MEM(type, page)                          \
     new (page, Core::Memory::Manager::MinimumAlignSize, \
          Core::Memory::Manager::EAllocateLocateType_Top)(type)
 
 // NEWの配列マクロ
 // メモリアライメント設定版
 // 通常はこちらを利用
-#define HE_NEW_ARRAY(type, num, page)                   \
+#define HE_NEW_MEM_ARRAY(type, num, page)               \
     new (page, Core::Memory::Manager::MinimumAlignSize, \
          Core::Memory::Manager::EAllocateLocateType_Top)(type[num])
 
@@ -134,27 +150,27 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
 // 細かなメモリ確保で使用
 // アライメント指定を間違えるとバグになるので蔵人向け
-#define HE_NEW_ALIENT(type, page, alignSize) \
+#define HE_NEW_MEM_ALIENT(type, page, alignSize) \
     new (page, alignSize, Core::Memory::Manager::EAllocateLocateType_Top)(type)
 
 // NEW配列マクロ
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
 // 細かなメモリ確保で使用
 // アライメント指定を間違えるとバグになるので蔵人向け
-#define HE_NEW_ARRAY_ALIENT(type, num, page, alignSize) \
+#define HE_NEW_MEM_ARRAY_ALIENT(type, num, page, alignSize) \
     new (page, alignSize, Core::Memory::Manager::EAllocateLocateType_Top)(type[num])
 
 // NEWマクロ
 // メモリをページの後ろから確保する
 // アライメント設定版
-#define HE_NEW_LAST(type, page)                           \
+#define HE_NEW_MEM_LAST(type, page)                       \
     / new (page, Core::Memory::Manager::MinimumAlignSize, \
            Core::Memory::Manager::EAllocateLocteType_Last)(type)
 
 // NEW配列のマクロ
 // メモリをページの後ろから確保する
 // アライメント設定版
-#define HE_NEW_ARRAY_LAST(type, num, page)              \
+#define HE_NEW_MEM_ARRAY_LAST(type, num, page)          \
     new (page, Core::Memory::Manager::MinimumAlignSize, \
          Core::Memory::Manager::EAllocateLocteType_Last)(type[num])
 
@@ -163,7 +179,7 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
 // 細かなメモリ確保で使用
 // アライメント指定を間違えるとバグになるので蔵人向け
-#define HE_NEW_LAST_ALIENT(type, page, alignSize) \
+#define HE_NEW_MEM_LAST_ALIENT(type, page, alignSize) \
     new (page, alignSize, Core::Memory::Manager::EAllocateLocteType_Last)(type)
 
 // NEW配列マクロ
@@ -171,8 +187,21 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
 // 細かなメモリ確保で使用
 // アライメント指定を間違えるとバグになるので蔵人向け
-#define HE_NEW_ARRAY_LAST_ALIENT(type, num, page, alignSize) \
+#define HE_NEW_MEM_ARRAY_LAST_ALIENT(type, num, page, alignSize) \
     new (page, alignSize, Core::Memory::Manager::EAllocateLocteType_Last)(type[num])
+
+// メモリ確保
+extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
+                            const Uint8 in_alignSize,
+                            const Core::Memory::Manager::EAllocateLocateType in_eLocateType);
+
+#define HE_ALLOC_MEM(size, page)                                          \
+    ::AllocateMemory(size, page, Core::Memory::Manager::MinimumAlignSize, \
+                     Core::Memory::Manager::EAllocateLocateType_Top);
+
+#define HE_ALLOC_MEM_LAST(size, page)                                     \
+    ::AllocateMemory(size, page, Core::Memory::Manager::MinimumAlignSize, \
+                     Core::Memory::Manager::EAllocateLocateType_Last);
 
 #endif
 
@@ -180,6 +209,34 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
 /// メモリ解放
 /// </summary>
 extern void FreeMemory(void*);
+
+// NEW / ALLOCで確保したメモリ解放で使用
+#define HE_DELETE_MEM(pPtr) ::FreeMemory(pPtr)
+
+// NEW_ARRAYで確保したメモリを解放に使用
+#define HE_DELETE_MEM_ARRAY(pPtr) ::FreeMemory(pPtr)
+
+// deleteを安全する実行するためのマクロ
+// ポインターチェックをしてすでに解放済みの場合でもエラーにはならないようにしている
+#define HE_SAFE_DELETE_MEM(pPtr) \
+    {                            \
+        if (pPtr)                \
+        {                        \
+            ::FreeMemory(pPtr);  \
+            (pPtr) = NULL;       \
+        }                        \
+    }
+
+// 確保した配列メモリをdeleteで安全する実行するためのマクロ
+// ポインターチェックをしてすでに解放済みの場合でもエラーにはならないようにしている
+#define HE_SAFE_DELETE_MEM_ARRAY(pPtr) \
+    {                                  \
+        if (pPtr)                      \
+        {                              \
+            ::FreeMemory(pPtr);        \
+            (pPtr) = NULL;             \
+        }                              \
+    }
 
 // メモリ解放をラップする構造体
 struct DeleterFreeMemory
@@ -201,39 +258,10 @@ struct DeleterFreeMemory
 #ifdef HE_ENGINE_DEBUG
 //        HE_LOG_LINE(HE_STR_TEXT("DeleteFreeMemory: %s(%d)"), this->szFilename, this->uLine);
 #endif
-        ::FreeMemory(ptr);
+        HE_SAFE_DELETE_MEM(ptr);
+        //::FreeMemory(ptr);
     }
 };
-
-// deleteのマクロ
-// NEWで確保したメモリ解放で使用
-#define HE_DELETE(pPtr) ::FreeMemory(pPtr)
-
-// 配列のdeleteマクロ
-// NEW_ARRAYで確保したメモリを解放に使用
-#define HE_DELETE_ARRAY(pPtr) ::FreeMemory(pPtr)
-
-// deleteを安全する実行するためのマクロ
-// ポインターチェックをしてすでに解放済みの場合でもエラーにはならないようにしている
-#define HE_SAFE_DELETE(pPtr)    \
-    {                           \
-        if (pPtr)               \
-        {                       \
-            ::FreeMemory(pPtr); \
-            (pPtr) = NULL;      \
-        }                       \
-    }
-
-// 確保した配列メモリをdeleteで安全する実行するためのマクロ
-// ポインターチェックをしてすでに解放済みの場合でもエラーにはならないようにしている
-#define HE_SAFE_DELETE_ARRAY(pPtr) \
-    {                              \
-        if (pPtr)                  \
-        {                          \
-            ::FreeMemory(pPtr);    \
-            (pPtr) = NULL;         \
-        }                          \
-    }
 
 namespace Core::Memory
 {
@@ -257,7 +285,7 @@ namespace Core::Memory
     {
         // 配列の要素を構築し、shared_ptrを作成する
 #ifdef HE_ENGINE_DEBUG
-        return SharedPtr<T>(HE_NEW(T, 0)(std::forward<Args>(args)...),
+        return SharedPtr<T>(HE_NEW_MEM(T, 0)(std::forward<Args>(args)...),
                             DeleterFreeMemory(in_szFile, in_uLine));
 #else
         return SharedPtr<T>(HE_NEW(T, 0)(std::forward<Args>(args)...), DeleterFreeMemory());
@@ -275,7 +303,7 @@ namespace Core::Memory
 #endif
     {
 #ifdef HE_ENGINE_DEBUG
-        return UniquePtr<T>(HE_NEW(T, 0)(std::forward<Args>(args)...),
+        return UniquePtr<T>(HE_NEW_MEM(T, 0)(std::forward<Args>(args)...),
                             DeleterFreeMemory(in_szFilename, in_uLine));
 #else
         return UniquePtr<T>(HE_NEW(T, 0)(std::forward<Args>(args)...), DeleterFreeMemory());

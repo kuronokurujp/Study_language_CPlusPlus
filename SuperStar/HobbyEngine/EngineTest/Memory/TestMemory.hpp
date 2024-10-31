@@ -65,6 +65,30 @@ TEST_CASE("Memory Allocate And Free")
         CHECK(memoryManager.SetupMemoryPage(memoryPageSetupInfoArray, pageMax));
         CHECK(memoryManager.CheckAllMemoryBlock());
     }
+#ifdef HE_ENGINE_DEBUG
+// メモリ確保
+#define HE_ALLOCATE_MEMORY(allocateSize, page, alignSize)                                   \
+    Allocate(allocateSize, page, alignSize, Core::Memory::Manager::EAllocateLocateType_Top, \
+             __FILE__, __LINE__)
+#else
+    // メモリ確保
+#define HE_ALLOCATE_MEMORY(allocateSize, page, alignSize) \
+    Allocate(allocateSize, page, alignSize, Core::Memory::Manager::ALLOCATE_LOCATE_TOP)
+#endif
+
+#ifdef HE_ENGINE_DEBUG
+// メモリ確保
+#define HE_ALLOCATE_MEMORY_LAST(allocateSize, page, alignSize)                               \
+    Allocate(allocateSize, page, alignSize, Core::Memory::Manager::EAllocateLocateType_Last, \
+             __FILE__, __LINE__)
+#else
+    // メモリ確保
+#define HE_ALLOCATE_MEMORY_LAST(allocateSize, page, alignSize) \
+    Allocate(allocateSize, page, alignSize, Core::Memory::Manager::ALLOCATE_LOCATE_LAST)
+#endif
+
+// メモリ解放
+#define HE_FREE_MEMORY(pAllocateMemory) Free(pAllocateMemory)
 
     // 確保と解放を繰り返して確保したのが残らないかテスト
     memoryManager.PrintAllMemoryInfo();
@@ -128,9 +152,9 @@ TEST_CASE("Memory New and Delete")
         Data() { this->i = 0; };
         Sint8 i = 0;
     };
-    Data* pData = HE_NEW_ARRAY(Data, 5, 0);
+    Data* pData = HE_NEW_MEM_ARRAY(Data, 5, 0);
 
-    HE_DELETE_ARRAY(pData);
+    HE_DELETE_MEM_ARRAY(pData);
 
     // new と deleteがうまくいっているかチェック
     CHECK(memoryManager.VRelease());
@@ -179,7 +203,7 @@ TEST_CASE("Memory Custom Shader Ptr")
     }
 
     // new と deleteがうまくいっているかチェック
-    CHECK(memoryManager.UsedAllMemoryBlock() == FALSE);
+    CHECK(memoryManager.UsedAllBlock() == FALSE);
 
     CHECK(memoryManager.VRelease());
     memoryManager.Reset();
@@ -227,7 +251,7 @@ TEST_CASE("Memory Custom Uniqe Ptr")
     }
 
     // new と deleteがうまくいっているかチェック
-    CHECK(memoryManager.UsedAllMemoryBlock() == FALSE);
+    CHECK(memoryManager.UsedAllBlock() == FALSE);
 
     CHECK(memoryManager.VRelease());
     memoryManager.Reset();

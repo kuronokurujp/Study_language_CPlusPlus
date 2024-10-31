@@ -27,7 +27,7 @@ namespace Level
 
             Uint32 uW     = pScreen->VWidth();
             Uint32 uH     = pScreen->VHeight();
-            this->_aPoint = HE_NEW_ARRAY(Render::Point2D, this->_uPointCount, 0);
+            this->_aPoint = HE_NEW_MEM_ARRAY(Render::Point2D, this->_uPointCount, 0);
             for (Uint32 i = 0; i < this->_uPointCount; ++i)
             {
                 const Float32 fX   = static_cast<Float32>(pSystem->VGetRand(uW));
@@ -44,7 +44,7 @@ namespace Level
 
     Bool LevelInGame_BG::VEnd()
     {
-        HE_SAFE_DELETE_ARRAY(this->_aPoint);
+        HE_SAFE_DELETE_MEM_ARRAY(this->_aPoint);
 
         auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
         pRenderModule->RemoveView(this->_viewHandle);

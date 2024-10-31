@@ -40,7 +40,7 @@ set(PROJECT_CACHE_SRC_FILES CACHE INTERNAL description)
 set(PROJECT_CACHE_INC_FILES CACHE INTERNAL description)
 
 # ワークスペース名と使用言語C++をプロジェクトに設定.
-project(${WORKSPACE_NAME} VERSION 2.0 LANGUAGES CXX)
+project(${WORKSPACE_NAME} VERSION 2.0 LANGUAGES C CXX)
 
 # 単体テスト用のビルドUnitTestを追加
 # set(CMAKE_CONFIGURATION_TYPES "Debug;Release;UnitTest" CACHE STRING "Configs" FORCE)

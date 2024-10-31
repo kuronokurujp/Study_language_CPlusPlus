@@ -36,33 +36,8 @@ namespace Core::Memory
             // 前から取る
             EAllocateLocateType_Top = 0,
             // 後ろから取る
-            EAllocateLocteType_Last,
+            EAllocateLocateType_Last,
         };
-
-#ifdef HE_ENGINE_DEBUG
-// メモリ確保
-#define HE_ALLOCATE_MEMORY(allocateSize, page, alignSize)                                         \
-    AllocateMemory(allocateSize, page, alignSize, Core::Memory::Manager::EAllocateLocateType_Top, \
-                   __FILE__, __LINE__)
-#else
-        // メモリ確保
-#define HE_ALLOCATE_MEMORY(allocateSize, page, alignSize) \
-    AllocateMemory(allocateSize, page, alignSize, Core::Memory::Manager::ALLOCATE_LOCATE_TOP)
-#endif
-
-#ifdef HE_ENGINE_DEBUG
-// メモリ確保
-#define HE_ALLOCATE_MEMORY_LAST(allocateSize, page, alignSize)                                    \
-    AllocateMemory(allocateSize, page, alignSize, Core::Memory::Manager::EAllocateLocteType_Last, \
-                   __FILE__, __LINE__)
-#else
-        // メモリ確保
-#define HE_ALLOCATE_MEMORY_LAST(allocateSize, page, alignSize) \
-    AllocateMemory(allocateSize, page, alignSize, Core::Memory::Manager::ALLOCATE_LOCATE_LAST)
-#endif
-
-// メモリ解放
-#define HE_FREE_MEMORY(pAllocateMemory) FreeMemory(pAllocateMemory)
 
     private:
         // メモリページの最大数。アラインはこのサイズの公倍数である必要あり
@@ -162,20 +137,20 @@ namespace Core::Memory
 
 #ifdef HE_ENGINE_DEBUG
         // メモリ確保
-        void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
-                             const Uint8 in_alignSize, const EAllocateLocateType in_eLocateType,
-                             const UTF8* in_pFile, Uint32 in_uLine);
+        void* Allocate(const Uint32 in_uAllocateSize, const Uint8 in_page, const Uint8 in_alignSize,
+                       const EAllocateLocateType in_eLocateType, const UTF8* in_pFile,
+                       Uint32 in_uLine);
 #else
         // メモリ確保
-        void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
-                             const Uint8 in_alignSize, const EAllocateLocateType in_eLocateType);
+        void* Allocate(const Uint32 in_uAllocateSize, const Uint8 in_page, const Uint8 in_alignSize,
+                       const EAllocateLocateType in_eLocateType);
 #endif
 
         // メモリ開放
-        void FreeMemory(void* in_pAllocatedMemory);
+        void Free(void* in_pAllocatedMemory);
 
         // 確保したメモリのサイズを取得
-        Uint32 GetAllocatedMemorySize(void* in_pAllocatedMemory);
+        Uint32 GetAllocateSize(void* in_pAllocatedMemory);
 
         // メモリページのセットアップ
         Bool SetupMemoryPage(PageSetupInfo* in_pSetupInfoArray, const Uint32 in_uNum);
@@ -190,12 +165,12 @@ namespace Core::Memory
         /// <summary>
         /// 全ページ内に利用中のメモリがあるか
         /// </summary>
-        Bool UsedAllMemoryBlock() const;
+        Bool UsedAllBlock() const;
 
         /// <summary>
         /// 指定ページに利用中のメモリがあるか
         /// </summary>
-        Bool UsedMemoryBlock(const Uint8 in_page) const;
+        Bool UsedBlock(const Uint8 in_page) const;
 
     private:
         /// <summary>

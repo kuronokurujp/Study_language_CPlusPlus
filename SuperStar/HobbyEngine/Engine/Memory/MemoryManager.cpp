@@ -182,7 +182,7 @@ namespace Core::Memory
                         // サイズが違う場合は大きくなる分には問題ないし
                         // 小さくなる場合も使用していない部分なら問題ないけど
                         // さらにリマップして問題が発生した際に原因が見つけにくくなりそうなのでとりあえずこうしておく
-                        if (this->UsedMemoryBlock(pTempSetupInfo->_page))
+                        if (this->UsedBlock(pTempSetupInfo->_page))
                         {
                             HE_ASSERT(0 &&
                                       "オフセットもしくはサイズの変更が指定されているが、使用中"
@@ -211,7 +211,7 @@ namespace Core::Memory
             if (uaSize[i] == 0)
             {
                 // 消すのにごみが残っていてはだめ
-                if (this->UsedMemoryBlock(i))
+                if (this->UsedBlock(i))
                 {
                     HE_ASSERT(0 && "ページを消去するのに、使用中のメモリブロックが存在している．");
                     return FALSE;
@@ -253,17 +253,17 @@ namespace Core::Memory
 #endif
     }
 
-    Bool Manager::UsedAllMemoryBlock() const
+    Bool Manager::UsedAllBlock() const
     {
         for (Uint8 i = 0; i < HE_ARRAY_NUM(this->_aMemoryPageInfoArray); ++i)
         {
-            if (this->UsedMemoryBlock(i)) return TRUE;
+            if (this->UsedBlock(i)) return TRUE;
         }
 
         return FALSE;
     }
 
-    Bool Manager::UsedMemoryBlock(const Uint8 in_page) const
+    Bool Manager::UsedBlock(const Uint8 in_page) const
     {
         // ページのメモリブロック先頭にデータがなければ存在しない
         if (this->_aMemoryPageInfoArray[in_page]._pMemoryBlockTop == NULL) return FALSE;
@@ -341,9 +341,9 @@ namespace Core::Memory
     /// <param name="in_pFile">呼び出したファイル名(デバッグ限定)</param>
     /// <param name="in_line">呼び出したファイルの行数(デバッグ限定)</param>
     /// <returns>NULL 確保失敗 / 非NULL 確保したメモリアドレス</returns>
-    void* Manager::AllocateMemory(Uint32 in_uAllocateSize, Uint8 in_page, Uint8 in_alignSize,
-                                  EAllocateLocateType in_eLocateType, const UTF8* in_szFile,
-                                  Uint32 in_uLine)
+    void* Manager::Allocate(Uint32 in_uAllocateSize, Uint8 in_page, Uint8 in_alignSize,
+                            EAllocateLocateType in_eLocateType, const UTF8* in_szFile,
+                            Uint32 in_uLine)
 #else
     /// <summary>
     /// メモリ確保
@@ -354,8 +354,8 @@ namespace Core::Memory
     /// <param name="in_alignSize">メモリのアライメントサイズ</param>
     /// <param name="in_locateType">確保位置(前からなのか後ろからなのか)</param>
     /// <returns>NULL 確保失敗 / 非NULL 確保したメモリアドレス</returns>
-    void* Manager::AllocateMemory(Uint32 in_uAllocateSize, Uint8 in_page, Uint8 in_alignSize,
-                                  EAllocateLocateType in_eLocateType)
+    void* Manager::Allocate(Uint32 in_uAllocateSize, Uint8 in_page, Uint8 in_alignSize,
+                            EAllocateLocateType in_eLocateType)
 #endif
     {
         // 確保サイズが0以下では確保できない
@@ -397,7 +397,7 @@ namespace Core::Memory
         }
 
         // 後ろからとる場合降順にする
-        if (in_eLocateType == EAllocateLocteType_Last)
+        if (in_eLocateType == EAllocateLocateType_Last)
         {
             // 一番後ろまでたどっていく
             while (pFreeMemoryBlock->_pNext != NULL) pFreeMemoryBlock = pFreeMemoryBlock->_pNext;
@@ -510,19 +510,23 @@ namespace Core::Memory
                     }
                 }
 
-                // システム使用分＋オフセット＋確保したい容量＋パディングを足した分とれるか？
-                // とりあえず とりたいメモリブロックのサイズ
-                uMemoryBlockSize =
-                    this->_GetMemoryBlockSystemDataSize() + in_uAllocateSize + uPaddingSize;
+                // システム使用分 + オフセット + 確保したい容量 + パディングを足した分とれるか?
+                // 取れるのであれば確保成功
+                {
+                    // とりたいメモリブロックのサイズ
+                    uMemoryBlockSize =
+                        this->_GetMemoryBlockSystemDataSize() + in_uAllocateSize + uPaddingSize;
 
-                // それにオフセットを足して 必要なサイズがとれるか
-                // あるいはオフセット＋要求量＋パディングがまったく同じな場合もOK（置き換えられるから）
+                    // それにオフセットを足して 必要なサイズがとれるか
+                    // あるいはオフセット + 要求量 + パディング
+                    // これががまったく同じな場合もOK（置き換えられるから）
 
-                // メモリ確保可能
-                if (pFreeMemoryBlock->_uAllocateSize >= (uMemoryBlockSize + uOffsetSize)) break;
-                if (pFreeMemoryBlock->_uAllocateSize ==
-                    (uOffsetSize + in_uAllocateSize + uPaddingSize))
-                    break;
+                    // メモリ確保可能
+                    if (pFreeMemoryBlock->_uAllocateSize >= (uMemoryBlockSize + uOffsetSize)) break;
+                    if (pFreeMemoryBlock->_uAllocateSize ==
+                        (uOffsetSize + in_uAllocateSize + uPaddingSize))
+                        break;
+                }
             }
 
             // 次へ
@@ -593,7 +597,7 @@ namespace Core::Memory
     /// <summary>
     /// メモリ解放
     /// </summary>
-    void Manager::FreeMemory(void* in_pAllocatedMemory)
+    void Manager::Free(void* in_pAllocatedMemory)
     {
         // 受け取ったのは使用できるメモリの先頭
         const Uint32 headerSize   = this->_GetMemoryBlockHeaderSize();
@@ -649,7 +653,7 @@ namespace Core::Memory
     /// </summary>
     /// <param name="in_pAllocatedMemory">管理側で確保したメモリのポインタ</param>
     /// <returns></returns>
-    Uint32 Manager::GetAllocatedMemorySize(void* in_pAllocatedMemory)
+    Uint32 Manager::GetAllocateSize(void* in_pAllocatedMemory)
     {
         // 受け取ったのは使用できるメモリの先頭
         BlockHeader* pMemoryBlock = reinterpret_cast<BlockHeader*>(

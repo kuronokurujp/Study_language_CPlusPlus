@@ -103,7 +103,7 @@ namespace AssetManager
                 // 開いたファイルのデータサイズを取得して読み込むメモリを確保
                 Sint32 iSize    = in_rFileSystem.VFileSize(this->_fileHandle);
                 Sint32 iMemSize = iSize + 1;
-                pReadTmpBuff    = HE_NEW_ARRAY(UTF8, iMemSize, 0);  // new UTF8[iMemSize];
+                pReadTmpBuff    = HE_NEW_MEM_ARRAY(UTF8, iMemSize, 0);
                 ::memset(pReadTmpBuff, '\0', iMemSize);
 
                 // ファイルの読み込み
@@ -113,8 +113,10 @@ namespace AssetManager
                     // 展開時にjsonを展開するためのメモリ確保をする
                     pReadTmpBuff[iSize] = '\n';
                     simdjson::validate_utf8(pReadTmpBuff, iMemSize);
-                    this->_json   = std::make_unique<simdjson::padded_string>(pReadTmpBuff, iSize);
-                    this->_parser = std::make_unique<simdjson::ondemand::parser>(iSize * 2);
+                    this->_json =
+                        HE_MAKE_CUSTOM_UNIQUE_PTR(simdjson::padded_string, pReadTmpBuff, iSize);
+                    this->_parser =
+                        HE_MAKE_CUSTOM_UNIQUE_PTR(simdjson::ondemand::parser, (iSize * 2));
                     {
                         auto resultCode = this->_parser->iterate(*this->_json).get(this->_doc);
                         if (resultCode != simdjson::error_code::SUCCESS)
@@ -140,7 +142,7 @@ namespace AssetManager
                 bRet = FALSE;
             }
             // jsonに展開した時のメモリを利用するので読み込んだメモリを解放
-            HE_SAFE_DELETE_ARRAY(pReadTmpBuff);
+            HE_SAFE_DELETE_MEM_ARRAY(pReadTmpBuff);
         }
         // ファイルを閉じる
         in_rFileSystem.VFileClose(this->_fileHandle);
@@ -210,7 +212,7 @@ namespace AssetManager
                 // 開いたファイルのデータサイズを取得して読み込むメモリを確保
                 Sint32 iSize    = in_rFileSystem.VFileSize(this->_fileHandle);
                 Sint32 iMemSize = iSize + 1;
-                pReadTmpBuff    = HE_NEW_ARRAY(UTF8, iMemSize, 0);  // new UTF8[iMemSize];
+                pReadTmpBuff    = HE_NEW_MEM_ARRAY(UTF8, iMemSize, 0);  // new UTF8[iMemSize];
                 ::memset(pReadTmpBuff, '\0', iMemSize);
 
                 // ファイルの読み込み
@@ -234,7 +236,7 @@ namespace AssetManager
                 }
             }
             // 展開した時のメモリを利用するので読み込んだメモリを解放
-            HE_SAFE_DELETE_ARRAY(pReadTmpBuff);
+            HE_SAFE_DELETE_MEM_ARRAY(pReadTmpBuff);
         }
         // ファイルを閉じる
         in_rFileSystem.VFileClose(this->_fileHandle);

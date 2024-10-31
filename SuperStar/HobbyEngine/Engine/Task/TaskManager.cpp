@@ -51,11 +51,11 @@ namespace Core
         this->_Reserve(in_taskMax);
 
         // タスクグループを確保
-        this->_pTasks = HE_NEW_ARRAY(TaskGroup, in_groupNum, 0);
+        this->_pTasks = HE_NEW_MEM_ARRAY(TaskGroup, in_groupNum, 0);
         for (Uint32 i = 0; i < in_groupNum; ++i)
         {
             // 先頭と終端タスクを作成して設定
-            this->_pTasks[i]._pRootTask = HE_NEW(Local::RootTask, 0);
+            this->_pTasks[i]._pRootTask = HE_NEW_MEM(Local::RootTask, 0);
             this->_pTasks[i]._pTailTask = this->_pTasks[i]._pRootTask;
             this->_pTasks[i]._uFlags    = 0;
         }
@@ -76,11 +76,11 @@ namespace Core
         for (Uint32 i = 0; i < this->_iGroupNum; ++i)
         {
             // 先頭と終端タスクを作成して設定
-            HE_SAFE_DELETE(this->_pTasks[i]._pRootTask);
+            HE_SAFE_DELETE_MEM(this->_pTasks[i]._pRootTask);
         }
 
         // グループを削除
-        HE_SAFE_DELETE_ARRAY(this->_pTasks);
+        HE_SAFE_DELETE_MEM_ARRAY(this->_pTasks);
     }
 
     void TaskManager::ForeachByGroup(const Sint32 in_sGroupId, std::function<void(Task*)> in_func)

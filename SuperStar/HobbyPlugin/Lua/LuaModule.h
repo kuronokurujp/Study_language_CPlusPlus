@@ -25,5 +25,8 @@ namespace Lua
         /// インスタンス破棄時に呼ばれる
         /// </summary>
         Bool _VRelease() override final;
+
+    private:
+        void* _pLuaState = NULL;
     };
 }  // namespace Lua

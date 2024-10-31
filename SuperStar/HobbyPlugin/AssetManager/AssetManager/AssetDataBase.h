@@ -1,9 +1,14 @@
 ﻿#pragma once
 
+// TODO: ヘッダーにOSSのヘッダーファイルをインクルードしない方がいい気がする
+// 他のプラグインからインクルードするとそのプラグインからもOSSの機能が使えてしまうから
 #include "AssetManager/ThirdParty/pugixml/pugixml.hpp"
 #include "AssetManager/ThirdParty/simidjson/simdjson.h"
 #include "Engine/Common/CustomMap.h"
 #include "Engine/File/Path.h"
+#include "Engine/Memory/Memory.h"
+
+// エンジンの最小インクルード
 #include "Engine/MiniEngine.h"
 
 //  tomlライブラリ内の例外処理をOFF
@@ -153,8 +158,8 @@ namespace AssetManager
     protected:
         Core::Common::Handle _fileHandle;
 
-        std::unique_ptr<simdjson::padded_string> _json;
-        std::unique_ptr<simdjson::ondemand::parser> _parser;
+        Core::Memory::UniquePtr<simdjson::padded_string> _json;
+        Core::Memory::UniquePtr<simdjson::ondemand::parser> _parser;
         simdjson::ondemand::document _doc;
     };
 

@@ -82,19 +82,19 @@ namespace Module
         {
             for (auto b = this->_mViewModule.Begin(); b != this->_mViewModule.End(); ++b)
             {
-                HE_DELETE(b->data);
+                HE_DELETE_MEM(b->data);
             }
             this->_mViewModule.Clear();
 
             for (auto b = this->_mLogicModule.Begin(); b != this->_mLogicModule.End(); ++b)
             {
-                HE_DELETE(b->data);
+                HE_DELETE_MEM(b->data);
             }
             this->_mLogicModule.Clear();
 
             for (auto b = this->_mAppModule.Begin(); b != this->_mAppModule.End(); ++b)
             {
-                HE_DELETE(b->data);
+                HE_DELETE_MEM(b->data);
             }
             this->_mAppModule.Clear();
         }

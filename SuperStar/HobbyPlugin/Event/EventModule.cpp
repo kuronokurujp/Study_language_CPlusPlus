@@ -11,7 +11,7 @@ namespace Event
         handle.Init(this->_uAddEventMngCount);
 
         // ストラテジーの所有権を管理インスタンスへ
-        this->_mEventMng.Add(handle, HE_NEW(EventManager, 0)(std::move(in_upStrategy)));
+        this->_mEventMng.Add(handle, HE_NEW_MEM(EventManager, 0)(std::move(in_upStrategy)));
 
         return handle;
     }
@@ -22,7 +22,7 @@ namespace Event
         if (this->_mEventMng.Contains(in_rHandle) == FALSE) return FALSE;
 
         auto pEventMng = this->_mEventMng.FindKey(in_rHandle);
-        HE_SAFE_DELETE(pEventMng->data);
+        HE_SAFE_DELETE_MEM(pEventMng->data);
 
         return this->_mEventMng.Erase(in_rHandle);
     }

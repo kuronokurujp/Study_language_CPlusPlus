@@ -54,14 +54,14 @@ namespace DXLib
         }
 
         HE_ASSERT(s_a2DPoint == NULL && "モジュールが重複生成されている");
-        s_a2DPoint = HE_NEW_ARRAY(::POINTDATA, s_u2DPointCount, 0);
+        s_a2DPoint = HE_NEW_MEM_ARRAY(::POINTDATA, s_u2DPointCount, 0);
 
         return bRet;
     }
 
     Bool DXLibModule::_VRelease()
     {
-        HE_SAFE_DELETE_ARRAY(s_a2DPoint);
+        HE_SAFE_DELETE_MEM_ARRAY(s_a2DPoint);
 
         // DxLibの後始末
         ::DxLib_End();
