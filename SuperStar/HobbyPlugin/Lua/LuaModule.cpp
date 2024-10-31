@@ -1,11 +1,13 @@
-﻿#include "__MODULE_NAME__Module.h"
+﻿#include "LuaModule.h"
 
-namespace __MODULE_NAME__
+#include "Lua/ThirdParty/lua/src/lua.hpp"
+
+namespace Lua
 {
     /// <summary>
     /// モジュール初期化
     /// </summary>
-    Bool __MODULE_NAME__Module::_VStart()
+    Bool LuaModule::_VStart()
     {
         return TRUE;
     }
@@ -13,8 +15,8 @@ namespace __MODULE_NAME__
     /// <summary>
     /// インスタンス破棄時に呼ばれる
     /// </summary>
-    Bool __MODULE_NAME__Module::_VRelease()
+    Bool LuaModule::_VRelease()
     {
         return TRUE;
     }
-}  // namespace __MODULE_NAME__
+}  // namespace Lua

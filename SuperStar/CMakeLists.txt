@@ -25,6 +25,8 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/UI/Config.cmake NO_POLICTY_SCOPE
 include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/EnhancedInput/Config.cmake NO_POLICTY_SCOPE)
 # Eventプラグイン
 include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Event/Config.cmake NO_POLICTY_SCOPE)
+# Luaプラグイン
+include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Lua/Config.cmake NO_POLICTY_SCOPE)
 
 option(
   CORE_CRL_MD
@@ -116,6 +118,7 @@ add_subdirectory(HobbyPlugin/Localization EXCLUDE_FROM_ALL)
 add_subdirectory(HobbyPlugin/UI EXCLUDE_FROM_ALL)
 add_subdirectory(HobbyPlugin/EnhancedInput EXCLUDE_FROM_ALL)
 add_subdirectory(HobbyPlugin/Event EXCLUDE_FROM_ALL)
+add_subdirectory(HobbyPlugin/Lua EXCLUDE_FROM_ALL)
 
 # テストプロジェクトを作る
 include(${CMAKE_CURRENT_SOURCE_DIR}/Test/Config.cmake NO_POLICTY_SCOPE)
@@ -131,6 +134,7 @@ set_target_properties(${APP_NAME} PROPERTIES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bin/${WORKSPACE_NAME}/${CMAKE_CFG_INTDIR}
 )
 
+check_variable(LUA_PLUGIN_NAME)
 check_variable(EVENT_PLUGIN_NAME)
 check_variable(ENHANCED_INPUT_PLUGIN_NAME)
 check_variable(UI_PLUGIN_NAME)
@@ -144,6 +148,7 @@ check_variable(ENGINE_NAME)
 
 # ライブラリ名をリストにまとめる
 set(PLUGIN_LIBRARIES
+  ${LUA_PLUGIN_NAME}
   ${EVENT_PLUGIN_NAME}
   ${ENHANCED_INPUT_PLUGIN_NAME}
   ${UI_PLUGIN_NAME}

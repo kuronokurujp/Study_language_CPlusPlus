@@ -4,27 +4,26 @@
 #include "Engine/Module/Module.h"
 
 // モジュールのヘッダーファイルは全てインクルードする
-namespace __MODULE_NAME__
+namespace Lua
 {
     /// <summary>
-    /// __MODULE_NAME__アクター用の追加モジュール
+    /// Luaアクター用の追加モジュール
     /// </summary>
-    class __MODULE_NAME__Module final : public Module::ModuleBase
+    class LuaModule final : public Module::ModuleBase
     {
-        HE_MODULE_GENRATE_DECLARATION(__MODULE_NAME__Module);
+        HE_MODULE_GENRATE_DECLARATION(LuaModule);
 
     public:
-        __MODULE_NAME__Module() : ModuleBase(ModuleName()) {}
+        LuaModule() : ModuleBase(ModuleName()) {}
 
     protected:
         /// <summary>
         /// モジュール初期化
         /// </summary>
         Bool _VStart() override final;
-
         /// <summary>
         /// インスタンス破棄時に呼ばれる
         /// </summary>
         Bool _VRelease() override final;
     };
-}  // namespace __MODULE_NAME__
+}  // namespace Lua

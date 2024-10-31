@@ -19,6 +19,7 @@
 #include "EventModule.h"
 #include "LevelModule.h"
 #include "LocalizationModule.h"
+#include "LuaModule.h"
 #include "RenderModule.h"
 #include "UIModule.h"
 
@@ -115,6 +116,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         HE_ENGINE.AddModule<Localization::LocalizationModule>();
         HE_ENGINE.AddModule<EnhancedInput::EnhancedInputModule>();
         HE_ENGINE.AddModule<Event::EventModule>();
+        HE_ENGINE.AddModule<Lua::LuaModule>();
     }
 
     const Bool bInitRet = HE_ENGINE.Start();
