@@ -205,9 +205,11 @@ namespace DXLib
                         // データ置換
                         const Render::Cmd2DPointArrayDraw* pCmdPoint2DCloud =
                             &pCommand->data.pointCloud2DDraw;
+                        HE_ASSERT(0 < pCmdPoint2DCloud->uCount && "点群の点が一つもないのはだめ");
+
                         if (0 < pCmdPoint2DCloud->uCount)
                         {
-                            const Uint32 num = HE_MIN(pCmdPoint2DCloud->uCount, 500);
+                            const Uint32 num = HE_MIN(pCmdPoint2DCloud->uCount, s_u2DPointCount);
                             std::transform(pCmdPoint2DCloud->aPoint, pCmdPoint2DCloud->aPoint + num,
                                            s_a2DPoint,
                                            [](const Render::Point2D& src)

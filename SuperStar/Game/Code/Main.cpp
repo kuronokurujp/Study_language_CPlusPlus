@@ -3,7 +3,13 @@
 #include "Main.h"
 
 #include "Engine/Engine.h"
-#include "framework.h"
+
+#ifdef HE_WIN
+
+#include "Platform/Win/Framework.h"
+#include "Platform/Win/Resource.h"
+
+#endif
 
 // 外部モジュール一覧
 #include "ActorModule.h"
@@ -15,6 +21,8 @@
 #include "LocalizationModule.h"
 #include "RenderModule.h"
 #include "UIModule.h"
+
+#ifdef HE_WIN
 
 #define MAX_LOADSTRING 100
 
@@ -122,6 +130,8 @@ void EndInstance(HINSTANCE hInstance)
 {
     HE_DELETE_ENGINE;
 }
+
+#endif
 
 // アプリの起動エントリークラス
 

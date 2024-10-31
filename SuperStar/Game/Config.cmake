@@ -74,9 +74,9 @@ set(TARGET_FILES
 	Code/InGame/Event/InGameEventShot.h
 	Code/InGame/Event/InGameEventShot.cpp
 
-	Code/framework.h
-	Code/Resource.h
-	Code/targetver.h
+	Code/Platform/Win/Framework.h
+	Code/Platform/Win/Resource.h
+	Code/Platform/Win/Targetver.h
 	
 	Resource/Assets/Locate/JP/Debug.json
 	Resource/Assets/Locate/JP/Text.json
