@@ -1,4 +1,4 @@
-set(__MODULE_UPPER_NAME___PLUGIN_NAME HoobyEnginePlugin___MODULE_NAME__)
+set(__MODULE_UPPER_NAME___PLUGIN_NAME HobbyEnginePlugin___MODULE_NAME__)
 
 # プロジェクトに登録するファイル群
 # ここに全て記載する

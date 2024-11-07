@@ -74,7 +74,7 @@ namespace Core::Common
     /// 固定長配列
     /// テンプレートで要素を決めている
     /// </summary>
-    template <class TYPE, Uint32 CAPACITY>
+    template <typename TYPE, Uint32 CAPACITY>
     class CustomArray final : public ArrayBase<TYPE>
     {
     public:

@@ -1,4 +1,4 @@
-set(DXLIB_PLUGIN_NAME HoobyEnginePlugin_DXLib)
+set(DXLIB_PLUGIN_NAME HobbyEnginePlugin_DXLib)
 
 # プロジェクトに登録するファイル群
 # ここに全て記載する

@@ -1,4 +1,4 @@
-set(ACTOR_PLUGIN_NAME HoobyEnginePlugin_Actor)
+set(ACTOR_PLUGIN_NAME HobbyEnginePlugin_Actor)
 
 # プロジェクトに登録するファイル群
 # ここに全て記載する

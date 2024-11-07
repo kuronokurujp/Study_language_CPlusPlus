@@ -1,4 +1,4 @@
-set(LUA_PLUGIN_NAME HoobyEnginePlugin_Lua)
+set(LUA_PLUGIN_NAME HobbyEnginePlugin_Lua)
 set(LUA_THIRD_PARTY_SRC_PATH Lua/ThirdParty/lua/src)
 
 # プロジェクトに登録するファイル群

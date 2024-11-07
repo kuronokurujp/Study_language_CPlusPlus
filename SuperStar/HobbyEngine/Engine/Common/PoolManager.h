@@ -82,6 +82,8 @@ namespace Core::Common
         /// </summary>
         void _Reserve(const Uint32 in_uMax)
         {
+            // TODO: 予約した数を変えたい場合にも対応できるようにしたほうがいい
+
             if (this->_upCacheDatas == NULL)
                 this->_upCacheDatas = HE_MAKE_CUSTOM_UNIQUE_PTR(std::vector<T*>);
 
@@ -244,10 +246,16 @@ namespace Core::Common
     /// データ最大数は固定
     /// データを使いまわすのでクラス型を利用するとクラスのプロパティ値が残るので注意
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     template <typename T, Uint32 CAPACITY>
     class FixPoolManager final
     {
+    private:
+        struct Slot
+        {
+            T data;
+            Uint32 uIndex = Handle::uNonMagic;
+        };
+
     public:
         /// <summary>
         /// データ使用個数
@@ -267,43 +275,49 @@ namespace Core::Common
         {
             HE_ASSERT(out != NULL);
 
-            Uint32 uIndex = 0;
-            if (this->_sFreeSlot.Empty())
+            Uint32 uUserSlotIndex = 0;
+            if (this->_sFreeSlotIndex.Empty())
             {
-                uIndex = this->_vMagicNum.Size();
-                out->Init(uIndex);
-                this->_vMagicNum.PushBack(out->Magic());
-            }
-            else
-            {
-                uIndex = this->_sFreeSlot.PopBack();
-                out->Init(uIndex);
+                if (CAPACITY <= this->_uFreeSlotMax) return NULL;
 
-                (*this->_vMagicNum.GetPtr(uIndex)) = out->Magic();
+                uUserSlotIndex = this->_uFreeSlotMax;
+                ++this->_uFreeSlotMax;
+
+                this->_sFreeSlotIndex.PushBack(uUserSlotIndex);
             }
 
-            HE_ASSERT(uIndex < this->_aUserSlot.Capacity() &&
+            uUserSlotIndex = this->_sFreeSlotIndex.PopBack();
+            out->Init(uUserSlotIndex);
+
+            HE_ASSERT(uUserSlotIndex < this->_aUserSlot.Capacity() &&
                       "プールオブジェクトのフリーインデックス値が確保数を超えている");
 
             ++this->_uUseCount;
+
             // 空きのあるスロットを使用する
-            return &this->_aUserSlot[uIndex];
+            Slot* pSlot   = &this->_aUserSlot[uUserSlotIndex];
+            pSlot->uIndex = uUserSlotIndex;
+
+            return &pSlot->data;
         }
 
         /// <summary>
         /// 割り当てデータを解放
         /// </summary>
-        bool Free(const Handle& in_rHandle)
+        Bool Free(const Handle& in_rHandle)
         {
             --this->_uUseCount;
             if (in_rHandle.Null()) return FALSE;
 
             const Uint32 uIndex = in_rHandle.Index();
-            HE_ASSERT(this->_vMagicNum[uIndex] != Handle::uNonMagic);
-            HE_ASSERT(this->_vMagicNum[uIndex] == in_rHandle.Magic());
+            HE_ASSERT(uIndex < this->_aUserSlot.Capacity());
 
-            (*this->_vMagicNum.GetPtr(uIndex)) = Handle::uNonMagic;
-            this->_sFreeSlot.PushBack(uIndex);
+            Slot* pSlot = &this->_aUserSlot[uIndex];
+            HE_ASSERT(pSlot->uIndex != Handle::uNonMagic);
+
+            pSlot->uIndex = Handle::uNonMagic;
+
+            this->_sFreeSlotIndex.PushBack(uIndex);
 
             return TRUE;
         }
@@ -314,11 +328,12 @@ namespace Core::Common
             if (in_rHandle.Null()) return NULL;
 
             Uint32 uIndex = in_rHandle.Index();
-            // マジックナンバーが空値ならハンドルは解放済み
-            if ((this->_vMagicNum[uIndex] == Handle::uNonMagic)) return NULL;
-            if ((this->_vMagicNum[uIndex] != in_rHandle.Magic())) return NULL;
+            HE_ASSERT(uIndex < this->_aUserSlot.Capacity());
 
-            return &this->_aUserSlot[uIndex];
+            Slot* pSlot = &this->_aUserSlot[uIndex];
+            if (pSlot->uIndex == Handle::uNonMagic) return NULL;
+
+            return &pSlot->data;
         }
 
         // データの参照(const版)
@@ -329,13 +344,11 @@ namespace Core::Common
         }
 
     private:
-        // TODO: 使う場所によってはスタックメモリを利用することになる
-        // ヒープ利用版も用意すべきか
-        CustomArray<T, CAPACITY> _aUserSlot;
-        CustomFixStack<Uint32, CAPACITY> _sFreeSlot;
-        CustomFixVector<Uint32, CAPACITY> _vMagicNum;
+        CustomArray<Slot, CAPACITY> _aUserSlot;
+        CustomFixStack<Uint32, CAPACITY> _sFreeSlotIndex;
 
-        Uint32 _uUseCount = 0;
+        Uint32 _uUseCount    = 0;
+        Uint32 _uFreeSlotMax = 0;
     };
 }  // namespace Core::Common
 ;  // namespace Core

@@ -1,4 +1,4 @@
-set(LOCALIZATION_PLUGIN_NAME HoobyEnginePlugin_Localization)
+set(LOCALIZATION_PLUGIN_NAME HobbyEnginePlugin_Localization)
 
 # プロジェクトに登録するファイル群
 # ここに全て記載する

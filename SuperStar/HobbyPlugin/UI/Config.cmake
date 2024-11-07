@@ -1,4 +1,4 @@
-set(UI_PLUGIN_NAME HoobyEnginePlugin_UI)
+set(UI_PLUGIN_NAME HobbyEnginePlugin_UI)
 
 # プロジェクトに登録するファイル群
 # ここに全て記載する

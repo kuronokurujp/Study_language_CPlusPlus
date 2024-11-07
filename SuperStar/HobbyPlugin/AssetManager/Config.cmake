@@ -1,4 +1,4 @@
-set(ASSET_MANAGER_PLUGIN_NAME HoobyEnginePlugin_AssetManager)
+set(ASSET_MANAGER_PLUGIN_NAME HobbyEnginePlugin_AssetManager)
 
 # プロジェクトに登録するファイル群
 # ここに全て記載する

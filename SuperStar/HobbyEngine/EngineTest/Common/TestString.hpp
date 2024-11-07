@@ -28,3 +28,22 @@ TEST_CASE("FixString Use")
     // 文字位置判定が意図通りか
     CHECK(str2.Find(HE_STR_TEXT("日")) == 0);
 }
+
+TEST_CASE("FixString OutputUTF8")
+{
+    // Char型の文字列を作る
+    Core::Common::FixString128 szStr(HE_STR_TEXT("日本語"));
+    UTF8 szUTF8[32] = {NULL};
+
+    // UTF8型に変える
+    szStr.OutputUTF8(szUTF8, 32);
+
+    // UTF8型のをChar型に変えて
+    Core::Common::FixString32 szStr32 = szUTF8;
+
+    // 正しい文字列になっているかチェック
+    CHECK(szStr32.Length() == 3);
+
+    // 文字位置判定が意図通りか
+    CHECK(szStr32.Find(HE_STR_TEXT("日")) == 0);
+}

@@ -1,4 +1,4 @@
-set(ENHANCED_INPUT_PLUGIN_NAME HoobyEnginePlugin_EnhancedInput)
+set(ENHANCED_INPUT_PLUGIN_NAME HobbyEnginePlugin_EnhancedInput)
 
 # プロジェクトに登録するファイル群
 # ここに全て記載する

@@ -17,11 +17,7 @@ namespace Core::Common
         HE_CLASS_MOVE_NG(Singleton);
 
     public:
-        Singleton()
-        {
-            HE_ASSERT((T::_pInstance == NULL) && "インスタンス二重生成");
-            T::_pInstance = static_cast<T*>(this);
-        }
+        Singleton() { this->Set(); }
 
         virtual ~Singleton()
         {
@@ -35,6 +31,17 @@ namespace Core::Common
             {
                 HE_PG_LOG_LINE(HE_STR_TEXT("インスタンス二重破棄"));
             }
+        }
+
+        void Set()
+        {
+            if (T::_pInstance)
+            {
+                HE_LOG_LINE(HE_STR_TEXT("インスタンス二重生成"));
+                return;
+            }
+
+            T::_pInstance = static_cast<T*>(this);
         }
 
         /// <summary>

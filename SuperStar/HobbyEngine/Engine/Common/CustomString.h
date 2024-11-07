@@ -20,7 +20,7 @@ namespace Core::Common
         HE_CLASS_MOVE_NG(StringBase);
 
     public:
-        StringBase(Char* in_cpBuff, Uint32 in_uSize);
+        StringBase(Char* in_szBuff, Uint32 in_uCapacity);
         virtual ~StringBase() { this->Clear(); }
 
         StringBase& Replace(const Char* in_szOld, const Char* in_szNew);
@@ -52,7 +52,7 @@ namespace Core::Common
         /// UTF8として出力
         /// 文字列をUTF-8として利用したい場合に利用
         /// </summary>
-        void OutputUTF8(UTF8* out, const Uint32 in_uSize) const;
+        void OutputUTF8(UTF8* out, const Uint32 in_uLen) const;
 
         // 大文字 / 小文字にする
         void ToLower() { HE_STR_LOWER(this->_szBuff, HE_STR_LEN(this->_szBuff) * sizeof(Char)); }
@@ -182,20 +182,25 @@ namespace Core::Common
         HE_CLASS_MOVE_NG(FixString);
 
     public:
-        FixString() : StringBase(this->_caBuff, CAPACITY) {}
-        FixString(const Char* in_szName) : StringBase(this->_caBuff, CAPACITY)
+        FixString() : StringBase(this->_szBuff, CAPACITY) {}
+        FixString(const Char* in_szName) : StringBase(this->_szBuff, CAPACITY)
         {
             this->_Copy(in_szName, HE_STR_LEN(in_szName));
         }
-        FixString(const FixString<CAPACITY>& r) : StringBase(this->_caBuff, CAPACITY) { *this = r; }
+        FixString(const FixString<CAPACITY>& r) : StringBase(this->_szBuff, CAPACITY) { *this = r; }
 
-#ifdef HE_WIN
-        FixString(const UTF8* in_szNameUTF8) : StringBase(this->_caBuff, CAPACITY)
+        FixString(const UTF8* in_szNameUTF8) : StringBase(this->_szBuff, CAPACITY)
         {
+            // Win版のみUTF8型がchar型なので切り替える
+#ifdef HE_WIN
             this->_ConvUTF8toWide(in_szNameUTF8, static_cast<Uint32>(::strlen(in_szNameUTF8)));
+#else
+            this->_Copy(in_szNameUTF8, HE_STR_LEN(in_szNameUTF8));
+#endif
         }
 
-        FixString(const std::string_view& in_szrName) : StringBase(this->_caBuff, CAPACITY)
+#ifdef HE_WIN
+        FixString(const std::string_view& in_szrName) : StringBase(this->_szBuff, CAPACITY)
         {
             this->_ConvUTF8toWide(in_szrName.data(), static_cast<Uint32>(in_szrName.length()));
         }
@@ -213,18 +218,21 @@ namespace Core::Common
             return *this;
         }
 
-// win版では文字列はwchar / charの二つの型がある
-#ifdef HE_WIN
-        FixString<CAPACITY>& operator=(const Sint8* in_szName)
+        // win版では文字列はwchar / charの二つの型がある
+        FixString<CAPACITY>& operator=(const UTF8* in_szName)
         {
+            // Win版のみUTF8型がchar型なので切り替える
+#ifdef HE_WIN
             this->_ConvUTF8toWide(in_szName, CAPACITY);
+#else
+            this->_Copy(in_szName, HE_STR_LEN(in_szName));
+#endif
             return *this;
         }
-#endif
 
         FixString<CAPACITY>& operator=(const FixString<CAPACITY>& r)
         {
-            this->_Copy(r._caBuff, HE_STR_LEN(r._caBuff));
+            this->_Copy(r._szBuff, HE_STR_LEN(r._szBuff));
             return *this;
         }
 
@@ -257,7 +265,7 @@ namespace Core::Common
         }
 #endif
     private:
-        Char _caBuff[CAPACITY] = {};
+        Char _szBuff[CAPACITY] = {};
     };
 
     // 固定長の文字列型
@@ -316,5 +324,18 @@ namespace Core::Common
     struct IsCustomFixString<FixString<CAPACITY>> : std::true_type
     {
     };
+
+    /// <summary>
+    /// 作業用の文字列変数
+    /// ローカル内で文字列制御をする一時利用できる変数
+    /// ※グローバルで利用は絶対してはいけない
+    /// </summary>
+    extern FixString16 s_szTempFixString16;
+    extern FixString32 s_szTempFixString32;
+    extern FixString64 s_szTempFixString64;
+    extern FixString128 s_szTempFixString128;
+    extern FixString256 s_szTempFixString256;
+    extern FixString512 s_szTempFixString512;
+    extern FixString1024 s_szTempFixString1024;
 
 }  // namespace Core::Common

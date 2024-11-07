@@ -30,6 +30,7 @@ typedef unsigned long long Ptr;
 typedef unsigned int Ptr;
 #endif
 
+typedef int Int;
 typedef signed long Sint32;
 typedef signed long long Sint64;
 typedef unsigned long Uint32;
@@ -41,10 +42,11 @@ typedef unsigned char Uint8;
 // WindowsではUnicode前提実装なのでwchar型にしている
 #ifdef HE_WIN
 typedef wchar_t Char;
+typedef char UTF8;
 #else
 typedef char Char;
-#endif
 typedef char UTF8;
+#endif
 
 typedef char Bool;
 typedef float Float32;

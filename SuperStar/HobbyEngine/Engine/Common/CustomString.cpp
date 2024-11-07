@@ -15,17 +15,26 @@
 
 namespace Core::Common
 {
-    StringBase::StringBase(Char* in_cpBuff, Uint32 in_uSize)
+    FixString16 s_szTempFixString16;
+    FixString32 s_szTempFixString32;
+    FixString64 s_szTempFixString64;
+    FixString128 s_szTempFixString128;
+    FixString256 s_szTempFixString256;
+    FixString512 s_szTempFixString512;
+    FixString1024 s_szTempFixString1024;
+
+    StringBase::StringBase(Char* in_szBuff, Uint32 in_uCapacity)
     {
-        this->_Init(in_cpBuff, in_uSize);
+        this->_Init(in_szBuff, in_uCapacity);
     }
 
-    void StringBase::_Init(Char* in_cpBuff, Uint32 in_uSize)
+    void StringBase::_Init(Char* in_szBuff, Uint32 in_uCapacity)
     {
-        HE_ASSERT(in_cpBuff && in_uSize);
+        HE_ASSERT(in_szBuff && "文字列を格納する文字列バッファがない");
+        HE_ASSERT(0 < in_uCapacity && "格納する文字最大数が0になっている");
 
-        this->_szBuff    = in_cpBuff;
-        this->_uCapacity = in_uSize;
+        this->_szBuff    = in_szBuff;
+        this->_uCapacity = in_uCapacity;
         this->_szBuff[0] = HE_STR_TEXT('\0');
     }
 
@@ -115,11 +124,12 @@ namespace Core::Common
 
     StringBase& StringBase::Remove(Uint32 in_uIndex, Uint32 in_uCount)
     {
-        Uint32 uSize = this->Capacity();
-        Char* szDst  = this->_szBuff + ((in_uIndex > uSize) ? uSize : in_uIndex);
+        Uint32 uCapacity = this->Capacity();
+        Char* szDst      = this->_szBuff + ((in_uIndex > uCapacity) ? uCapacity : in_uIndex);
         const Char* szSrc =
-            this->_szBuff + (((in_uIndex + in_uCount) > uSize) ? uSize : (in_uIndex + in_uCount));
-        const Char* szSrcEnd = this->_szBuff + uSize;
+            this->_szBuff +
+            (((in_uIndex + in_uCount) > uCapacity) ? uCapacity : (in_uIndex + in_uCount));
+        const Char* szSrcEnd = this->_szBuff + uCapacity;
 
         while (szSrc <= szSrcEnd) *szDst++ = *szSrc++;
 
@@ -168,12 +178,12 @@ namespace Core::Common
 #ifdef HE_WIN
         return static_cast<Uint32>(HE_STR_LEN(this->_szBuff));
 #else
-        Uint32 uSize = this->Capacity();
-        Uint32 uLen  = 0;
+        Uint32 uCapacity = this->Capacity();
+        Uint32 uLen      = 0;
 
         Uint32 uOffset = 0;
         Uint32 i       = 0;
-        while (i < uSize)
+        while (i < uCapacity)
         {
             Uint8 c = static_cast<Uint8>(this->_cpBuff[i]);
             // 終端があれば終了する
@@ -219,18 +229,23 @@ namespace Core::Common
     /// UTF8として出力
     /// 文字列をUTF-8として利用したい場合に利用
     /// </summary>
-    void StringBase::OutputUTF8(UTF8* out, const Uint32 in_uSize) const
+    void StringBase::OutputUTF8(UTF8* out, const Uint32 in_uLen) const
     {
         HE_ASSERT(out);
-        HE_ASSERT(in_uSize <= this->Capacity());
+        HE_ASSERT(in_uLen <= this->Capacity());
         // wchar_t型をutf8のcharに変えて出力
 #ifdef HE_WIN
-        ::memset(out, 0, in_uSize);
-        Sint32 uStrSize = WideCharToMultiByte(CP_UTF8, 0, this->Str(), -1, NULL, 0, NULL, NULL);
-        if (uStrSize <= 0) return;
+        ::memset(out, 0, in_uLen);
 
-        uStrSize = HE_MIN(static_cast<Uint32>(uStrSize), in_uSize);
-        WideCharToMultiByte(CP_UTF8, 0, this->Str(), -1, out, uStrSize, NULL, NULL);
+        // WideからUTF8にした時の文字列数を取得
+        Sint32 uStrLen = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, this->Str(), -1, NULL,
+                                             0, NULL, NULL);
+        if (uStrLen <= 0) return;
+
+        // UTF8の文字列数を出力
+        uStrLen = HE_MIN(static_cast<Uint32>(uStrLen), in_uLen);
+        WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, this->Str(), -1, out, uStrLen, NULL,
+                            NULL);
 #else
         // TODO: のちに対応
         HE_ASSERT(0 && "Str()のをそのままコピーする");

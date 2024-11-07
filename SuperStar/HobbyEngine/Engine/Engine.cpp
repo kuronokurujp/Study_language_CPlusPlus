@@ -112,6 +112,9 @@ Bool Engine::VRelease()
     // デストラクタが呼ばれる
     // メモリ管理から取得したメモリを参照すると例外エラーになる
 
+    this->_bInit  = FALSE;
+    this->_bStart = FALSE;
+
     return TRUE;
 }
 
@@ -211,7 +214,8 @@ Platform::PlatformModule* Engine::_PlatformModule()
 {
     HE_ASSERT(this->_upModuleManager);
 
-    return this->_upModuleManager->Get<Platform::PlatformModule>();
+    Core::Common::FixString128 szName(Platform::PlatformModule::ModuleName());
+    return reinterpret_cast<Platform::PlatformModule*>(this->_upModuleManager->Get(szName.Str()));
 }
 
 Bool Engine::_AddModule(class Module::ModuleBase* in_pModule)

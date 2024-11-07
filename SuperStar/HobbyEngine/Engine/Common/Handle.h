@@ -10,7 +10,7 @@ namespace Core::Common
     class Handle final
     {
     public:
-        static const Uint32 uNonMagic = 0;
+        static const Uint32 uNonMagic = 0xffffffff;
 
     public:
         Handle() { this->Clear(); }

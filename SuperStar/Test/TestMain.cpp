@@ -1,10 +1,13 @@
 ﻿// 以下のマクロ定義するとCatch2側でエントリーポイント(main)関数が定義される
 // #define CATCH_CONFIG_MAIN
 #define CATCH_CONFIG_RUNNER
-#define HE_ENGINE_DEBUG
+#define HE_UNIT_TEST_MODE
 
-#include "Engine/Engine.h"
+#include "Engine/MiniEngine.h"
 #include "ThirdParty/Catch.hpp"
+
+// デバッグビルドのみ有効
+#ifdef HE_ENGINE_DEBUG
 
 // 外部モジュール一覧
 #include <fcntl.h>
@@ -76,6 +79,8 @@ int main(int argc, char* const argv[])
 #include "EngineTest/Common/TestString.hpp"
 // カスタムリストのテストコード
 #include "EngineTest/Common/TestList.hpp"
+// プール管理のテストコード
+#include "EngineTest/Common/TestPoolManager.hpp"
 
 // Mapテストコード
 #include "EngineTest/Common/TestMap.hpp"
@@ -94,3 +99,8 @@ int main(int argc, char* const argv[])
 
 // イベントテスト
 #include "TestCode/Event/TestEvent.hpp"
+
+// Luaモジュールテスト
+#include "LuaTest/LuaModuleTest.hpp"
+
+#endif

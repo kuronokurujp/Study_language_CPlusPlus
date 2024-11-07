@@ -1,4 +1,4 @@
-set(LEVEL_PLUGIN_NAME HoobyEnginePlugin_Level)
+set(LEVEL_PLUGIN_NAME HobbyEnginePlugin_Level)
 
 # プロジェクトに登録するファイル群
 # ここに全て記載する
