@@ -36,6 +36,7 @@
 | [tomlplusplus](https://github.com/marzer/tomlplusplus?tab=readme-ov-file) | V3.4.0    |
 | [simdjson](https://github.com/simdjson/simdjson)                          | v3.9.4    |
 | [pugixml](https://github.com/simdjson/simdjson)                           | v1.14     |
+| [Lua](https://www.lua.org/lua-l.html)                                     | v5.4.7    |
 
 ## 開発目的
 
@@ -153,6 +154,7 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
     |----|----|----|
     |Sint8|なし|使う機会がほとんどないから|
     |UInt8|なし|使う機会がほとんどないから|
+    |Int|なし|使う機会がほとんどないから|
     |Sint16|is||
     |Uint16|us||
     |Sint32|i||
@@ -369,5 +371,9 @@ TaskManager.hpp
 -   [Visual Studio ユーザーに送る CMake テクニック ☆ (1)](https://elda27.hatenablog.com/entry/2016/11/29/235301)
     -   VS2022 プロジェクトのフィルタリングを CMake で作成する方法
     -   プロジェクトのファイルを整理して見やすくするために必要
+
+## Lua
+
+-   [Lua5.4 リファレンスマニュアル(日本語版)](https://inzkyk.xyz/lua_5_4/#gsc.tab=0)
 
 ## 参考書籍
