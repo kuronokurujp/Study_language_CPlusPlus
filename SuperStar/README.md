@@ -1,7 +1,7 @@
-# ゲーム「SuperStar」開発プロジェクト
+# ゲーム「SuperStar」開発プロジェクト(未完成)
 
--   update: 2024/10/17
--   version: 1.2.0
+-   update: 2024/11/19
+-   version: 0.3.0
 
 ## ゲーム
 
