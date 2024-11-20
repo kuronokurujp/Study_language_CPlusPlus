@@ -35,6 +35,7 @@ namespace Core::Common
 
         this->_szBuff    = in_szBuff;
         this->_uCapacity = in_uCapacity;
+        ::memset(this->_szBuff, 0, sizeof(Char) * in_uCapacity);
         this->_szBuff[0] = HE_STR_TEXT('\0');
     }
 

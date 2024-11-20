@@ -21,8 +21,8 @@ namespace Core::Common
 
     public:
         StringBase(Char* in_szBuff, Uint32 in_uCapacity);
-        virtual ~StringBase() { this->Clear(); }
 
+        virtual ~StringBase() { this->Clear(); }
         StringBase& Replace(const Char* in_szOld, const Char* in_szNew);
         StringBase& Insert(Uint32 in_uIndex, const Char* in_szInsert);
         StringBase& Remove(Uint32 in_uIndex, Uint32 in_uCount = 1);
@@ -156,11 +156,6 @@ namespace Core::Common
         }
 
     protected:
-        StringBase(const StringBase& in_szrName)
-        {
-            this->_Copy(in_szrName.Str(), in_szrName.Length());
-        }
-
         StringBase& _Copy(const Char* in_szName, const Uint32 in_uLen);
 
     private:
@@ -181,7 +176,7 @@ namespace Core::Common
     template <Uint32 CAPACITY>
     class FixString final : public StringBase
     {
-        HE_CLASS_MOVE_NG(FixString);
+        //HE_CLASS_MOVE_NG(FixString);
 
     public:
         FixString() : StringBase(this->_szBuff, CAPACITY) {}
@@ -190,6 +185,11 @@ namespace Core::Common
             this->_Copy(in_szName, HE_STR_LEN(in_szName));
         }
         FixString(const FixString<CAPACITY>& r) : StringBase(this->_szBuff, CAPACITY) { *this = r; }
+        FixString(const FixString<CAPACITY>&& r) : StringBase(this->_szBuff, CAPACITY) { *this = r; }
+        FixString(const StringBase& r) : StringBase(this->_szBuff, CAPACITY)
+        {
+            this->_Copy(r.Str(), r.Length());
+        }
 
         FixString(const UTF8* in_szNameUTF8) : StringBase(this->_szBuff, CAPACITY)
         {

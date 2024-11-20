@@ -54,7 +54,9 @@ namespace Actor
         // 設定しているコンポーネントを全て破棄
         this->RemoveAllComponent();
 
-        this->_Clear();
+        // コンポーネント終了
+        this->_components.End();
+        this->_lateComponents.End();
 
         return TaskTree::VEnd();
     }

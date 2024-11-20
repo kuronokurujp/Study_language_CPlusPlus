@@ -106,7 +106,7 @@ namespace InGame
                 std::vector<class C_EnemyActorBase*> m_aMapSettingEnemyList;
                 */
         Core::Common::Handle _characterEventHandle;
-        Core::Memory::SharedPtr<Event::EventListenerInterface> _spCharacterEventListener;
+        //Core::Memory::SharedPtr<Event::EventListenerInterface> _spCharacterEventListener;
 
         Core::Common::CustomFixMap<Uint32, Actor::Object*, 256> _mEnemyMap;
     };

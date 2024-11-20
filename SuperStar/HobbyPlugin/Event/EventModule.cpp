@@ -22,6 +22,8 @@ namespace Event
         if (this->_mEventMng.Contains(in_rHandle) == FALSE) return FALSE;
 
         auto pEventMng = this->_mEventMng.FindKey(in_rHandle);
+        pEventMng->data->Release();
+
         HE_SAFE_DELETE_MEM(pEventMng->data);
 
         return this->_mEventMng.Erase(in_rHandle);

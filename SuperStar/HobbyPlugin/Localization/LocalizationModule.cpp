@@ -113,8 +113,14 @@ namespace Localization
         HE_ASSERT(groupIter.IsValid());
 
         LocateAssetData& rData = pLocalModule->GetAsset<LocateAssetData>(groupIter->data);
+
         // テキストを取得
-        return rData.GetText(in_szKey.Str()).Str();
+        HE_ASSERT(in_szKey.Length() <= 256);
+        // 作業用の変数
+        static UTF8 szKeyByTempBuff[256] = {0};
+
+        in_szKey.OutputUTF8(szKeyByTempBuff, in_szKey.Length());
+        return rData.GetText(szKeyByTempBuff).Str();
     }
 
     Bool SystemAssetData::_VLoad(Platform::FileInterface& in_rFileSystem)
@@ -178,22 +184,13 @@ namespace Localization
         return it->data;
     }
 
-    const Core::Common::FixString1024& LocateAssetData::GetText(const Char* in_szKey)
+    const Core::Common::FixString1024& LocateAssetData::GetText(const UTF8* in_szKey)
     {
         // キャッシュしているテキストがなければデータからテキストを取る
         if (this->_textBuffMap.Contains(in_szKey) == FALSE)
         {
-            OutputJsonValue v;
-            if (this->_OutputValue(&v, in_szKey))
-            {
-                auto value = v["items"]["0"]["text"];
-                HE_ASSERT(value.error() == simdjson::error_code::SUCCESS);
-                HE_ASSERT(value.is_string());
-
-                auto str   = value.get_string();
-                auto str_v = str.value();
-                this->_textBuffMap.Add(in_szKey, value.get_string().value());
-            }
+            Core::Common::FixString1024 value = this->VGetChar({in_szKey, "items", "0", "text"});
+            this->_textBuffMap.Add(in_szKey, value);
         }
 
         return this->_textBuffMap[in_szKey];

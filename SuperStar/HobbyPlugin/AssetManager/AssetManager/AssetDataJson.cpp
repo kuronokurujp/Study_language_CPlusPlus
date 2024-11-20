@@ -5,6 +5,84 @@
 
 namespace AssetManager
 {
+    static Bool _OutputValueBySimdJson(simdjson::fallback::ondemand::value* out,
+                                       simdjson::ondemand::document& in_rDoc,
+                                       const std::initializer_list<const UTF8*>& in_rTokens)
+    {
+        HE_ASSERT(out);
+        HE_ASSERT(0 < in_rTokens.size());
+
+        try
+        {
+            auto itr = in_rTokens.begin();
+
+            auto v = in_rDoc[*itr];
+            HE_ASSERT(v.error() == simdjson::error_code::SUCCESS);
+
+            // TODO: 未対応
+            // 複数の取得は未対応
+            ++itr;
+            for (; itr != in_rTokens.end(); ++itr)
+            {
+                v = v[*itr];
+                HE_ASSERT(v.error() == simdjson::error_code::SUCCESS);
+            }
+
+            // 要素を出力
+            v.get(*out);
+
+            return TRUE;
+        }
+        catch (const simdjson::simdjson_error& e)
+        {
+            HE_PG_LOG_LINE(HE_STR_TEXT("json要素がない: %s"), e.what());
+        }
+
+        return FALSE;
+    }
+
+    Uint32 AssetDataJson::VGetUInt32(const std::initializer_list<const UTF8*>& in_rTokens)
+    {
+        simdjson::fallback::ondemand::value val;
+        if (_OutputValueBySimdJson(&val,
+                                   *(reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc)),
+                                   in_rTokens) == FALSE)
+            return 0;
+
+        HE_ASSERT(val.is_integer());
+        return static_cast<Uint32>(val.get_int64().value_unsafe());
+    }
+
+    Float32 AssetDataJson::VGetFloat32(const std::initializer_list<const UTF8*>& in_rTokens)
+    {
+        simdjson::fallback::ondemand::value val;
+        if (_OutputValueBySimdJson(&val,
+                                   *(reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc)),
+                                   in_rTokens) == FALSE)
+            return 0;
+
+        HE_ASSERT(val.is_integer());
+        return static_cast<Float32>(val.get_double().value_unsafe());
+    }
+
+    Core::Common::FixString1024 AssetDataJson::VGetChar(
+        const std::initializer_list<const UTF8*>& in_rTokens)
+    {
+        Core::Common::FixString1024 str;
+
+        simdjson::fallback::ondemand::value val;
+        if (_OutputValueBySimdJson(&val,
+                                   *(reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc)),
+                                   in_rTokens) == FALSE)
+            return str;
+
+        HE_ASSERT(val.is_string());
+        // unsafeの方が高速なのだが, 文字列の中にゴミの値が入っていた
+        str = val.get_string().value();
+
+        return str;
+    }
+
     Bool AssetDataJson::_VLoad(Platform::FileInterface& in_rFileSystem)
     {
         Bool bRet = TRUE;
@@ -29,7 +107,8 @@ namespace AssetManager
                     // 読み込んだメモリをjsonデータとして展開
                     // 展開時にjsonを展開するためのメモリ確保をする
                     pReadTmpBuff[iSize] = '\n';
-                    simdjson::validate_utf8(pReadTmpBuff, iMemSize);
+                    HE_ASSERT(simdjson::validate_utf8(pReadTmpBuff, iMemSize));
+
                     this->_json =
                         HE_MAKE_CUSTOM_UNIQUE_PTR((simdjson::padded_string), pReadTmpBuff, iSize);
                     this->_parser =
@@ -79,6 +158,7 @@ namespace AssetManager
         HE_SAFE_DELETE_MEM(this->_pDoc);
     }
 
+#if 0
     Bool AssetDataJson::_OutputValue(simdjson::fallback::ondemand::value* out,
                                      const Char* in_szaName[], const Uint32 in_uCount)
     {
@@ -121,5 +201,6 @@ namespace AssetManager
 
         return FALSE;
     }
+#endif
 
 }  // namespace AssetManager

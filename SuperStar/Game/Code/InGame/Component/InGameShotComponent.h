@@ -25,6 +25,11 @@ namespace InGame
         virtual ~InGameShotComponent() = default;
 
         /// <summary>
+        /// 終了
+        /// </summary>
+        Bool VEnd() override final;
+
+        /// <summary>
         /// コンポーネントの更新
         /// </summary>
         void VUpdate(const Float32 in_fDt) override final;

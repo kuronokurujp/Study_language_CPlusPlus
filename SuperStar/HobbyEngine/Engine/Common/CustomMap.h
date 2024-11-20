@@ -170,6 +170,38 @@ namespace Core::Common
         }
 
         /// <summary>
+        /// キーとデータを追加
+        /// DATAがムーブセマンティック用
+        /// </summary>
+        Iterator AddByMoveData(const KEY& in_rKey, DATA&& in_rData)
+        {
+            // 赤ノードを作る
+            Node* pNode = this->_NewNode();
+            if (pNode == NULL) return this->End();
+
+            pNode->_pair.key = in_rKey;
+            {
+                // 添え字アクセスで作る場合はデータが無い
+                // コピーして渡す
+                if constexpr (IsUniquePtrByTemplateType<DATA>::value)
+                {
+                    pNode->_pair.data = std::move(in_rData);
+                }
+                else
+                {
+                    HE_STATIC_ASSERT(0);
+                }
+            }
+
+            // ルートを親として追加
+            this->_pRoot = this->_Insert(this->_pRoot, pNode);
+            // ルートは常に黒維持
+            this->_pRoot->_uColor = Node::EColor::EColor_Black;
+
+            return Iterator(pNode);
+        }
+
+        /// <summary>
         /// キーからデータ検索
         /// </summary>
         Iterator FindKey(const KEY& in_trKey) const
@@ -314,15 +346,25 @@ namespace Core::Common
         /// </summary>
         virtual void _VDestoryNode(const Core::Common::Handle& in_rHandle)
         {
+            Node* p = this->_poolObject.Ref(in_rHandle);
+            if (p == NULL) return;
+
+            this->_DestroyNodeData(p->_pair.data);
+            /*
+
+            if constexpr (IsUniquePtrByTemplateType<DATA>::value)
+            {
+                // UniquePtrなら破棄する
+
+                HE_SAFE_DELETE_UNIQUE_PTR(p->_pair.data);
+            }
             // DATA型で破棄する時にクラスのプロパティをクリアするためにデストラクタを呼ぶ
-            // 対象クラスは汎用データ構造を持つクラスに限定
-            if constexpr (IsCustomFixVector<DATA>::value || IsCustomFixStack<DATA>::value ||
-                          IsCustomFixString<DATA>::value)
+            else if constexpr (std::is_class<DATA>::value)
             {
                 // デストラクタを呼ぶ
-                Node* p = this->_poolObject.Ref(in_rHandle);
                 p->_pair.data.~DATA();
             }
+            */
 
             this->_poolObject.Free(in_rHandle);
         }
@@ -467,7 +509,14 @@ namespace Core::Common
             {
                 // 添え字アクセスで作る場合はデータが無い
                 // コピーして渡す
-                pNode->_pair.data = *in_pData;
+                if constexpr (IsUniquePtrByTemplateType<DATA>::value)
+                {
+                    HE_STATIC_ASSERT(0);
+                }
+                else
+                {
+                    pNode->_pair.data = *in_pData;
+                }
             }
 
             // ルートを親として追加
@@ -860,6 +909,21 @@ namespace Core::Common
             this->_head._pNext = &this->_tail;
             this->_tail._pPrev = &this->_head;
             this->_tail._pNext = NULL;
+        }
+
+        /// <summary>
+        /// ノードのデータを削除
+        /// </summary>
+        void _DestroyNodeData(DATA& in_rData)
+        {
+            if constexpr (IsUniquePtrByTemplateType<DATA>::value)
+            {
+                HE_SAFE_DELETE_UNIQUE_PTR(in_rData);
+            }
+            else if constexpr (std::is_class<DATA>::value)
+            {
+                in_rData.~DATA();
+            }
         }
 
     private:

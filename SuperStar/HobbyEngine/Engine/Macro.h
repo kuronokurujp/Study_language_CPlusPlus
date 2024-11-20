@@ -240,12 +240,14 @@ void HE_LOG_LINE(const Char* in_szFormat, Args... in_args)
     _x_(_x_&&)       = delete;          \
     _x_(const _x_&&) = delete;
 
-#define HE_CLASS_MOVE_NG(_x_)             \
-    _x_(_x_&&)                  = delete; \
-    _x_(const _x_&&)            = delete; \
+#define HE_CLASS_MOVE_OPERATOR_NG(_x_)    \
     _x_& operator=(_x_&&)       = delete; \
     _x_& operator=(const _x_&&) = delete;
 
+#define HE_CLASS_MOVE_NG(_x_)  \
+    _x_(_x_&&)       = delete; \
+    _x_(const _x_&&) = delete; \
+        
 // 値のmin/maxマクロ
 // 上限値の制御
 #define HE_MAX(__src__, __max__) ((__src__) < (__max__) ? (__max__) : (__src__))

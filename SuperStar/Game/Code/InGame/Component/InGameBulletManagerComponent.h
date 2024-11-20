@@ -82,7 +82,7 @@ namespace InGame
 
     private:
         Core::Common::CustomFixMap<Core::Common::FixString128,
-                                   Core::Memory::SharedPtr<InGame::InGameBulletStrategyInterface>,
+                                   Core::Memory::UniquePtr<InGame::InGameBulletStrategyInterface>,
                                    32>
             _mBulletStrategy;
 
@@ -90,6 +90,6 @@ namespace InGame
         Core::Common::Handle _viewHandle;
 
         Core::Common::Handle _shotEventHandle;
-        Core::Memory::SharedPtr<Event::EventListenerInterface> _shotEventListener;
+        //Core::Memory::SharedPtr<Event::EventListenerInterface> _shotEventListener;
     };
 }  // namespace InGame

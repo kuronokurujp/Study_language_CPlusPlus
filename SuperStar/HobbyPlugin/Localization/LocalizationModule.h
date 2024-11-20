@@ -61,7 +61,7 @@ namespace Localization
         /// <summary>
         /// テキスト取得
         /// </summary>
-        const Core::Common::FixString1024& GetText(const Char*);
+        const Core::Common::FixString1024& GetText(const UTF8*);
 
     private:
         // 一度読み込んだテキストをキャッシュするテキストバッファ

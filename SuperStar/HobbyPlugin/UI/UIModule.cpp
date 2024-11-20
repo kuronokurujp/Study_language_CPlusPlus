@@ -226,11 +226,6 @@ namespace UI
                                         Level::LevelUserInputReceiveComponent* pUserInputEventComp =
                                             reinterpret_cast<
                                                 Level::LevelUserInputReceiveComponent*>(c);
-                                        /*
-                                            pLevelModule->GetLevel(widgetHandlePack._levelHandle)
-                                                .GetComponent<
-                                                    Level::LevelUserInputReceiveComponent>(handle);
-                                                    */
                                         pUserInputEventComp->Message(in_msg.Str());
                                     }
                                 });

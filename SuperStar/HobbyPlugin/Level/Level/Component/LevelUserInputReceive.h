@@ -44,7 +44,9 @@ namespace Level
         /// 登録に必要な情報を設定
         /// </summary>
         /// <param name="bAutoDelete">TRUEだとタスク破棄と同時に削除
-        virtual void VSetup(const Bool in_bReleaseMem = TRUE) override;
+        virtual void VSetup(const Bool in_bReleaseMem = TRUE) override final;
+
+        virtual Bool VEnd() override final;
 
         void Message(const Char* in_szMsg);
 

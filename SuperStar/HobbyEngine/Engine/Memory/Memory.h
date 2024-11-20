@@ -239,13 +239,13 @@ extern void FreeMemory(void*);
 
 // UniquePtrを解放して紐づいているメモリ削除
 #define HE_SAFE_DELETE_UNIQUE_PTR(ptr) \
-    {                                     \
-        if (ptr)                          \
-        {                                 \
-            auto p = ptr.release();       \
-            HE_SAFE_DELETE_MEM(p);        \
-            (ptr) = NULL;                 \
-        }                                 \
+    {                                  \
+        if (ptr)                       \
+        {                              \
+            auto p = ptr.release();    \
+            HE_SAFE_DELETE_MEM(p);     \
+            (ptr) = NULL;              \
+        }                              \
     }
 
 // メモリ解放をラップする構造体
@@ -348,3 +348,16 @@ namespace Core::Memory
     Core::Memory::MakeCustomUniquePtr<HE_REMOVE_PARENS __T__>(##__VA_ARGS__)
 
 #endif
+
+// is_unique_ptr の安全な定義
+// テンプレート型がUniquePtr型かどうかを判定
+template <typename T, typename = void>
+struct IsUniquePtrByTemplateType : std::false_type
+{
+};
+
+template <typename T>
+struct IsUniquePtrByTemplateType<T, std::void_t<typename T::element_type>>
+    : std::is_same<T, Core::Memory::UniquePtr<typename T::element_type>>
+{
+};

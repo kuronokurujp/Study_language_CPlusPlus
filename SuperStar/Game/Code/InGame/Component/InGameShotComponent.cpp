@@ -4,6 +4,13 @@
 
 namespace InGame
 {
+    Bool InGameShotComponent::VEnd()
+    {
+        this->_spStrategy = NULL;
+
+        return Component::VEnd();
+    }
+
     void InGameShotComponent::VUpdate(const Float32 in_fDt)
     {
         Actor::Component::VUpdate(in_fDt);

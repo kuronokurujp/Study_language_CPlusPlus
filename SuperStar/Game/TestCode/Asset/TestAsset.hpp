@@ -26,6 +26,10 @@ TEST_CASE("Test Paramater Asset Load")
             CHECK(rAsset.Version() == 1);
             HE_LOG_LINE(HE_STR_TEXT("バージョン: %d"), rAsset.Version());
 
+            auto hp = rAsset.VGetUInt32({"data", "player_default", "hp"});
+            CHECK(hp == 100);
+            HE_LOG_LINE(HE_STR_TEXT("HP: %d"), hp);
+
             pAssetManagerModule->Unload(handle);
             return TRUE;
         });

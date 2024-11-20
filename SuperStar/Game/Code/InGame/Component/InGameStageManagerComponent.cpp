@@ -87,13 +87,13 @@ namespace InGame
             this->_characterEventHandle = pEventModule->AddEventManager(std::move(upStrategy));
             HE_ASSERT(this->_characterEventHandle.Null() == FALSE);
 
-            this->_spCharacterEventListener =
+            auto spCharacterEventListener =
                 HE_MAKE_CUSTOM_SHARED_PTR((Event::EventListenerWithRegistEventFunc),
                                           HE_STR_TEXT("LevelInGameCharacterListener"),
                                           [this](Event::EventDataInterfacePtr const& in_spEventData)
                                           { return this->_HandleCharacterEvent(in_spEventData); });
 
-            if (pEventModule->AddListener(this->_spCharacterEventListener,
+            if (pEventModule->AddListener(spCharacterEventListener,
                                           INGAME_CHARACTER_EVENT_TYPE_NAME) == FALSE)
             {
                 HE_ASSERT(0 && "キャラクターイベントリスナー設定に失敗");

@@ -34,13 +34,13 @@ namespace InGame
             this->_shotEventHandle = pEventModule->AddEventManager(std::move(upStrategy));
             HE_ASSERT(this->_shotEventHandle.Null() == FALSE);
 
-            this->_shotEventListener =
+            auto shotEventListener =
                 HE_MAKE_CUSTOM_SHARED_PTR((Event::EventListenerWithRegistEventFunc),
                                           HE_STR_TEXT("LevelInGameShotListener"),
                                           [this](Event::EventDataInterfacePtr const& in_spEventData)
                                           { return this->_HandleEvent(in_spEventData); });
 
-            if (pEventModule->AddListener(this->_shotEventListener, INGAME_SHOT_EVENT_TYPE_NAME) ==
+            if (pEventModule->AddListener(shotEventListener, INGAME_SHOT_EVENT_TYPE_NAME) ==
                 FALSE)
             {
                 HE_ASSERT(0 && "イベントリスナー設定に失敗");
@@ -126,7 +126,7 @@ namespace InGame
         }
 
         auto szName = in_upStrategy->VName();
-        this->_mBulletStrategy.Add(szName, std::move(in_upStrategy));
+        this->_mBulletStrategy.AddByMoveData(szName, std::move(in_upStrategy));
 
         return TRUE;
     }

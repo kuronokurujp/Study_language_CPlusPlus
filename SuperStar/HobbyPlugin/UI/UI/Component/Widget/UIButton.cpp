@@ -24,7 +24,7 @@ namespace UI
         const Bool bRet = UIWidgetComponent::VEnd();
 
         // プッシュハンドルを解放
-        this->_pushHandler.release();
+        HE_SAFE_DELETE_UNIQUE_PTR(this->_pushHandler);
 
         return bRet;
     }

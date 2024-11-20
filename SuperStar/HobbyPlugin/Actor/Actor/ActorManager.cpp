@@ -25,6 +25,7 @@ namespace Actor
 
     Bool ActorManager::End()
     {
+        HE_SAFE_DELETE_UNIQUE_PTR(this->_upDecorator);
         this->_taskManager.End();
 
         return TRUE;
