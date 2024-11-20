@@ -1,0 +1,87 @@
+﻿#pragma once
+
+#include "AssetDataBase.h"
+#include "Engine/Common/CustomMap.h"
+
+//  tomlライブラリ内の例外処理をOFF
+//  こちらでエラー処理をする
+#define TOML_EXCEPTIONS 0
+#include "AssetManager/ThirdParty/tomlplusplus/toml.hpp"
+
+// エンジンの最小インクルード
+#include "Engine/MiniEngine.h"
+
+namespace AssetManager
+{
+    /// <summary>
+    /// tomlアセットデータ
+    /// </summary>
+    class AssetDataToml : public AssetDataBase
+    {
+        HE_CLASS_COPY_NG(AssetDataToml);
+        HE_CLASS_MOVE_NG(AssetDataToml);
+
+    public:
+        // 前方宣言
+        class Node;
+
+        // Nodeをマップで扱う型
+        using ToolNodeMapType = Core::Common::CustomFixMap<Core::Common::FixString128, Node, 64>;
+
+        class Node final
+        {
+        public:
+            Node() {}
+            Node(toml::node_view<toml::node> in_node) : _node(in_node) {}
+            Node(toml::node& in_rNode) : _node(in_rNode) {}
+
+            const Core::Common::FixString512 GetString() const;
+
+            template <typename... Args>
+            typename std::enable_if<(std::is_same<Args, const Char*>::value && ...), Node>::type
+            GetNode(Args... args)
+            {
+                // 引数の個数を取得
+                Uint32 uCount = static_cast<Uint32>(sizeof...(args));
+                if (uCount <= 0) return Node();
+
+                // 初期化リストを使用して引数を処理
+                const Char* values[] = {args...};
+
+                return this->_GetNode(values, uCount);
+            }
+
+            template <typename... Args>
+            typename std::enable_if<(std::is_same<Args, const Char*>::value && ...),
+                                    const Bool>::type
+            OutputNodeMap(ToolNodeMapType* out, Args... args)
+            {
+                // 引数の個数を取得
+                Uint32 uCount = static_cast<Uint32>(sizeof...(args));
+                if (uCount <= 0) return FALSE;
+
+                // 初期化リストを使用して引数を処理
+                const Char* szaName[] = {args...};
+                return this->_OutputNodeMap(out, szaName, uCount);
+            }
+
+        private:
+            Bool _OutputNodeMap(ToolNodeMapType* out, const Char* in_szaName[],
+                                const Uint32 in_uCount);
+            Node _GetNode(const Char* in_szaName[], Uint32 in_uCount);
+
+        private:
+            toml::node_view<toml::node> _node;
+        };
+
+        AssetDataToml() : AssetDataBase() {}
+
+        virtual Bool _VLoad(Platform::FileInterface&) override;
+        virtual void _VUnload() override;
+
+        Node GetRootNode();
+
+    private:
+        toml::parse_result _result;
+    };
+}  // namespace AssetManager

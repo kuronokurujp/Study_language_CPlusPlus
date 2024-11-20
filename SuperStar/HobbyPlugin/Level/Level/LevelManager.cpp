@@ -10,7 +10,7 @@ namespace Level
     {
         // タスク管理を初期化
         // 利用するタスク設定は内部で固定する
-        this->_upNodeManager = HE_MAKE_CUSTOM_UNIQUE_PTR(Actor::ActorManager);
+        this->_upNodeManager = HE_MAKE_CUSTOM_UNIQUE_PTR((Actor::ActorManager));
         if (this->_upNodeManager->Start(32, 2) == FALSE) return FALSE;
 
         return TRUE;

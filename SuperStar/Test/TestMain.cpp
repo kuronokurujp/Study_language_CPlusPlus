@@ -60,6 +60,8 @@ int main(int argc, char* const argv[])
 
 #endif  // __OBJC__
 
+// エンジンのテスト一覧
+
 // マクロテストコード
 #include "EngineTest/Common/TestMacro.hpp"
 
@@ -82,14 +84,14 @@ int main(int argc, char* const argv[])
 // プール管理のテストコード
 #include "EngineTest/Common/TestPoolManager.hpp"
 
-// Mapテストコード
-#include "EngineTest/Common/TestMap.hpp"
-
 // ランダム処理のテストコード
 #include "EngineTest/Math/TestRandom.hpp"
 
 // タスクのテストコード
 #include "EngineTest/Task/TestTask.hpp"
+
+// Mapテストコード
+#include "EngineTest/Common/TestMap.hpp"
 
 // メモリ処理のテストコード
 #include "EngineTest/Memory/TestMemory.hpp"
@@ -97,10 +99,20 @@ int main(int argc, char* const argv[])
 // エンジン本体のテストコード
 #include "EngineTest/TestEngine.hpp"
 
-// イベントテスト
-#include "TestCode/Event/TestEvent.hpp"
+// エンジンのモジュール用のテスト一覧
 
 // Luaモジュールテスト
 #include "LuaTest/LuaModuleTest.hpp"
+// イベントテスト
+#include "TestCode/Event/TestEvent.hpp"
+
+// ゲーム用のテスト一覧
+
+// Lambdaテストコード
+#include "EngineTest/Common/TestLambda.hpp"
+
+// ゲーム用アセットのテスト
+// ゲームプロジェクトはアプリプロジェクトでコードの実態を入れ込むためにcppファイルもインクルードしないといけない
+#include "TestCode/Asset/TestAsset.hpp"
 
 #endif

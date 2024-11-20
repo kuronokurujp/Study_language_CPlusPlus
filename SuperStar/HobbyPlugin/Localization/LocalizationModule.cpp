@@ -183,7 +183,7 @@ namespace Localization
         // キャッシュしているテキストがなければデータからテキストを取る
         if (this->_textBuffMap.Contains(in_szKey) == FALSE)
         {
-            simdjson::fallback::ondemand::value v;
+            OutputJsonValue v;
             if (this->_OutputValue(&v, in_szKey))
             {
                 auto value = v["items"]["0"]["text"];

@@ -40,7 +40,7 @@ namespace Level
             auto comp = this->GetComponent<Level::LevelUserInputReceiveComponent>(h);
 
             auto handler =
-                HE_MAKE_CUSTOM_UNIQUE_PTR(Level::LevelUserInputMessage,
+                HE_MAKE_CUSTOM_UNIQUE_PTR((Level::LevelUserInputMessage),
                                           [this](const Char* in_pMsg) { HE_LOG_LINE(in_pMsg); });
             comp->SetReceiver(std::move(handler));
         }

@@ -443,13 +443,14 @@ namespace Core::Common
             in_pNode->_pNext->_pPrev = in_pNode->_pPrev;
             in_pNode->_pPrev->_pNext = in_pNode->_pNext;
 
-#ifdef HE_ENGINE_DEBUG
             in_pNode->_pLeft  = NULL;
-            in_pNode->_pNext  = NULL;
-            in_pNode->_pPrev  = NULL;
             in_pNode->_pRight = NULL;
             in_pNode->_uColor = 0;
-#endif
+            // 前と後を指すノードは初期化しない
+            // 初期化するとループ中のEraseでエラーなるから
+            //            in_pNode->_pNext  = NULL;
+            //            in_pNode->_pPrev  = NULL;
+
             this->_VDestoryNode(in_pNode->handle);
             --this->_uNodeNum;
         }

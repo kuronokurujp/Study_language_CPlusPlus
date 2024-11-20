@@ -314,16 +314,23 @@ namespace Core::Memory
 
 // shader_ptr / unique_ptrを使うためのマクロ
 // 利用箇所のファイル名とファイル行数を設定できるのでメモリリーク調査を少しでも進めるようにしている
+#define HE_REMOVE_PARENS(...) __VA_ARGS__
+
 #ifdef HE_ENGINE_DEBUG
 
+// __T__型は括弧で囲ってほしい
+//    HE_MAKE_CUSTOM_UNIQUE_PTR((Uint32));
+// 括弧を囲う事で__T__型がテンプレートを使っている場合でも意図したマクロ置換が出来るようにしている
 #define HE_MAKE_CUSTOM_SHARED_PTR(__T__, ...) \
-    Core::Memory::MakeCustomSharedPtr<__T__>(HE_FILE, __LINE__, ##__VA_ARGS__)
+    Core::Memory::MakeCustomSharedPtr<HE_REMOVE_PARENS __T__>(HE_FILE, __LINE__, ##__VA_ARGS__)
 #define HE_MAKE_CUSTOM_UNIQUE_PTR(__T__, ...) \
-    Core::Memory::MakeCustomUniquePtr<__T__>(HE_FILE, __LINE__, ##__VA_ARGS__)
+    Core::Memory::MakeCustomUniquePtr<HE_REMOVE_PARENS __T__>(HE_FILE, __LINE__, ##__VA_ARGS__)
 
 #else
 
-#define HE_MAKE_CUSTOM_SHARED_PTR(T, ...) Core::Memory::MakeCustomSharedPtr<T>(##__VA_ARGS__)
-#define HE_MAKE_CUSTOM_UNIQUE_PTR(T, ...) Core::Memory::MakeCustomUniquePtr<T>(##__VA_ARGS__)
+#define HE_MAKE_CUSTOM_SHARED_PTR(__T__, ...) \
+    Core::Memory::MakeCustomSharedPtr<HE_REMOVE_PARENS __T__>(##__VA_ARGS__)
+#define HE_MAKE_CUSTOM_UNIQUE_PTR(__T__, ...) \
+    Core::Memory::MakeCustomUniquePtr<HE_REMOVE_PARENS __T__>(##__VA_ARGS__)
 
 #endif

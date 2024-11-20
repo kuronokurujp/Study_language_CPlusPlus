@@ -1,9 +1,9 @@
 ﻿#pragma once
 
+#include "Engine/Common/CustomMap.h"
 #include "Engine/MiniEngine.h"
 
 // 外部モジュール
-#include "EventModule.h"
 #include "LevelModule.h"
 
 namespace Level
@@ -31,5 +31,8 @@ namespace Level
         Core::Common::Handle _systemComponentHandle;
         Core::Common::Handle _stageManagerComponentHandle;
         Core::Common::Handle _viewHandle;
+
+        Core::Common::CustomFixMap<Core::Common::FixString128, Core::Common::Handle, 64>
+            _mGameAsset;
     };
 }  // namespace Level

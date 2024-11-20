@@ -49,13 +49,13 @@ namespace InGame
         // TODO: 各機能を実装する
         {
             this->_mShotStrategy.Add(HE_STR_TEXT("Normal"),
-                                     HE_MAKE_CUSTOM_SHARED_PTR(InGameShotStrategyNormalBullet));
+                                     HE_MAKE_CUSTOM_SHARED_PTR((InGameShotStrategyNormalBullet)));
             this->_mShotStrategy.Add(HE_STR_TEXT("Laser"),
-                                     HE_MAKE_CUSTOM_SHARED_PTR(InGameShotStrategyNormalBullet));
+                                     HE_MAKE_CUSTOM_SHARED_PTR((InGameShotStrategyNormalBullet)));
             this->_mShotStrategy.Add(HE_STR_TEXT("Homing"),
-                                     HE_MAKE_CUSTOM_SHARED_PTR(InGameShotStrategyNormalBullet));
+                                     HE_MAKE_CUSTOM_SHARED_PTR((InGameShotStrategyNormalBullet)));
             this->_mShotStrategy.Add(HE_STR_TEXT("4Way"),
-                                     HE_MAKE_CUSTOM_SHARED_PTR(InGameShotStrategyNormalBullet));
+                                     HE_MAKE_CUSTOM_SHARED_PTR((InGameShotStrategyNormalBullet)));
         }
 
         // 弾を打つコンポーネントを追加

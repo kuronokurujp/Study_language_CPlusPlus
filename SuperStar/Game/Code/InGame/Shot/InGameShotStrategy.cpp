@@ -16,7 +16,7 @@ namespace InGame
         // 弾発生イベント通知
         auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
 
-        auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR(EventShotNormalBullet, 0, in_rConfig.pos,
+        auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((EventShotNormalBullet), 0, in_rConfig.pos,
                                                  in_rConfig.dir, in_rConfig.uCollisionHashCoee);
         pEventModule->QueueEvent(std::move(spEvent));
     }

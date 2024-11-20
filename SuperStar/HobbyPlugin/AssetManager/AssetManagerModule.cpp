@@ -39,6 +39,8 @@ namespace AssetManager
     Bool AssetManagerModule::_Load(AssetDataBase* out)
     {
         auto pPlatformModule = this->GetDependenceModule<Platform::PlatformModule>();
+        HE_ASSERT(pPlatformModule);
+
         Platform::FileInterface* pFileSystem = pPlatformModule->VFile();
         if (out->_VLoad(*pFileSystem) == FALSE)
         {

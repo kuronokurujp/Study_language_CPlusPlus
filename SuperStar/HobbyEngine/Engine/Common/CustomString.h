@@ -90,7 +90,9 @@ namespace Core::Common
 
         // いくつかの型を指定できるようにする
         template <typename... Args>
-        typename std::enable_if<(std::is_same<Args, const Char*>::value && ...), void>::type
+        typename std::enable_if<
+            ((std::is_same<Args, Char*>::value || std::is_same<Args, const Char*>::value) && ...),
+            void>::type
         Concatenate(Args... args)
         {
             // 引数の個数を取得

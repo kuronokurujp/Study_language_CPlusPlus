@@ -22,7 +22,7 @@ namespace InGame
     {
         // 利用する弾のアルゴリズムを登録
         {
-            auto upStrategy = HE_MAKE_CUSTOM_UNIQUE_PTR(InGame::InGameBulletNormalStrategy);
+            auto upStrategy = HE_MAKE_CUSTOM_UNIQUE_PTR((InGame::InGameBulletNormalStrategy));
             this->AddStrategy(std::move(upStrategy));
         }
 
@@ -30,12 +30,12 @@ namespace InGame
         {
             auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
 
-            auto upStrategy = HE_MAKE_CUSTOM_UNIQUE_PTR(InGame::InGameShotEventManagerStrategy);
+            auto upStrategy = HE_MAKE_CUSTOM_UNIQUE_PTR((InGame::InGameShotEventManagerStrategy));
             this->_shotEventHandle = pEventModule->AddEventManager(std::move(upStrategy));
             HE_ASSERT(this->_shotEventHandle.Null() == FALSE);
 
             this->_shotEventListener =
-                HE_MAKE_CUSTOM_SHARED_PTR(Event::EventListenerWithRegistEventFunc,
+                HE_MAKE_CUSTOM_SHARED_PTR((Event::EventListenerWithRegistEventFunc),
                                           HE_STR_TEXT("LevelInGameShotListener"),
                                           [this](Event::EventDataInterfacePtr const& in_spEventData)
                                           { return this->_HandleEvent(in_spEventData); });
@@ -182,7 +182,7 @@ namespace InGame
                 reinterpret_cast<EventShotNormalBullet*>(in_spEventData.get());
             HE_ASSERT(pEvent != NULL);
 
-            auto upFactor = HE_MAKE_CUSTOM_UNIQUE_PTR(InGameBulletNormalFactory, pEvent->_pos,
+            auto upFactor = HE_MAKE_CUSTOM_UNIQUE_PTR((InGameBulletNormalFactory), pEvent->_pos,
                                                       pEvent->_dir, pEvent->_uCollisionHashCode);
 
             this->MakeObject(std::move(upFactor));

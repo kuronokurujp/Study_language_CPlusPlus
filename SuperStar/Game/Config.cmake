@@ -9,6 +9,9 @@ set(TARGET_FILES
 
 	Code/Main.cpp
 	Code/Main.h
+	
+	Code/Asset/ParamaterAssetData.h
+	Code/Asset/ParamaterAssetData.cpp
 
 	Code/Level/LevelLauncher.cpp
 	Code/Level/LevelLauncher.h
@@ -83,4 +86,7 @@ set(TARGET_FILES
 	Resource/Assets/Locate/System.toml
 	Resource/Assets/UI/Builder/Test/Launcher.xml
 	Resource/Assets/UI/Builder/Game/Title.xml
+	Resource/Assets/Lua/Enemy/Zako_001.lua
+	Resource/Assets/Paramater/Enemy.json
+	Resource/Assets/Paramater/Player.json
 )

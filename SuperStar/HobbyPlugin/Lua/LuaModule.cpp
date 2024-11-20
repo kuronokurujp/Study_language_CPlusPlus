@@ -1,15 +1,41 @@
 ﻿#include "LuaModule.h"
 
+#include "Engine/Common/CustomStack.h"
 #include "Engine/Memory/Memory.h"
+
+// Luaエンジン
 #include "Lua/ThirdParty/lua/src/lua.hpp"
 
 namespace Lua
 {
-
     static UTF8 s_szPushStackTempText[1024] = {NULL};
 
-    static void _AddFuncByState(lua_State* in_pState, const Char* in_szFuncName,
-                                lua_CFunction in_FuncAddr)
+    // Luaモジュールのインスタンスは一つしかない前提
+    static Core::Common::CustomFixStack<LuaFuncData, 128> s_sLuaFuncResultData;
+
+    /// <summary>
+    /// Lua処理でエラーが起きた場合のトレースバックのデバッグ処理
+    /// </summary>
+    int _LuaDebugTraceback(lua_State* L)
+    {
+        const UTF8* msg = lua_tostring(L, 1);
+        if (msg)
+        {
+            luaL_traceback(L, L, msg, 1);
+        }
+        else
+        {
+            lua_pushliteral(L, "No error message");
+        }
+
+        return 1;
+    }
+
+    /// <summary>
+    /// Luaスクリプトで実行する関数を追加
+    /// </summary>
+    static Bool _LuaRegistFuncByState(lua_State* in_pState, const Char* in_szFuncName,
+                                      lua_CFunction in_funcAddr)
     {
         Core::Common::s_szTempFixString256 = in_szFuncName;
 
@@ -17,7 +43,80 @@ namespace Lua
         Core::Common::s_szTempFixString256
             .OutputUTF8(szRegistFuncName, Core::Common::s_szTempFixString256.Capacity());
 
-        lua_register(in_pState, szRegistFuncName, in_FuncAddr);
+        // アップバリューとして関数名をプッシュ
+        lua_pushstring(in_pState, szRegistFuncName);
+        // アップバリューを1つ持つクロージャを作成
+        lua_pushcclosure(in_pState, in_funcAddr, 1);
+        // グローバル関数として登録
+        lua_setglobal(in_pState, szRegistFuncName);
+
+        return TRUE;
+    }
+
+    /// <summary>
+    /// Luaスクリプト内で呼び出される関数
+    /// </summary>
+    static int _LuaScriptCallFunc(lua_State* in_pLuaState)
+    {
+        // 関数結果をスタックにプッシュ
+        LuaFuncData* pFuncData = s_sLuaFuncResultData.PushFront();
+
+        // 関数名を取得
+        {
+            const UTF8* szName = lua_tostring(in_pLuaState, lua_upvalueindex(1));
+            // 関数名設定
+            Core::Common::s_szTempFixString128 = szName;
+            HE_STR_CPY_S(pFuncData->szFuncName, HE_ARRAY_NUM(pFuncData->szFuncName),
+                         Core::Common::s_szTempFixString128.Str(),
+                         Core::Common::s_szTempFixString128.Length());
+        }
+
+        // 関数の引数の数を取得
+        const Uint32 argCount = static_cast<Uint32>(lua_gettop(in_pLuaState));
+        HE_ASSERT(argCount <= HE_ARRAY_NUM(pFuncData->aArg));
+
+        // スタックにプッシュしたデータをうめる
+        pFuncData->uArgCount = argCount;
+
+        // TODO: 非型テンプレートで一行でCallを呼び出すようにする
+        // 引数の各値を取得
+        for (Uint32 i = 1; i <= argCount; ++i)
+        {
+            auto* pArgData = &pFuncData->aArg[i - 1];
+            int type       = lua_type(in_pLuaState, i);
+            switch (type)
+            {
+                case LUA_TNUMBER:
+                {
+                    pArgData->eValType = ELuaFuncArgType_Float32;
+
+                    const Float32 fVal  = lua_tonumber(in_pLuaState, i);
+                    pArgData->data.fVal = fVal;
+                    break;
+                }
+                case LUA_TSTRING:
+                {
+                    pArgData->eValType = ELuaFuncArgType_Str;
+
+                    const UTF8* pStr                   = lua_tostring(in_pLuaState, i);
+                    Core::Common::s_szTempFixString128 = pStr;
+
+                    HE_STR_CPY_S(pArgData->data.szText, HE_ARRAY_NUM(pArgData->data.szText),
+                                 Core::Common::s_szTempFixString128.Str(),
+                                 Core::Common::s_szTempFixString128.Length());
+
+                    break;
+                }
+                // 非対応の型なのでエラー
+                default:
+                {
+                    HE_ASSERT(FALSE && "Luaスクリプトが呼び出した関数の引数型が対応していない");
+                    break;
+                }
+            }
+        }
+
+        return 0;
     }
 
     /// <summary>
@@ -117,58 +216,11 @@ namespace Lua
 #endif
     }
 
-    // Sint32型をプッシュ
-    static void pushValue(lua_State* L, const Sint32 value)
-    {
-        lua_pushinteger(L, static_cast<lua_Integer>(value));
-    }
-
-    // Uint32型をプッシュ
-    static void pushValue(lua_State* L, const Uint32 value)
-    {
-        lua_pushinteger(L, static_cast<lua_Integer>(value));
-    }
-
-    // Float32
-    static void pushValue(lua_State* L, const Float32 value)
-    {
-        lua_pushnumber(L, static_cast<lua_Number>(value));
-    }
-
-    // Bool型をプッシュ
-    static void pushValue(lua_State* L, const Bool value)
-    {
-        lua_pushboolean(L, value);
-    }
-
-    // const Char* 型をプッシュ
-    static void pushValue(lua_State* L, const Char* value)
-    {
-    }
-
-    // StringBase型を
-    static void pushValue(lua_State* L, const Core::Common::StringBase& value)
-    {
-    }
-
-    // ベースケース：引数がない場合
-    static void pushArguments(lua_State* L)
-    {
-        // 何もしない
-    }
-
-    // 再帰ケース：少なくとも一つの引数がある場合
-    template <typename T, typename... Args>
-    static void pushArguments(lua_State* L, T value, Args... args)
-    {
-        pushValue(L, value);        // 現在の引数をプッシュ
-        pushArguments(L, args...);  // 残りの引数を処理（再帰）
-    }
-
     const Core::Common::Handle LuaModule::CreateLuaObject(const Char* in_pName)
     {
         HE_ASSERT(in_pName && "Luaオブジェクトの作成で名前指定がない");
 
+        // TODO: スレッドを使った非同期対応が必要
         Core::Common::s_szTempFixString128 = in_pName;
 
         Core::Common::Handle handle;
@@ -183,14 +235,14 @@ namespace Lua
         //	常に常駐させる関数登録
         {
             //	デバッグ表示
-            _AddFuncByState(pLuaState, HE_STR_TEXT("HE_LOG"), &_LuaFuncByLog);
+            _LuaRegistFuncByState(pLuaState, HE_STR_TEXT("HE_LOG"), &_LuaFuncByLog);
         }
 
         HE_STR_CPY_S(pLuaObject->szName, HE_ARRAY_NUM(pLuaObject->szName),
                      Core::Common::s_szTempFixString128.Str(),
                      Core::Common::s_szTempFixString128.Length());
 
-        this->_mUseLuaObject.Add(pLuaObject, handle);
+        this->_mUseLuaObject.Add(pLuaState, handle);
 
         return handle;
     }
@@ -202,11 +254,11 @@ namespace Lua
         auto* pLuaObject = this->_luaObjectPool.Ref(in_rHandle);
         if (pLuaObject == NULL) return FALSE;
 
-        this->_mUseLuaObject.Erase(pLuaObject);
-
         lua_State* pLuaState = reinterpret_cast<lua_State*>(pLuaObject->pLuaState);
         HE_ASSERT(pLuaState);
         lua_close(pLuaState);
+
+        this->_mUseLuaObject.Erase(pLuaObject->pLuaState);
 
         return this->_luaObjectPool.Free(in_rHandle);
     }
@@ -226,15 +278,80 @@ namespace Lua
 
         lua_State* pLuaState = reinterpret_cast<lua_State*>(pLuaObject->pLuaState);
         HE_ASSERT(pLuaState);
-        auto result = luaL_dostring(pLuaState, szText);
-        if (result == LUA_OK)
+        // Luaコードをロード
+        if (luaL_loadstring(pLuaState, szText) != LUA_OK)
         {
-            return TRUE;
+            // スタックトップのエラーメッセージを取得
+            const UTF8* szError = lua_tostring(pLuaState, -1);
+            HE_LOG_LINE(HE_STR_TEXT("Lua load error: %s"), szError);
+
+            // スタックトップのエラーメッセージをスタックから取り除く
+            lua_pop(pLuaState, 1);
+
+            return FALSE;
         }
 
-        // TODO: エラー処理
-        _LuaErrorMsg(pLuaState, result);
+        // エラーハンドラ関数をスタックにプッシュ
+        lua_pushcfunction(pLuaState, _LuaDebugTraceback);
+
+        // スタックの並びを調整
+        // 以下のスタック状態になる
+        // [関数]
+        // [エラーハンドラ]
+        lua_insert(pLuaState, -2);
+
+        // Luaコードを実行（エラーハンドラを指定）
+        if (lua_pcall(pLuaState, 0, LUA_MULTRET, -2) == LUA_OK)
+        {
+            // エラーハンドラをスタックから取り除く
+            lua_pop(pLuaState, 1);
+            return TRUE;
+        }
+        else
+        {
+            // エラーメッセージとエラーハンドラをスタックから取り除く
+            const UTF8* szError = lua_tostring(pLuaState, -1);
+            HE_LOG_LINE(HE_STR_TEXT("Lua runtime error:\n%s"), szError);
+            lua_pop(pLuaState, 2);
+        }
+
         return FALSE;
+    }
+
+    // c++側がキャッチできる関数を登録
+    Bool LuaModule::RegistScriptFunc(const Core::Common::Handle& in_rHandle,
+                                     const Char* in_pFuncName)
+    {
+        HE_ASSERT(in_rHandle.Null() == FALSE);
+
+        Core::Common::s_szTempFixString1024 = in_pFuncName;
+        HE_ASSERT(0 < Core::Common::s_szTempFixString1024.Length());
+
+        auto* pLuaObject = this->_luaObjectPool.Ref(in_rHandle);
+        if (pLuaObject == NULL) return FALSE;
+
+        lua_State* pLuaState = reinterpret_cast<lua_State*>(pLuaObject->pLuaState);
+        HE_ASSERT(pLuaState);
+
+        // Luaスクリプトをが呼ぶ関数名を生成
+        // State名を先頭につける
+        Core::Common::s_szTempFixString1024.Clear();
+        Core::Common::s_szTempFixString1024 += pLuaObject->szName;
+        Core::Common::s_szTempFixString1024 += HE_STR_TEXT("_");
+        Core::Common::s_szTempFixString1024 += in_pFuncName;
+
+        // Luaスクリプトが呼び出した関数を受け取るようにする
+        return _LuaRegistFuncByState(pLuaState, Core::Common::s_szTempFixString1024.Str(),
+                                     &_LuaScriptCallFunc);
+    }
+
+    Bool LuaModule::SetEventFunctionByLuaFunc(
+        Core::Memory::SharedPtr<Core::Common::FunctionObject<void, LuaFuncData&>> in_spFunc)
+    {
+        auto a = reinterpret_cast<std::uintptr_t>(in_spFunc.get());
+        this->_mScriptFuncAction.Add(a, in_spFunc);
+
+        return TRUE;
     }
 
     /// <summary>
@@ -243,6 +360,10 @@ namespace Lua
     Bool LuaModule::_VStart()
     {
         HE_ASSERT(this->_mUseLuaObject.Empty());
+        this->_mScriptFuncAction.Clear();
+
+        s_sLuaFuncResultData.Clear();
+
         return TRUE;
     }
 
@@ -257,6 +378,60 @@ namespace Lua
             this->ReleaseLuaObject(itr->data);
         }
         HE_ASSERT(this->_mUseLuaObject.Empty());
+
+        // 参照先をNULLにしないとメモリが残る
+        for (auto itr = this->_mScriptFuncAction.Begin(); itr != this->_mScriptFuncAction.End();
+             ++itr)
+        {
+            itr->data = NULL;
+        }
+        this->_mScriptFuncAction.Clear();
+
+        s_sLuaFuncResultData.Clear();
+
+        return TRUE;
+    }
+
+    Bool LuaModule::_VLateUpdate(const Float32 in_fDeltaTime)
+    {
+        // TODO: Luaスクリプトから呼び出した関数結果を出力
+
+        while (s_sLuaFuncResultData.Empty() == FALSE)
+        {
+            auto& rData = s_sLuaFuncResultData.PopBack();
+            // TODO: 関数結果を受け取る
+            // HE_LOG_LINE(HE_STR_TEXT("Lua関数は%s関数を呼んだ"), rData.szFuncName);
+
+            for (auto itr = this->_mScriptFuncAction.Begin(); itr != this->_mScriptFuncAction.End();
+                 ++itr)
+            {
+                if (1 < itr->data.use_count())
+                {
+                    itr->data->Call(rData);
+                }
+                else
+                {
+                    DeleterFreeMemory* pDeleter = std::get_deleter<DeleterFreeMemory>(itr->data);
+                    if (pDeleter)
+                    {
+#ifdef HE_ENGINE_DEBUG
+
+                        HE_LOG_LINE(
+                            HE_STR_TEXT(
+                                "参照カウント数が1以下で参照が危険なので削除: File(%s) / Line(%d)"),
+                            pDeleter->szFilename, pDeleter->uLine);
+#endif
+                    }
+                    else
+                    {
+                        HE_LOG_LINE(HE_STR_TEXT("参照カウント数が1以下で参照が危険なので削除"));
+                    }
+
+                    this->_mScriptFuncAction.Erase(itr);
+                    itr->data = NULL;
+                }
+            }
+        }
 
         return TRUE;
     }
@@ -318,7 +493,6 @@ namespace Lua
         lua_pushstring(pLuaState, s_szPushStackTempText);
     }
 
-    // StringBase型を
     void LuaModule::_LuaStackPushValue(void* in_pLuaState,
                                        const Core::Common::StringBase& in_rszValue)
     {
@@ -344,6 +518,7 @@ namespace Lua
         // 名前が関数名でなければエラー
         if (lua_getglobal(pLuaState, s_szPushStackTempText) != LUA_TFUNCTION)
         {
+            HE_LOG_LINE(HE_STR_TEXT("Lua関数(%s)は関数じゃない"), s_szPushStackTempText);
             return FALSE;
         }
 
@@ -364,6 +539,7 @@ namespace Lua
         HE_ASSERT(pLuaState);
 
         // TODO: Lua関数の戻り値は非対応
+        // TODO: Lua関数のコルーチンは非対応
         if (lua_pcall(pLuaState, in_uArgCount, 0, 0) != LUA_OK)
         {
             const UTF8* szError = lua_tolstring(pLuaState, -1, NULL);

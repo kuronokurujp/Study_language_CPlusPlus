@@ -85,16 +85,12 @@ namespace Core::Common
             // TODO: 予約した数を変えたい場合にも対応できるようにしたほうがいい
 
             if (this->_upCacheDatas == NULL)
-                this->_upCacheDatas = HE_MAKE_CUSTOM_UNIQUE_PTR(std::vector<T*>);
+                this->_upCacheDatas = HE_MAKE_CUSTOM_UNIQUE_PTR((std::vector<T*>));
 
             if (this->_upUserSlot == NULL)
             {
-                // this->_upUserSlot =
-                // HE_MAKE_CUSTOM_UNIQUE_PTR(std::unordered_map<Core::Common::Handle, T*>);
-                // 上記のやり方だとエラーになるので代替え方法
                 this->_upUserSlot =
-                    Core::Memory::MakeCustomUniquePtr<std::unordered_map<Core::Common::Handle, T*>>(
-                        HE_FILE, __LINE__);
+                    HE_MAKE_CUSTOM_UNIQUE_PTR((std::unordered_map<Core::Common::Handle, T*>));
             }
 
             this->_upCacheDatas->reserve(in_uMax);

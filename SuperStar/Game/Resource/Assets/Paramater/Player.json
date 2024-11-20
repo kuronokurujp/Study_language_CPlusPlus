@@ -1,0 +1,9 @@
+{
+    "version": 1,
+    "data": {
+        "player_default": {
+            "hp": 100,
+            "move_spped": 1.0
+        }
+    }
+}

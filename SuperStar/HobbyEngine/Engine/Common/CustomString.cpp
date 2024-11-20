@@ -229,23 +229,31 @@ namespace Core::Common
     /// UTF8として出力
     /// 文字列をUTF-8として利用したい場合に利用
     /// </summary>
-    void StringBase::OutputUTF8(UTF8* out, const Uint32 in_uLen) const
+    void StringBase::OutputUTF8(UTF8* out, const Uint32 in_uOutBuffLen) const
     {
         HE_ASSERT(out);
-        HE_ASSERT(in_uLen <= this->Capacity());
+        ::memset(out, 0, in_uOutBuffLen);
+
+        Uint32 uOutputTextMaxLen = in_uOutBuffLen;
+        if (in_uOutBuffLen <= this->Capacity())
+        {
+            uOutputTextMaxLen = this->Capacity();
+        }
+
         // wchar_t型をutf8のcharに変えて出力
 #ifdef HE_WIN
-        ::memset(out, 0, in_uLen);
-
         // WideからUTF8にした時の文字列数を取得
-        Sint32 uStrLen = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, this->Str(), -1, NULL,
-                                             0, NULL, NULL);
-        if (uStrLen <= 0) return;
+        {
+            Sint32 uUTF8TextLen = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, this->Str(),
+                                                      -1, NULL, 0, NULL, NULL);
+            if (uUTF8TextLen <= 0) return;
+
+            uOutputTextMaxLen = HE_MIN(static_cast<Uint32>(uUTF8TextLen), uOutputTextMaxLen);
+        }
 
         // UTF8の文字列数を出力
-        uStrLen = HE_MIN(static_cast<Uint32>(uStrLen), in_uLen);
-        WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, this->Str(), -1, out, uStrLen, NULL,
-                            NULL);
+        WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, this->Str(), -1, out, uOutputTextMaxLen,
+                            NULL, NULL);
 #else
         // TODO: のちに対応
         HE_ASSERT(0 && "Str()のをそのままコピーする");

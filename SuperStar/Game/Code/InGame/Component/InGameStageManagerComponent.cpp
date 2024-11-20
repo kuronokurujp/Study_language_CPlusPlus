@@ -83,12 +83,12 @@ namespace InGame
             auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
 
             auto upStrategy =
-                HE_MAKE_CUSTOM_UNIQUE_PTR(InGame::InGameCharacterEventManagerStrategy);
+                HE_MAKE_CUSTOM_UNIQUE_PTR((InGame::InGameCharacterEventManagerStrategy));
             this->_characterEventHandle = pEventModule->AddEventManager(std::move(upStrategy));
             HE_ASSERT(this->_characterEventHandle.Null() == FALSE);
 
             this->_spCharacterEventListener =
-                HE_MAKE_CUSTOM_SHARED_PTR(Event::EventListenerWithRegistEventFunc,
+                HE_MAKE_CUSTOM_SHARED_PTR((Event::EventListenerWithRegistEventFunc),
                                           HE_STR_TEXT("LevelInGameCharacterListener"),
                                           [this](Event::EventDataInterfacePtr const& in_spEventData)
                                           { return this->_HandleCharacterEvent(in_spEventData); });

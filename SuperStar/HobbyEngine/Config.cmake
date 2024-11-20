@@ -37,6 +37,7 @@ set(ENGINE_TARGET_FILES
     Engine/Common/Hash.cpp
     Engine/Common/UUID.h
     Engine/Common/UUID.cpp
+    Engine/Common/Function.h
     
     Engine/File/Path.cpp
     Engine/File/Path.h

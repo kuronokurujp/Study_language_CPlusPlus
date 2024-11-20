@@ -75,20 +75,20 @@ TEST_CASE("Event System")
         CHECK(memoryManager.CheckAllMemoryBlock());
     }
 
-    auto st = HE_MAKE_CUSTOM_UNIQUE_PTR(TestEventManagerStrategy);
+    auto st = HE_MAKE_CUSTOM_UNIQUE_PTR((TestEventManagerStrategy));
     Event::EventManager eventMng(std::move(st));
 
     HE_LOG_LINE(HE_STR_TEXT("EventMangerTest"));
 
     // リスナー登録
-    auto spTestListenr = HE_MAKE_CUSTOM_UNIQUE_PTR(TestListener);
+    auto spTestListenr = HE_MAKE_CUSTOM_UNIQUE_PTR((TestListener));
 
     // リスナー追加は初回なので必ず成功する
     CHECK(eventMng.AddListener(std::move(spTestListenr), EventTest::s_TestEventType));
 
     // イベントは生成して所有権は管理側に渡す
     auto spTestEvent =
-        HE_MAKE_CUSTOM_UNIQUE_PTR(EventTest::EvtDataTextPut, EventTest::s_TestEventType);
+        HE_MAKE_CUSTOM_UNIQUE_PTR((EventTest::EvtDataTextPut), EventTest::s_TestEventType);
     CHECK(eventMng.QueueEvent(std::move(spTestEvent)));
 
     // 登録しているイベント型名から登録リスナーを出力
@@ -157,7 +157,7 @@ TEST_CASE("Event System All Remove Listener")
         CHECK(memoryManager.CheckAllMemoryBlock());
     }
 
-    auto st = HE_MAKE_CUSTOM_UNIQUE_PTR(TestEventManagerStrategy);
+    auto st = HE_MAKE_CUSTOM_UNIQUE_PTR((TestEventManagerStrategy));
     Event::EventManager eventMng(std::move(st));
 
     HE_LOG_LINE(HE_STR_TEXT("EventMangerTest RemoveAllListener"));
@@ -165,8 +165,8 @@ TEST_CASE("Event System All Remove Listener")
     // リスナー登録
     // イベントタイプが違うリスナーを登録
     {
-        auto spTestListenr  = HE_MAKE_CUSTOM_UNIQUE_PTR(TestListener);
-        auto spTestListenr2 = HE_MAKE_CUSTOM_UNIQUE_PTR(TestListener);
+        auto spTestListenr  = HE_MAKE_CUSTOM_UNIQUE_PTR((TestListener));
+        auto spTestListenr2 = HE_MAKE_CUSTOM_UNIQUE_PTR((TestListener));
 
         // リスナー追加は初回なので必ず成功する
         CHECK(eventMng.AddListener(std::move(spTestListenr), EventTest::s_TestEventType));

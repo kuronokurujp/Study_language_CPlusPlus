@@ -112,14 +112,14 @@ namespace DXLib
     {
         if (this->_bQuit) return FALSE;
 
+        auto pRenderModule = this->GetDependenceModule<Render::RenderModule>();
+        if (pRenderModule == NULL) return FALSE;
+
         // 画面全体の色を初期化
         ::SetBackgroundColor(0, 0, 0);
 
         // 画面の描画クリア
         ::ClearDrawScreen();
-
-        auto pRenderModule = this->GetDependenceModule<Render::RenderModule>();
-        HE_ASSERT(pRenderModule);
 
         // ビュー毎に描画コマンド処理
         auto vViewHandles = pRenderModule->ViewHandles();

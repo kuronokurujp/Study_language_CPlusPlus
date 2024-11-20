@@ -36,14 +36,14 @@ namespace Localization
         using LocateMap =
             Core::Common::CustomFixMap<Core::Common::FixString128, SystemAssetData::LocateData, 32>;
 
-        virtual Bool _VLoad(Platform::FileInterface& in_rFileSystem) override;
+        virtual Bool _VLoad(Platform::FileInterface&) override;
 
         /// <summary>
         /// ロケートマップデータを探して取得
         /// 常駐しているメンバー変数を参照するようにしている
         /// 呼び出し側が参照したメンバー変数の書き換えたをできないようにするためにconstにしている
         /// </summary>
-        const LocateMap& FindLocate(const Char* in_szLocateName);
+        const LocateMap& FindLocate(const Char*);
 
     private:
         /// <summary>
@@ -53,7 +53,7 @@ namespace Localization
     };
 
     /// <summary>
-    /// 言語のテキストなどのアセットデータ
+    /// 言語のテキストアセットデータ
     /// </summary>
     class LocateAssetData final : public AssetManager::AssetDataJson
     {
@@ -61,11 +61,11 @@ namespace Localization
         /// <summary>
         /// テキスト取得
         /// </summary>
-        /// <param name="in_pKey"></param>
-        /// <returns></returns>
-        const Core::Common::FixString1024& GetText(const Char* in_szKey);
+        const Core::Common::FixString1024& GetText(const Char*);
 
     private:
+        // 一度読み込んだテキストをキャッシュするテキストバッファ
+        // 同じデータを何度も読み込まないようにするため
         Core::Common::CustomFixMap<Core::Common::FixString128, Core::Common::FixString1024, 128>
             _textBuffMap;
     };

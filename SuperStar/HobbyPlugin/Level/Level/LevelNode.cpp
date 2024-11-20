@@ -60,7 +60,8 @@ namespace Level
         Core::Common::CustomList<Actor::InputComponent> _lstInputComponent;
     };
 
-    Node::Node() : Actor::Object(), _actorManager(HE_MAKE_CUSTOM_UNIQUE_PTR(ActorManagerDecorater))
+    Node::Node()
+        : Actor::Object(), _actorManager(HE_MAKE_CUSTOM_UNIQUE_PTR((ActorManagerDecorater)))
     {
     }
 

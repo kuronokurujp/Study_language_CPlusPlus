@@ -3,6 +3,9 @@
 #include "Engine/Common/Hash.h"
 #include "Engine/Math/Vector2.h"
 
+// ゲーム専用アセット
+#include "Asset/ParamaterAssetData.h"
+
 // インゲーム専用コンポーネント一覧
 #include "InGame/Component/InGameBulletManagerComponent.h"
 #include "InGame/Component/InGameCollisionComponent.h"
@@ -17,6 +20,7 @@
 #include "InGame/Event/InGameEventCharacter.h"
 
 // 利用モジュール
+#include "AssetManagerModule.h"
 #include "EnhancedInputModule.h"
 #include "EventModule.h"
 #include "RenderModule.h"
@@ -47,6 +51,25 @@ namespace Level
         HE_ASSERT(bRet);
 
         // TODO: アセットのロード
+        {
+            auto pAssetManagerModule =
+                HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
+
+            auto szPlayerParamaterAssetName = HE_STR_TEXT("PlayerParamater");
+            auto playerParamaterAssetHandle =
+                pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
+                    szPlayerParamaterAssetName,
+                    Core::File::Path(HE_STR_TEXT("Paramater/Player.json")));
+            this->_mGameAsset.Add(HE_STR_TEXT("PlayerParamater"), playerParamaterAssetHandle);
+
+            auto szEnemeyParamaterAssetName = HE_STR_TEXT("EnemyParamater");
+            auto enemyParamaterAssetHandle =
+                pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
+                    szEnemeyParamaterAssetName,
+                    Core::File::Path(HE_STR_TEXT("Paramater/Enemy.json")));
+
+            this->_mGameAsset.Add(HE_STR_TEXT("EnemyParamater"), enemyParamaterAssetHandle);
+        }
 
         // ユーザー共通入力割り当て設定
         {
@@ -112,6 +135,12 @@ namespace Level
 
     Bool LevelInGame::VEnd()
     {
+        // ロードしたアセットを解放
+        {
+            auto pAssetManagerModule =
+                HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
+        }
+
         auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
         pRenderModule->RemoveView(this->_viewHandle);
 
@@ -171,7 +200,7 @@ namespace Level
         {
             // TODO: イベントを作成処理は重いかも
             // 自前アロケーターを使っているが,
-            auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR(InGame::EventCharacterAttack, 0,
+            auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterAttack), 0,
                                                      InGame::EObjectTag_Player, 0);
             pEventModule->QueueEvent(spEvent);
             /*
@@ -186,7 +215,7 @@ namespace Level
         if (move.IsZero() == FALSE)
         {
             move.Normalize();
-            auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR(InGame::EventCharacterMove, 0,
+            auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterMove), 0,
                                                      InGame::EObjectTag_Player, 0, move);
             pEventModule->QueueEvent(spEvent);
         }

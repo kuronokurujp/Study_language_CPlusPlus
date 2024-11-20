@@ -1,0 +1,17 @@
+{
+    "version": 1,
+    "data": {
+        "zako_debug": {
+            "hp": 10,
+            "move_spped": 1.0
+        },
+        "zako": {
+            "hp": 10,
+            "move_spped": 2.0
+        },
+        "zako_02": {
+            "hp": 20,
+            "move_spped": 1.0
+        }
+    }
+}

@@ -24,7 +24,7 @@ namespace Level
     {
         // レベル関連の準備
         {
-            this->_spLevelManager = HE_MAKE_CUSTOM_SHARED_PTR(Manager);
+            this->_spLevelManager = HE_MAKE_CUSTOM_SHARED_PTR((Manager));
             this->_spLevelManager->Init();
         }
 

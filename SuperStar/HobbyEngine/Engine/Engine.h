@@ -5,7 +5,9 @@
 
 // デバッグビルドのみ有効
 #ifdef HE_ENGINE_DEBUG
+#ifdef HE_UNIT_TEST_MODE
 #include <functional>
+#endif
 #endif
 
 // 前方宣言
@@ -161,13 +163,12 @@ private:
 #ifdef HE_ENGINE_DEBUG
 // ユニットテスト専用
 #ifdef HE_UNIT_TEST_MODE
-#include <functional>
 
 /// <summary>
 /// 一つのモジュールを単体テスト実行
 /// </summary>
-template <typename T>
-static void UnitTestRunnerByModuleOnly(std::function<void(T*)> in_func)
+template <class... TArgs>
+static void UnitTestRunnerByModuleOnly(std::function<Bool()> in_func)
 {
     // エンジン起動
     HE_CREATE_ENGINE;
@@ -177,11 +178,13 @@ static void UnitTestRunnerByModuleOnly(std::function<void(T*)> in_func)
 
     // テストモジュールを登録
     {
-        HE_ENGINE.AddModule<T>();
+        (HE_ENGINE.AddModule<TArgs>(), ...);
     }
 
     const Bool bInitRet = HE_ENGINE.Start();
     HE_ASSERT(bInitRet && "初期化に失敗");
+    Bool bEnd = FALSE;
+    while (bEnd == FALSE)
     {
         const Float32 d = HE_ENGINE.GetDeltaTimeSec();
         if (HE_ENGINE.BeforeUpdateLoop(d))
@@ -191,8 +194,8 @@ static void UnitTestRunnerByModuleOnly(std::function<void(T*)> in_func)
             if (HE_ENGINE.MainUpdateLoop(d))
             {
                 HE_ENGINE.LateUpdateLoop(d);
-                // TODO: ここでモジュールのテストをする?
-                in_func(HE_ENGINE.ModuleManager().Get<T>());
+                // モジュールのテスト
+                bEnd = in_func();
             }
         }
     }

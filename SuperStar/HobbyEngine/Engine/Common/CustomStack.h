@@ -45,6 +45,25 @@ namespace Core::Common
             return &this->_pBuff[(this->_uNum - 1)];
         }
 
+        /// <summary>
+        /// 配列の先頭に要素を追加
+        /// </summary>
+        TYPE* PushFront()
+        {
+            HE_ASSERT(this->_uNum < this->Capacity());
+
+            if (0 < this->_uNum)
+            {
+                // 配列先頭からのデータを一つ横にずらしてインデックス0に空きを作る
+                Uint32 uMemMoveSize = this->_uNum * sizeof(TYPE);
+                ::memmove(&this->_pBuff[1], &this->_pBuff[0], uMemMoveSize);
+            }
+
+            ++this->_uNum;
+
+            return &this->_pBuff[0];
+        }
+
         TYPE& PopBack()
         {
             Sint32 i = this->_uNum - 1;

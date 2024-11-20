@@ -18,7 +18,7 @@ Bool Engine::Init()
 
     this->_bInit = TRUE;
 
-    this->_memoryManager.VRelease();
+    this->_memoryManager.Set();
 
     // メモリ管理
     // カスタムメモリ確保
@@ -53,7 +53,7 @@ Bool Engine::Init()
     }
 
     // モジュール管理を使えるようにする
-    this->_upModuleManager = HE_MAKE_CUSTOM_UNIQUE_PTR(Module::ModuleManager);
+    this->_upModuleManager = HE_MAKE_CUSTOM_UNIQUE_PTR((Module::ModuleManager));
 
     // 成功
     return TRUE;
@@ -81,7 +81,7 @@ Bool Engine::Start()
     auto pPlatformModule = this->_PlatformModule();
     if (pPlatformModule)
     {
-        this->_spFPS = HE_MAKE_CUSTOM_SHARED_PTR(Core::Time::FPS, pPlatformModule->VTime());
+        this->_spFPS = HE_MAKE_CUSTOM_SHARED_PTR((Core::Time::FPS), pPlatformModule->VTime());
     }
 
     this->_bStart = TRUE;
@@ -107,6 +107,7 @@ Bool Engine::VRelease()
     // アプリ/エンジンで利用しているメモリはここで解放
     // 確保したメモリが残っている場合はエラーになるので注意
     this->_memoryManager.VRelease();
+    this->_memoryManager.Reset();
 
     HE_LOG_LINE(HE_STR_TEXT("エンジンの終了"));
     // デストラクタが呼ばれる

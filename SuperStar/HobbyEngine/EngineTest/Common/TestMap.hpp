@@ -215,3 +215,31 @@ TEST_CASE("FixMap Copy")
         HE_LOG_LINE(HE_STR_TEXT("key(%s) / data(%d)"), iter->key.Str(), iter->data);
     }
 }
+
+TEST_CASE("FixMap Erase")
+{
+    BASICMAP srcmap;
+    srcmap.Add(Core::Common::FixString16(HE_STR_TEXT("a")), 1);
+    srcmap.Add(Core::Common::FixString16(HE_STR_TEXT("b")), 2);
+    srcmap.Add(Core::Common::FixString16(HE_STR_TEXT("c")), 3);
+    srcmap.Add(Core::Common::FixString16(HE_STR_TEXT("d")), 4);
+    srcmap.Add(Core::Common::FixString16(HE_STR_TEXT("e")), 5);
+    srcmap.Add(Core::Common::FixString16(HE_STR_TEXT("f")), 6);
+
+    // ループ中に要素削除しても大丈夫か
+    for (auto itr = srcmap.Begin(); itr != srcmap.End(); ++itr)
+    {
+        HE_LOG_LINE(HE_STR_TEXT("key(%s), data(%d)"), itr->key.Str(), itr->data);
+
+        if (itr->data == 2)
+        {
+            HE_LOG_LINE(HE_STR_TEXT("Delete data 2"));
+            srcmap.Erase(itr);
+        }
+    }
+
+    for (auto itr = srcmap.Begin(); itr != srcmap.End(); ++itr)
+    {
+        HE_LOG_LINE(HE_STR_TEXT("key(%s), data(%d)"), itr->key.Str(), itr->data);
+    }
+}

@@ -12,6 +12,12 @@ set(ASSET_MANAGER_PLUGIN_TARGET_FILES
     
     AssetManager/AssetDataBase.h
     AssetManager/AssetDataBase.cpp
+    AssetManager/AssetDataJson.h
+    AssetManager/AssetDataJson.cpp
+    AssetManager/AssetDataToml.h
+    AssetManager/AssetDataToml.cpp
+    AssetManager/AssetDataXml.h
+    AssetManager/AssetDataXml.cpp
     
     AssetManager/ThirdParty/pugixml/pugiconfig.hpp
     AssetManager/ThirdParty/pugixml/pugixml.cpp

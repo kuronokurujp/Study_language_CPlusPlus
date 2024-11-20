@@ -8,6 +8,9 @@
 
 // モジュールのヘッダーファイルは全てインクルードする
 #include "AssetManager/AssetDataBase.h"
+#include "AssetManager/AssetDataJson.h"
+#include "AssetManager/AssetDataToml.h"
+#include "AssetManager/AssetDataXml.h"
 
 namespace AssetManager
 {

@@ -83,7 +83,7 @@ namespace UI
         auto hInputRouter = this->AddComponent<Actor::InputComponent>(handlePack, 0);
         // 入力ルーター設定
         {
-            auto pInputStrategy = HE_MAKE_CUSTOM_SHARED_PTR(UI::UIInputRouterStrategy);
+            auto pInputStrategy = HE_MAKE_CUSTOM_SHARED_PTR((UI::UIInputRouterStrategy));
 
             auto pWidget         = this->GetWidget(handlePack);
             auto pInputComponent = pWidget->GetComponent<Actor::InputComponent>(hInputRouter);
@@ -209,7 +209,7 @@ namespace UI
                             //                                pWidget->GetComponent<UI::UIButtonComponent>(handle);
 
                             auto handler = HE_MAKE_CUSTOM_UNIQUE_PTR(
-                                UI::UIButtonMessageHandlerDefault, pNodeData->szId,
+                                (UI::UIButtonMessageHandlerDefault), pNodeData->szId,
                                 [this, &widgetHandlePack](Core::Common::StringBase& in_msg)
                                 {
                                     auto pLevelModule =

@@ -251,7 +251,7 @@ namespace Event
         this->_aQueue[this->_iActiveQueue].clear();
 
         // 特殊イベントをリスナーが受け取り処理
-        auto itSpecalEventListener = this->_mRegistry.FindKey(BaseEventData::EType_SpecalEvent);
+        auto itSpecalListener = this->_mRegistry.FindKey(BaseEventData::EType_SpecalEvent);
 
         while (0 < this->_aQueue[sQueueToProcess].size())
         {
@@ -261,15 +261,15 @@ namespace Event
 
             // 特殊イベントタイプのリスナー処理
             {
-                if (itSpecalEventListener != this->_mRegistry.End())
+                if (itSpecalListener != this->_mRegistry.End())
                 {
-                    EventListenerTable const& table = itSpecalEventListener->data;
-                    for (EventListenerTable::const_iterator it2    = table.begin(),
-                                                            it2End = table.end();
-                         it2 != it2End; it2++)
+                    EventListenerTable const& table = itSpecalListener->data;
+                    for (EventListenerTable::const_iterator listener         = table.begin(),
+                                                            listenerEndPoint = table.end();
+                         listener != listenerEndPoint; listener++)
                     {
                         // 特殊イベントは処理失敗しても継続
-                        (*it2)->VHandleEvent(spEvent);
+                        (*listener)->VHandleEvent(spEvent);
                     }
                 }
             }
@@ -283,14 +283,15 @@ namespace Event
                 if (itListeners == this->_mRegistry.End()) continue;
 
                 // イベントタイプに対応したリスナーを呼ぶ
-                const Uint32 kEventId           = itListeners->key;
-                EventListenerTable const& table = itListeners->data;
+                const Uint32 uEventId            = itListeners->key;
+                EventListenerTable const& lTable = itListeners->data;
 
-                for (EventListenerTable::const_iterator it = table.begin(), end = table.end();
-                     it != end; it++)
+                for (EventListenerTable::const_iterator listener = lTable.begin(),
+                                                        end      = lTable.end();
+                     listener != end; ++listener)
                 {
                     // リスナーがイベント処理に失敗したら以降のリスナーはイベント処理しない
-                    if ((*it)->VHandleEvent(spEvent)) break;
+                    if ((*listener)->VHandleEvent(spEvent)) break;
                 }
 
                 // 指定時間を超えた場合はイベント処理を中断
@@ -300,10 +301,10 @@ namespace Event
 
                     // 指定時間を超えたらイベント処理を中断
                     // 処理に要した時間をミリ秒に変換
-                    const Uint32 fElapsed =
+                    const Uint32 uElapsed =
                         std::chrono::duration_cast<std::chrono::milliseconds>(endClock - startClock)
                             .count();
-                    if (in_uMaxMillis <= fElapsed) break;
+                    if (in_uMaxMillis <= uElapsed) break;
                 }
             }
         }
