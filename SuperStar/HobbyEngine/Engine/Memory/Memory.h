@@ -139,6 +139,11 @@ extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
     new (page, Core::Memory::Manager::MinimumAlignSize, \
          Core::Memory::Manager::EAllocateLocateType_Top)(type)
 
+// マクロの引数で__FILE__と__LINE__を指定
+#define HE_NEW_MEM_INFO(type, page, file, line)         \
+    new (page, Core::Memory::Manager::MinimumAlignSize, \
+         Core::Memory::Manager::EAllocateLocateType_Top)(type)
+
 // NEWの配列マクロ
 // メモリアライメント設定版
 // 通常はこちらを利用
@@ -210,12 +215,6 @@ extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
 /// </summary>
 extern void FreeMemory(void*);
 
-// NEW / ALLOCで確保したメモリ解放で使用
-#define HE_DELETE_MEM(pPtr) ::FreeMemory(pPtr)
-
-// NEW_ARRAYで確保したメモリを解放に使用
-#define HE_DELETE_MEM_ARRAY(pPtr) ::FreeMemory(pPtr)
-
 // deleteを安全する実行するためのマクロ
 // ポインターチェックをしてすでに解放済みの場合でもエラーにはならないようにしている
 #define HE_SAFE_DELETE_MEM(pPtr) \
@@ -238,19 +237,30 @@ extern void FreeMemory(void*);
         }                              \
     }
 
+// UniquePtrを解放して紐づいているメモリ削除
+#define HE_SAFE_DELETE_UNIQUE_PTR(ptr) \
+    {                                     \
+        if (ptr)                          \
+        {                                 \
+            auto p = ptr.release();       \
+            HE_SAFE_DELETE_MEM(p);        \
+            (ptr) = NULL;                 \
+        }                                 \
+    }
+
 // メモリ解放をラップする構造体
 struct DeleterFreeMemory
 {
 #ifdef HE_ENGINE_DEBUG
-    const Char* szFilename = NULL;
+    const UTF8* szFilename = NULL;
     Uint32 uLine           = 0;
 
-    DeleterFreeMemory(const Char* in_szFile, const Uint32 in_uLine)
+    DeleterFreeMemory(const UTF8* in_szFile, const Uint32 in_uLine)
         : szFilename(in_szFile), uLine(in_uLine)
     {
     }
 
-    DeleterFreeMemory() : szFilename(HE_STR_EMPTY), uLine(0) {}
+    DeleterFreeMemory() : szFilename(""), uLine(0) {}
 #endif
 
     void operator()(void* ptr) const
@@ -278,15 +288,17 @@ namespace Core::Memory
     /// </summary>
     template <typename T, typename... Args>
 #ifdef HE_ENGINE_DEBUG
-    SharedPtr<T> MakeCustomSharedPtr(const Char* in_szFile, const Uint32 in_uLine, Args&&... args)
+    SharedPtr<T> MakeCustomSharedPtr(const UTF8* in_szFilename, const Uint32 in_uLine,
+                                     Args&&... args)
 #else
     SharedPtr<T> MakeCustomSharedPtr(Args&&... args)
 #endif
     {
         // 配列の要素を構築し、shared_ptrを作成する
 #ifdef HE_ENGINE_DEBUG
-        return SharedPtr<T>(HE_NEW_MEM(T, 0)(std::forward<Args>(args)...),
-                            DeleterFreeMemory(in_szFile, in_uLine));
+        return SharedPtr<T>(HE_NEW_MEM_INFO(T, 0, in_szFilename,
+                                            in_uLine)(std::forward<Args>(args)...),
+                            DeleterFreeMemory(in_szFilename, in_uLine));
 #else
         return SharedPtr<T>(HE_NEW(T, 0)(std::forward<Args>(args)...), DeleterFreeMemory());
 #endif
@@ -297,13 +309,15 @@ namespace Core::Memory
     /// </summary>
     template <typename T, typename... Args>
 #ifdef HE_ENGINE_DEBUG
-    UniquePtr<T> MakeCustomUniquePtr(const Char* in_szFilename, Uint32 in_uLine, Args&&... args)
+    UniquePtr<T> MakeCustomUniquePtr(const UTF8* in_szFilename, const Uint32 in_uLine,
+                                     Args&&... args)
 #else
     UniquePtr<T> MakeCustomUniquePtr(Args&&... args)
 #endif
     {
 #ifdef HE_ENGINE_DEBUG
-        return UniquePtr<T>(HE_NEW_MEM(T, 0)(std::forward<Args>(args)...),
+        return UniquePtr<T>(HE_NEW_MEM_INFO(T, 0, in_szFilename,
+                                            in_uLine)(std::forward<Args>(args)...),
                             DeleterFreeMemory(in_szFilename, in_uLine));
 #else
         return UniquePtr<T>(HE_NEW(T, 0)(std::forward<Args>(args)...), DeleterFreeMemory());
@@ -322,9 +336,9 @@ namespace Core::Memory
 //    HE_MAKE_CUSTOM_UNIQUE_PTR((Uint32));
 // 括弧を囲う事で__T__型がテンプレートを使っている場合でも意図したマクロ置換が出来るようにしている
 #define HE_MAKE_CUSTOM_SHARED_PTR(__T__, ...) \
-    Core::Memory::MakeCustomSharedPtr<HE_REMOVE_PARENS __T__>(HE_FILE, __LINE__, ##__VA_ARGS__)
+    Core::Memory::MakeCustomSharedPtr<HE_REMOVE_PARENS __T__>(__FILE__, __LINE__, ##__VA_ARGS__)
 #define HE_MAKE_CUSTOM_UNIQUE_PTR(__T__, ...) \
-    Core::Memory::MakeCustomUniquePtr<HE_REMOVE_PARENS __T__>(HE_FILE, __LINE__, ##__VA_ARGS__)
+    Core::Memory::MakeCustomUniquePtr<HE_REMOVE_PARENS __T__>(__FILE__, __LINE__, ##__VA_ARGS__)
 
 #else
 

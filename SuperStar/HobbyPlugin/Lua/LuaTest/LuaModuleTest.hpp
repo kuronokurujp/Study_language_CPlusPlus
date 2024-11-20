@@ -97,7 +97,7 @@ TEST_CASE("Lua Module Script Func Catch")
                 HE_LOG_LINE(
                     HE_STR_TEXT("LuaスクリプトをロードしてLua関数でコードで登録した関数を呼ぶ"));
 
-                static auto f = HE_MAKE_CUSTOM_SHARED_PTR(
+                auto f = HE_MAKE_CUSTOM_SHARED_PTR(
                     (Core::Common::FunctionObject<void, Lua::LuaFuncData&>),
                     [](Lua::LuaFuncData& in_rLuaFuncData)
                     {

@@ -21,7 +21,7 @@ namespace AssetManager
     /// エンジンのアセット対応のモジュール
     /// </summary>
     class AssetManagerModule final : public Module::ModuleBase,
-                                     Core::Common::RuntimePoolManager<AssetDataBase>
+                                     public Core::Common::RuntimePoolManager<AssetDataBase>
     {
         HE_MODULE_GENRATE_DECLARATION(AssetManagerModule);
 
@@ -76,7 +76,6 @@ namespace AssetManager
         /// <summary>
         /// モジュール開始
         /// </summary>
-        /// <returns></returns>
         Bool _VStart() override final;
 
         /// <summary>

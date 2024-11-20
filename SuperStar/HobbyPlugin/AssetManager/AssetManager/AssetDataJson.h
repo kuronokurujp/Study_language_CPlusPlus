@@ -27,10 +27,10 @@ namespace AssetManager
         AssetDataJson() : AssetDataBase() {}
         virtual ~AssetDataJson() = default;
 
+    protected:
         virtual Bool _VLoad(Platform::FileInterface&) override;
         virtual void _VUnload() override;
 
-    protected:
         template <typename... Args>
         typename std::enable_if<(std::is_same<Args, const Char*>::value && ...), const Bool>::type
         _OutputValue(OutputJsonValue* out, Args... args)
@@ -55,6 +55,6 @@ namespace AssetManager
 
         Core::Memory::UniquePtr<simdjson::padded_string> _json;
         Core::Memory::UniquePtr<simdjson::ondemand::parser> _parser;
-        simdjson::ondemand::document _doc;
+        void* _pDoc = NULL;
     };
 }  // namespace AssetManager

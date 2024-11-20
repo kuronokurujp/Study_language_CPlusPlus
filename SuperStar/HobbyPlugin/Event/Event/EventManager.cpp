@@ -52,11 +52,7 @@ namespace Event
         }
 
         // 拡張ストラテジーを解放
-        if (this->_upStrategy)
-        {
-            this->_upStrategy.release();
-            this->_upStrategy = NULL;
-        }
+        HE_SAFE_DELETE_UNIQUE_PTR(this->_upStrategy);
     }
 
     Bool EventManager::AddListener(EventListenerPtr const& in_rListener,

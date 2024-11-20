@@ -51,7 +51,7 @@ public:
         T* pModule = HE_NEW_MEM_LAST(T, 0);
         if (this->_AddModule(pModule) == FALSE)
         {
-            HE_DELETE_MEM(pModule);
+            HE_SAFE_DELETE_MEM(pModule);
             return FALSE;
         }
 

@@ -32,7 +32,7 @@ namespace Core::Common
         };
 
     public:
-        virtual ~RuntimePoolManager() { this->_Release(); }
+        virtual ~RuntimePoolManager() { this->_ReleasePool(); }
 
         /// <summary>
         /// データ使用個数
@@ -80,7 +80,7 @@ namespace Core::Common
         /// プールするためのデータバッファ数を指定して確保
         /// 継承したクラスが必ず実行
         /// </summary>
-        void _Reserve(const Uint32 in_uMax)
+        void _ReservePool(const Uint32 in_uMax)
         {
             // TODO: 予約した数を変えたい場合にも対応できるようにしたほうがいい
 
@@ -96,11 +96,31 @@ namespace Core::Common
             this->_upCacheDatas->reserve(in_uMax);
         }
 
-        void _Release()
+        void _ReleasePool()
         {
-            if (this->_upCacheDatas) this->_upCacheDatas.release();
+            if (this->_upCacheDatas)
+            {
+                for (auto itr = this->_upCacheDatas->begin(); itr != this->_upCacheDatas->end();
+                     ++itr)
+                {
+                    HE_SAFE_DELETE_MEM(*itr);
+                }
+                this->_upCacheDatas->clear();
 
-            if (this->_upUserSlot) this->_upUserSlot.release();
+                HE_SAFE_DELETE_UNIQUE_PTR(this->_upCacheDatas);
+            }
+
+            if (this->_upUserSlot)
+            {
+                for (auto itr = this->_upUserSlot->begin(); itr != this->_upUserSlot->end(); ++itr)
+                {
+                    HE_SAFE_DELETE_MEM(itr->second);
+                }
+
+                this->_upUserSlot->clear();
+
+                HE_SAFE_DELETE_UNIQUE_PTR(this->_upUserSlot);
+            }
         }
 
         /// <summary>
@@ -213,6 +233,8 @@ namespace Core::Common
         {
             if (in_rHandle.Null()) return NULL;
             // 要素があるかチェック
+            if (this->_upUserSlot == FALSE) return NULL;
+
             if (this->_upUserSlot->find(in_rHandle) != this->_upUserSlot->end())
                 return this->_upUserSlot->at(in_rHandle);
 

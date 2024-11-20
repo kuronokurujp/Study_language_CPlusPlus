@@ -48,7 +48,7 @@ namespace Core
         if (in_groupNum <= 0) return FALSE;
 
         // プールのバッファ予約
-        this->_Reserve(in_taskMax);
+        this->_ReservePool(in_taskMax);
 
         // タスクグループを確保
         this->_pTasks = HE_NEW_MEM_ARRAY(TaskGroup, in_groupNum, 0);
@@ -81,6 +81,8 @@ namespace Core
 
         // グループを削除
         HE_SAFE_DELETE_MEM_ARRAY(this->_pTasks);
+
+        this->_ReleasePool();
     }
 
     void TaskManager::ForeachByGroup(const Sint32 in_sGroupId, std::function<void(Task*)> in_func)

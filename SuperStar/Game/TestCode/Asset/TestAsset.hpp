@@ -24,6 +24,7 @@ TEST_CASE("Test Paramater Asset Load")
             Game::Asset::ParamaterAssetData& rAsset =
                 pAssetManagerModule->GetAsset<Game::Asset::ParamaterAssetData>(handle);
             CHECK(rAsset.Version() == 1);
+            HE_LOG_LINE(HE_STR_TEXT("バージョン: %d"), rAsset.Version());
 
             pAssetManagerModule->Unload(handle);
             return TRUE;

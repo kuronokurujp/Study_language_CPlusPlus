@@ -170,7 +170,7 @@ namespace Core::Memory
         /// <summary>
         /// 指定ページに利用中のメモリがあるか
         /// </summary>
-        Bool UsedBlock(const Uint8 in_page) const;
+        Bool UsedBlock(const Uint8) const;
 
     private:
         /// <summary>
@@ -231,14 +231,27 @@ namespace Core::Memory
 #ifdef HE_ENGINE_DEBUG
     public:
         // 指定されたメモリページの情報を表示する
-        void PrintMemoryPageInfo(const Uint8 in_page);
+        void PrintMemoryPageInfo(const Uint8);
         // すべてのメモリ情報を表示する
         void PrintAllMemoryInfo();
 
         // 指定されたメモリページのメモリブロックが正常かチェックする
-        Bool CheckMemoryBlockByPage(const Uint8 in_page);
+        Bool CheckMemoryBlockByPage(const Uint8);
         // すべてのメモリブロックが正常かチェックする
         Bool CheckAllMemoryBlock();
+
+        /// <summary>
+        /// 指定メモリページでメモリリークしているかチェック
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns>TRUE: リークしていない</returns>
+        Bool CheckAllMemoryLeakByPage(const Uint8);
+
+        /// <summary>
+        /// メモリリークしているかチェック
+        /// </summary>
+        /// <returns>TRUE: リークしていない</returns>
+        Bool CheckAllMemoryLeak();
 
     private:
         // TODO: ランタイムでエンディアンを判定する方法あるか?

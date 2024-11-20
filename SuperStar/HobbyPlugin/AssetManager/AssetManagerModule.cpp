@@ -14,7 +14,7 @@ namespace AssetManager
     Bool AssetManagerModule::_VStart()
     {
         // 利用するアセット数を設定
-        this->_Reserve(1024);
+        this->_ReservePool(1024);
 
         return TRUE;
     }
@@ -60,6 +60,8 @@ namespace AssetManager
                 this->Unload(it->first);
             }
         }
+
+        this->_ReleasePool();
 
         return TRUE;
     }

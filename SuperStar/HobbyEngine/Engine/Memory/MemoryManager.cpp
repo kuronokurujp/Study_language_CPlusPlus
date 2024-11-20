@@ -8,7 +8,14 @@ namespace Core::Memory
     {
         if (this->_IsReady() == FALSE) return TRUE;
 
-        // TODO: メモリが残っているかチェック
+            // メモリが残っているかチェック
+#ifdef HE_ENGINE_DEBUG
+        if (this->CheckAllMemoryLeak() == FALSE)
+        {
+            this->PrintAllMemoryInfo();
+            HE_ASSERT(FALSE);
+        }
+#endif
 
         // 解放する
         // TODO: プラットフォームのヒープ解放に切り替える
@@ -902,7 +909,7 @@ namespace Core::Memory
         HE_LOG_LINE(HE_STR_TEXT("--------------------------------------------"));
 
         // チェックする
-        this->CheckMemoryBlockByPage(in_page);
+        HE_ASSERT(this->CheckMemoryBlockByPage(in_page));
 
         // 使用分の表示
         BlockHeader* pUsedMemoryBlock = this->_aMemoryPageInfoArray[in_page]._pMemoryBlockTop;
@@ -1052,6 +1059,50 @@ namespace Core::Memory
             if (this->CheckMemoryBlockByPage(i))
             {
                 if (this->CheckMemoryBlockByPage(i) == FALSE) return FALSE;
+            }
+        }
+
+        return TRUE;
+    }
+
+    Bool Manager::CheckAllMemoryLeakByPage(const Uint8 in_page)
+    {
+        // 使用分の表示
+        BlockHeader* pUsedMemoryBlock = this->_aMemoryPageInfoArray[in_page]._pMemoryBlockTop;
+
+        Uint32 uUsedTotal = 0;
+        Uint32 uUsedCount = 0;
+
+        BlockHeader* pLargestUsedBlock = NULL;
+        while (pUsedMemoryBlock != NULL)
+        {
+            if (pUsedMemoryBlock->_useFlag == 1)
+            {
+                Ptr pBlockAddr = reinterpret_cast<Ptr>(pUsedMemoryBlock);
+                uUsedTotal += pUsedMemoryBlock->_uAllocateSize;
+                ++uUsedCount;
+
+                if (pLargestUsedBlock == NULL ||
+                    pLargestUsedBlock->_uAllocateSize < pUsedMemoryBlock->_uAllocateSize)
+                {
+                    pLargestUsedBlock = pUsedMemoryBlock;
+                }
+            }
+
+            pUsedMemoryBlock = pUsedMemoryBlock->_pNext;
+        }
+
+        return (uUsedCount <= 0);
+    }
+
+    Bool Manager::CheckAllMemoryLeak()
+    {
+        for (Uint8 i = 0; i < MemoryPageMax; ++i)
+        {
+            //	使用していないページはチェックしない．
+            if (this->CheckMemoryBlockByPage(i))
+            {
+                if (this->CheckAllMemoryLeakByPage(i) == FALSE) return FALSE;
             }
         }
 

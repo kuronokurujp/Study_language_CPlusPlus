@@ -19,7 +19,8 @@ namespace AssetManager
                 // 開いたファイルのデータサイズを取得して読み込むメモリを確保
                 Sint32 iSize    = in_rFileSystem.VFileSize(this->_fileHandle);
                 Sint32 iMemSize = iSize + 1;
-                pReadTmpBuff    = HE_NEW_MEM_ARRAY(UTF8, iMemSize, 0);
+                // TODO: メモリページを外部から指定できるようにする
+                pReadTmpBuff = HE_NEW_MEM_ARRAY(UTF8, iMemSize, 0);
                 ::memset(pReadTmpBuff, '\0', iMemSize);
 
                 // ファイルの読み込み
@@ -34,7 +35,11 @@ namespace AssetManager
                     this->_parser =
                         HE_MAKE_CUSTOM_UNIQUE_PTR((simdjson::ondemand::parser), (iSize * 2));
                     {
-                        auto resultCode = this->_parser->iterate(*this->_json).get(this->_doc);
+                        this->_pDoc = HE_NEW_MEM(simdjson::ondemand::document, 0);
+                        simdjson::ondemand::document* pDoc =
+                            reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc);
+
+                        auto resultCode = this->_parser->iterate(*this->_json).get(*pDoc);
                         if (resultCode != simdjson::error_code::SUCCESS)
                         {
                             HE_PG_LOG_LINE(HE_STR_TEXT("%s ファイルエラー: %d"), this->_path.Str(),
@@ -63,16 +68,15 @@ namespace AssetManager
         // ファイルを閉じる
         in_rFileSystem.VFileClose(this->_fileHandle);
 
-        if (bRet == FALSE) return FALSE;
-
-        return TRUE;
+        return bRet;
     }
 
     void AssetDataJson::_VUnload()
     {
-        // json展開したメモリを解放
-        this->_json.release();
-        this->_parser.release();
+        HE_SAFE_DELETE_UNIQUE_PTR(this->_json);
+        HE_SAFE_DELETE_UNIQUE_PTR(this->_parser);
+
+        HE_SAFE_DELETE_MEM(this->_pDoc);
     }
 
     Bool AssetDataJson::_OutputValue(simdjson::fallback::ondemand::value* out,
@@ -87,7 +91,10 @@ namespace AssetManager
             UTF8 szKey[256] = {0};
             str.OutputUTF8(szKey, HE_ARRAY_SIZE(szKey));
 
-            auto v = this->_doc[szKey];
+            simdjson::ondemand::document* pDoc =
+                reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc);
+
+            auto v = (*pDoc)[szKey];
             HE_ASSERT(v.error() == simdjson::error_code::SUCCESS);
 
             // TODO: 未対応

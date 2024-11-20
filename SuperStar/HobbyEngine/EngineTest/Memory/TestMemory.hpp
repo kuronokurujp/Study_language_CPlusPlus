@@ -154,7 +154,7 @@ TEST_CASE("Memory New and Delete")
     };
     Data* pData = HE_NEW_MEM_ARRAY(Data, 5, 0);
 
-    HE_DELETE_MEM_ARRAY(pData);
+    HE_SAFE_DELETE_MEM_ARRAY(pData);
 
     // new と deleteがうまくいっているかチェック
     CHECK(memoryManager.VRelease());
