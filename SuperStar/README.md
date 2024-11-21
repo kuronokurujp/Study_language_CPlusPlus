@@ -1,6 +1,6 @@
 # ゲーム「SuperStar」開発プロジェクト(未完成)
 
--   update: 2024/11/19
+-   update: 2024/11/21
 -   version: 0.3.0
 
 ## ゲーム
@@ -24,19 +24,25 @@
 | C++  | 17         |
 
 | ツール | バージョン |
-| CMake | 3.30.0 |
-| ----- | ------ |
+| ------ | ---------- |
+| CMake  | 3.30.0     |
 
 ## 利用ライブラリ一覧
 
-| Name                                                                      | Version   |
-| ------------------------------------------------------------------------- | --------- |
-| [Catch2](https://github.com/catchorg/Catch2)                              | v2.13.10  |
-| [DxLib](https://dxlib.xsrv.jp/)                                           | Ver 3.24d |
-| [tomlplusplus](https://github.com/marzer/tomlplusplus?tab=readme-ov-file) | V3.4.0    |
-| [simdjson](https://github.com/simdjson/simdjson)                          | v3.9.4    |
-| [pugixml](https://github.com/simdjson/simdjson)                           | v1.14     |
-| [Lua](https://www.lua.org/lua-l.html)                                     | v5.4.7    |
+| Name                                                                      | Version   | 用途               |
+| ------------------------------------------------------------------------- | --------- | ------------------ |
+| [Catch2](https://github.com/catchorg/Catch2)                              | v2.13.10  | コードの単体テスト |
+| [DxLib](https://dxlib.xsrv.jp/)                                           | Ver 3.24d | 描画ライブラリ     |
+| [tomlplusplus](https://github.com/marzer/tomlplusplus?tab=readme-ov-file) | V3.4.0    | toml ファイル制御  |
+| [simdjson](https://github.com/simdjson/simdjson)                          | v3.9.4    | json ファイル制御  |
+| [pugixml](https://github.com/simdjson/simdjson)                           | v1.14     | xml ファイル制御   |
+| [Lua](https://www.lua.org/lua-l.html)                                     | v5.4.7    | lua スクリプト活用 |
+
+## 自作ツール一覧
+
+| Name                                                                                           | Version | 説明                   |
+| ---------------------------------------------------------------------------------------------- | ------- | ---------------------- |
+| [GameDataMaker](https://github.com/kuronokurujp/Stduy_language_Python/tree/main/GameDataMaker) | v0.0.1  | ゲームのパラメータ生成 |
 
 ## 開発目的
 
