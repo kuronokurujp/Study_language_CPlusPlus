@@ -28,37 +28,16 @@ namespace AssetManager
         virtual ~AssetDataJson() = default;
 
         // 指定するノードのトークン名はアルファベットと数値のみなのでUTF8型にした
-        virtual Uint32 VGetUInt32(const std::initializer_list<const UTF8*>&) override final;
-        virtual Float32 VGetFloat32(const std::initializer_list<const UTF8*>&) override final;
+        virtual Uint32 VGetUInt32(const std::initializer_list<const UTF8*>&) override;
+        virtual Float32 VGetFloat32(const std::initializer_list<const UTF8*>&) override;
         virtual Core::Common::FixString1024 VGetChar(
-            const std::initializer_list<const UTF8*>&) override final;
+            const std::initializer_list<const UTF8*>&) override;
 
     protected:
         virtual Bool _VLoad(Platform::FileInterface&) override;
         virtual void _VUnload() override;
 
-/*
-        template <typename... Args>
-        typename std::enable_if<(std::is_same<Args, const Char*>::value && ...), const Bool>::type
-        _OutputValue(OutputJsonValue* out, Args... args)
-        {
-            HE_ASSERT(out);
-
-            // 引数の個数を取得
-            Uint32 uCount = static_cast<Uint32>(sizeof...(args));
-            if (uCount <= 0) return FALSE;
-
-            // 初期化リストを使用して引数を処理
-            const Char* szaName[] = {args...};
-            return this->_OutputValue(out, szaName, uCount);
-        }
-        */
-
-    private:
-    /*
-        Bool _OutputValue(simdjson::fallback::ondemand::value* out, const Char* in_szaName[],
-                          const Uint32 in_uCount);
-                          */
+        void* _GetNode(const std::initializer_list<const UTF8*>&);
 
     protected:
         Core::Common::Handle _fileHandle;

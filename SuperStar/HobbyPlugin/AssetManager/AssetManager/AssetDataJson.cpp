@@ -19,8 +19,7 @@ namespace AssetManager
             auto v = in_rDoc[*itr];
             HE_ASSERT(v.error() == simdjson::error_code::SUCCESS);
 
-            // TODO: 未対応
-            // 複数の取得は未対応
+            // 複数トークンでの取得
             ++itr;
             for (; itr != in_rTokens.end(); ++itr)
             {
@@ -61,7 +60,6 @@ namespace AssetManager
                                    in_rTokens) == FALSE)
             return 0;
 
-        HE_ASSERT(val.is_integer());
         return static_cast<Float32>(val.get_double().value_unsafe());
     }
 
@@ -157,50 +155,5 @@ namespace AssetManager
 
         HE_SAFE_DELETE_MEM(this->_pDoc);
     }
-
-#if 0
-    Bool AssetDataJson::_OutputValue(simdjson::fallback::ondemand::value* out,
-                                     const Char* in_szaName[], const Uint32 in_uCount)
-    {
-        HE_ASSERT(out);
-        HE_ASSERT(0 < in_uCount);
-
-        try
-        {
-            Core::Common::FixString256 str(in_szaName[0]);
-            UTF8 szKey[256] = {0};
-            str.OutputUTF8(szKey, HE_ARRAY_SIZE(szKey));
-
-            simdjson::ondemand::document* pDoc =
-                reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc);
-
-            auto v = (*pDoc)[szKey];
-            HE_ASSERT(v.error() == simdjson::error_code::SUCCESS);
-
-            // TODO: 未対応
-            // 複数の取得は未対応
-            for (Uint32 i = 1; i < in_uCount; ++i)
-            {
-                HE_ASSERT(FALSE);
-                /*
-                Core::Common::FixString256 str(in_szaName[i]);
-                str.OutputUTF8(szKey, HE_ARRAY_SIZE(szKey));
-                v = v[szKey];
-                HE_ASSERT(v.error() == simdjson::error_code::SUCCESS);
-                */
-            }
-            // 要素を出力
-            v.get(*out);
-
-            return TRUE;
-        }
-        catch (const simdjson::simdjson_error& e)
-        {
-            HE_PG_LOG_LINE(HE_STR_TEXT("json要素がない: %s"), e.what());
-        }
-
-        return FALSE;
-    }
-#endif
 
 }  // namespace AssetManager

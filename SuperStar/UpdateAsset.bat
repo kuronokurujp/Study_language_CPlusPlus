@@ -4,6 +4,10 @@ rem アセットデータを更新バッチ
 
 setlocal
 
+rem パラメータデータをコンバート
+Tool\GameDataMaker\20241121_180832\main.exe conv-param .\Game\Resource\Assets\Paramater .\Game\Resource\Orginal\Paramater\Game.xlsx
+
+rem アセットファイルを読み込みディレクトリに転送
 call .\HobbyEngine\Script\MoveDir.bat .\Game\Resource\Assets\ .\Bin\SuperStar\Debug\Assets
 call .\HobbyEngine\Script\MoveDir.bat .\Game\Resource\Assets\ .\Bin\SuperStar\Release\Assets
 

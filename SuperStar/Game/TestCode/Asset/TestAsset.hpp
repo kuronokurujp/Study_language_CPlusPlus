@@ -26,9 +26,13 @@ TEST_CASE("Test Paramater Asset Load")
             CHECK(rAsset.Version() == 1);
             HE_LOG_LINE(HE_STR_TEXT("バージョン: %d"), rAsset.Version());
 
-            auto hp = rAsset.VGetUInt32({"data", "player_default", "hp"});
-            CHECK(hp == 100);
-            HE_LOG_LINE(HE_STR_TEXT("HP: %d"), hp);
+            auto uHp = rAsset.GetUInt32ByIdData("player_default", "hp");
+            CHECK(uHp == 100);
+            HE_LOG_LINE(HE_STR_TEXT("HP: %d"), uHp);
+
+            auto fMoveSpeed = rAsset.GetFloat32ByIdData("player_default", "move_spped");
+            CHECK(fMoveSpeed == 1.0f);
+            HE_LOG_LINE(HE_STR_TEXT("MoveSpeed: %f"), fMoveSpeed);
 
             pAssetManagerModule->Unload(handle);
             return TRUE;
