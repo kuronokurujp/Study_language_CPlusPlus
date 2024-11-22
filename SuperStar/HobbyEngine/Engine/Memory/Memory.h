@@ -286,10 +286,10 @@ namespace Core::Memory
     /// クラスの場合はデフォルトコンストラクターが必要
     /// TODO: メモリのページ指定が必要
     /// </summary>
-    template <typename T, typename... Args>
+    template <typename T, typename... TArgs>
 #ifdef HE_ENGINE_DEBUG
     SharedPtr<T> MakeCustomSharedPtr(const UTF8* in_szFilename, const Uint32 in_uLine,
-                                     Args&&... args)
+                                     TArgs&&... args)
 #else
     SharedPtr<T> MakeCustomSharedPtr(Args&&... args)
 #endif
@@ -297,7 +297,7 @@ namespace Core::Memory
         // 配列の要素を構築し、shared_ptrを作成する
 #ifdef HE_ENGINE_DEBUG
         return SharedPtr<T>(HE_NEW_MEM_INFO(T, 0, in_szFilename,
-                                            in_uLine)(std::forward<Args>(args)...),
+                                            in_uLine)(std::forward<TArgs>(args)...),
                             DeleterFreeMemory(in_szFilename, in_uLine));
 #else
         return SharedPtr<T>(HE_NEW(T, 0)(std::forward<Args>(args)...), DeleterFreeMemory());
@@ -307,17 +307,17 @@ namespace Core::Memory
     /// <summary>
     /// std::make_unique内で独自メモリシステムを利用
     /// </summary>
-    template <typename T, typename... Args>
+    template <typename T, typename... TArgs>
 #ifdef HE_ENGINE_DEBUG
     UniquePtr<T> MakeCustomUniquePtr(const UTF8* in_szFilename, const Uint32 in_uLine,
-                                     Args&&... args)
+                                     TArgs&&... args)
 #else
     UniquePtr<T> MakeCustomUniquePtr(Args&&... args)
 #endif
     {
 #ifdef HE_ENGINE_DEBUG
         return UniquePtr<T>(HE_NEW_MEM_INFO(T, 0, in_szFilename,
-                                            in_uLine)(std::forward<Args>(args)...),
+                                            in_uLine)(std::forward<TArgs>(args)...),
                             DeleterFreeMemory(in_szFilename, in_uLine));
 #else
         return UniquePtr<T>(HE_NEW(T, 0)(std::forward<Args>(args)...), DeleterFreeMemory());
@@ -359,5 +359,18 @@ struct IsUniquePtrByTemplateType : std::false_type
 template <typename T>
 struct IsUniquePtrByTemplateType<T, std::void_t<typename T::element_type>>
     : std::is_same<T, Core::Memory::UniquePtr<typename T::element_type>>
+{
+};
+
+// is_shader_ptr の安全な定義
+// テンプレート型がShaderPtr型かどうかを判定
+template <typename T, typename = void>
+struct IsShaderPtrByTemplateType : std::false_type
+{
+};
+
+template <typename T>
+struct IsShaderPtrByTemplateType<T, std::void_t<typename T::element_type>>
+    : std::is_same<T, Core::Memory::SharedPtr<typename T::element_type>>
 {
 };

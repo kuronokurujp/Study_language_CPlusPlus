@@ -55,8 +55,8 @@ void HE_LOG_UPDATE_FORMAT_STRING(std::wstring& in_szFormat, size_t& in_pos, cons
 }
 
 // 共通処理を行う関数の作成
-template <typename... Args>
-Bool HE_LOG_CREATE_FORMATERD_STRING(Char* out, const Char* in_szFormat, Args... in_args)
+template <typename... TArgs>
+Bool HE_LOG_CREATE_FORMATERD_STRING(Char* out, const Char* in_szFormat, TArgs... in_args)
 {
     std::wstring szDynamicFormat = in_szFormat;
     size_t pos                   = szDynamicFormat.find(L"%");
@@ -83,8 +83,8 @@ Bool HE_LOG_CREATE_FORMATERD_STRING(Char* out, const Char* in_szFormat, Args... 
 // format引数は必ず文字列リテラルを設定する
 // 文字列型の変数を入れるとコンパイルエラーになる
 // コンソールにも出力
-template <typename... Args>
-void HE_LOG(const Char* in_szFormat, Args... in_args)
+template <typename... TArgs>
+void HE_LOG(const Char* in_szFormat, TArgs... in_args)
 {
     // 共通部分を関数で呼び出す
 
@@ -114,8 +114,8 @@ void HE_LOG(const Char* in_szFormat, Args... in_args)
 // format引数は必ず文字列リテラルを設定する
 // 文字列型の変数を入れるとコンパイルエラーになる
 // コンソールにも出力
-template <typename... Args>
-void HE_LOG_LINE(const Char* in_szFormat, Args... in_args)
+template <typename... TArgs>
+void HE_LOG_LINE(const Char* in_szFormat, TArgs... in_args)
 {
     static Char szText[HE_LOG_MSG_SIZE] = {};
     if (HE_LOG_CREATE_FORMATERD_STRING(szText, in_szFormat, in_args...) == FALSE)

@@ -7,7 +7,7 @@ namespace Core::Common
     /// <summary>
     /// Vectorの基本クラス
     /// </summary>
-    template <typename TYPE>
+    template <typename TType>
     class VectorBase
     {
         HE_CLASS_DEFAULT_CONSTRUCT_NG(VectorBase);
@@ -15,7 +15,7 @@ namespace Core::Common
         HE_CLASS_MOVE_CONSTRUCT_NG(VectorBase);
 
     public:
-        VectorBase(TYPE* in_tpArrayAddr, Uint32 in_uSize)
+        VectorBase(TType* in_tpArrayAddr, Uint32 in_uSize)
             : _pBuff(in_tpArrayAddr), _uCapacity(in_uSize)
         {
         }
@@ -32,7 +32,7 @@ namespace Core::Common
         /// 配列の末尾に要素を追加
         /// クラスや構造体だとコピー処理が走るのでコピー処理ができるクラスのみ使える
         /// </summary>
-        TYPE& PushBack(const TYPE& in_rData)
+        TType& PushBack(const TType& in_rData)
         {
             HE_ASSERT(this->_uSize < this->Capacity());
             // コピー処理が発生
@@ -45,14 +45,14 @@ namespace Core::Common
         /// <summary>
         /// 配列の先頭に要素を追加
         /// </summary>
-        TYPE& PushFront(const TYPE& in_rData)
+        TType& PushFront(const TType& in_rData)
         {
             HE_ASSERT(this->_uSize < this->Capacity());
 
             if (0 < this->_uSize)
             {
                 // 配列先頭からのデータを一つ横にずらしてインデックス0に空きを作る
-                Uint32 uSize = this->_uSize * sizeof(TYPE);
+                Uint32 uSize = this->_uSize * sizeof(TType);
                 ::memmove(&this->_pBuff[1], &this->_pBuff[0], uSize);
             }
 
@@ -64,7 +64,7 @@ namespace Core::Common
             return this->_pBuff[0];
         }
 
-        TYPE* PopBack()
+        TType* PopBack()
         {
             const Uint32 uPopItemIndex = this->_uSize - 1;
             if (0 < this->_uSize)
@@ -80,7 +80,7 @@ namespace Core::Common
         /// 指定インデックスにデータ挿入
         /// 挿入するとデータの配置が変化するので使う側はインデックスを取得するのはNG
         /// </summary>
-        TYPE& Insert(const Uint32 in_uIndex, const TYPE& in_rData)
+        TType& Insert(const Uint32 in_uIndex, const TType& in_rData)
         {
             HE_ASSERT(this->_uSize < this->Capacity());
 
@@ -89,7 +89,7 @@ namespace Core::Common
 
             // データ末尾位置より前に挿入
             // 配置したデータを一つ後ろにずらす
-            const Uint32 uSize = (this->_uSize - in_uIndex) * sizeof(TYPE);
+            const Uint32 uSize = (this->_uSize - in_uIndex) * sizeof(TType);
             ::memmove(&this->_pBuff[in_uIndex + 1], &this->_pBuff[in_uIndex], uSize);
 
             // 後ろに一つずらした事で挿入先が空いたので挿入
@@ -103,7 +103,7 @@ namespace Core::Common
         /// 引数の要素と一致したのを削除
         /// クラスの場合だと==の定義が必要
         /// </summary>
-        Bool Remove(const TYPE& in_rData)
+        Bool Remove(const TType& in_rData)
         {
             Bool bRet = FALSE;
             // 要素が重複している可能性があるので全要素チェック
@@ -119,7 +119,7 @@ namespace Core::Common
             return bRet;
         }
 
-        TYPE& operator[](const Uint32 in_uIndex) const
+        TType& operator[](const Uint32 in_uIndex) const
         {
             HE_ASSERT(0 < this->_uSize);
             return this->_pBuff[in_uIndex];
@@ -128,7 +128,7 @@ namespace Core::Common
         void operator=(VectorBase& in_vrData) { this->_DeepCopy(in_vrData); }
         void operator=(const VectorBase& in_vrData) { this->_DeepCopy(in_vrData); }
 
-        TYPE* GetPtr(const Uint32 in_uIndex) const
+        TType* GetPtr(const Uint32 in_uIndex) const
         {
             HE_ASSERT(0 < this->_uSize);
             return &this->_pBuff[in_uIndex];
@@ -162,7 +162,7 @@ namespace Core::Common
             {
                 // 削除する要素位置に上書きして削除
                 // メモリ移動のみで高速削除できる
-                Uint32 uSize = (uLastIndex - in_uIndex) * sizeof(TYPE);
+                Uint32 uSize = (uLastIndex - in_uIndex) * sizeof(TType);
                 ::memmove(&this->_pBuff[in_uIndex], &this->_pBuff[in_uIndex + 1], uSize);
             }
             else
@@ -177,7 +177,7 @@ namespace Core::Common
         Uint32 _uSize = 0;
 
     private:
-        TYPE* _pBuff      = NULL;
+        TType* _pBuff      = NULL;
         Uint32 _uCapacity = 0;
     };
 
@@ -185,31 +185,31 @@ namespace Core::Common
     /// 固定長のカスタムVector
     /// テンプレートで要素を決めている
     /// </summary>
-    template <typename TYPE, Uint32 CAPACITY>
-    class CustomFixVector : public VectorBase<TYPE>
+    template <typename TType, Uint32 TCapacity>
+    class CustomFixVector : public VectorBase<TType>
     {
         HE_CLASS_MOVE_NG(CustomFixVector);
 
     public:
-        CustomFixVector() : VectorBase<TYPE>(this->_aBuff, CAPACITY) {}
-        CustomFixVector(CustomFixVector& in_rSrc) : VectorBase<TYPE>(this->_aBuff, CAPACITY)
+        CustomFixVector() : VectorBase<TType>(this->_aBuff, TCapacity) {}
+        CustomFixVector(CustomFixVector& in_rSrc) : VectorBase<TType>(this->_aBuff, TCapacity)
         {
             this->_DeepCopy(in_rSrc);
         }
 
-        CustomFixVector(const CustomFixVector& in_rSrc) : VectorBase<TYPE>(this->_aBuff, CAPACITY)
+        CustomFixVector(const CustomFixVector& in_rSrc) : VectorBase<TType>(this->_aBuff, TCapacity)
         {
             this->_DeepCopy(in_rSrc);
         }
 
         // コンストラクタ
         // 宣言と同時に初期化できるようにしている
-        CustomFixVector(const std::initializer_list<TYPE>& in_rInitList)
-            : VectorBase<TYPE>(this->_aBuff, CAPACITY)
+        CustomFixVector(const std::initializer_list<TType>& in_rInitList)
+            : VectorBase<TType>(this->_aBuff, TCapacity)
         {
             if (in_rInitList.size() <= 0) return;
 
-            const Uint32 uSize = HE_MIN(CAPACITY, in_rInitList.size());
+            const Uint32 uSize = HE_MIN(TCapacity, in_rInitList.size());
 
             auto it = in_rInitList.begin();
             for (Uint32 i = 0; i < uSize; ++i)
@@ -227,7 +227,7 @@ namespace Core::Common
         void operator=(const CustomFixVector& in_vrData) { this->_DeepCopy(in_vrData); }
 
     private:
-        TYPE _aBuff[CAPACITY];
+        TType _aBuff[TCapacity];
     };
 
     // テンプレートクラス CustomFixVector の部分的な型特性
@@ -237,8 +237,8 @@ namespace Core::Common
     };
 
     // CustomFixVector のインスタンスに対する特殊化
-    template <typename TYPE, Uint32 CAPACITY>
-    struct IsCustomFixVector<CustomFixVector<TYPE, CAPACITY>> : std::true_type
+    template <typename TType, Uint32 TCapacity>
+    struct IsCustomFixVector<CustomFixVector<TType, TCapacity>> : std::true_type
     {
     };
 

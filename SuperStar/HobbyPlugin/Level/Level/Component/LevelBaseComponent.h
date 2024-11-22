@@ -27,12 +27,12 @@ namespace Level
         /// <summary>
         /// レベルにアクターを追加
         /// </summary>
-        template <class T>
-        Core::Common::Handle AddActor()
+        template <class T, typename... TArgs>
+        Core::Common::Handle AddActor(TArgs&&... args)
         {
             auto pNode = reinterpret_cast<Node*>(this->_pOwner);
             HE_ASSERT(pNode);
-            return pNode->AddActor<T>();
+            return pNode->AddActor<T>(std::forward<TArgs>(args)...);
         }
 
         template <class T>

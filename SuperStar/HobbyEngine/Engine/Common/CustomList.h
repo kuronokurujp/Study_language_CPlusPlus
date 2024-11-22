@@ -54,20 +54,20 @@ namespace Core::Common
     /// <summary>
     /// 双方向リストのイテレーターのテンプレート
     /// </summary>
-    /// <typeparam name="DATATYPE">LinkedListNodeで指定してテンプレート型</typeparam>
-    /// <typeparam name="NODETYPE">LinkedListNode継承したクラス</typeparam>
-    template <typename DATATYPE, typename NODETYPE>
+    /// <typeparam name="TDataType">LinkedListNodeで指定してテンプレート型</typeparam>
+    /// <typeparam name="TNodeType">LinkedListNode継承したクラス</typeparam>
+    template <typename TDataType, typename TNodeType>
     class ListNodeIterator
     {
     public:
         ListNodeIterator() = default;
-        ListNodeIterator(NODETYPE* in_pNode) : _pNode(in_pNode) {}
+        ListNodeIterator(TNodeType* in_pNode) : _pNode(in_pNode) {}
 
-        ListNodeIterator(const ListNodeIterator<DATATYPE, NODETYPE>& in_rIt) : _pNode(in_rIt._pNode)
+        ListNodeIterator(const ListNodeIterator<TDataType, TNodeType>& in_rIt) : _pNode(in_rIt._pNode)
         {
         }
 
-        ListNodeIterator(const ListNodeIterator<DATATYPE, NODETYPE>&& in_rIt)
+        ListNodeIterator(const ListNodeIterator<TDataType, TNodeType>&& in_rIt)
             : _pNode(in_rIt._pNode)
         {
         }
@@ -79,28 +79,28 @@ namespace Core::Common
         /// ノードクラスを継承した派生クラスへキャスト
         /// </summary>
         /// <returns></returns>
-        DATATYPE& operator*()
+        TDataType& operator*()
         {
             HE_ASSERT(this->_pNode);
-            return static_cast<DATATYPE&>(*this->_pNode);
+            return static_cast<TDataType&>(*this->_pNode);
         }
 
         /// <summary>
         /// データ参照
         /// </summary>
-        const DATATYPE& operator*() const { return static_cast<DATATYPE&>(*this->_pNode); }
+        const TDataType& operator*() const { return static_cast<TDataType&>(*this->_pNode); }
 
         /// <summary>
         /// データポインタ参照
         /// </summary>
         /// <returns></returns>
-        DATATYPE* operator->() { return static_cast<DATATYPE*>(this->_pNode); }
+        TDataType* operator->() { return static_cast<TDataType*>(this->_pNode); }
 
         /// <summary>
         /// データポインタ参照
         /// </summary>
         /// <returns></returns>
-        const DATATYPE* operator->() const { return static_cast<DATATYPE*>(this->_pNode); }
+        const TDataType* operator->() const { return static_cast<TDataType*>(this->_pNode); }
 
         /// <summary>
         /// インクリメント
@@ -147,7 +147,7 @@ namespace Core::Common
         /// <summary>
         /// 比較
         /// </summary>
-        Bool operator==(const ListNodeIterator<DATATYPE, NODETYPE>& in_rRhs) const
+        Bool operator==(const ListNodeIterator<TDataType, TNodeType>& in_rRhs) const
         {
             return (this->_pNode == in_rRhs._pNode);
         }
@@ -155,7 +155,7 @@ namespace Core::Common
         /// <summary>
         /// 比較
         /// </summary>
-        Bool operator!=(const ListNodeIterator<DATATYPE, NODETYPE>& in_rRhs) const
+        Bool operator!=(const ListNodeIterator<TDataType, TNodeType>& in_rRhs) const
         {
             return ((*this == in_rRhs) == FALSE);
         }
@@ -163,36 +163,36 @@ namespace Core::Common
         /// <summary>
         /// 代入
         /// </summary>
-        const ListNodeIterator& operator=(const ListNodeIterator<DATATYPE, NODETYPE>& in_rRhs)
+        const ListNodeIterator& operator=(const ListNodeIterator<TDataType, TNodeType>& in_rRhs)
         {
             this->_pNode = in_rRhs._pNode;
             return *this;
         }
 
-        NODETYPE* GetNode() const { return this->_pNode; }
+        TNodeType* GetNode() const { return this->_pNode; }
 
     private:
-        NODETYPE* _pNode = NULL;
+        TNodeType* _pNode = NULL;
     };
 
     /// <summary>
     /// 双方向リストの逆イテレータ
     /// </summary>
-    /// <typeparam name="DATATYPE">LinkedListNodeで指定してテンプレート型</typeparam>
-    /// <typeparam name="NODETYPE">LinkedListNode継承したクラス</typeparam>
-    template <typename DATATYPE, typename NODETYPE>
+    /// <typeparam name="TDataType">LinkedListNodeで指定してテンプレート型</typeparam>
+    /// <typeparam name="TNodeType">LinkedListNode継承したクラス</typeparam>
+    template <typename TDataType, typename TNodeType>
     class ListNodeReverseIterator
     {
     public:
         ListNodeReverseIterator() = default;
-        ListNodeReverseIterator(NODETYPE* in_pNode) : _pNode(in_pNode) {}
+        ListNodeReverseIterator(TNodeType* in_pNode) : _pNode(in_pNode) {}
 
-        ListNodeReverseIterator(const ListNodeReverseIterator<DATATYPE, NODETYPE>& it)
+        ListNodeReverseIterator(const ListNodeReverseIterator<TDataType, TNodeType>& it)
             : _pNode(it._pNode)
         {
         }
 
-        ListNodeReverseIterator(const ListNodeReverseIterator<DATATYPE, NODETYPE>&& it)
+        ListNodeReverseIterator(const ListNodeReverseIterator<TDataType, TNodeType>&& it)
             : _pNode(it._pNode)
         {
         }
@@ -203,26 +203,26 @@ namespace Core::Common
         /// データ参照
         /// 派生クラスにキャストして返している
         /// </summary>
-        DATATYPE& operator*()
+        TDataType& operator*()
         {
             HE_ASSERT(this->_pNode);
-            return static_cast<DATATYPE&>(*this->_pNode);
+            return static_cast<TDataType&>(*this->_pNode);
         }
 
         /// <summary>
         /// データ参照
         /// </summary>
-        const DATATYPE& operator*() const { return static_cast<DATATYPE&>(this->_pNode); }
+        const TDataType& operator*() const { return static_cast<TDataType&>(this->_pNode); }
 
         /// <summary>
         /// データポインタ参照
         /// </summary>
-        DATATYPE* operator->() { return static_cast<DATATYPE*>(this->_pNode); }
+        TDataType* operator->() { return static_cast<TDataType*>(this->_pNode); }
 
         /// <summary>
         /// データポインタ参照
         /// </summary>
-        const DATATYPE* operator->() const { return static_cast<DATATYPE*>(this->_pNode); }
+        const TDataType* operator->() const { return static_cast<TDataType*>(this->_pNode); }
 
         /// <summary>
         /// インクリメント
@@ -265,7 +265,7 @@ namespace Core::Common
         /// <summary>
         /// 比較
         /// </summary>
-        Bool operator==(const ListNodeReverseIterator<DATATYPE, NODETYPE>& in_rRhs) const
+        Bool operator==(const ListNodeReverseIterator<TDataType, TNodeType>& in_rRhs) const
         {
             return (this->_pNode == in_rRhs._pNode);
         }
@@ -273,7 +273,7 @@ namespace Core::Common
         /// <summary>
         /// 比較
         /// </summary>
-        Bool operator!=(const ListNodeReverseIterator<DATATYPE, NODETYPE>& in_rRhs) const
+        Bool operator!=(const ListNodeReverseIterator<TDataType, TNodeType>& in_rRhs) const
         {
             return ((*this == in_rRhs) == FALSE);
         }
@@ -282,16 +282,16 @@ namespace Core::Common
         /// 代入
         /// </summary>
         const ListNodeReverseIterator& operator=(
-            const ListNodeReverseIterator<DATATYPE, NODETYPE>& in_rRhs)
+            const ListNodeReverseIterator<TDataType, TNodeType>& in_rRhs)
         {
             this->_pNode = in_rRhs._pNode;
             return *this;
         }
 
-        NODETYPE* GetNode() const { return _pNode; }
+        TNodeType* GetNode() const { return _pNode; }
 
     private:
-        NODETYPE* _pNode = NULL;
+        TNodeType* _pNode = NULL;
     };
 
     /// <summary>
@@ -481,6 +481,18 @@ namespace Core::Common
     private:
         LinkedListNode<T> _head;
         LinkedListNode<T> _tail;
+    };
+
+    // テンプレートクラス CustomFixVector の部分的な型特性
+    template <typename T>
+    struct IsCustomList : std::false_type
+    {
+    };
+
+    // CustomFixVector のインスタンスに対する特殊化
+    template <typename TType>
+    struct IsCustomList<CustomList<TType>> : std::true_type
+    {
     };
 
 }  // namespace Core::Common

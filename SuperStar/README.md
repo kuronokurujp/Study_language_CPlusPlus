@@ -181,7 +181,7 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
     |std::list または 同様の機能を持つクラス|lst||
     |std::map または 同様の機能を持つクラス|m||
     |std::stack または 同様の機能を持つクラス|s||
-    |テンプレート|なし||
+    |テンプレート型|T|頭にTをつけて後はキャメルケースで記述|
     |メソッド引数の入力|in\*||
     |値をメソッド出力引数|out||
     |クラスのメンバー変数|\_||
@@ -225,9 +225,11 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
 -   関数の戻り値の型が組み込み型の場合は const はつけない
     -   ※ポインタ型の場合は const をつける
 
-### クラスのメソッド名
+### クラス
 
-#### protected or private は外部公開ができない事を読んで判断できるようにするためにメソッド名の先頭に\_をつける
+#### メソッド名
+
+-   protected or private は外部公開ができない事を読んで判断できるようにするためにメソッド名の先頭に\_をつける
 
 ```
     class Object
@@ -237,50 +239,88 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
     };
 ```
 
-#### 仮想メソッドは V をつける
+#### 仮想メソッドには V をつける
 
-#### 宣言・定義の両面で見ても仮想メソッドと一目でわかるようにするため
+- 宣言・定義の両面で見ても仮想メソッドと一目でわかるようにするため
 
-#### 宣言は override で見て一目でわかるが、定義では override が付けれないので一目でわからず考える時間が生まれたから
+    -  宣言は override で見て一目でわかるが、定義では override が付けれないので一目でわからず考える時間が生まれたから
 
-```
+    例)
+    ```
+        class Object
+        {
+        public:
+            virtual void VRun() {}
+        };
+    ```
+
+#### クラスのオーバーライド
+
+- オーバーライドしたメソッドは基本クラスのメソッドも呼び出す
+
+    ※ 基本クラスのメソッドの中身が空で呼ぶ必要がないケースもあるが,
+       呼ぶか呼ばないかを調べるコストが高くなってしまう
+
+- クラスには仮想デストラクタを宣言
+
+    ※ 基本クラス型のポインタを使って派生クラスのインスタンスを削除した場合,
+       派生クラスのデストラクタを必ず呼ぶため
+
+- クラスを派生しないなら必ずfinalを使う
+
+    例)
+
+    ```
     class Object
     {
     public:
-        virtual void VRun() {}
+        virtual ~Object() = default;
+        virtual void VProcess() {}
     };
-```
 
-### クラスのオーバーライド
+    class ObjectV2 final : public Object
+    {
+    public:
+        void VProcess() override final { Object::VProcess(); }
+    };
+    ```
 
-```
-オーバーライドしたメソッドは基本クラスのメソッドも呼び出す
-※ 基本クラスのメソッドの中身が空で呼ぶ必要がないケースもあるが,
-   呼ぶか呼ばないかを調べるコストが高くなってしまう
+#### クラス内でのメンバー変数の参照
 
-クラスには仮想デストラクタを宣言
-※ 基本クラス型のポインタを使って派生クラスのインスタンスを削除した場合,
-   派生クラスのデストラクタを必ず呼ぶため
+-   クラス内のメンバー変数を参照する時は this をつける
 
-クラスを派生しないなら必ずfinalを使う
-```
+    例)
 
-#### 例)
+    ```
+    class Object
+    {
+    public:
+        Uint32 Count() const { this->_uCount; }
+    private:
+        Uint32 _uCount;
+    }
+    ```
 
-```
-class Object
-{
-public:
-    virtual ~Object() = default;
-    virtual void VProcess() {}
-};
+#### 強制デストラクタは絶対しない
 
-class ObjectV2 final : public Object
-{
-public:
-    void VProcess() override final { Object::VProcess(); }
-};
-```
+-   言語仕様でクラスの強制デストラクタが可能
+
+    例)
+    ```
+    class Object
+    {
+    public:
+        Uint32 Count() const { this->_uCount; }
+    private:
+        Uint32 _uCount;
+    }
+
+    Object obj;
+    obj.~Object();
+    ```
+
+しかしデストラクタはクラスの破棄タイミングで呼ばれるのが仕様なので、
+任意で実行すると意図しないバグを起こすので使用してはいけない
 
 ### ファイル名 / ディレクトリ名
 
@@ -321,22 +361,6 @@ TaskManager.hpp
 
     // NG
     EState e1 = EState::EState_Active;
-    ```
-
-### クラス内でのメンバー変数の参照
-
--   クラス内のメンバー変数を参照する時は this をつける
-
-    例)
-
-    ```
-    class Object
-    {
-    public:
-        Uint32 Count() const { this->_uCount; }
-    private:
-        Uint32 _uCount;
-    }
     ```
 
 ### プラグインで使うサードパーティーのヘッダーファイルのインクルードは cpp ファイルのみにする

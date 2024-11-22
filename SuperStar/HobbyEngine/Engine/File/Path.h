@@ -27,8 +27,8 @@ namespace Core::File
         /// <summary>
         /// パス文字列を複数設定
         /// </summary>
-        template <typename... Args>
-        Path(Args... in_args)
+        template <typename... TArgs>
+        Path(TArgs... in_args)
         {
             // TODO: 未対応の型でエラーになった場合, 追跡ができない
             // これ非対応にして変わりのを用意する

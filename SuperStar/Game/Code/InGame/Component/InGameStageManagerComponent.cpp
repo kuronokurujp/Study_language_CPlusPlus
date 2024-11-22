@@ -58,7 +58,8 @@ namespace InGame
             */
 
         // プレイヤーアクター生成
-        this->_playerHandle = this->AddActor<InGamePlayerActor>();
+        InGamePlayerActor::Parameter playerParamater;
+        this->_playerHandle = this->AddActor<InGamePlayerActor>(playerParamater);
         // プレイヤーの外部からの初期設定
         {
             Core::Math::Vector2 size(30.0f, 30.0f);
@@ -67,8 +68,6 @@ namespace InGame
             pPlayer->SetPos(Core::Math::Vector2(100.0f, 100.0f));
             // サイズ
             pPlayer->SetSize(size);
-
-            // pPlayer->SetViewHandle(this->_viewHandle);
 
             // プレイヤーのレンダリングコンポーネントを追加
             auto [h, c] = pPlayer->AddComponentByHandleAndComp<InGameRendererUserShipComponent>(

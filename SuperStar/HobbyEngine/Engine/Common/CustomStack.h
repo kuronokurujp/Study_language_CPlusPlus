@@ -7,14 +7,14 @@ namespace Core::Common
     /// <summary>
     /// 固定長スタックの基本クラス
     /// </summary>
-    template <class TYPE>
+    template <class TType>
     class StackBase
     {
         HE_CLASS_COPY_NG(StackBase);
         HE_CLASS_MOVE_NG(StackBase);
 
     public:
-        StackBase(TYPE* in_tpArrayAddr, Uint32 in_uSize)
+        StackBase(TType* in_tpArrayAddr, Uint32 in_uSize)
             : _pBuff(in_tpArrayAddr), _uCapacity(in_uSize)
         {
         }
@@ -27,7 +27,7 @@ namespace Core::Common
 
         void Clear() HE_NOEXCEPT { this->_uNum = 0; }
 
-        void PushBack(const TYPE& in_rData)
+        void PushBack(const TType& in_rData)
         {
             HE_ASSERT(this->_uNum < this->Capacity());
             this->_pBuff[this->_uNum] = in_rData;
@@ -37,7 +37,7 @@ namespace Core::Common
         /// <summary>
         /// データをプッシュで確保して利用側がデータ設定
         /// </summary>
-        TYPE* PushBack()
+        TType* PushBack()
         {
             HE_ASSERT(this->_uNum < this->Capacity());
             ++this->_uNum;
@@ -48,14 +48,14 @@ namespace Core::Common
         /// <summary>
         /// 配列の先頭に要素を追加
         /// </summary>
-        TYPE* PushFront()
+        TType* PushFront()
         {
             HE_ASSERT(this->_uNum < this->Capacity());
 
             if (0 < this->_uNum)
             {
                 // 配列先頭からのデータを一つ横にずらしてインデックス0に空きを作る
-                Uint32 uMemMoveSize = this->_uNum * sizeof(TYPE);
+                Uint32 uMemMoveSize = this->_uNum * sizeof(TType);
                 ::memmove(&this->_pBuff[1], &this->_pBuff[0], uMemMoveSize);
             }
 
@@ -64,7 +64,7 @@ namespace Core::Common
             return &this->_pBuff[0];
         }
 
-        TYPE& PopBack()
+        TType& PopBack()
         {
             Sint32 i = this->_uNum - 1;
             if (0 < this->_uNum) --this->_uNum;
@@ -75,7 +75,7 @@ namespace Core::Common
         }
 
     private:
-        TYPE* _pBuff      = NULL;
+        TType* _pBuff     = NULL;
         Uint32 _uNum      = 0;
         Uint32 _uCapacity = 0;
     };
@@ -84,28 +84,28 @@ namespace Core::Common
     /// 固定長の高速処理のスタック
     /// テンプレートで要素を決めている
     /// </summary>
-    template <class TYPE, Uint32 CAPACITY>
-    class CustomFixStack final : public StackBase<TYPE>
+    template <class TType, Uint32 TCapacity>
+    class CustomFixStack final : public StackBase<TType>
     {
         HE_CLASS_COPY_NG(CustomFixStack);
         HE_CLASS_MOVE_NG(CustomFixStack);
 
     public:
-        CustomFixStack() : StackBase<TYPE>(_taBuff, CAPACITY) {}
+        CustomFixStack() : StackBase<TType>(_taBuff, TCapacity) {}
 
     private:
-        TYPE _taBuff[CAPACITY];
+        TType _taBuff[TCapacity];
     };
 
-    // テンプレートクラス CustomFixVector の部分的な型特性
+    // テンプレートクラス CustomFixStack の部分的な型特性
     template <typename T>
     struct IsCustomFixStack : std::false_type
     {
     };
 
     // CustomFixVector のインスタンスに対する特殊化
-    template <typename TYPE, Uint32 CAPACITY>
-    struct IsCustomFixStack<CustomFixStack<TYPE, CAPACITY>> : std::true_type
+    template <typename TType, Uint32 TCapacity>
+    struct IsCustomFixStack<CustomFixStack<TType, TCapacity>> : std::true_type
     {
     };
 

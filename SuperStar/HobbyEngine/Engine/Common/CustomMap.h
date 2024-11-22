@@ -6,6 +6,7 @@
 // アルゴリズムはLLRB(赤黒木)を使っている
 // キーの重複はだめ
 
+#include "Engine/Common/CustomList.h"
 #include "Engine/Common/CustomStack.h"
 #include "Engine/Common/CustomString.h"
 #include "Engine/Common/CustomVector.h"
@@ -19,11 +20,11 @@ namespace Core::Common
     /// KEY添え字にしてDATAを探索するDATA固定長のMap
     /// 探索速度はO(log n)になる
     /// </summary>
-    /// <typeparam name="KEY">連想配列の添え字の型</typeparam>
-    /// <typeparam name="DATA">配列要素の型</typeparam>
-    /// <typeparam name="SIZE">SIZEで指定した値が最大要素数,
+    /// <typeparam name="TKey">連想配列の添え字の型</typeparam>
+    /// <typeparam name="TData">配列要素の型</typeparam>
+    /// <typeparam name="TSize">TSizeで指定した値が最大要素数,
     /// 最大要素数を超えたらエラーとなる</typeparam>
-    template <typename KEY, typename DATA, Sint32 SIZE>
+    template <typename TKey, typename TData, Sint32 TSize>
     class CustomFixMap final
     {
         HE_CLASS_MOVE_NG(CustomFixMap);
@@ -35,8 +36,8 @@ namespace Core::Common
         // キーとデータのペア構造体
         struct Pair
         {
-            KEY key;
-            DATA data;
+            TKey key;
+            TData data;
         };
 
         // カスタムマップのイテレーター
@@ -119,7 +120,7 @@ namespace Core::Common
 
         // コンストラクタ
         // 宣言と同時に初期化できるようにしている
-        CustomFixMap(const std::initializer_list<std::pair<KEY, DATA>>& in_rInitList)
+        CustomFixMap(const std::initializer_list<std::pair<TKey, TData>>& in_rInitList)
             : _iteratorTail(&this->_tail)
         {
             this->_Init();
@@ -164,7 +165,7 @@ namespace Core::Common
         /// <summary>
         /// キーとデータを追加
         /// </summary>
-        Iterator Add(const KEY& in_rKey, const DATA& in_rData)
+        Iterator Add(const TKey& in_rKey, const TData& in_rData)
         {
             return this->_Add(in_rKey, &in_rData);
         }
@@ -173,7 +174,7 @@ namespace Core::Common
         /// キーとデータを追加
         /// DATAがムーブセマンティック用
         /// </summary>
-        Iterator AddByMoveData(const KEY& in_rKey, DATA&& in_rData)
+        Iterator AddByMoveData(const TKey& in_rKey, TData&& in_rData)
         {
             // 赤ノードを作る
             Node* pNode = this->_NewNode();
@@ -183,7 +184,7 @@ namespace Core::Common
             {
                 // 添え字アクセスで作る場合はデータが無い
                 // コピーして渡す
-                if constexpr (IsUniquePtrByTemplateType<DATA>::value)
+                if constexpr (IsUniquePtrByTemplateType<TData>::value)
                 {
                     pNode->_pair.data = std::move(in_rData);
                 }
@@ -204,7 +205,7 @@ namespace Core::Common
         /// <summary>
         /// キーからデータ検索
         /// </summary>
-        Iterator FindKey(const KEY& in_trKey) const
+        Iterator FindKey(const TKey& in_trKey) const
         {
             // ツリーが空なら終端を返す
             if (this->Empty()) return this->End();
@@ -225,7 +226,7 @@ namespace Core::Common
         /// <summary>
         /// データからキー検索
         /// </summary>
-        Iterator FindData(const DATA& in_rData)
+        Iterator FindData(const TData& in_rData)
         {
             // ツリーが空なら終端を返す
             if (this->Empty()) return this->End();
@@ -246,7 +247,7 @@ namespace Core::Common
         /// <summary>
         /// 指定キーの要素があるか
         /// </summary>
-        Bool Contains(const KEY& in_rKey) const
+        Bool Contains(const TKey& in_rKey) const
         {
             // ツリーが空なのでキーの要素はない
             if (this->Empty()) return FALSE;
@@ -260,7 +261,7 @@ namespace Core::Common
         /// <summary>
         /// データ削除(キー版)
         /// </summary>
-        Bool Erase(const KEY& in_rKey)
+        Bool Erase(const TKey& in_rKey)
         {
             if (this->Contains(in_rKey) == FALSE) return FALSE;
 
@@ -295,6 +296,8 @@ namespace Core::Common
         /// </summary>
         void Clear()
         {
+            if (this->Empty()) return;
+
             // ルートから辿って破棄
             this->_Clear(this->_pRoot);
             this->_Init();
@@ -325,7 +328,7 @@ namespace Core::Common
         /// KEYを添え字にしてデータアクセス
         /// KEYがなければそのKEYでデータを追加して参照を返す
         /// </summary>
-        DATA& operator[](const KEY& in_trKey) { return this->FindOrAddKey(in_trKey); }
+        TData& operator[](const TKey& in_trKey) { return this->FindOrAddKey(in_trKey); }
 
     protected:
         /// <summary>
@@ -341,35 +344,7 @@ namespace Core::Common
             return pNode;
         }
 
-        /// <summary>
-        /// ノード破棄
-        /// </summary>
-        virtual void _VDestoryNode(const Core::Common::Handle& in_rHandle)
-        {
-            Node* p = this->_poolObject.Ref(in_rHandle);
-            if (p == NULL) return;
-
-            this->_DestroyNodeData(p->_pair.data);
-            /*
-
-            if constexpr (IsUniquePtrByTemplateType<DATA>::value)
-            {
-                // UniquePtrなら破棄する
-
-                HE_SAFE_DELETE_UNIQUE_PTR(p->_pair.data);
-            }
-            // DATA型で破棄する時にクラスのプロパティをクリアするためにデストラクタを呼ぶ
-            else if constexpr (std::is_class<DATA>::value)
-            {
-                // デストラクタを呼ぶ
-                p->_pair.data.~DATA();
-            }
-            */
-
-            this->_poolObject.Free(in_rHandle);
-        }
-
-        inline DATA& FindOrAddKey(const KEY& in_trKey)
+        inline TData& FindOrAddKey(const TKey& in_trKey)
         {
             Iterator it = this->FindKey(in_trKey);
             if (it == this->End())
@@ -493,12 +468,19 @@ namespace Core::Common
             //            in_pNode->_pNext  = NULL;
             //            in_pNode->_pPrev  = NULL;
 
-            this->_VDestoryNode(in_pNode->handle);
+            // ノードのデータを破棄
+            Node* p = this->_poolObject.Ref(in_pNode->handle);
+            if (p)
+            {
+                this->_DestroyNodeData(p->_pair.data);
+                this->_poolObject.Free(in_pNode->handle);
+            }
+
             --this->_uNodeNum;
         }
 
         // ノードを追加する
-        Iterator _Add(const KEY& in_rKey, const DATA* in_pData)
+        Iterator _Add(const TKey& in_rKey, const TData* in_pData)
         {
             // 赤ノードを作る
             Node* pNode = this->_NewNode();
@@ -509,7 +491,7 @@ namespace Core::Common
             {
                 // 添え字アクセスで作る場合はデータが無い
                 // コピーして渡す
-                if constexpr (IsUniquePtrByTemplateType<DATA>::value)
+                if constexpr (IsUniquePtrByTemplateType<TData>::value)
                 {
                     HE_STATIC_ASSERT(0);
                 }
@@ -584,7 +566,7 @@ namespace Core::Common
         // キーの大小比較
         // クラスをキーにする場合
         // 比較演算子( >, < )を用意してください。
-        Sint32 _CompareByKey(const KEY& in_rLeft, const KEY& in_rRight) const HE_NOEXCEPT
+        Sint32 _CompareByKey(const TKey& in_rLeft, const TKey& in_rRight) const HE_NOEXCEPT
         {
             if (in_rLeft < in_rRight)
             {
@@ -603,7 +585,7 @@ namespace Core::Common
 
         // データの大小比較
         // クラスをデータにする場合、比較演算子( >, < )を用意してください。
-        Sint32 _CompareByData(const DATA& in_rLeft, const DATA& in_rRight) const HE_NOEXCEPT
+        Sint32 _CompareByData(const TData& in_rLeft, const TData& in_rRight) const HE_NOEXCEPT
         {
             // TODO:
             // 比較演算しを対応しているかどうかチェックして対応していない場合はスキップできるか？
@@ -623,7 +605,7 @@ namespace Core::Common
         }
 
         // キーに対応したノードを探す
-        Node* _FindKey(Node* in_pNode, const KEY& in_rKey) const
+        Node* _FindKey(Node* in_pNode, const TKey& in_rKey) const
         {
             // 見つからないまま終端
             if (in_pNode == NULL) return NULL;
@@ -648,7 +630,7 @@ namespace Core::Common
         }
 
         // データに対応したノードを探す
-        Node* _FindData(Node* in_pNode, const DATA& in_rData) const
+        Node* _FindData(Node* in_pNode, const TData& in_rData) const
         {
             // 見つからないまま終端
             if (in_pNode == NULL) return NULL;
@@ -673,7 +655,7 @@ namespace Core::Common
         }
 
         // キーに対応したノードを探して削除
-        Node* _Erase(Node* in_pNode, const KEY& in_trKey)
+        Node* _Erase(Node* in_pNode, const TKey& in_trKey)
         {
             if (this->_CompareByKey(in_pNode->_pair.key, in_trKey) < 0)
             {
@@ -914,15 +896,41 @@ namespace Core::Common
         /// <summary>
         /// ノードのデータを削除
         /// </summary>
-        void _DestroyNodeData(DATA& in_rData)
+        void _DestroyNodeData(TData& in_rData)
         {
-            if constexpr (IsUniquePtrByTemplateType<DATA>::value)
+            // TData型がどのような型かによって削除処理を分岐している
+            if constexpr (IsUniquePtrByTemplateType<TData>::value)
             {
                 HE_SAFE_DELETE_UNIQUE_PTR(in_rData);
             }
-            else if constexpr (std::is_class<DATA>::value)
+            else if constexpr (IsShaderPtrByTemplateType<TData>::value)
             {
-                in_rData.~DATA();
+                in_rData = NULL;
+            }
+            else if constexpr (IsCustomFixStack<TData>::value)
+            {
+                in_rData.Clear();
+            }
+            else if constexpr (IsCustomFixVector<TData>::value)
+            {
+                in_rData.Clear();
+            }
+            else if constexpr (IsCustomFixString<TData>::value)
+            {
+                in_rData.Clear();
+            }
+            else if constexpr (IsCustomList<TData>::value)
+            {
+                in_rData.Clear();
+            }
+            else if constexpr (IsCustomFixVector<TData>::value)
+            {
+                in_rData.Clear();
+            }
+            else if constexpr (std::is_class<TData>::value)
+            {
+                // std::listなどを強制デストラクタするとハングするので強制処理はしない
+                // in_rData.~DATA();
             }
         }
 
@@ -936,6 +944,6 @@ namespace Core::Common
         Iterator _iteratorTail;
 
         Uint32 _uNodeNum = 0;
-        Core::Common::FixPoolManager<Node, SIZE> _poolObject;
+        Core::Common::FixPoolManager<Node, TSize> _poolObject;
     };
 }  // namespace Core::Common

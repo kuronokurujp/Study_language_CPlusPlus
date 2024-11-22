@@ -62,7 +62,6 @@ int main(int argc, char* const argv[])
 
 // エンジンのテスト一覧
 
-/*
 // マクロテストコード
 #include "EngineTest/Common/TestMacro.hpp"
 
@@ -112,7 +111,6 @@ int main(int argc, char* const argv[])
 // Lambdaテストコード
 #include "EngineTest/Common/TestLambda.hpp"
 
-*/
 // ゲーム用アセットのテスト
 // ゲームプロジェクトはアプリプロジェクトでコードの実態を入れ込むためにcppファイルもインクルードしないといけない
 #include "TestCode/Asset/TestAsset.hpp"

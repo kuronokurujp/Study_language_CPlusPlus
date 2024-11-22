@@ -17,14 +17,14 @@ namespace Core::Common
     /// <summary>
     /// 固定長配列の基本クラス
     /// </summary>
-    template <class TYPE>
+    template <class TType>
     class ArrayBase
     {
         HE_CLASS_COPY_NG(ArrayBase);
         HE_CLASS_MOVE_NG(ArrayBase);
 
     public:
-        explicit ArrayBase(TYPE* in_pArrayAddr, Uint32 in_uSize)
+        explicit ArrayBase(TType* in_pArrayAddr, Uint32 in_uSize)
             : _pBuff(in_pArrayAddr), _uCapacity(in_uSize)
         {
         }
@@ -35,13 +35,13 @@ namespace Core::Common
         /// <summary>
         /// 指定した要素に値をコピーして設定
         /// </summary>
-        inline void Set(const Uint32 in_uIndex, const TYPE& in_data) HE_NOEXCEPT
+        inline void Set(const Uint32 in_uIndex, const TType& in_data) HE_NOEXCEPT
         {
             HE_ASSERT(in_uIndex < this->_uCapacity);
             this->_pBuff[in_uIndex] = in_data;
         }
 
-        inline void Set(const Uint32 in_uIndex, TYPE&& in_data) HE_NOEXCEPT
+        inline void Set(const Uint32 in_uIndex, TType&& in_data) HE_NOEXCEPT
         {
             HE_ASSERT(in_uIndex < this->_uCapacity);
             this->_pBuff[in_uIndex] = std::move(in_data);
@@ -59,14 +59,14 @@ namespace Core::Common
             std::copy(this->_pBuff, this->_pBuff + uMinCapacity, this->_pBuff);
         }
 
-        TYPE& operator[](const Uint32 in_uIndex) const
+        TType& operator[](const Uint32 in_uIndex) const
         {
             HE_ASSERT(0 < this->_uCapacity);
             return this->_pBuff[in_uIndex];
         }
 
     private:
-        TYPE* _pBuff      = NULL;
+        TType* _pBuff      = NULL;
         Uint32 _uCapacity = 0;
     };
 
@@ -74,18 +74,18 @@ namespace Core::Common
     /// 固定長配列
     /// テンプレートで要素を決めている
     /// </summary>
-    template <typename TYPE, Uint32 CAPACITY>
-    class CustomArray final : public ArrayBase<TYPE>
+    template <typename TType, Uint32 TCapacity>
+    class CustomArray final : public ArrayBase<TType>
     {
     public:
-        explicit CustomArray() : ArrayBase<TYPE>(this->_aBuff, CAPACITY) {}
+        explicit CustomArray() : ArrayBase<TType>(this->_aBuff, TCapacity) {}
 
         // コンストラクタ
         // 配列宣言と同時に値を初期化できるようにしている
-        CustomArray(std::initializer_list<TYPE>& in_rInitList)
-            : ArrayBase<TYPE>(this->_aBuff, CAPACITY)
+        CustomArray(std::initializer_list<TType>& in_rInitList)
+            : ArrayBase<TType>(this->_aBuff, TCapacity)
         {
-            const Uint32 uMinCapacity = HE_MIN(CAPACITY, in_rInitList.size());
+            const Uint32 uMinCapacity = HE_MIN(TCapacity, in_rInitList.size());
 
             auto it = in_rInitList.begin();
             for (Uint32 i = 0; i < uMinCapacity; ++i)
@@ -95,6 +95,6 @@ namespace Core::Common
         }
 
     private:
-        TYPE _aBuff[CAPACITY];
+        TType _aBuff[TCapacity];
     };
 }  // namespace Core::Common

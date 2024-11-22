@@ -127,8 +127,8 @@ namespace Core::Common
         /// プールしているデータの中で利用できるデータ枠を取得
         /// 利用するデータとそのデータを紐づけたハンドルを返す
         /// </summary>
-        template <class S>
-        AllocData _Alloc()
+        template <class S, typename... TArgs>
+        AllocData _Alloc(TArgs&&... in_args)
         {
             HE_STATIC_ASSERT(std::is_base_of<T, S>::value, "SクラスはTクラスを継承していない");
 
@@ -174,6 +174,8 @@ namespace Core::Common
                         this->_upCacheDatas->erase(b);
                         handle.Init(uChkIndex);
 
+                        // TODO: 再利用する場合はコンストラクターを呼ばなくてもいいのか？
+
                         break;
                     }
 
@@ -193,7 +195,7 @@ namespace Core::Common
 
                 // Tを継承したSクラスのインスタンスを生成
                 // NEWは用意したマクロを使う
-                pObject = HE_NEW_MEM(S, 0);
+                pObject = HE_NEW_MEM(S, 0)(std::forward<TArgs>(in_args)...);
             }
 
             allocData._handle = handle;
@@ -264,7 +266,7 @@ namespace Core::Common
     /// データ最大数は固定
     /// データを使いまわすのでクラス型を利用するとクラスのプロパティ値が残るので注意
     /// </summary>
-    template <typename T, Uint32 CAPACITY>
+    template <typename T, Uint32 TCapacity>
     class FixPoolManager final
     {
     private:
@@ -296,7 +298,7 @@ namespace Core::Common
             Uint32 uUserSlotIndex = 0;
             if (this->_sFreeSlotIndex.Empty())
             {
-                if (CAPACITY <= this->_uFreeSlotMax) return NULL;
+                if (TCapacity <= this->_uFreeSlotMax) return NULL;
 
                 uUserSlotIndex = this->_uFreeSlotMax;
                 ++this->_uFreeSlotMax;
@@ -362,8 +364,8 @@ namespace Core::Common
         }
 
     private:
-        CustomArray<Slot, CAPACITY> _aUserSlot;
-        CustomFixStack<Uint32, CAPACITY> _sFreeSlotIndex;
+        CustomArray<Slot, TCapacity> _aUserSlot;
+        CustomFixStack<Uint32, TCapacity> _sFreeSlotIndex;
 
         Uint32 _uUseCount    = 0;
         Uint32 _uFreeSlotMax = 0;

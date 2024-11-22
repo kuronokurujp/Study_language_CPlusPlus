@@ -74,8 +74,8 @@ namespace Actor
         /// <summary>
         /// アクター追加
         /// </summary>
-        template <class T>
-        Core::Common::Handle Add()
+        template <class T, typename... TArgs>
+        Core::Common::Handle Add(TArgs&&... in_args)
         {
             HE_STATIC_ASSERT(std::is_base_of<Object, T>::value,
                              "TクラスはアクターのObjectクラスを継承していない");
@@ -85,7 +85,7 @@ namespace Actor
             Sint32 sGroupId = 0;
             if (this->_bUpdatingActors) sGroupId = this->_GetPendingGroupId();
 
-            auto handle = this->_taskManager.CreateAndAdd<T>(sGroupId, TRUE);
+            auto handle = this->_taskManager.CreateAndAdd<T>(sGroupId, TRUE, std::forward<TArgs>(in_args)...);
 
             Object* pObject = this->_taskManager.GetTask<Object>(handle);
             HE_ASSERT(pObject != NULL);

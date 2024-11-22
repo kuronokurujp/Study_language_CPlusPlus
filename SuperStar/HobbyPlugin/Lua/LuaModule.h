@@ -80,8 +80,8 @@ namespace Lua
         /// TODO: ローカル関数の戻り値は非対応
         /// Luaスクリプトのコルーチンは非対応
         /// </summary>
-        template <typename... Args>
-        Bool CallScriptFunc(const Core::Common::Handle&, const Char*, Args... args);
+        template <typename... TArgs>
+        Bool CallScriptFunc(const Core::Common::Handle&, const Char*, TArgs... args);
 
         // TODO: c++側がキャッチできる関数を登録
         Bool RegistScriptFunc(const Core::Common::Handle&, const Char*);
@@ -108,10 +108,10 @@ namespace Lua
         Bool _VLateUpdate(const Float32 in_fDeltaTime) override final;
 
     private:
-        template <typename... Args>
-        void _LuaStackPushArguments(void* in_pLuaState, Args&&... args)
+        template <typename... TArgs>
+        void _LuaStackPushArguments(void* in_pLuaState, TArgs&&... args)
         {
-            (this->_LuaStackPushValue(in_pLuaState, std::forward<Args>(args)), ...);
+            (this->_LuaStackPushValue(in_pLuaState, std::forward<TArgs>(args)), ...);
         }
 
         void _LuaStackPushArguments(void*)
@@ -158,9 +158,9 @@ namespace Lua
     /// Luaスクリプトの関数を呼び出す
     /// Luaスクリプトのコルーチンは使えない
     /// </summary>
-    template <typename... Args>
+    template <typename... TArgs>
     Bool LuaModule::CallScriptFunc(const Core::Common::Handle& in_rHandle,
-                                   const Char* in_pActionName, Args... args)
+                                   const Char* in_pActionName, TArgs... args)
     {
         auto* pLuaObject = this->_luaObjectPool.Ref(in_rHandle);
         if (this->_BeginLocalFunc(pLuaObject->pLuaState, in_pActionName) == FALSE) return FALSE;

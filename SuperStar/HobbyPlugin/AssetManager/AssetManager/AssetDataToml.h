@@ -37,9 +37,9 @@ namespace AssetManager
 
             const Core::Common::FixString512 GetString() const;
 
-            template <typename... Args>
-            typename std::enable_if<(std::is_same<Args, const Char*>::value && ...), Node>::type
-            GetNode(Args... args)
+            template <typename... TArgs>
+            typename std::enable_if<(std::is_same<TArgs, const Char*>::value && ...), Node>::type
+            GetNode(TArgs... args)
             {
                 // 引数の個数を取得
                 Uint32 uCount = static_cast<Uint32>(sizeof...(args));
@@ -51,10 +51,10 @@ namespace AssetManager
                 return this->_GetNode(values, uCount);
             }
 
-            template <typename... Args>
-            typename std::enable_if<(std::is_same<Args, const Char*>::value && ...),
+            template <typename... TArgs>
+            typename std::enable_if<(std::is_same<TArgs, const Char*>::value && ...),
                                     const Bool>::type
-            OutputNodeMap(ToolNodeMapType* out, Args... args)
+            OutputNodeMap(ToolNodeMapType* out, TArgs... args)
             {
                 // 引数の個数を取得
                 Uint32 uCount = static_cast<Uint32>(sizeof...(args));

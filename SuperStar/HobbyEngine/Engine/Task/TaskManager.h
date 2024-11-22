@@ -70,8 +70,8 @@ namespace Core
         /// タスク作成して追加する
         /// 結果はハンドルで返す
         /// </summary>
-        template <class T>
-        Common::Handle CreateAndAdd(const Sint32 in_sGroupId, const Bool in_bReleaseMem)
+        template <class T, typename ... TArgs>
+        Common::Handle CreateAndAdd(const Sint32 in_sGroupId, const Bool in_bReleaseMem, TArgs&&... in_args)
         {
             HE_STATIC_ASSERT(std::is_base_of<Task, T>::value,
                              "TクラスはTaskクラスを継承していない");
@@ -79,7 +79,7 @@ namespace Core
             HE_ASSERT(in_sGroupId < this->_iGroupNum);
 
             // 利用するタスクを割り当て
-            RuntimePoolManager::AllocData resAlloc = this->_Alloc<T>();
+            RuntimePoolManager::AllocData resAlloc = this->_Alloc<T>(std::forward<TArgs>(in_args)...);
             Task* pTask                            = resAlloc._pItem;
 
             pTask->VSetup(in_bReleaseMem);

@@ -20,9 +20,10 @@
 
 namespace InGame
 {
-    InGamePlayerActor::InGamePlayerActor() : InGameScene2DActor()
+    InGamePlayerActor::InGamePlayerActor(const Parameter& in_defaultParam) : InGameScene2DActor()
     {
         this->_Clear();
+        this->_defaultParameter = in_defaultParam;
     }
 
     Bool InGamePlayerActor::VBegin()

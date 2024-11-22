@@ -89,11 +89,11 @@ namespace Core::Common
         }
 
         // いくつかの型を指定できるようにする
-        template <typename... Args>
+        template <typename... TArgs>
         typename std::enable_if<
-            ((std::is_same<Args, Char*>::value || std::is_same<Args, const Char*>::value) && ...),
+            ((std::is_same<TArgs, Char*>::value || std::is_same<TArgs, const Char*>::value) && ...),
             void>::type
-        Concatenate(Args... args)
+        Concatenate(TArgs... args)
         {
             // 引数の個数を取得
             Uint32 uCount = static_cast<Uint32>(sizeof...(args));
@@ -173,25 +173,25 @@ namespace Core::Common
     /// 固定長の文字列クラス
     /// </summary>
     /// <typeparam name="SIZE"></typeparam>
-    template <Uint32 CAPACITY>
+    template <Uint32 TCapacity>
     class FixString final : public StringBase
     {
         //HE_CLASS_MOVE_NG(FixString);
 
     public:
-        FixString() : StringBase(this->_szBuff, CAPACITY) {}
-        FixString(const Char* in_szName) : StringBase(this->_szBuff, CAPACITY)
+        FixString() : StringBase(this->_szBuff, TCapacity) {}
+        FixString(const Char* in_szName) : StringBase(this->_szBuff, TCapacity)
         {
             this->_Copy(in_szName, HE_STR_LEN(in_szName));
         }
-        FixString(const FixString<CAPACITY>& r) : StringBase(this->_szBuff, CAPACITY) { *this = r; }
-        FixString(const FixString<CAPACITY>&& r) : StringBase(this->_szBuff, CAPACITY) { *this = r; }
-        FixString(const StringBase& r) : StringBase(this->_szBuff, CAPACITY)
+        FixString(const FixString<TCapacity>& r) : StringBase(this->_szBuff, TCapacity) { *this = r; }
+        FixString(const FixString<TCapacity>&& r) : StringBase(this->_szBuff, TCapacity) { *this = r; }
+        FixString(const StringBase& r) : StringBase(this->_szBuff, TCapacity)
         {
             this->_Copy(r.Str(), r.Length());
         }
 
-        FixString(const UTF8* in_szNameUTF8) : StringBase(this->_szBuff, CAPACITY)
+        FixString(const UTF8* in_szNameUTF8) : StringBase(this->_szBuff, TCapacity)
         {
             // Win版のみUTF8型がchar型なので切り替える
 #ifdef HE_WIN
@@ -202,7 +202,7 @@ namespace Core::Common
         }
 
 #ifdef HE_WIN
-        FixString(const std::string_view& in_szrName) : StringBase(this->_szBuff, CAPACITY)
+        FixString(const std::string_view& in_szrName) : StringBase(this->_szBuff, TCapacity)
         {
             this->_ConvUTF8toWide(in_szrName.data(), static_cast<Uint32>(in_szrName.length()));
         }
@@ -214,25 +214,25 @@ namespace Core::Common
         }
 #endif
 
-        FixString<CAPACITY>& operator=(const Char* in_szName)
+        FixString<TCapacity>& operator=(const Char* in_szName)
         {
             this->_Copy(in_szName, HE_STR_LEN(in_szName));
             return *this;
         }
 
         // win版では文字列はwchar / charの二つの型がある
-        FixString<CAPACITY>& operator=(const UTF8* in_szName)
+        FixString<TCapacity>& operator=(const UTF8* in_szName)
         {
             // Win版のみUTF8型がchar型なので切り替える
 #ifdef HE_WIN
-            this->_ConvUTF8toWide(in_szName, CAPACITY);
+            this->_ConvUTF8toWide(in_szName, TCapacity);
 #else
             this->_Copy(in_szName, HE_STR_LEN(in_szName));
 #endif
             return *this;
         }
 
-        FixString<CAPACITY>& operator=(const FixString<CAPACITY>& r)
+        FixString<TCapacity>& operator=(const FixString<TCapacity>& r)
         {
             this->_Copy(r._szBuff, HE_STR_LEN(r._szBuff));
             return *this;
@@ -248,18 +248,18 @@ namespace Core::Common
         Bool _ConvUTF8toWide(const UTF8* in_szNameUTF8, const Uint32 in_uLen)
         {
             HE_ASSERT(in_szNameUTF8);
-            HE_ASSERT(in_uLen <= CAPACITY);
+            HE_ASSERT(in_uLen <= TCapacity);
 
-            static Char w[CAPACITY] = {};
+            static Char w[TCapacity] = {};
             ::memset(w, 0, HE_ARRAY_SIZE(w));
 
             // 利用する文字数を取得
             Sint32 iUseSize = MultiByteToWideChar(CP_UTF8, 0, in_szNameUTF8, in_uLen, NULL, 0);
             // 利用する文字数が制限を超えていないかチェック
-            HE_ASSERT(iUseSize < CAPACITY);
+            HE_ASSERT(iUseSize < TCapacity);
 
             // UTF8文字列からUTF16の文字列に変える
-            MultiByteToWideChar(CP_UTF8, 0, in_szNameUTF8, CAPACITY, &w[0], iUseSize);
+            MultiByteToWideChar(CP_UTF8, 0, in_szNameUTF8, TCapacity, &w[0], iUseSize);
 
             (*this) = w;
 
@@ -267,7 +267,7 @@ namespace Core::Common
         }
 #endif
     private:
-        Char _szBuff[CAPACITY] = {};
+        Char _szBuff[TCapacity] = {};
     };
 
     // 固定長の文字列型
@@ -322,8 +322,8 @@ namespace Core::Common
     };
 
     // CustomFixVector のインスタンスに対する特殊化
-    template <Uint32 CAPACITY>
-    struct IsCustomFixString<FixString<CAPACITY>> : std::true_type
+    template <Uint32 TCapacity>
+    struct IsCustomFixString<FixString<TCapacity>> : std::true_type
     {
     };
 

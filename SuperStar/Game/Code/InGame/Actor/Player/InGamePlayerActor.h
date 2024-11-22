@@ -29,7 +29,7 @@ namespace InGame
         };
 
     public:
-        InGamePlayerActor();
+        InGamePlayerActor(const Parameter& in_defaultParam);
         virtual ~InGamePlayerActor() = default;
 
         /// <summary>
@@ -47,6 +47,7 @@ namespace InGame
         void VUpdate(const Float32 in_fDt) override final;
 
         void SetSize(const Core::Math::Vector2&);
+        void SetMoveSpped(const Float32 in_fSpeed) {}
 
         void Move(const Core::Math::Vector2&);
         void Shot();
@@ -75,21 +76,6 @@ namespace InGame
         }
 
     private:
-        /*
-            //	定数
-            enum
-            {
-                eSHOT_BASIC = 0,
-                eSHOT_LASER,
-                eSHOT_HOMING,
-                eSHOT_WAY,
-
-                eSHOT_MAX
-            };
-
-            Sint32 m_aShotHandle[eSHOT_MAX];
-            */
-
         Core::Math::Vector2 _size;
         Core::Math::Vector2 _move;
 

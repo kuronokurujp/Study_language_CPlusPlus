@@ -49,6 +49,7 @@ namespace Event
 
                 itr->data.clear();
             }
+            this->_mRegistry.Clear();
         }
 
         // 拡張ストラテジーを解放
