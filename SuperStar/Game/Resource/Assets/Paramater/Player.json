@@ -2,8 +2,9 @@
     "version": 1,
     "data": {
         "player_default": {
-            "hp": 100,
-            "move_spped": 1.0
+            "hp": 3,
+            "move_spped": 7.0,
+            "InvincibleTimeSec": 1.5
         }
     }
 }

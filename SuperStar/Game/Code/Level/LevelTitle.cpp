@@ -36,13 +36,14 @@ namespace Level
 
         // UIイベントをキャッチするコンポーネントを追加
         {
-            auto h    = this->AddComponent<Level::LevelUserInputReceiveComponent>(0);
-            auto comp = this->GetComponent<Level::LevelUserInputReceiveComponent>(h);
+            auto [compHandle, pComp] =
+                this->AddComponentByHandleAndComp<Level::LevelUserInputReceiveComponent>(
+                    0, Actor::Component::EPriorty::EPriorty_Main);
 
             auto handler =
                 HE_MAKE_CUSTOM_UNIQUE_PTR((Level::LevelUserInputMessage),
                                           [this](const Char* in_pMsg) { HE_LOG_LINE(in_pMsg); });
-            comp->SetReceiver(std::move(handler));
+            pComp->SetReceiver(std::move(handler));
         }
 
         // UIのBuilderファイルからレイアウト作成

@@ -21,7 +21,7 @@ namespace InGame
         void SetSize(Core::Math::Vector2&);
 
     protected:
-        void _VRenderer(Core::Common::Handle& in_rViewHandle,
+        void _VRenderer(const Core::Common::Handle& in_rViewHandle,
                         class Actor::TransformComponent*) override final;
 
     private:

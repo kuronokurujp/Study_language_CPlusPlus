@@ -14,7 +14,8 @@ namespace UI
 
         if (this->_viewHandle.Null()) return FALSE;
 
-        this->_transformHandle = this->_pOwner->AddComponent<Actor::TransformComponent>(0);
+        this->_transformHandle = this->_pOwner->AddComponent<Actor::TransformComponent>(
+            0, Actor::Component::EPriorty::EPriorty_Main);
         if (this->_transformHandle.Null()) return FALSE;
 
         this->GetTransformComponent()->SetPos(Core::Math::Vector3(this->_pos));

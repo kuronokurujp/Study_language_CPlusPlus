@@ -33,12 +33,7 @@ namespace InGame
         };
 
     public:
-        explicit InGameBulletManagerComponent() = default;
-
-        /// <summary>
-        /// 弾をレンダリングするハンドル
-        /// </summary>
-        void SetViewHandle(Core::Common::Handle& in_rHandle) { this->_viewHandle = in_rHandle; }
+        explicit InGameBulletManagerComponent(Core::Common::Handle in_rViewHandle);
 
         /// <summary>
         /// 初期化
@@ -90,6 +85,6 @@ namespace InGame
         Core::Common::Handle _viewHandle;
 
         Core::Common::Handle _shotEventHandle;
-        //Core::Memory::SharedPtr<Event::EventListenerInterface> _shotEventListener;
+        // Core::Memory::SharedPtr<Event::EventListenerInterface> _shotEventListener;
     };
 }  // namespace InGame

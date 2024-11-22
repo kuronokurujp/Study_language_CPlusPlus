@@ -51,15 +51,15 @@ namespace Level
         HE_ASSERT(bRet);
 
         // TODO: アセットのロード
+
+        Core::Common::Handle playerParamaterAssetHandle;
         {
             auto pAssetManagerModule =
                 HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
 
             auto szPlayerParamaterAssetName = HE_STR_TEXT("PlayerParamater");
-            auto playerParamaterAssetHandle =
-                pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
-                    szPlayerParamaterAssetName,
-                    Core::File::Path(HE_STR_TEXT("Paramater/Player.json")));
+            playerParamaterAssetHandle = pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
+                szPlayerParamaterAssetName, Core::File::Path(HE_STR_TEXT("Paramater/Player.json")));
             this->_mGameAsset.Add(HE_STR_TEXT("PlayerParamater"), playerParamaterAssetHandle);
 
             auto szEnemeyParamaterAssetName = HE_STR_TEXT("EnemyParamater");
@@ -88,7 +88,8 @@ namespace Level
 
         // インゲームのシステムコンポーネントを追加
         {
-            this->_systemComponentHandle = this->AddComponent<InGame::InGameSystemComponent>(0);
+            this->_systemComponentHandle = this->AddComponent<InGame::InGameSystemComponent>(
+                0, Actor::Component::EPriorty::EPriorty_Main);
             auto pSystemComponent =
                 this->GetComponent<InGame::InGameSystemComponent>(this->_systemComponentHandle);
             pSystemComponent->SetFlgGameEnd(FALSE);
@@ -96,20 +97,15 @@ namespace Level
         }
 
         // 味方や敵の弾を管理するオブジェクトとコンポーネント追加
-        Core::Common::Handle bulletManagerActorHandle;
-        Core::Common::Handle bulletManagerComponentHandle;
         {
-            bulletManagerActorHandle = this->AddActor<Actor::Object>();
-            auto pActor              = this->GetActor<Actor::Object>(bulletManagerActorHandle);
-
-            auto [handle, pComp] =
-                pActor->AddComponentByHandleAndComp<InGame::InGameBulletManagerComponent>(0);
-            HE_ASSERT(handle.Null() == FALSE);
-
-            bulletManagerComponentHandle = handle;
+            auto bulletManagerActorHandle = this->AddActor<Actor::Object>();
+            auto pActor                   = this->GetActor<Actor::Object>(bulletManagerActorHandle);
 
             // 弾を描画ハンドルを渡す
-            pComp->SetViewHandle(this->_viewHandle);
+            auto [handle, pComp] =
+                pActor->AddComponentByHandleAndComp<InGame::InGameBulletManagerComponent>(
+                    0, Actor::Component::EPriorty::EPriorty_Main, this->_viewHandle);
+            HE_ASSERT(handle.Null() == FALSE);
 
             pComp->SetCollisionHashCode(HE_STR_TEXT("Bullet"));
 
@@ -120,14 +116,12 @@ namespace Level
         }
 
         // インゲームのステージコンポーネント追加
-        InGame::InGameStageManagerComponent* pStageManagerComponent = NULL;
         {
-            this->_stageManagerComponentHandle =
-                this->AddComponent<InGame::InGameStageManagerComponent>(0);
-            pStageManagerComponent = this->GetComponent<InGame::InGameStageManagerComponent>(
-                this->_stageManagerComponentHandle);
-            HE_ASSERT(pStageManagerComponent);
-            pStageManagerComponent->SetViewHandle(this->_viewHandle);
+            auto [handle, pComp] =
+                this->AddComponentByHandleAndComp<InGame::InGameStageManagerComponent>(
+                    0, Actor::Component::EPriorty::EPriorty_Main, this->_viewHandle,
+                    playerParamaterAssetHandle);
+            this->_stageManagerComponentHandle = handle;
         }
 
         return TRUE;

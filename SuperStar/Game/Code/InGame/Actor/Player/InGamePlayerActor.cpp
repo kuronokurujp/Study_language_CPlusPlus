@@ -1,5 +1,6 @@
 ﻿#include "InGamePlayerActor.h"
 
+#include "InGame/Component//Renderer/InGameRendererUserShipComponent.h"
 #include "InGame/Component/InGameCollisionComponent.h"
 #include "InGame/Component/InGameShotComponent.h"
 #include "InGame/Shot/InGameShotStrategy.h"
@@ -23,7 +24,9 @@ namespace InGame
     InGamePlayerActor::InGamePlayerActor(const Parameter& in_defaultParam) : InGameScene2DActor()
     {
         this->_Clear();
+
         this->_defaultParameter = in_defaultParam;
+        this->_parameter        = this->_defaultParameter;
     }
 
     Bool InGamePlayerActor::VBegin()
@@ -33,7 +36,8 @@ namespace InGame
         // 当たり判定コンポーネント追加
         {
             auto [handle, pComponent] =
-                this->AddComponentByHandleAndComp<InGameCircleCollision2DComponent>(0);
+                this->AddComponentByHandleAndComp<InGameCircleCollision2DComponent>(
+                    0, Actor::Component::EPriorty::EPriorty_Main);
             HE_ASSERT(handle.Null() == FALSE);
 
             pComponent->SetRadius(HE_MIN(this->_size._fX, this->_size._fY));
@@ -61,7 +65,9 @@ namespace InGame
 
         // 弾を打つコンポーネントを追加
         {
-            this->_shotHandle = this->AddComponent<InGameShotComponent>(2);
+            this->_shotHandle =
+                this->AddComponent<InGameShotComponent>(2,
+                                                        Actor::Component::EPriorty::EPriorty_Main);
             HE_ASSERT(this->_shotHandle.Null() == FALSE);
 
             auto pShotComponent = this->GetComponent<InGameShotComponent>(this->_shotHandle);
@@ -128,6 +134,12 @@ namespace InGame
 
     void InGamePlayerActor::SetSize(const Core::Math::Vector2& in_rSize)
     {
+        auto pRenderer = this->GetComponent<InGameRendererUserShipComponent>();
+        if (pRenderer)
+        {
+            pRenderer->SetSize(in_rSize);
+        }
+
         this->_size = in_rSize;
     }
 

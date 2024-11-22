@@ -10,7 +10,7 @@ namespace InGame
         this->_size = in_rSize;
     }
 
-    void InGameRendererEnemyZakoComponent::_VRenderer(Core::Common::Handle& in_rViewHandle,
+    void InGameRendererEnemyZakoComponent::_VRenderer(const Core::Common::Handle& in_rViewHandle,
                                                       Actor::TransformComponent* in_pTrans)
     {
         // 描画座標取得

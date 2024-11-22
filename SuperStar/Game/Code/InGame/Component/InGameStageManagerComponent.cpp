@@ -4,6 +4,8 @@
 #include "InGame/Actor/Player/InGamePlayerActor.h"
 #include "InGame/Component/Renderer/InGameRendererEnemyZakoComponent.h"
 #include "InGame/Component/Renderer/InGameRendererUserShipComponent.h"
+// ゲーム専用アセット
+#include "Asset/ParamaterAssetData.h"
 
 // ゲームキャラクター用のイベント
 #include "InGame/Event/InGameEventCharacter.h"
@@ -18,6 +20,8 @@
 #include "scripting/LuaStateManager.h"
 #include "system/System.h"
 */
+// 利用モジュール
+#include "AssetManagerModule.h"
 
 namespace InGame
 {
@@ -36,9 +40,15 @@ namespace InGame
     };
     */
 
-    InGameStageManagerComponent::InGameStageManagerComponent() : Level::LevelBaseComponent()
+    InGameStageManagerComponent::InGameStageManagerComponent(
+        const Core::Common::Handle& in_rViewHandle,
+        const Core::Common::Handle& in_rPlayerParamaterAssetHandle)
+        : Level::LevelBaseComponent()
     {
-        _Clear();
+        this->_Clear();
+
+        this->_viewHandle                 = in_rViewHandle;
+        this->_playerParamaterAssetHandle = in_rPlayerParamaterAssetHandle;
     }
 
     Bool InGameStageManagerComponent::VBegin()
@@ -57,24 +67,36 @@ namespace InGame
             m_State = _STATE_SCROLL;
             */
 
+        auto& rParamaterAssetData =
+            HE_ENGINE.ModuleManager()
+                .Get<AssetManager::AssetManagerModule>()
+                ->GetAsset<Game::Asset::ParamaterAssetData>(this->_playerParamaterAssetHandle);
+
+        const UTF8* szParamaterIdName = "player_default";
+
         // プレイヤーアクター生成
         InGamePlayerActor::Parameter playerParamater;
+        {
+            playerParamater.ulife = rParamaterAssetData.GetUInt32ByIdData(szParamaterIdName, "hp");
+            playerParamater.speed =
+                rParamaterAssetData.GetFloat32ByIdData(szParamaterIdName, "move_spped");
+            playerParamater.fInvincibleTimeSec =
+                rParamaterAssetData.GetFloat32ByIdData(szParamaterIdName, "InvincibleTimeSec");
+        }
         this->_playerHandle = this->AddActor<InGamePlayerActor>(playerParamater);
+
         // プレイヤーの外部からの初期設定
         {
             Core::Math::Vector2 size(30.0f, 30.0f);
             auto pPlayer = this->GetActor<InGamePlayerActor>(this->_playerHandle);
+            // プレイヤーのレンダリングコンポーネントを追加
+            auto [h, c] = pPlayer->AddComponentByHandleAndComp<InGameRendererUserShipComponent>(
+                0, Actor::Component::EPriorty_Late, this->_viewHandle);
+
             // 位置
             pPlayer->SetPos(Core::Math::Vector2(100.0f, 100.0f));
             // サイズ
             pPlayer->SetSize(size);
-
-            // プレイヤーのレンダリングコンポーネントを追加
-            auto [h, c] = pPlayer->AddComponentByHandleAndComp<InGameRendererUserShipComponent>(
-                0, Actor::Component::EPriorty_Late);
-
-            c->SetSize(size);
-            c->SetViewHandle(this->_viewHandle);
         }
 
         // TODO: イベント追加
@@ -122,12 +144,6 @@ namespace InGame
                 SAFE_DELETE(*it);
             }
             */
-    }
-
-    void InGameStageManagerComponent::SetViewHandle(const Core::Common::Handle& in_rHandle)
-    {
-        HE_ASSERT(in_rHandle.Null() == FALSE);
-        this->_viewHandle = in_rHandle;
     }
 
     Bool InGameStageManagerComponent::_HandleCharacterEvent(
@@ -193,7 +209,8 @@ namespace InGame
                     auto [actorHandle, pActor] =
                         this->AddActorByHandleAndActor<InGameEnemyZakoActor>();
                     auto [compHandle, pComp] =
-                        pActor->AddComponentByHandleAndComp<InGameRendererEnemyZakoComponent>(0);
+                        pActor->AddComponentByHandleAndComp<InGameRendererEnemyZakoComponent>(
+                            0, Actor::Component::EPriorty::EPriorty_Main);
                     pComp->SetViewHandle(this->_viewHandle);
                     // TODO: パラメータはテスト
                     pComp->SetSize(Core::Math::Vector2(32.0f, 32.0f));
@@ -209,6 +226,7 @@ namespace InGame
                     break;
             }
         }
+        // TODO: プレイヤー生成
 
         return TRUE;
     }
@@ -523,6 +541,7 @@ namespace InGame
     {
         this->_playerHandle.Clear();
         this->_viewHandle.Clear();
+        this->_playerParamaterAssetHandle.Clear();
         /*
             m_StageIndex    = 0;
             m_Speed         = 0;

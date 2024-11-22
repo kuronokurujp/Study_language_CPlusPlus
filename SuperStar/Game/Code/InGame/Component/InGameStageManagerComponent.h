@@ -24,7 +24,8 @@ namespace InGame
 
     public:
         //	コンストラクタ
-        InGameStageManagerComponent();
+        InGameStageManagerComponent(const Core::Common::Handle& in_rViewHandle,
+                                    const Core::Common::Handle& in_rPlayerParamaterAssetHandle);
         virtual ~InGameStageManagerComponent() = default;
 
         /// <summary>
@@ -47,7 +48,7 @@ namespace InGame
                 virtual void VOnCallbackSendMessage(const int in_DataType, void* in_pData);
                 */
 
-        void SetViewHandle(const Core::Common::Handle&);
+        //void SetViewHandle(const Core::Common::Handle&);
 
         /// <summary>
         /// リスナーがイベント受け取ったかどうか
@@ -87,6 +88,7 @@ namespace InGame
 
     private:
         Core::Common::Handle _viewHandle;
+        Core::Common::Handle _playerParamaterAssetHandle;
         Core::Common::Handle _playerHandle;
 
         /*
@@ -106,7 +108,7 @@ namespace InGame
                 std::vector<class C_EnemyActorBase*> m_aMapSettingEnemyList;
                 */
         Core::Common::Handle _characterEventHandle;
-        //Core::Memory::SharedPtr<Event::EventListenerInterface> _spCharacterEventListener;
+        // Core::Memory::SharedPtr<Event::EventListenerInterface> _spCharacterEventListener;
 
         Core::Common::CustomFixMap<Uint32, Actor::Object*, 256> _mEnemyMap;
     };

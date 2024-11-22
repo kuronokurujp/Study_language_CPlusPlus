@@ -5,12 +5,12 @@
 
 namespace InGame
 {
-    void InGameRendererBaseComponent::SetViewHandle(Core::Common::Handle& in_rHandle)
+    void InGameRendererBaseComponent::SetViewHandle(const Core::Common::Handle& in_rHandle)
     {
         this->_viewHandle = in_rHandle;
     }
 
-    void InGameRendererBaseComponent::SetTransformHandle(Core::Common::Handle& in_rHandle)
+    void InGameRendererBaseComponent::SetTransformHandle(const Core::Common::Handle& in_rHandle)
     {
         this->_transformHandle = in_rHandle;
     }

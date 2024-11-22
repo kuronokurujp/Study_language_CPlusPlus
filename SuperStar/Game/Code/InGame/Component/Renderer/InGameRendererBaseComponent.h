@@ -19,8 +19,8 @@ namespace InGame
     public:
         InGameRendererBaseComponent() = default;
 
-        void SetViewHandle(Core::Common::Handle&);
-        void SetTransformHandle(Core::Common::Handle&);
+        void SetViewHandle(const Core::Common::Handle&);
+        void SetTransformHandle(const Core::Common::Handle&);
 
         /// <summary>
         /// タスク開始
@@ -33,7 +33,7 @@ namespace InGame
         void VUpdate(const Float32 in_fDt) override final;
 
     protected:
-        virtual void _VRenderer(Core::Common::Handle& in_rViewHandle,
+        virtual void _VRenderer(const Core::Common::Handle& in_rViewHandle,
                                 class Actor::TransformComponent*) = 0;
 
     private:

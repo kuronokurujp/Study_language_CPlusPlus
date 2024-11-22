@@ -47,7 +47,6 @@ namespace InGame
         void VUpdate(const Float32 in_fDt) override final;
 
         void SetSize(const Core::Math::Vector2&);
-        void SetMoveSpped(const Float32 in_fSpeed) {}
 
         void Move(const Core::Math::Vector2&);
         void Shot();

@@ -5,12 +5,19 @@
 
 namespace InGame
 {
-    void InGameRendererUserShipComponent::SetSize(Core::Math::Vector2& in_rSize)
+    InGameRendererUserShipComponent::InGameRendererUserShipComponent(
+        const Core::Common::Handle& in_rViewHandle)
+        : InGameRendererBaseComponent()
+    {
+        this->SetViewHandle(in_rViewHandle);
+    }
+
+    void InGameRendererUserShipComponent::SetSize(const Core::Math::Vector2& in_rSize)
     {
         this->_size = in_rSize;
     }
 
-    void InGameRendererUserShipComponent::_VRenderer(Core::Common::Handle& in_rViewHandle,
+    void InGameRendererUserShipComponent::_VRenderer(const Core::Common::Handle& in_rViewHandle,
                                                      Actor::TransformComponent* in_pTrans)
     {
         // 描画座標取得
@@ -22,7 +29,7 @@ namespace InGame
         }
 
         // 描画コマンド追加
-        // TODO: 画像表示に切り替えるかも
+        // TODO: 三角形の表示に切り替えられるか
         Render::Command2DRectDraw(in_rViewHandle, rect, Render::RGB::White);
     }
 

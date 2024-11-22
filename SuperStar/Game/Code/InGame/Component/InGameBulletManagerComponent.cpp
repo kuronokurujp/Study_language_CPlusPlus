@@ -12,6 +12,12 @@
 
 namespace InGame
 {
+    InGameBulletManagerComponent::InGameBulletManagerComponent(Core::Common::Handle in_rViewHandle)
+        : InGameCollisionComponent()
+    {
+        this->_viewHandle = in_rViewHandle;
+    }
+
     void InGameBulletManagerComponent::VSetup(const Bool in_bReleaseMem)
     {
         InGame::InGameCollisionComponent::VSetup(in_bReleaseMem);
@@ -40,8 +46,7 @@ namespace InGame
                                           [this](Event::EventDataInterfacePtr const& in_spEventData)
                                           { return this->_HandleEvent(in_spEventData); });
 
-            if (pEventModule->AddListener(shotEventListener, INGAME_SHOT_EVENT_TYPE_NAME) ==
-                FALSE)
+            if (pEventModule->AddListener(shotEventListener, INGAME_SHOT_EVENT_TYPE_NAME) == FALSE)
             {
                 HE_ASSERT(0 && "イベントリスナー設定に失敗");
             }

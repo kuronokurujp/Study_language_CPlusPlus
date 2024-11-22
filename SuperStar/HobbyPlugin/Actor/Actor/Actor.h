@@ -88,18 +88,17 @@ namespace Actor
 
         /// <summary>
         /// コンポーネントを追加
-        /// TODO:
-        /// コンポーネントの型をチェックしてアクターにつけていいコンポーネントかチェック機能を入れる
+        /// TArgsにクラスのコンストラクタ引数を渡す
         /// </summary>
-        template <class T>
-        Core::Common::Handle AddComponent(
-            const Sint32 in_uUpdateOrder,
-            const Component::EPriorty in_ePriorty = Component::EPriorty_Main)
+        template <class T, typename... TArgs>
+        Core::Common::Handle AddComponent(const Sint32 in_uUpdateOrder,
+                                          const Component::EPriorty in_ePriorty, TArgs&&... in_args)
         {
             HE_STATIC_ASSERT(std::is_base_of<Component, T>::value,
                              "TクラスはComponentクラスを継承していない");
 
-            auto [h, c] = this->AddComponentByHandleAndComp<T>(in_uUpdateOrder, in_ePriorty);
+            auto [h, c] = this->AddComponentByHandleAndComp<T>(in_uUpdateOrder, in_ePriorty,
+                                                               std::forward<TArgs>(in_args)...);
             if (h.Null())
             {
                 return NullHandle;
@@ -111,11 +110,11 @@ namespace Actor
         /// <summary>
         /// コンポーネント追加
         /// 作成ハンドルと追加コンポーネントを返す
+        /// TArgsにクラスのコンストラクタ引数を渡す
         /// </summary>
-        template <class T>
+        template <class T, typename... TArgs>
         std::tuple<Core::Common::Handle, T*> AddComponentByHandleAndComp(
-            const Sint32 in_uUpdateOrder,
-            const Component::EPriorty in_ePriorty = Component::EPriorty::EPriorty_Main)
+            const Sint32 in_uUpdateOrder, const Component::EPriorty in_ePriorty, TArgs&&... in_args)
         {
             HE_STATIC_ASSERT(std::is_base_of<Component, T>::value,
                              "TクラスはComponentクラスを継承していない");
@@ -134,7 +133,8 @@ namespace Actor
 
             HE_ASSERT(in_uUpdateOrder < static_cast<Sint32>(pCurrentComponents->GetMaxGroup()));
 
-            auto handle     = pCurrentComponents->CreateAndAdd<T>(in_uUpdateOrder, FALSE);
+            auto handle     = pCurrentComponents->CreateAndAdd<T>(in_uUpdateOrder, FALSE,
+                                                              std::forward<TArgs>(in_args)...);
             auto pComponent = this->GetComponent<T>(handle);
             if (this->_VSetupComponent(pComponent) == FALSE)
             {
