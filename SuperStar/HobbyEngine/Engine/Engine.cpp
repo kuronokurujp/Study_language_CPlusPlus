@@ -158,6 +158,7 @@ Bool Engine::WaitFrameLoop()
     if (pPlatform == NULL) return FALSE;
 
     // 1 / 60 秒経過しないと更新しない
+    // 更新が1/60秒より早い場合に一定間隔で更新するための対応
     // TODO: FPS設定できるようにした方がいい
     if (this->_spFPS != NULL)
     {
@@ -199,7 +200,7 @@ Float32 Engine::GetDeltaTimeSec()
     auto pPlatform = this->_PlatformModule();
     if (pPlatform == NULL) return 0.0f;
 
-    return this->_spFPS->GetDeltaTimeSec(pPlatform->VTime());
+    return this->_spFPS->GetDeltaTimeSec();
 }
 
 Bool Engine::IsAppQuit()

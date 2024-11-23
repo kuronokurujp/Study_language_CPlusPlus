@@ -62,25 +62,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         s_app.VStart(HE_ENGINE.IsDebugMode());
 
         // ゲームループ
+        Float32 fDelta = 0.0f;
         while (HE_ENGINE.IsAppQuit() == FALSE)
         {
             // 前処理
+            fDelta = HE_ENGINE.GetDeltaTimeSec();
             {
-                const Float32 d = HE_ENGINE.GetDeltaTimeSec();
-                if (HE_ENGINE.BeforeUpdateLoop(d) == FALSE) break;
+                if (HE_ENGINE.BeforeUpdateLoop(fDelta) == FALSE) break;
             }
 
-            if (HE_ENGINE.WaitFrameLoop() == FALSE) break;
+            if (HE_ENGINE.WaitFrameLoop() == FALSE)
+            {
+                break;
+            }
 
             {
-                const Float32 d = HE_ENGINE.GetDeltaTimeSec();
-
                 // アプリメイン
-                if (s_app.VUpdate(d) == FALSE) break;
+                if (s_app.VUpdate(fDelta) == FALSE) break;
 
-                if (HE_ENGINE.MainUpdateLoop(d) == FALSE) break;
+                if (HE_ENGINE.MainUpdateLoop(fDelta) == FALSE) break;
 
-                if (HE_ENGINE.LateUpdateLoop(d) == FALSE) break;
+                if (HE_ENGINE.LateUpdateLoop(fDelta) == FALSE) break;
             }
         }
 

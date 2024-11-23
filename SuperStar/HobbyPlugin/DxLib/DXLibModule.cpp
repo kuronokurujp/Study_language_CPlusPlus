@@ -35,6 +35,10 @@ namespace DXLib
             // ウィンドウを非表示にします
             ::SetWindowVisibleFlag(FALSE);
 
+            // ScreenFlip関数の垂直同期はOFFにしている
+            // アプリ側で垂直同期を自前で作ってほしい
+            ::SetWaitVSyncFlag(FALSE);
+
             // DxLib初期化
             if (::DxLib_Init() == -1)
             {
@@ -267,7 +271,7 @@ namespace DXLib
         }
 
         // 画面の反映
-        ScreenFlip();
+        ::ScreenFlip();
 
         return TRUE;
     }
