@@ -22,6 +22,11 @@ namespace Game::Asset
         return this->VGetUInt32({"data", in_pIdName, in_pFieldName});
     }
 
+    Sint32 ParamaterAssetData::GetSInt32ByIdData(const UTF8* in_pIdName, const UTF8* in_pFieldName)
+    {
+        return this->VGetSInt32({"data", in_pIdName, in_pFieldName});
+    }
+
     Float32 ParamaterAssetData::GetFloat32ByIdData(const UTF8* in_pIdName,
                                                    const UTF8* in_pFieldName)
     {
@@ -32,6 +37,11 @@ namespace Game::Asset
                                                                     const UTF8* in_pFieldName)
     {
         return this->VGetChar({"data", in_pIdName, in_pFieldName});
+    }
+
+    Bool ParamaterAssetData::IsId(const UTF8* in_pIdName)
+    {
+        return this->IsToken({"data", in_pIdName});
     }
 
 }  // namespace Game::Asset

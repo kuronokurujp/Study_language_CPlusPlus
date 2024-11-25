@@ -16,7 +16,8 @@ namespace Core::Common
         Handle() { this->Clear(); }
         // 値をコピーする
         Handle(Handle& in_rHandle) { this->_ulHandle = in_rHandle._ulHandle; }
-        Handle(const Handle& in_crHandle) { this->_ulHandle = in_crHandle._ulHandle; }
+        Handle(const Handle& in_rHandle) { this->_ulHandle = in_rHandle._ulHandle; }
+        Handle(const Uint64 in_ulHandle) { this->_ulHandle = in_ulHandle; }
 
         // ムーブセマンティクス
         // コピーと同じにする

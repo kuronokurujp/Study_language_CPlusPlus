@@ -83,7 +83,8 @@ namespace InGame
     {
     public:
         EventCharacterPutEnemy(const Float32 in_fTimeStamp, const Core::Math::Vector2& in_rPos,
-                               const EEnemyTag in_eTag, const Uint32 in_uId);
+                               const EEnemyTag in_eTag, const Uint32 in_uId,
+                               const UTF8* in_szIdName);
 
         static inline Uint32 EventTypeHash() { return s_uEventTypeHash; }
 
@@ -91,9 +92,49 @@ namespace InGame
         Core::Math::Vector2 _pos;
         EEnemyTag _eEnemyTag = EEnemyTag::EEnemyTag_None;
         Uint32 _uId          = 0;
+        Core::Common::FixString32 _szIdName;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterPutEnemy");
+        static inline Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+    };
+
+    /// <summary>
+    /// 自機生成
+    /// </summary>
+    class EventCharacterPutPlayer final : public Event::BaseEventData
+    {
+    public:
+        EventCharacterPutPlayer(const Float32 in_fTimeStamp, const Core::Math::Vector2& in_rPos);
+
+        static inline Uint32 EventTypeHash() { return s_uEventTypeHash; }
+
+    public:
+        Core::Math::Vector2 _pos;
+
+    private:
+        static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterPutPlayer");
+        static inline Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+    };
+
+    /// <summary>
+    /// ダメージ通知
+    /// </summary>
+    class EventCharacterDamage final : public Event::BaseEventData
+    {
+    public:
+        EventCharacterDamage(const Float32 in_fTimeStamp, EObjectTag in_eObjectTag,
+                             const Uint64 in_ulHandle, const Sint32 in_sDamage);
+
+        static inline Uint32 EventTypeHash() { return s_uEventTypeHash; }
+
+    public:
+        Sint32 _sDamage        = 0;
+        EObjectTag _eObjectTag = EObjectTag::EObjectTag_None;
+        Uint64 _ulHandle       = 0;
+
+    private:
+        static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterDamage");
         static inline Uint32 s_uEventTypeHash           = s_szEventType.Hash();
     };
 }  // namespace InGame

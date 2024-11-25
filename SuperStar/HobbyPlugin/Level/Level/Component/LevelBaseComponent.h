@@ -28,17 +28,17 @@ namespace Level
         /// レベルにアクターを追加
         /// </summary>
         template <class T, typename... TArgs>
-        Core::Common::Handle AddActor(TArgs&&... args)
+        Core::Common::Handle AddActor(TArgs&&... in_args)
         {
             auto pNode = reinterpret_cast<Node*>(this->_pOwner);
             HE_ASSERT(pNode);
-            return pNode->AddActor<T>(std::forward<TArgs>(args)...);
+            return pNode->AddActor<T>(std::forward<TArgs>(in_args)...);
         }
 
-        template <class T>
-        std::tuple<Core::Common::Handle, T*> AddActorByHandleAndActor()
+        template <class T, typename... TArgs>
+        std::tuple<Core::Common::Handle, T*> AddActorByHandleAndActor(TArgs&&... in_args)
         {
-            auto handle = this->AddActor<T>();
+            auto handle = this->AddActor<T>(std::forward<TArgs>(in_args)...);
             return std::make_tuple(handle, this->GetActor<T>(handle));
         }
 

@@ -23,6 +23,10 @@ namespace InGame
         ECollisionType eType;
         Uint32 uHashCode = 0;
 
+        // メタデータ
+        // 利用者が自由に使えるもの
+        Uint64 ulMetaData = 0;
+
         union
         {
             Uint8 aWork[256] = {0};
@@ -62,23 +66,29 @@ namespace InGame
         virtual Uint32 VColCount() const                                           = 0;
         virtual Bool VOutputColData(CollisionData* out, const Uint32 in_uColIndex) = 0;
 
-        void OnHit(const CollisionData& in_rSelfColData, const CollisionData& in_rHitColData);
+        /// <summary>
+        /// 衝突発生
+        /// </summary>
+        virtual Bool VOnHit(const CollisionData& in_rSelfColData,
+                            const CollisionData& in_rHitColData);
 
         void SetCollisionHashCode(const Char* in_szName);
         void SetCollisionHashCode(const Uint32 in_uHashCode);
+        void SetMetaData(const Uint64 in_ulMetaData);
 
         Uint32 HashCode() const { return this->_uHashCode; }
 
-        void SetHitAction(std::function<void(const CollisionData&, const CollisionData&)> in_func)
+        void SetHitAction(std::function<Bool(const CollisionData&, const CollisionData&)> in_func)
         {
             this->_hitAction = in_func;
         }
 
     protected:
-        Uint32 _uHashCode = 0;
+        Uint32 _uHashCode  = 0;
+        Uint64 _ulMetaData = 0;
 
     private:
-        std::function<void(const CollisionData&, const CollisionData&)> _hitAction = NULL;
+        std::function<Bool(const CollisionData&, const CollisionData&)> _hitAction = NULL;
     };
 
     class InGameCircleCollision2DComponent final : public InGameCollisionComponent

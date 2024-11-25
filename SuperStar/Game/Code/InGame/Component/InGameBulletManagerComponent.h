@@ -53,7 +53,13 @@ namespace InGame
         /// <summary>
         /// コンポーネントの更新
         /// </summary>
-        virtual void VUpdate(const Float32 in_fDt) override final;
+        void VUpdate(const Float32 in_fDt) override final;
+
+        /// <summary>
+        /// 衝突発生
+        /// </summary>
+        Bool VOnHit(const CollisionData& in_rSelfColData,
+                    const CollisionData& in_rHitColData) override final;
 
         /// <summary>
         /// 弾の生成
@@ -85,6 +91,5 @@ namespace InGame
         Core::Common::Handle _viewHandle;
 
         Core::Common::Handle _shotEventHandle;
-        // Core::Memory::SharedPtr<Event::EventListenerInterface> _shotEventListener;
     };
 }  // namespace InGame

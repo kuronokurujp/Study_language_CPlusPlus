@@ -3,6 +3,7 @@
 #include "InGame/Component//Renderer/InGameRendererUserShipComponent.h"
 #include "InGame/Component/InGameCollisionComponent.h"
 #include "InGame/Component/InGameShotComponent.h"
+#include "InGame/InGameTag.h"
 #include "InGame/Shot/InGameShotStrategy.h"
 
 #if 0
@@ -41,11 +42,16 @@ namespace InGame
             HE_ASSERT(handle.Null() == FALSE);
 
             pComponent->SetRadius(HE_MIN(this->_size._fX, this->_size._fY));
-            pComponent->SetCollisionHashCode(HE_STR_TEXT("Player"));
+            pComponent->SetCollisionHashCode(InGame::EObjectTag::EObjectTag_Player);
+            pComponent->SetMetaData(this->Handle());
 
             //  TODO: 当たった時の処理を追加
-            pComponent->SetHitAction([](const CollisionData& in_rSelf, const CollisionData& in_rHit)
-                                     { HE_LOG_LINE(HE_STR_TEXT("Hit")); });
+            pComponent->SetHitAction(
+                [](const CollisionData& in_rSelf, const CollisionData& in_rHit)
+                {
+                    HE_LOG_LINE(HE_STR_TEXT("Hit"));
+                    return TRUE;
+                });
 
             this->_collisoinHandle = handle;
         }
@@ -217,6 +223,14 @@ namespace InGame
             }
         }
 #endif
+    }
+
+    Bool InGamePlayerActor::Damage(const Sint32 in_sDamage)
+    {
+        this->_parameter.ulife -= in_sDamage;
+        if (this->_parameter.ulife <= 0) return TRUE;
+
+        return FALSE;
     }
 
 #if 0

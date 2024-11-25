@@ -1,5 +1,9 @@
 ﻿#include "InGameZakoEnemyActor.h"
 
+#include "InGame/Component/InGameCollisionComponent.h"
+#include "InGame/Component/Renderer/InGameRendererEnemyZakoComponent.h"
+#include "InGame/InGameTag.h"
+
 /*
 #include "actor/ActorCommon.h"
 #include "actor/shot/Manager.h"
@@ -11,9 +15,6 @@
 #include "tips/Primitive.h"
 */
 
-// 利用モジュール一覧
-#include "RenderModule.h"
-
 namespace InGame
 {
     /*
@@ -23,20 +24,30 @@ namespace InGame
             "./resource/script/enemy/zako_knight.lua",
         };
     */
-    InGameEnemyZakoActor::InGameEnemyZakoActor() : InGameScene2DActor()
+
+    InGameEnemyZakoActor::InGameEnemyZakoActor(const Parameter& in_rParameter)
+        : InGameScene2DActor(), _parameter(in_rParameter)
     {
         this->_Clear();
-
-        // m_size = 16.f;
-    }
-
-    InGameEnemyZakoActor::~InGameEnemyZakoActor()
-    {
     }
 
     Bool InGameEnemyZakoActor::VBegin()
     {
         if (InGameScene2DActor::VBegin() == FALSE) return FALSE;
+
+        // 当たり判定コンポーネント追加
+        {
+            auto [handle, pComponent] =
+                this->AddComponentByHandleAndComp<InGameCircleCollision2DComponent>(
+                    0, Actor::Component::EPriorty::EPriorty_Main);
+            HE_ASSERT(handle.Null() == FALSE);
+
+            pComponent->SetRadius(HE_MIN(this->_size._fX, this->_size._fY));
+            pComponent->SetCollisionHashCode(InGame::EObjectTag::EObjectTag_Enemy);
+            pComponent->SetMetaData(this->Handle());
+        }
+
+        // TODO: Luaスクリプトで敵の挙動制御をする
 
         return TRUE;
     }
@@ -44,6 +55,30 @@ namespace InGame
     void InGameEnemyZakoActor::VUpdate(const Float32 in_fDt)
     {
         InGameScene2DActor::VUpdate(in_fDt);
+
+        // TODO: 画面外かどうかチェック
+    }
+
+    void InGameEnemyZakoActor::SetSize(const Core::Math::Vector2& in_rSize)
+    {
+        this->_size             = in_rSize;
+        auto pRendererComponent = this->GetComponent<InGameRendererEnemyZakoComponent>();
+        if (pRendererComponent)
+        {
+            pRendererComponent->SetSize(in_rSize);
+        }
+    }
+
+    Bool InGameEnemyZakoActor::Damage(const Sint32 in_sDamage)
+    {
+        this->_parameter.ulife -= in_sDamage;
+        if (this->_parameter.ulife <= 0) return TRUE;
+
+        return FALSE;
+    }
+
+    void InGameEnemyZakoActor::_Clear()
+    {
     }
 
 #if 0
@@ -79,15 +114,6 @@ namespace InGame
         }
 
         return true;
-    }
-
-    /*
-            @brief	描画
-    */
-    void C_EnemyActorZako::draw(void)
-    {
-        DrawPrimitive2DSimpleQuad(m_pos.x, m_pos.y, m_size, m_size, 0.f,
-                                  D3DCOLOR_ARGB(255, 255, 255, 0));
     }
 
     //	データ通知

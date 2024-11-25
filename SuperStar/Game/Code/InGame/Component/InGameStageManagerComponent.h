@@ -24,8 +24,11 @@ namespace InGame
 
     public:
         //	コンストラクタ
-        InGameStageManagerComponent(const Core::Common::Handle& in_rViewHandle,
-                                    const Core::Common::Handle& in_rPlayerParamaterAssetHandle);
+        InGameStageManagerComponent(
+            const Core::Common::Handle& in_rViewHandle,
+            const Core::Common::Handle& in_rPlayerParamaterAssetHandle,
+            const Core::Common::Handle& in_rEnemyParamterAssetHandle,
+            const Core::Common::Handle& in_rStageTimelineParamaterAssetHandle);
         virtual ~InGameStageManagerComponent() = default;
 
         /// <summary>
@@ -38,6 +41,11 @@ namespace InGame
         /// </summary>
         Bool VEnd() override final;
 
+        /// <summary>
+        /// 更新
+        /// </summary>
+        void VUpdate(const Float32) override final;
+
         /*
                 // 初期化、終了
                 // 更新、描画で十分
@@ -48,7 +56,7 @@ namespace InGame
                 virtual void VOnCallbackSendMessage(const int in_DataType, void* in_pData);
                 */
 
-        //void SetViewHandle(const Core::Common::Handle&);
+        // void SetViewHandle(const Core::Common::Handle&);
 
         /// <summary>
         /// リスナーがイベント受け取ったかどうか
@@ -89,6 +97,8 @@ namespace InGame
     private:
         Core::Common::Handle _viewHandle;
         Core::Common::Handle _playerParamaterAssetHandle;
+        Core::Common::Handle _enemyParamaterAssetHandle;
+        Core::Common::Handle _stageTimelineParamaterAssetHandle;
         Core::Common::Handle _playerHandle;
 
         /*
@@ -108,9 +118,12 @@ namespace InGame
                 std::vector<class C_EnemyActorBase*> m_aMapSettingEnemyList;
                 */
         Core::Common::Handle _characterEventHandle;
-        // Core::Memory::SharedPtr<Event::EventListenerInterface> _spCharacterEventListener;
 
-        Core::Common::CustomFixMap<Uint32, Actor::Object*, 256> _mEnemyMap;
+        Core::Common::CustomFixMap<Uint32, Core::Common::Handle, 256> _mEnemyMap;
+        Float32 _fTime      = 0.0f;
+        Uint32 _uTimelineNo = 0;
+        Uint32 _uEnemyId    = 0;
+        Bool _bTimeline     = TRUE;
     };
 
 }  // namespace InGame

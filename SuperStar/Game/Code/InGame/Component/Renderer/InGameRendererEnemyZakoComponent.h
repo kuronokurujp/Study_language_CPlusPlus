@@ -18,7 +18,7 @@ namespace InGame
     public:
         InGameRendererEnemyZakoComponent() = default;
 
-        void SetSize(Core::Math::Vector2&);
+        void SetSize(const Core::Math::Vector2&);
 
     protected:
         void _VRenderer(const Core::Common::Handle& in_rViewHandle,

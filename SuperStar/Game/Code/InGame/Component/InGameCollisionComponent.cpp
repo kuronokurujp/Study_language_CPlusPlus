@@ -58,8 +58,8 @@ namespace InGame
                                     // 2Dの円同士の当たり判定
                                     if (IsHitWithCircle2D(selfColData, targetColData))
                                     {
-                                        in_rSelf.OnHit(selfColData, targetColData);
-                                        in_rTarget.OnHit(targetColData, selfColData);
+                                        in_rSelf.VOnHit(selfColData, targetColData);
+                                        in_rTarget.VOnHit(targetColData, selfColData);
                                     }
                                     break;
                                 }
@@ -114,12 +114,18 @@ namespace InGame
         return TRUE;
     }
 
-    void InGameCollisionComponent::OnHit(const CollisionData& in_rSelfColData,
-                                         const CollisionData& in_rHitColData)
+    Bool InGameCollisionComponent::VOnHit(const CollisionData& in_rSelfColData,
+                                          const CollisionData& in_rHitColData)
     {
-        if (this->_hitAction == NULL) return;
+        if (this->_hitAction == NULL) return TRUE;
 
-        this->_hitAction(in_rSelfColData, in_rHitColData);
+        if (this->_hitAction(in_rSelfColData, in_rHitColData))
+        {
+            // アクションでコリジョン成功かどうかを決める事ができる
+            return TRUE;
+        }
+
+        return FALSE;
     }
 
     void InGameCollisionComponent::SetCollisionHashCode(const Char* in_szName)
@@ -130,6 +136,11 @@ namespace InGame
     void InGameCollisionComponent::SetCollisionHashCode(const Uint32 in_uHashCode)
     {
         this->_uHashCode = in_uHashCode;
+    }
+
+    void InGameCollisionComponent::SetMetaData(const Uint64 in_ulMetaData)
+    {
+        this->_ulMetaData = in_ulMetaData;
     }
 
     Bool InGameCircleCollision2DComponent::VOutputColData(CollisionData* out,
@@ -143,6 +154,7 @@ namespace InGame
         out->data.circle2D.fRadius = this->_fRadius;
         out->eType                 = ECollisionType::ECollisionType_Circle2D;
         out->uHashCode             = this->_uHashCode;
+        out->ulMetaData            = this->_ulMetaData;
 
         return TRUE;
     }

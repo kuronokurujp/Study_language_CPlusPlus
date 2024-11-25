@@ -19,6 +19,7 @@ namespace InGame
 
     struct InGameBulletObject
     {
+        Bool bKill     = FALSE;
         Char aName[64] = {};
         InGameBulletWork work;
     };

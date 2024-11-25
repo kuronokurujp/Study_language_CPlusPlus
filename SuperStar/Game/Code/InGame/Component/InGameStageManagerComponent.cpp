@@ -4,6 +4,7 @@
 #include "InGame/Actor/Player/InGamePlayerActor.h"
 #include "InGame/Component/Renderer/InGameRendererEnemyZakoComponent.h"
 #include "InGame/Component/Renderer/InGameRendererUserShipComponent.h"
+
 // ゲーム専用アセット
 #include "Asset/ParamaterAssetData.h"
 
@@ -42,64 +43,25 @@ namespace InGame
 
     InGameStageManagerComponent::InGameStageManagerComponent(
         const Core::Common::Handle& in_rViewHandle,
-        const Core::Common::Handle& in_rPlayerParamaterAssetHandle)
+        const Core::Common::Handle& in_rPlayerParamaterAssetHandle,
+        const Core::Common::Handle& in_rEnemyParamterAssetHandle,
+        const Core::Common::Handle& in_rStageTimelineParamaterAssetHandle)
         : Level::LevelBaseComponent()
     {
         this->_Clear();
 
-        this->_viewHandle                 = in_rViewHandle;
-        this->_playerParamaterAssetHandle = in_rPlayerParamaterAssetHandle;
+        this->_viewHandle                        = in_rViewHandle;
+        this->_playerParamaterAssetHandle        = in_rPlayerParamaterAssetHandle;
+        this->_enemyParamaterAssetHandle         = in_rEnemyParamterAssetHandle;
+        this->_stageTimelineParamaterAssetHandle = in_rStageTimelineParamaterAssetHandle;
     }
 
     Bool InGameStageManagerComponent::VBegin()
     {
         if (Level::LevelBaseComponent::VBegin() == FALSE) return FALSE;
+        this->_Clear();
 
-        // TODO: ステージ制御するLuaファイルをロード
-        /*
-            LuaStateManager::DoFile(s_pStageManagerScriptName[m_StageIndex], "Init");
-
-            SystemProprtyInterfaceInGame::ACTOR_HANDLE_DATA_ST& rHandle =
-                SystemProprtyInterfaceInGame::GetActorHandleData();
-            C_ColisionActorManager& iActorManager = C_ColisionActorManager::inst();
-
-
-            m_State = _STATE_SCROLL;
-            */
-
-        auto& rParamaterAssetData =
-            HE_ENGINE.ModuleManager()
-                .Get<AssetManager::AssetManagerModule>()
-                ->GetAsset<Game::Asset::ParamaterAssetData>(this->_playerParamaterAssetHandle);
-
-        const UTF8* szParamaterIdName = "player_default";
-
-        // プレイヤーアクター生成
-        InGamePlayerActor::Parameter playerParamater;
-        {
-            playerParamater.ulife = rParamaterAssetData.GetUInt32ByIdData(szParamaterIdName, "hp");
-            playerParamater.speed =
-                rParamaterAssetData.GetFloat32ByIdData(szParamaterIdName, "move_spped");
-            playerParamater.fInvincibleTimeSec =
-                rParamaterAssetData.GetFloat32ByIdData(szParamaterIdName, "InvincibleTimeSec");
-        }
-        this->_playerHandle = this->AddActor<InGamePlayerActor>(playerParamater);
-
-        // プレイヤーの外部からの初期設定
-        {
-            Core::Math::Vector2 size(30.0f, 30.0f);
-            auto pPlayer = this->GetActor<InGamePlayerActor>(this->_playerHandle);
-            // プレイヤーのレンダリングコンポーネントを追加
-            auto [h, c] = pPlayer->AddComponentByHandleAndComp<InGameRendererUserShipComponent>(
-                0, Actor::Component::EPriorty_Late, this->_viewHandle);
-
-            // 位置
-            pPlayer->SetPos(Core::Math::Vector2(100.0f, 100.0f));
-            // サイズ
-            pPlayer->SetSize(size);
-        }
-
-        // TODO: イベント追加
+        // イベントリスナーを追加
         {
             auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
 
@@ -133,17 +95,86 @@ namespace InGame
         // 作成したイベント管理を解放
         pEventModule->RemoveEventManager(this->_characterEventHandle);
 
+        // 作成したアクターを全て破棄
         this->RemoveActor(&this->_playerHandle);
+        for (auto itr = this->_mEnemyMap.Begin(); itr != this->_mEnemyMap.End(); ++itr)
+        {
+            this->RemoveActor(&itr->data);
+        }
+        this->_mEnemyMap.Clear();
 
         return LevelBaseComponent::VEnd();
+    }
 
-        /*
-            std::vector<C_EnemyActorBase*>::iterator it;
-            for (it = m_aMapSettingEnemyList.begin(); it != m_aMapSettingEnemyList.end(); ++it)
+    void InGameStageManagerComponent::VUpdate(const Float32 in_dt)
+    {
+        Level::LevelBaseComponent::VUpdate(in_dt);
+
+        // ステージの時間更新
+        this->_fTime += in_dt;
+
+        // ステージのタイムラインを更新
+        auto& rParamaterAssetData = HE_ENGINE.ModuleManager()
+                                        .Get<AssetManager::AssetManagerModule>()
+                                        ->GetAsset<Game::Asset::ParamaterAssetData>(
+                                            this->_stageTimelineParamaterAssetHandle);
+
+        UTF8 szTimelineNo[32] = {0};
+        while (this->_bTimeline)
+        {
+            Core::Common::s_szTempFixString16 = this->_uTimelineNo;
+            Core::Common::s_szTempFixString16.OutputUTF8(szTimelineNo, HE_ARRAY_NUM(szTimelineNo));
+
+            // ステージタイムラインがすでに終了しているか
+            if (rParamaterAssetData.IsId(szTimelineNo) == FALSE)
             {
-                SAFE_DELETE(*it);
+                this->_bTimeline = FALSE;
+                break;
             }
-            */
+
+            const Float32 fPeroid =
+                rParamaterAssetData.GetFloat32ByIdData(szTimelineNo, "peroid_sec");
+            if (this->_fTime < fPeroid)
+            {
+                break;
+            }
+
+            const auto fPosX = rParamaterAssetData.GetFloat32ByIdData(szTimelineNo, "pos_x");
+            const auto fPosY = rParamaterAssetData.GetFloat32ByIdData(szTimelineNo, "pos_y");
+
+            UTF8 szIdName[32] = {};
+            rParamaterAssetData.GetCharByIdData(szTimelineNo, "parameter_id")
+                .OutputUTF8(szIdName, HE_ARRAY_NUM(szIdName));
+
+            // イベント実行
+            Core::Common::s_szTempFixString1024 =
+                rParamaterAssetData.GetCharByIdData(szTimelineNo, "event");
+            if (Core::Common::s_szTempFixString1024 == HE_STR_TEXT("put_player"))
+            {
+                // 自機を作成
+                auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterPutPlayer), 0,
+                                                         Core::Math::Vector2(fPosX, fPosY));
+
+                auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
+                pEventModule->QueueEvent(spEvent);
+            }
+            else if (Core::Common::s_szTempFixString1024 == HE_STR_TEXT("put_zako"))
+            {
+                // idはかぶらないようにする
+
+                // 雑魚敵作成
+                auto spEvent =
+                    HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterPutEnemy), 0,
+                                              Core::Math::Vector2(fPosX, fPosY),
+                                              EEnemyTag::EEnemyTag_Zako, this->_uEnemyId, szIdName);
+                ++this->_uEnemyId;
+
+                auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
+                pEventModule->QueueEvent(spEvent);
+            }
+
+            ++this->_uTimelineNo;
+        }
     }
 
     Bool InGameStageManagerComponent::_HandleCharacterEvent(
@@ -162,12 +193,15 @@ namespace InGame
             {
                 case EObjectTag_Player:
                 {
-                    HE_ASSERT(this->_playerHandle.Null() == FALSE);
-                    auto pPlayer = this->GetActor<InGamePlayerActor>(this->_playerHandle);
-                    pPlayer->Move(pEvent->_move);
+                    if (this->_playerHandle.Null() == FALSE)
+                    {
+                        auto pPlayer = this->GetActor<InGamePlayerActor>(this->_playerHandle);
+                        pPlayer->Move(pEvent->_move);
+                    }
 
                     break;
                 }
+                // TODO: 敵の移動
                 default:
                     break;
             }
@@ -182,42 +216,58 @@ namespace InGame
             {
                 case EObjectTag_Player:
                 {
-                    HE_ASSERT(this->_playerHandle.Null() == FALSE);
-                    auto pPlayer = this->GetActor<InGamePlayerActor>(this->_playerHandle);
-                    pPlayer->Shot();
+                    if (this->_playerHandle.Null() == FALSE)
+                    {
+                        auto pPlayer = this->GetActor<InGamePlayerActor>(this->_playerHandle);
+                        pPlayer->Shot();
+                    }
 
                     break;
                 }
+                // TODO: 敵の攻撃
                 default:
                     break;
             }
         }
-        // TODO: 敵生成
+        // 敵生成
         else if (uEventHash == EventCharacterPutEnemy::EventTypeHash())
         {
             auto pEvent = reinterpret_cast<EventCharacterPutEnemy*>(in_spEventData.get());
             HE_ASSERT(pEvent != NULL);
 
-            // idはかぶらないようにする
-            static Uint32 s_uEnemyId = 0;
-
-            // TODO: タグに応じた敵を生成する
+            // タグに応じた敵を生成する
             switch (pEvent->_eEnemyTag)
             {
                 case EEnemyTag::EEnemyTag_Zako:
                 {
+                    auto& rParamaterAssetData = HE_ENGINE.ModuleManager()
+                                                    .Get<AssetManager::AssetManagerModule>()
+                                                    ->GetAsset<Game::Asset::ParamaterAssetData>(
+                                                        this->_enemyParamaterAssetHandle);
+
+                    // TODO: パラメータ設定
+                    UTF8 szIdName[32] = {0};
+                    pEvent->_szIdName.OutputUTF8(szIdName, HE_ARRAY_NUM(szIdName));
+
+                    InGameEnemyZakoActor::Parameter parameter;
+                    parameter.ulife = rParamaterAssetData.GetSInt32ByIdData(szIdName, "hp");
+                    parameter.speed =
+                        rParamaterAssetData.GetFloat32ByIdData(szIdName, "move_speed");
+
                     auto [actorHandle, pActor] =
-                        this->AddActorByHandleAndActor<InGameEnemyZakoActor>();
+                        this->AddActorByHandleAndActor<InGameEnemyZakoActor>(parameter);
                     auto [compHandle, pComp] =
                         pActor->AddComponentByHandleAndComp<InGameRendererEnemyZakoComponent>(
                             0, Actor::Component::EPriorty::EPriorty_Main);
                     pComp->SetViewHandle(this->_viewHandle);
-                    // TODO: パラメータはテスト
-                    pComp->SetSize(Core::Math::Vector2(32.0f, 32.0f));
+
+                    const Core::Math::Vector2
+                        size(rParamaterAssetData.GetFloat32ByIdData(szIdName, "size_x"),
+                             rParamaterAssetData.GetFloat32ByIdData(szIdName, "size_y"));
+                    pActor->SetSize(size);
                     pActor->SetPos(pEvent->_pos);
 
-                    ++s_uEnemyId;
-                    this->_mEnemyMap.Add(s_uEnemyId, pActor);
+                    this->_mEnemyMap.Add(pEvent->_uId, actorHandle);
 
                     break;
                 }
@@ -226,7 +276,93 @@ namespace InGame
                     break;
             }
         }
-        // TODO: プレイヤー生成
+        // プレイヤー生成
+        else if (uEventHash == EventCharacterPutPlayer::EventTypeHash())
+        {
+            auto pEvent = reinterpret_cast<EventCharacterPutPlayer*>(in_spEventData.get());
+            HE_ASSERT(pEvent != NULL);
+
+            // すでにプレイヤーがいれば削除
+            if (this->_playerHandle.Null() == FALSE)
+            {
+                this->RemoveActor(&this->_playerParamaterAssetHandle);
+            }
+
+            const UTF8* szParamaterIdName = "player_default";
+
+            auto& rParamaterAssetData =
+                HE_ENGINE.ModuleManager()
+                    .Get<AssetManager::AssetManagerModule>()
+                    ->GetAsset<Game::Asset::ParamaterAssetData>(this->_playerParamaterAssetHandle);
+
+            // プレイヤーアクター生成
+            InGamePlayerActor::Parameter playerParamater;
+            {
+                playerParamater.ulife =
+                    rParamaterAssetData.GetSInt32ByIdData(szParamaterIdName, "hp");
+                playerParamater.speed =
+                    rParamaterAssetData.GetFloat32ByIdData(szParamaterIdName, "move_speed");
+                playerParamater.fInvincibleTimeSec =
+                    rParamaterAssetData.GetFloat32ByIdData(szParamaterIdName,
+                                                           "invincible_time_sec");
+            }
+            this->_playerHandle = this->AddActor<InGamePlayerActor>(playerParamater);
+
+            // プレイヤーの外部からの初期設定
+            {
+                Core::Math::Vector2 size(30.0f, 30.0f);
+                auto pPlayer = this->GetActor<InGamePlayerActor>(this->_playerHandle);
+                // プレイヤーのレンダリングコンポーネントを追加
+                auto [h, c] = pPlayer->AddComponentByHandleAndComp<InGameRendererUserShipComponent>(
+                    0, Actor::Component::EPriorty_Late, this->_viewHandle);
+
+                // 位置
+                pPlayer->SetPos(pEvent->_pos);
+                // サイズ
+                pPlayer->SetSize(size);
+            }
+        }
+        // TODO: ダメージイベント
+        else if (uEventHash == EventCharacterDamage::EventTypeHash())
+        {
+            auto pEvent = reinterpret_cast<EventCharacterDamage*>(in_spEventData.get());
+            HE_ASSERT(pEvent != NULL);
+
+            switch (pEvent->_eObjectTag)
+            {
+                case InGame::EObjectTag::EObjectTag_Player:
+                {
+                    auto pPlayer = this->GetActor<InGamePlayerActor>(pEvent->_ulHandle);
+                    if (pPlayer)
+                    {
+                        if (pPlayer->Damage(pEvent->_sDamage))
+                        {
+                            // TODO: 死亡
+                        }
+                    }
+
+                    break;
+                }
+                case InGame::EObjectTag::EObjectTag_Enemy:
+                {
+                    auto pEnemy = this->GetActor<InGameEnemyZakoActor>(pEvent->_ulHandle);
+                    if (pEnemy)
+                    {
+                        if (pEnemy->Damage(pEvent->_sDamage))
+                        {
+                            // TODO: 死亡
+                            pEnemy->Kill();
+                        }
+                    }
+
+                    break;
+                }
+                default:
+                    break;
+            }
+            // TODO: プレイヤーへのダメージ
+            // TODO: 敵へのダメージ
+        }
 
         return TRUE;
     }
@@ -534,24 +670,14 @@ namespace InGame
     }
     */
 
-    /*
-            @brief	クリア
-    */
     void InGameStageManagerComponent::_Clear()
     {
         this->_playerHandle.Clear();
-        this->_viewHandle.Clear();
-        this->_playerParamaterAssetHandle.Clear();
-        /*
-            m_StageIndex    = 0;
-            m_Speed         = 0;
-            m_MapXPos       = 0;
-            m_W             = 0;
-            m_ScrollEndXPos = 0;
-            m_State         = _STATE_SCROLL;
-            m_bClearPoint   = false;
-            m_ClearPointNum = 0;
-            m_BossHandle    = 0;
-            */
+        this->_characterEventHandle.Clear();
+        this->_mEnemyMap.Clear();
+
+        this->_fTime       = 0.0f;
+        this->_uTimelineNo = 0;
+        this->_uEnemyId    = 0;
     }
 }  // namespace InGame

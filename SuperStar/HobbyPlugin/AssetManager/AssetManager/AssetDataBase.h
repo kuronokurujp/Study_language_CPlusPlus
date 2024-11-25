@@ -45,10 +45,10 @@ namespace AssetManager
     {
     public:
         // 指定するノードのトークン名はアルファベットと数値のみなのでUTF8型にした
-        virtual Uint32 VGetUInt32(const std::initializer_list<const UTF8*>&)   = 0;
-        virtual Float32 VGetFloat32(const std::initializer_list<const UTF8*>&) = 0;
-        virtual Core::Common::FixString1024 VGetChar(
-            const std::initializer_list<const UTF8*>&) = 0;
+        virtual Uint32 VGetUInt32(const std::initializer_list<const UTF8*>&)                    = 0;
+        virtual Sint32 VGetSInt32(const std::initializer_list<const UTF8*>&)                    = 0;
+        virtual Float32 VGetFloat32(const std::initializer_list<const UTF8*>&)                  = 0;
+        virtual Core::Common::FixString1024 VGetChar(const std::initializer_list<const UTF8*>&) = 0;
     };
 
 }  // namespace AssetManager

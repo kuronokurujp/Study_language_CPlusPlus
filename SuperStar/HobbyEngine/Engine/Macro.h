@@ -147,14 +147,14 @@ void HE_LOG_LINE(const Char* in_szFormat, TArgs... in_args)
 #define HE_PG_LOG_LINE(format, ...)                                                               \
     do                                                                                            \
     {                                                                                             \
-        Char c[HE_LOG_MSG_SIZE] = {};                                                             \
+        static Char c[HE_LOG_MSG_SIZE] = {};                                                      \
         HE_LOG_CREATE_FORMATERD_STRING(c, format, __VA_ARGS__);                                   \
-        Char c2[HE_LOG_MSG_SIZE * 2] = {};                                                        \
+        static Char c2[HE_LOG_MSG_SIZE * 2] = {};                                                 \
         _snwprintf_s(c2, HE_LOG_MSG_SIZE * 2, HE_LOG_MSG_SIZE * 2, L"%ls:%d %ls", __FILEW__,      \
                      __LINE__, c);                                                                \
         OutputDebugString(c2);                                                                    \
         OutputDebugString(L"\n");                                                                 \
-        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);                                        \
+        static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);                                 \
         if (hConsole != INVALID_HANDLE_VALUE)                                                     \
         {                                                                                         \
             DWORD written = 0;                                                                    \
@@ -246,8 +246,8 @@ void HE_LOG_LINE(const Char* in_szFormat, TArgs... in_args)
 
 #define HE_CLASS_MOVE_NG(_x_)  \
     _x_(_x_&&)       = delete; \
-    _x_(const _x_&&) = delete; \
-        
+    _x_(const _x_&&) = delete;
+
 // 値のmin/maxマクロ
 // 上限値の制御
 #define HE_MAX(__src__, __max__) ((__src__) < (__max__) ? (__max__) : (__src__))

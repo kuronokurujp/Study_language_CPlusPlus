@@ -119,7 +119,8 @@ namespace UI
         {
             auto pActor = this->GetWidget(in_rWidgetHandle);
             // アクターにコンポーネント追加
-            return pActor->AddComponent<T>(in_iUpdateOrder, Actor::Component::EPriorty::EPriorty_Main);
+            return pActor->AddComponent<T>(in_iUpdateOrder,
+                                           Actor::Component::EPriorty::EPriorty_Main);
         }
 
         Widget* GetWidget(const UIWidgetHandlePack&);

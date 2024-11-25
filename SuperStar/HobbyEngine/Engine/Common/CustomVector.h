@@ -177,7 +177,7 @@ namespace Core::Common
         Uint32 _uSize = 0;
 
     private:
-        TType* _pBuff      = NULL;
+        TType* _pBuff     = NULL;
         Uint32 _uCapacity = 0;
     };
 

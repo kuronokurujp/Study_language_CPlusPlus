@@ -67,7 +67,8 @@ namespace Level
             HE_STATIC_ASSERT(std::is_base_of<Actor::Object, T>::value,
                              "TクラスはアクターのObjectクラスを継承していない");
 
-            Core::Common::Handle handle = this->_actorManager.Add<T>(std::forward<TArgs>(in_args)...);
+            Core::Common::Handle handle =
+                this->_actorManager.Add<T>(std::forward<TArgs>(in_args)...);
             HE_ASSERT(handle.Null() == FALSE);
 
             return handle;

@@ -50,25 +50,38 @@ namespace Level
         const Bool bRet = Node::VBegin();
         HE_ASSERT(bRet);
 
-        // TODO: アセットのロード
+        auto pAssetManagerModule =
+            HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
 
+        // TODO: アセットのロード
+        // ステージのタイムラインアセットロード
+        Core::Common::Handle stageTimelineParamaterAssetHandle;
+        {
+            const auto szParamaterAssetName = HE_STR_TEXT("StageTimelineParamater");
+            stageTimelineParamaterAssetHandle =
+                pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
+                    szParamaterAssetName,
+                    Core::File::Path(HE_STR_TEXT("Paramater/Stage_Timeline_01.json")));
+            this->_mGameAsset.Add(szParamaterAssetName, stageTimelineParamaterAssetHandle);
+        }
+
+        // プレイヤーのアセットロード
         Core::Common::Handle playerParamaterAssetHandle;
         {
-            auto pAssetManagerModule =
-                HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
-
-            auto szPlayerParamaterAssetName = HE_STR_TEXT("PlayerParamater");
+            const auto szPlayerParamaterAssetName = HE_STR_TEXT("PlayerParamater");
             playerParamaterAssetHandle = pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
                 szPlayerParamaterAssetName, Core::File::Path(HE_STR_TEXT("Paramater/Player.json")));
-            this->_mGameAsset.Add(HE_STR_TEXT("PlayerParamater"), playerParamaterAssetHandle);
+            this->_mGameAsset.Add(szPlayerParamaterAssetName, playerParamaterAssetHandle);
+        }
 
-            auto szEnemeyParamaterAssetName = HE_STR_TEXT("EnemyParamater");
-            auto enemyParamaterAssetHandle =
-                pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
-                    szEnemeyParamaterAssetName,
-                    Core::File::Path(HE_STR_TEXT("Paramater/Enemy.json")));
+        // 敵のアセットロード
+        Core::Common::Handle enemyParamaterAssetHandle;
+        {
+            const auto szEnemeyParamaterAssetName = HE_STR_TEXT("EnemyParamater");
+            enemyParamaterAssetHandle = pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
+                szEnemeyParamaterAssetName, Core::File::Path(HE_STR_TEXT("Paramater/Enemy.json")));
 
-            this->_mGameAsset.Add(HE_STR_TEXT("EnemyParamater"), enemyParamaterAssetHandle);
+            this->_mGameAsset.Add(szEnemeyParamaterAssetName, enemyParamaterAssetHandle);
         }
 
         // ユーザー共通入力割り当て設定
@@ -111,8 +124,48 @@ namespace Level
 
             // 弾が当たった時のヒットアクション
             pComp->SetHitAction(
-                [](const InGame::CollisionData& in_rSelf, const InGame::CollisionData& in_rTargtt)
-                { HE_LOG_LINE(HE_STR_TEXT("Hit Bullet")); });
+                [](const InGame::CollisionData& in_rSelf, const InGame::CollisionData& in_rTarget)
+                {
+                    auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
+                    switch (in_rTarget.uHashCode)
+                    {
+                        case InGame::EObjectTag::EObjectTag_Player:
+                        {
+                            if (in_rSelf.uHashCode == InGame::EObjectTag::EObjectTag_Enemy)
+                            {
+                                // TODO: プレイヤーへダメージイベント通知
+                                auto spEvent =
+                                    HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterDamage), 0,
+                                                              InGame::EObjectTag::EObjectTag_Player,
+                                                              in_rTarget.ulMetaData, 1);
+
+                                pEventModule->QueueEvent(spEvent);
+                            }
+
+                            break;
+                        }
+                        case InGame::EObjectTag::EObjectTag_Enemy:
+                        {
+                            if (in_rSelf.uHashCode == InGame::EObjectTag::EObjectTag_Player)
+                            {
+                                // TODO: 敵へダメージイベント通知
+                                auto spEvent =
+                                    HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterDamage), 0,
+                                                              InGame::EObjectTag::EObjectTag_Enemy,
+                                                              in_rTarget.ulMetaData, 1);
+
+                                pEventModule->QueueEvent(spEvent);
+                            }
+
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+
+                    HE_LOG_LINE(HE_STR_TEXT("Hit Bullet"));
+                    return TRUE;
+                });
         }
 
         // インゲームのステージコンポーネント追加
@@ -120,7 +173,8 @@ namespace Level
             auto [handle, pComp] =
                 this->AddComponentByHandleAndComp<InGame::InGameStageManagerComponent>(
                     0, Actor::Component::EPriorty::EPriorty_Main, this->_viewHandle,
-                    playerParamaterAssetHandle);
+                    playerParamaterAssetHandle, enemyParamaterAssetHandle,
+                    stageTimelineParamaterAssetHandle);
             this->_stageManagerComponentHandle = handle;
         }
 
@@ -192,17 +246,8 @@ namespace Level
 
         if (in_pInputMap->Contains(Local::szInputShot))
         {
-            // TODO: イベントを作成処理は重いかも
-            // 自前アロケーターを使っているが,
             auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterAttack), 0,
                                                      InGame::EObjectTag_Player, 0);
-            pEventModule->QueueEvent(spEvent);
-            /*
-            // TODO: 敵を出してみる
-            auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR(InGame::EventCharacterPutEnemy, 0,
-                                                     Core::Math::Vector2(320.0f, 110.0f),
-                                                     InGame::EEnemyTag::EEnemyTag_Zako, 0);
-            */
             pEventModule->QueueEvent(spEvent);
         }
 

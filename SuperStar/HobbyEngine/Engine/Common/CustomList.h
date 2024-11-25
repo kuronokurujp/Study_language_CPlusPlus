@@ -63,7 +63,8 @@ namespace Core::Common
         ListNodeIterator() = default;
         ListNodeIterator(TNodeType* in_pNode) : _pNode(in_pNode) {}
 
-        ListNodeIterator(const ListNodeIterator<TDataType, TNodeType>& in_rIt) : _pNode(in_rIt._pNode)
+        ListNodeIterator(const ListNodeIterator<TDataType, TNodeType>& in_rIt)
+            : _pNode(in_rIt._pNode)
         {
         }
 

@@ -3,8 +3,8 @@
     "data": {
         "player_default": {
             "hp": 3,
-            "move_spped": 7.0,
-            "InvincibleTimeSec": 1.5
+            "move_speed": 7.0,
+            "invincible_time_sec": 1.5
         }
     }
 }

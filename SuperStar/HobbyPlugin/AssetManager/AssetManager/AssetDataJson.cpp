@@ -16,15 +16,25 @@ namespace AssetManager
         {
             auto itr = in_rTokens.begin();
 
-            auto v = in_rDoc[*itr];
-            HE_ASSERT(v.error() == simdjson::error_code::SUCCESS);
+            auto v     = in_rDoc[*itr];
+            auto error = v.error();
+            if (error != simdjson::error_code::SUCCESS)
+            {
+                HE_PG_LOG_LINE(HE_STR_TEXT("error(%d): Token(%s)"), error, *itr);
+                return FALSE;
+            }
 
             // 複数トークンでの取得
             ++itr;
             for (; itr != in_rTokens.end(); ++itr)
             {
-                v = v[*itr];
-                HE_ASSERT(v.error() == simdjson::error_code::SUCCESS);
+                v     = v[*itr];
+                error = v.error();
+                if (error != simdjson::error_code::SUCCESS)
+                {
+                    HE_PG_LOG_LINE(HE_STR_TEXT("error(%d): Token(%s)"), error, *itr);
+                    return FALSE;
+                }
             }
 
             // 要素を出力
@@ -50,6 +60,11 @@ namespace AssetManager
 
         HE_ASSERT(val.is_integer());
         return static_cast<Uint32>(val.get_int64().value_unsafe());
+    }
+
+    Sint32 AssetDataJson::VGetSInt32(const std::initializer_list<const UTF8*>& in_rTokens)
+    {
+        return static_cast<Sint32>(this->VGetUInt32(in_rTokens));
     }
 
     Float32 AssetDataJson::VGetFloat32(const std::initializer_list<const UTF8*>& in_rTokens)
@@ -79,6 +94,17 @@ namespace AssetManager
         str = val.get_string().value();
 
         return str;
+    }
+
+    Bool AssetDataJson::IsToken(const std::initializer_list<const UTF8*>& in_rTokens)
+    {
+        simdjson::fallback::ondemand::value val;
+        if (_OutputValueBySimdJson(&val,
+                                   *(reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc)),
+                                   in_rTokens) == FALSE)
+            return FALSE;
+
+        return TRUE;
     }
 
     Bool AssetDataJson::_VLoad(Platform::FileInterface& in_rFileSystem)

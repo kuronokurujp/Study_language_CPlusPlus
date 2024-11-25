@@ -89,6 +89,8 @@ namespace InGame
             [this, activeScreenInSide](InGame::InGameBulletObject* in_pObject,
                                        InGame::InGameBulletStrategyInterface* in_pStrategy)
             {
+                if (in_pObject->bKill) return FALSE;
+
                 // 更新失敗したらワークから外す
                 if (in_pStrategy->VUpdate(&in_pObject->work, this->_viewHandle) == FALSE)
                 {
@@ -103,6 +105,21 @@ namespace InGame
 
                 return TRUE;
             });
+    }
+
+    Bool InGameBulletManagerComponent::VOnHit(const CollisionData& in_rSelfColData,
+                                              const CollisionData& in_rHitColData)
+    {
+        // コリジョン成功か失敗か
+        if (InGameCollisionComponent::VOnHit(in_rSelfColData, in_rHitColData) == FALSE)
+        {
+            return FALSE;
+        }
+
+        // 接触した場合は弾を消すフラグを立てる
+        this->_vBullet.GetPtr(in_rSelfColData.ulMetaData)->bKill = TRUE;
+
+        return TRUE;
     }
 
     Bool InGameBulletManagerComponent::MakeObject(
@@ -142,6 +159,8 @@ namespace InGame
 
         auto itr = this->_mBulletStrategy.FindKey(pBullet->aName);
         if (this->_mBulletStrategy.End() == itr) return FALSE;
+
+        out->ulMetaData = in_uColIndex;
 
         // ストラテジー毎にコリジョンデータを作成
         return itr->data->VOutputCollisionData(out, &pBullet->work);

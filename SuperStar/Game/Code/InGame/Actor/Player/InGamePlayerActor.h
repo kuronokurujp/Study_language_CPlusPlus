@@ -25,7 +25,7 @@ namespace InGame
             // 無敵時間
             Float32 fInvincibleTimeSec = 1.5;
             // HP
-            Uint32 ulife = 3;
+            Sint32 ulife = 3;
         };
 
     public:
@@ -50,6 +50,7 @@ namespace InGame
 
         void Move(const Core::Math::Vector2&);
         void Shot();
+        Bool Damage(const Sint32 in_sDamage);
 
         const Parameter& GetParameter() const { return this->_parameter; }
 

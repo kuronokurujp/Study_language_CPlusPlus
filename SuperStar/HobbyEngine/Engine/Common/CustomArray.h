@@ -66,7 +66,7 @@ namespace Core::Common
         }
 
     private:
-        TType* _pBuff      = NULL;
+        TType* _pBuff     = NULL;
         Uint32 _uCapacity = 0;
     };
 

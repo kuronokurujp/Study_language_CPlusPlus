@@ -15,7 +15,8 @@ namespace InGame
 
         // 座標関連のコンポーネント追加
         {
-            this->_transformHandle = this->AddComponent<Actor::TransformComponent>(1, Actor::Component::EPriorty::EPriorty_Main);
+            this->_transformHandle = this->AddComponent<Actor::TransformComponent>(
+                1, Actor::Component::EPriorty::EPriorty_Main);
             HE_ASSERT((this->_transformHandle.Null() == FALSE) &&
                       "トランスフォームコンポーネントの追加失敗");
 

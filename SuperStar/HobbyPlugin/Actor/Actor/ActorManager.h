@@ -85,7 +85,8 @@ namespace Actor
             Sint32 sGroupId = 0;
             if (this->_bUpdatingActors) sGroupId = this->_GetPendingGroupId();
 
-            auto handle = this->_taskManager.CreateAndAdd<T>(sGroupId, TRUE, std::forward<TArgs>(in_args)...);
+            auto handle =
+                this->_taskManager.CreateAndAdd<T>(sGroupId, TRUE, std::forward<TArgs>(in_args)...);
 
             Object* pObject = this->_taskManager.GetTask<Object>(handle);
             HE_ASSERT(pObject != NULL);

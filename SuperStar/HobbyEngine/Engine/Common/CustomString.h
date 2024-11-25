@@ -58,6 +58,16 @@ namespace Core::Common
         void ToLower() { HE_STR_LOWER(this->_szBuff, HE_STR_LEN(this->_szBuff) * sizeof(Char)); }
         void ToUpper() { HE_STR_UPPER(this->_szBuff, HE_STR_LEN(this->_szBuff) * sizeof(Char)); }
 
+        // 数値を文字列に変換
+        void operator=(const Uint32 in_uNum)
+        {
+#ifdef HE_WIN
+            ::swprintf(this->_szBuff, this->_uCapacity, L"%d", in_uNum);
+#else
+            ::snprintf(this->_szBuff, this->_uCapacity, "%d", in_uNum);
+#endif
+        }
+
         StringBase& operator=(const Char* in_szName)
         {
             this->_Copy(in_szName, this->_uCapacity);
@@ -172,11 +182,12 @@ namespace Core::Common
     /// <summary>
     /// 固定長の文字列クラス
     /// </summary>
-    /// <typeparam name="SIZE"></typeparam>
     template <Uint32 TCapacity>
     class FixString final : public StringBase
     {
-        //HE_CLASS_MOVE_NG(FixString);
+    public:
+        // 基本クラスのオペレーターを使えるようにしている
+        using StringBase::operator=;
 
     public:
         FixString() : StringBase(this->_szBuff, TCapacity) {}
@@ -184,8 +195,14 @@ namespace Core::Common
         {
             this->_Copy(in_szName, HE_STR_LEN(in_szName));
         }
-        FixString(const FixString<TCapacity>& r) : StringBase(this->_szBuff, TCapacity) { *this = r; }
-        FixString(const FixString<TCapacity>&& r) : StringBase(this->_szBuff, TCapacity) { *this = r; }
+        FixString(const FixString<TCapacity>& r) : StringBase(this->_szBuff, TCapacity)
+        {
+            *this = r;
+        }
+        FixString(const FixString<TCapacity>&& r) : StringBase(this->_szBuff, TCapacity)
+        {
+            *this = r;
+        }
         FixString(const StringBase& r) : StringBase(this->_szBuff, TCapacity)
         {
             this->_Copy(r.Str(), r.Length());
@@ -213,12 +230,6 @@ namespace Core::Common
             HE_ASSERT(0);
         }
 #endif
-
-        FixString<TCapacity>& operator=(const Char* in_szName)
-        {
-            this->_Copy(in_szName, HE_STR_LEN(in_szName));
-            return *this;
-        }
 
         // win版では文字列はwchar / charの二つの型がある
         FixString<TCapacity>& operator=(const UTF8* in_szName)

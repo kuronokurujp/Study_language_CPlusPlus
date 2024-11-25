@@ -2,16 +2,25 @@
     "version": 1,
     "data": {
         "zako_debug": {
-            "hp": 10,
-            "move_spped": 1.0
+            "hp": 1,
+            "move_speed": 1.0,
+            "size_x": 32.0,
+            "size_y": 32.0,
+            "point": 10
         },
         "zako": {
-            "hp": 10,
-            "move_spped": 2.0
+            "hp": 1,
+            "move_speed": 2.0,
+            "size_x": 32.0,
+            "size_y": 32.0,
+            "point": 15
         },
         "zako_02": {
-            "hp": 20,
-            "move_spped": 1.0
+            "hp": 2,
+            "move_speed": 1.0,
+            "size_x": 32.0,
+            "size_y": 32.0,
+            "point": 12
         }
     }
 }

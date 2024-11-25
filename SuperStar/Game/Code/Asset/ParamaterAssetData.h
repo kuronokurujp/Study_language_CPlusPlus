@@ -20,9 +20,12 @@ namespace Game::Asset
 
         // パラメータの取得
         Uint32 GetUInt32ByIdData(const UTF8* in_pIdName, const UTF8* in_pFieldName);
+        Sint32 GetSInt32ByIdData(const UTF8* in_pIdName, const UTF8* in_pFieldName);
         Float32 GetFloat32ByIdData(const UTF8* in_pIdName, const UTF8* in_pFieldName);
         Core::Common::FixString1024 GetCharByIdData(const UTF8* in_pIdName,
                                                     const UTF8* in_pFieldName);
+
+        Bool IsId(const UTF8* in_pIdName);
 
     protected:
         // パラメータ取得用のを別途用意していているので汎用取得のは使えないようにする
@@ -30,6 +33,12 @@ namespace Game::Asset
             const std::initializer_list<const UTF8*>& in_rTokens) override final
         {
             return AssetDataJson::VGetUInt32(in_rTokens);
+        }
+
+        virtual Sint32 VGetSInt32(
+            const std::initializer_list<const UTF8*>& in_rTokens) override final
+        {
+            return AssetDataJson::VGetSInt32(in_rTokens);
         }
 
         virtual Float32 VGetFloat32(

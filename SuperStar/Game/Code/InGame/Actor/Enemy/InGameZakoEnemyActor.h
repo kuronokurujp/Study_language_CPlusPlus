@@ -18,12 +18,28 @@ namespace InGame
         HE_GENERATED_CLASS_BODY_HEADER(InGameEnemyZakoActor, InGameScene2DActor);
 
     public:
-        InGameEnemyZakoActor();
-        virtual ~InGameEnemyZakoActor();
+        /// <summary>
+        /// 自機のパラメータ
+        /// </summary>
+        struct Parameter
+        {
+            // 移動スピード
+            Float32 speed = 5.0f;
+
+            // HP
+            Sint32 ulife = 3;
+        };
+
+    public:
+        InGameEnemyZakoActor(const Parameter& in_rParameter);
 
         Bool VBegin() override final;
 
         void VUpdate(const Float32 in_fDt) override final;
+
+        void SetSize(const Core::Math::Vector2& in_rSize);
+
+        Bool Damage(const Sint32 in_sDamage);
 
         // virtual bool update(void);
         // virtual void draw(void);
@@ -32,8 +48,7 @@ namespace InGame
         // virtual void VOnCallbackSendMessage(const int in_DataType, void* in_pData);
 
     private:
-        //	関数
-        void _Clear() { this->_fSpeed = 0.0f; }
+        void _Clear();
         /*
                 virtual void _VOnCallbackOtherActorData(C_PaketSendActor* in_pOtherActor);
                 //	スクリプトで通知したデータを受け取る
@@ -53,6 +68,7 @@ namespace InGame
                 //Vec3 m_Vec;
                 */
     private:
-        Float32 _fSpeed = 0.0f;
+        Core::Math::Vector2 _size;
+        Parameter _parameter;
     };
 }  // namespace InGame
