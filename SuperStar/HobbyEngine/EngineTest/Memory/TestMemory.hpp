@@ -98,8 +98,7 @@ TEST_CASE("Memory Allocate And Free")
 
         // メモリの前確保がうまくいっているか
         Uint8* pPtr = static_cast<Uint8*>(
-            memoryManager.HE_ALLOCATE_MEMORY(0x10000, page,
-                                             Core::Memory::Manager::MinimumAlignSize));
+            memoryManager.HE_ALLOCATE_MEMORY(0x10000, page, Core::Memory::minimumAlignSize));
         CHECK(pPtr);
         {
             *pPtr = static_cast<Uint8>(i);
@@ -109,8 +108,7 @@ TEST_CASE("Memory Allocate And Free")
 
         // メモリの後確保がうまくいっているか
         Uint32* pPtr2 = static_cast<Uint32*>(
-            memoryManager.HE_ALLOCATE_MEMORY_LAST(1000, 1,
-                                                  Core::Memory::Manager::MinimumAlignSize));
+            memoryManager.HE_ALLOCATE_MEMORY_LAST(1000, 1, Core::Memory::minimumAlignSize));
         CHECK(pPtr2);
         {
             *pPtr2 = i + 1234;
@@ -188,7 +186,7 @@ TEST_CASE("Memory Custom Shader Ptr")
         Sint8 i = 0;
     };
 
-    Core::Common::CustomArray<std::shared_ptr<Data>, 10> memArray;
+    Core::Common::FixedArray<std::shared_ptr<Data>, 10> memArray;
     for (Uint32 i = 0; i < 10; ++i)
     {
         auto p = HE_MAKE_CUSTOM_SHARED_PTR((Data), i);
@@ -236,7 +234,7 @@ TEST_CASE("Memory Custom Uniqe Ptr")
         Sint8 i = 0;
     };
 
-    Core::Common::CustomArray<Core::Memory::UniquePtr<Data>, 10> memArray;
+    Core::Common::FixedArray<Core::Memory::UniquePtr<Data>, 10> memArray;
     for (Uint32 i = 0; i < 10; ++i)
     {
         auto p = HE_MAKE_CUSTOM_UNIQUE_PTR((Data), i);

@@ -7,7 +7,7 @@
 #include "Engine/Memory/Memory.h"
 
 // 標準のメモリ確保を使用する<文字列, 整数>のマップ
-typedef Core::Common::CustomFixMap<Core::Common::FixString16, Sint32, 2048> BASICMAP;
+typedef Core::Common::FixedMap<Core::Common::FixedString16, Sint32, 2048> BASICMAP;
 std::ostream& operator<<(std::ostream& out, const BASICMAP::Iterator& r)
 {
     (void)r;
@@ -30,7 +30,7 @@ TEST_CASE("FixMap Test")
     }
 
     clock_t ctime;
-    Core::Common::FixString16 strKey;
+    Core::Common::FixedString16 strKey;
 
     // データ個数
     const Sint32 ARRAY_NUM = 1024;
@@ -219,12 +219,12 @@ TEST_CASE("FixMap Copy")
 TEST_CASE("FixMap Erase")
 {
     BASICMAP srcmap;
-    srcmap.Add(Core::Common::FixString16(HE_STR_TEXT("a")), 1);
-    srcmap.Add(Core::Common::FixString16(HE_STR_TEXT("b")), 2);
-    srcmap.Add(Core::Common::FixString16(HE_STR_TEXT("c")), 3);
-    srcmap.Add(Core::Common::FixString16(HE_STR_TEXT("d")), 4);
-    srcmap.Add(Core::Common::FixString16(HE_STR_TEXT("e")), 5);
-    srcmap.Add(Core::Common::FixString16(HE_STR_TEXT("f")), 6);
+    srcmap.Add(Core::Common::FixedString16(HE_STR_TEXT("a")), 1);
+    srcmap.Add(Core::Common::FixedString16(HE_STR_TEXT("b")), 2);
+    srcmap.Add(Core::Common::FixedString16(HE_STR_TEXT("c")), 3);
+    srcmap.Add(Core::Common::FixedString16(HE_STR_TEXT("d")), 4);
+    srcmap.Add(Core::Common::FixedString16(HE_STR_TEXT("e")), 5);
+    srcmap.Add(Core::Common::FixedString16(HE_STR_TEXT("f")), 6);
 
     // ループ中に要素削除しても大丈夫か
     for (auto itr = srcmap.Begin(); itr != srcmap.End(); ++itr)

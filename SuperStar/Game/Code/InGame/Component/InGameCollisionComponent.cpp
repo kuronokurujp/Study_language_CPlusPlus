@@ -9,7 +9,7 @@ namespace InGame
     namespace Local
     {
         // コリジョンリスト
-        static Core::Common::CustomFixVector<InGameCollisionComponent*, 1024> vCollision;
+        static Core::Common::FixedVector<InGameCollisionComponent*, 1024> vCollision;
 
         /// <summary>
         /// ２次元の円同士の衝突ヒット

@@ -11,7 +11,7 @@ namespace Lua
     static UTF8 s_szPushStackTempText[1024] = {NULL};
 
     // Luaモジュールのインスタンスは一つしかない前提
-    static Core::Common::CustomFixStack<LuaFuncData, 128> s_sLuaFuncResultData;
+    static Core::Common::FixedStack<LuaFuncData, 128> s_sLuaFuncResultData;
 
     /// <summary>
     /// Lua処理でエラーが起きた場合のトレースバックのデバッグ処理
@@ -37,11 +37,11 @@ namespace Lua
     static Bool _LuaRegistFuncByState(lua_State* in_pState, const Char* in_szFuncName,
                                       lua_CFunction in_funcAddr)
     {
-        Core::Common::s_szTempFixString256 = in_szFuncName;
+        Core::Common::g_szTempFixedString256 = in_szFuncName;
 
         UTF8 szRegistFuncName[256] = {NULL};
-        Core::Common::s_szTempFixString256
-            .OutputUTF8(szRegistFuncName, Core::Common::s_szTempFixString256.Capacity());
+        Core::Common::g_szTempFixedString256
+            .OutputUTF8(szRegistFuncName, Core::Common::g_szTempFixedString256.Capacity());
 
         // アップバリューとして関数名をプッシュ
         lua_pushstring(in_pState, szRegistFuncName);
@@ -65,10 +65,10 @@ namespace Lua
         {
             const UTF8* szName = lua_tostring(in_pLuaState, lua_upvalueindex(1));
             // 関数名設定
-            Core::Common::s_szTempFixString128 = szName;
+            Core::Common::g_szTempFixedString128 = szName;
             HE_STR_CPY_S(pFuncData->szFuncName, HE_ARRAY_NUM(pFuncData->szFuncName),
-                         Core::Common::s_szTempFixString128.Str(),
-                         Core::Common::s_szTempFixString128.Length());
+                         Core::Common::g_szTempFixedString128.Str(),
+                         Core::Common::g_szTempFixedString128.Length());
         }
 
         // 関数の引数の数を取得
@@ -98,12 +98,12 @@ namespace Lua
                 {
                     pArgData->eValType = ELuaFuncArgType_Str;
 
-                    const UTF8* pStr                   = lua_tostring(in_pLuaState, i);
-                    Core::Common::s_szTempFixString128 = pStr;
+                    const UTF8* pStr                     = lua_tostring(in_pLuaState, i);
+                    Core::Common::g_szTempFixedString128 = pStr;
 
                     HE_STR_CPY_S(pArgData->data.szText, HE_ARRAY_NUM(pArgData->data.szText),
-                                 Core::Common::s_szTempFixString128.Str(),
-                                 Core::Common::s_szTempFixString128.Length());
+                                 Core::Common::g_szTempFixedString128.Str(),
+                                 Core::Common::g_szTempFixedString128.Length());
 
                     break;
                 }
@@ -136,8 +136,8 @@ namespace Lua
             pText = lua_tostring(in_pLuaState, 1);
             if (pText == NULL)
             {
-                Core::Common::s_szTempFixString1024 = lua_tostring(in_pLuaState, -1);
-                HE_LOG_LINE(HE_STR_TEXT("Error, %s"), Core::Common::s_szTempFixString1024.Str());
+                Core::Common::g_szTempFixedString1024 = lua_tostring(in_pLuaState, -1);
+                HE_LOG_LINE(HE_STR_TEXT("Error, %s"), Core::Common::g_szTempFixedString1024.Str());
             }
         }
         else
@@ -147,8 +147,8 @@ namespace Lua
 
         if (pText)
         {
-            Core::Common::s_szTempFixString1024 = pText;
-            HE_LOG_LINE(Core::Common::s_szTempFixString1024.Str());
+            Core::Common::g_szTempFixedString1024 = pText;
+            HE_LOG_LINE(Core::Common::g_szTempFixedString1024.Str());
 
             lua_settop(in_pLuaState, 0);
         }
@@ -221,7 +221,7 @@ namespace Lua
         HE_ASSERT(in_pName && "Luaオブジェクトの作成で名前指定がない");
 
         // TODO: スレッドを使った非同期対応が必要
-        Core::Common::s_szTempFixString128 = in_pName;
+        Core::Common::g_szTempFixedString128 = in_pName;
 
         Core::Common::Handle handle;
         auto* pLuaObject = this->_luaObjectPool.Alloc(&handle);
@@ -239,8 +239,8 @@ namespace Lua
         }
 
         HE_STR_CPY_S(pLuaObject->szName, HE_ARRAY_NUM(pLuaObject->szName),
-                     Core::Common::s_szTempFixString128.Str(),
-                     Core::Common::s_szTempFixString128.Length());
+                     Core::Common::g_szTempFixedString128.Str(),
+                     Core::Common::g_szTempFixedString128.Length());
 
         this->_mUseLuaObject.Add(pLuaState, handle);
 
@@ -267,14 +267,14 @@ namespace Lua
     {
         HE_ASSERT(in_rHandle.Null() == FALSE);
 
-        Core::Common::s_szTempFixString1024 = in_pText;
-        HE_ASSERT(0 < Core::Common::s_szTempFixString1024.Length());
+        Core::Common::g_szTempFixedString1024 = in_pText;
+        HE_ASSERT(0 < Core::Common::g_szTempFixedString1024.Length());
 
         auto* pLuaObject = this->_luaObjectPool.Ref(in_rHandle);
         if (pLuaObject == NULL) return FALSE;
 
         UTF8 szText[1024] = {NULL};
-        Core::Common::s_szTempFixString1024.OutputUTF8(szText, HE_ARRAY_NUM(szText));
+        Core::Common::g_szTempFixedString1024.OutputUTF8(szText, HE_ARRAY_NUM(szText));
 
         lua_State* pLuaState = reinterpret_cast<lua_State*>(pLuaObject->pLuaState);
         HE_ASSERT(pLuaState);
@@ -324,8 +324,8 @@ namespace Lua
     {
         HE_ASSERT(in_rHandle.Null() == FALSE);
 
-        Core::Common::s_szTempFixString1024 = in_pFuncName;
-        HE_ASSERT(0 < Core::Common::s_szTempFixString1024.Length());
+        Core::Common::g_szTempFixedString1024 = in_pFuncName;
+        HE_ASSERT(0 < Core::Common::g_szTempFixedString1024.Length());
 
         auto* pLuaObject = this->_luaObjectPool.Ref(in_rHandle);
         if (pLuaObject == NULL) return FALSE;
@@ -335,13 +335,13 @@ namespace Lua
 
         // Luaスクリプトをが呼ぶ関数名を生成
         // State名を先頭につける
-        Core::Common::s_szTempFixString1024.Clear();
-        Core::Common::s_szTempFixString1024 += pLuaObject->szName;
-        Core::Common::s_szTempFixString1024 += HE_STR_TEXT("_");
-        Core::Common::s_szTempFixString1024 += in_pFuncName;
+        Core::Common::g_szTempFixedString1024.Clear();
+        Core::Common::g_szTempFixedString1024 += pLuaObject->szName;
+        Core::Common::g_szTempFixedString1024 += HE_STR_TEXT("_");
+        Core::Common::g_szTempFixedString1024 += in_pFuncName;
 
         // Luaスクリプトが呼び出した関数を受け取るようにする
-        return _LuaRegistFuncByState(pLuaState, Core::Common::s_szTempFixString1024.Str(),
+        return _LuaRegistFuncByState(pLuaState, Core::Common::g_szTempFixedString1024.Str(),
                                      &_LuaScriptCallFunc);
     }
 
@@ -486,9 +486,9 @@ namespace Lua
         lua_State* pLuaState = reinterpret_cast<lua_State*>(in_pLuaState);
         HE_ASSERT(pLuaState);
 
-        Core::Common::s_szTempFixString1024 = in_szValue;
-        Core::Common::s_szTempFixString1024.OutputUTF8(s_szPushStackTempText,
-                                                       HE_ARRAY_NUM(s_szPushStackTempText));
+        Core::Common::g_szTempFixedString1024 = in_szValue;
+        Core::Common::g_szTempFixedString1024.OutputUTF8(s_szPushStackTempText,
+                                                         HE_ARRAY_NUM(s_szPushStackTempText));
 
         lua_pushstring(pLuaState, s_szPushStackTempText);
     }
@@ -511,9 +511,9 @@ namespace Lua
         HE_ASSERT(pLuaState);
 
         // 実行するLua関数名をスタックにプッシュ
-        Core::Common::s_szTempFixString1024 = in_szFuncName;
-        Core::Common::s_szTempFixString1024.OutputUTF8(s_szPushStackTempText,
-                                                       HE_ARRAY_NUM(s_szPushStackTempText));
+        Core::Common::g_szTempFixedString1024 = in_szFuncName;
+        Core::Common::g_szTempFixedString1024.OutputUTF8(s_szPushStackTempText,
+                                                         HE_ARRAY_NUM(s_szPushStackTempText));
 
         // 名前が関数名でなければエラー
         if (lua_getglobal(pLuaState, s_szPushStackTempText) != LUA_TFUNCTION)

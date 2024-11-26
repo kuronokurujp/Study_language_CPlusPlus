@@ -76,9 +76,9 @@ namespace UI
         }
 
     private:
-        Core::Common::FixString1024 _szText;
-        Core::Common::FixString1024 _szDrawText;
-        Core::Common::FixString128 _szLocGroup;
+        Core::Common::FixedString1024 _szText;
+        Core::Common::FixedString1024 _szDrawText;
+        Core::Common::FixedString128 _szLocGroup;
         Core::Math::Rect2 _rect;
         Core::Math::Rect2::EAnchor _eAnchor = Core::Math::Rect2::EAnchor_Left;
         Uint32 _fontSize                    = 32;

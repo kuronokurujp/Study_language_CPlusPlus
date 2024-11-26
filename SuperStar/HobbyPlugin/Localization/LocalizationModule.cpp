@@ -68,7 +68,7 @@ namespace Localization
         HE_ASSERT(map.Empty() == FALSE);
 
         LocateTextMap textMap;
-        Core::Common::FixString128 szTmp;
+        Core::Common::FixedString128 szTmp;
         for (auto it = map.Begin(); it != map.End(); ++it)
         {
             szTmp = in_szLocateName.Str();
@@ -131,7 +131,7 @@ namespace Localization
         auto rootNode = this->GetRootNode();
 
         // コンフィグデータからデータパスのディレクトリ名を取得
-        Core::Common::FixString512 pathName =
+        Core::Common::FixedString512 pathName =
             rootNode.GetNode(HE_STR_TEXT("config"), HE_STR_TEXT("current_dir")).GetString();
         Core::File::Path dataRootPath(pathName.Str());
 
@@ -143,13 +143,13 @@ namespace Localization
 
         locateNode.OutputNodeMap(&mLocateNode, HE_STR_EMPTY);
 
-        Core::Common::FixString128 locateStr;
+        Core::Common::FixedString128 locateStr;
         for (auto it = mLocateNode.Begin(); it != mLocateNode.End(); ++it)
         {
             locateStr = it->key.Str();
             locateStr.ToUpper();
 
-            Core::Common::CustomFixMap<Core::Common::FixString128, LocateData, 32> mData;
+            Core::Common::FixedMap<Core::Common::FixedString128, LocateData, 32> mData;
 
             mGroupNode.Clear();
             it->data.OutputNodeMap(&mGroupNode, HE_STR_EMPTY);
@@ -165,7 +165,7 @@ namespace Localization
                 LocateData data(path);
                 HE_LOG_LINE(HE_STR_TEXT("%s"), data._textFilePath.Str());
 
-                const Core::Common::FixString128 szGroupName(groupIt->key.Str());
+                const Core::Common::FixedString128 szGroupName(groupIt->key.Str());
                 mData.Add(szGroupName, data);
             }
 
@@ -179,17 +179,17 @@ namespace Localization
     {
         HE_ASSERT(in_szLocateName);
 
-        Core::Common::FixString128 key(in_szLocateName);
+        Core::Common::FixedString128 key(in_szLocateName);
         auto it = this->_locateDataMap.FindKey(key);
         return it->data;
     }
 
-    const Core::Common::FixString1024& LocateAssetData::GetText(const UTF8* in_szKey)
+    const Core::Common::FixedString1024& LocateAssetData::GetText(const UTF8* in_szKey)
     {
         // キャッシュしているテキストがなければデータからテキストを取る
         if (this->_textBuffMap.Contains(in_szKey) == FALSE)
         {
-            Core::Common::FixString1024 value = this->VGetChar({in_szKey, "items", "0", "text"});
+            Core::Common::FixedString1024 value = this->VGetChar({in_szKey, "items", "0", "text"});
             this->_textBuffMap.Add(in_szKey, value);
         }
 

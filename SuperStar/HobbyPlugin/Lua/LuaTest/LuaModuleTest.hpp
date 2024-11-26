@@ -53,13 +53,13 @@ TEST_CASE("Lua Module Script Func")
             CHECK(pModule->CallScriptFunc(handle, HE_STR_TEXT("M")) == FALSE);
 
             // 引数がないLua関数にコードが引数を設定してもLua関数は正常に動作するか
-            Core::Common::s_szTempFixString16 = HE_STR_TEXT("temp");
+            Core::Common::g_szTempFixedString16 = HE_STR_TEXT("temp");
             CHECK(pModule->CallScriptFunc(handle, HE_STR_TEXT("Message"), HE_STR_TEXT("a"), 1, 3.0f,
-                                          Core::Common::s_szTempFixString16));
+                                          Core::Common::g_szTempFixedString16));
 
             // TODO: 引数のあるLua関数を呼び出す事ができるか
             CHECK(pModule->CallScriptFunc(handle, HE_STR_TEXT("MessageArg"), HE_STR_TEXT("a"), 1,
-                                          3.0f, Core::Common::s_szTempFixString16));
+                                          3.0f, Core::Common::g_szTempFixedString16));
 
             // 同じLuaスクリプトテキストを読み込む場合
             szScriptText = HE_STR_TEXT(

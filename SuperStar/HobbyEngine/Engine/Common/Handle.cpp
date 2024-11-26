@@ -7,13 +7,12 @@ namespace Core::Common
     static Uint32 s_uMagicNumber = 0;
 
     /// <summary>
-    /// 初期化
     /// 管理するindexを設定
     /// </summary>
-    void Handle::Init(const Uint32 in_uIndex)
+    void Handle::Set(const Uint32 in_uIndex)
     {
         HE_ASSERT(this->Null());
-        HE_ASSERT(in_uIndex <= E_MAX_INDEX);
+        HE_ASSERT(in_uIndex <= EMax_Index);
 
         ++s_uMagicNumber;
 

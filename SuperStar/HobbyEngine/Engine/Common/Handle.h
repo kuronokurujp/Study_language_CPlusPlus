@@ -10,9 +10,6 @@ namespace Core::Common
     class Handle final
     {
     public:
-        static const Uint32 uNonMagic = 0xffffffff;
-
-    public:
         Handle() { this->Clear(); }
         // 値をコピーする
         Handle(Handle& in_rHandle) { this->_ulHandle = in_rHandle._ulHandle; }
@@ -24,16 +21,14 @@ namespace Core::Common
         Handle(Handle&& r) HE_NOEXCEPT { this->_ulHandle = r._ulHandle; }
 
         /// <summary>
-        /// 初期化
         /// 管理するindexを設定
         /// </summary>
-        void Init(const Uint32 in_uIndex);
+        void Set(const Uint32 in_uIndex);
 
-        void Clear() HE_NOEXCEPT { this->_ulHandle = 0; }
-
-        Uint32 Index() const HE_NOEXCEPT { return this->_handleField._uIndex; }
-        Uint32 Magic() const HE_NOEXCEPT { return this->_handleField._uMagic; }
-        Bool Null() const HE_NOEXCEPT { return (this->_ulHandle == 0); }
+        inline void Clear() HE_NOEXCEPT { this->_ulHandle = ulInvalidUint64; }
+        inline Uint32 Index() const HE_NOEXCEPT { return this->_handleField._uIndex; }
+        inline Uint32 Magic() const HE_NOEXCEPT { return this->_handleField._uMagic; }
+        inline Bool Null() const HE_NOEXCEPT { return (this->_ulHandle == ulInvalidUint64); }
 
         operator Uint64() const HE_NOEXCEPT { return this->_ulHandle; }
 
@@ -50,13 +45,13 @@ namespace Core::Common
         {
             // インデックスとマジックナンバーの使用ビットフィールドサイズ
             // 今のところ合計64bitまで使用可能
-            E_SIZE_INDEX_BIT = 32,
-            E_SIZE_MAGIC_BIT = 32,
+            ESize_MagicBit = 32,
+            ESize_IndexBit = 64 - ESize_MagicBit,
 
             // インデックスとマジックナンバーの最大値
             // ハンドルを扱うことが出来る最大数
-            E_MAX_INDEX = (1LL << E_SIZE_INDEX_BIT) - 1,
-            E_MAX_MAGIC = (1LL << E_SIZE_MAGIC_BIT) - 1,
+            EMax_Magic = (1LL << ESize_MagicBit) - 1,
+            EMax_Index = (1LL << ESize_IndexBit) - 1,
         };
 
         /// <summary>
@@ -66,13 +61,13 @@ namespace Core::Common
         {
             struct
             {
-                // インデックス
-                Uint32 _uIndex : E_SIZE_INDEX_BIT;
                 // マジックナンバー
-                Uint32 _uMagic : E_SIZE_MAGIC_BIT;
+                Uint64 _uMagic : ESize_MagicBit;
+                // インデックス
+                Uint64 _uIndex : ESize_IndexBit;
             } _handleField;
 
-            Uint64 _ulHandle = 0;
+            Uint64 _ulHandle = ulInvalidUint64;
         };
     };
 

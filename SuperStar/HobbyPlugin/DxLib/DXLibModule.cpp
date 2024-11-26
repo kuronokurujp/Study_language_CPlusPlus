@@ -172,7 +172,7 @@ namespace DXLib
 
                         const Uint32 uColor = ::GetColor(pText2D->color.c32.r, pText2D->color.c32.g,
                                                          pText2D->color.c32.b);
-                        Core::Common::FixString1024 str(pText2D->szChars);
+                        Core::Common::FixedString1024 str(pText2D->szChars);
                         int x = static_cast<int>(pText2D->fX);
                         int y = static_cast<int>(pText2D->fY);
                         // 配置指定で配置座標を変更

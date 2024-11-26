@@ -26,7 +26,7 @@ namespace Core::Common
                         in_rBaseRTTI.GetName().Str());
         }
 
-        const FixString128& GetName() const HE_NOEXCEPT { return this->_szClass; }
+        const FixedString128& GetName() const HE_NOEXCEPT { return this->_szClass; }
         Bool IsExactly(const RTTI& in_rRtti) const HE_NOEXCEPT
         {
             return (this->_pBaseRTTI == &in_rRtti);
@@ -35,7 +35,7 @@ namespace Core::Common
         Bool DerivesFrom(const RTTI*) const;
 
     private:
-        const FixString128 _szClass;
+        const FixedString128 _szClass;
         const RTTI* _pBaseRTTI = NULL;
     };
 }  // namespace Core::Common

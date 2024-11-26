@@ -33,8 +33,8 @@ namespace Game::Asset
         return this->VGetFloat32({"data", in_pIdName, in_pFieldName});
     }
 
-    Core::Common::FixString1024 ParamaterAssetData::GetCharByIdData(const UTF8* in_pIdName,
-                                                                    const UTF8* in_pFieldName)
+    Core::Common::FixedString1024 ParamaterAssetData::GetCharByIdData(const UTF8* in_pIdName,
+                                                                      const UTF8* in_pFieldName)
     {
         return this->VGetChar({"data", in_pIdName, in_pFieldName});
     }

@@ -47,7 +47,7 @@ namespace Core::Memory
         // TODO: プラットフォーム用のヒープ取得に切り替え
         // プラットフォームのアライメントに合わせたい
         // とり方は各プラットフォームによって変えること
-        this->_pHeapTop = ::_aligned_malloc(in_uUseHeapSize, Manager::MinimumAlignSize);
+        this->_pHeapTop = ::_aligned_malloc(in_uUseHeapSize, minimumAlignSize);
         if (this->_pHeapTop == NULL)
         {
             //	取れなかった．
@@ -318,7 +318,7 @@ namespace Core::Memory
         pPageInfo->_pMemoryBlockTop->_pPrev       = NULL;
         pPageInfo->_pMemoryBlockTop->_pNext       = NULL;
         pPageInfo->_pMemoryBlockTop->_useFlag     = 0;
-        pPageInfo->_pMemoryBlockTop->_alignSize   = Manager::MinimumAlignSize;
+        pPageInfo->_pMemoryBlockTop->_alignSize   = minimumAlignSize;
         pPageInfo->_pMemoryBlockTop->_page        = in_page;
         pPageInfo->_pMemoryBlockTop->_paddingSize = 0;
 
@@ -386,14 +386,14 @@ namespace Core::Memory
         }
 
         // メモリブロックヘッダの都合上最低アラインサイズを守る
-        if ((in_alignSize % Manager::MinimumAlignSize) != 0)
+        if ((in_alignSize % minimumAlignSize) != 0)
         {
             HE_ASSERT(0 && "alignSizeがMINIMUM_ALIGN_SIZEの倍数ではない．");
             return NULL;
         }
 
         // 0の時はMinimumAlignSizeに
-        in_alignSize = in_alignSize == 0 ? Manager::MinimumAlignSize : in_alignSize;
+        in_alignSize = in_alignSize == 0 ? minimumAlignSize : in_alignSize;
 
         // 空きメモリブロックをたどって, 確保したい容量より大きい奴を探す
         BlockHeader* pFreeMemoryBlock = this->_aMemoryPageInfoArray[in_page]._pMemoryBlockTop;
@@ -431,14 +431,14 @@ namespace Core::Memory
                 pFreeMemoryBlock->_uAllocateSize >= in_uAllocateSize)
             {
                 // 後ろのパディングサイズを割り出す
-                // 後ろはMinimumAlignSizeの倍数であればいい
+                // 後ろはminimumAlignSizeの倍数であればいい
                 // また頭の方は最低MinimumAlignSizeの倍数のはずなので
                 // 単純に要求サイズから割り出せる
-                uPaddingSize = in_uAllocateSize % Manager::MinimumAlignSize;
+                uPaddingSize = in_uAllocateSize % minimumAlignSize;
                 if (uPaddingSize != 0)
                 {
                     // 0じゃないならパディング必要
-                    uPaddingSize = Manager::MinimumAlignSize - uPaddingSize;
+                    uPaddingSize = minimumAlignSize - uPaddingSize;
                 }
 
                 // 後ろからとる場合オフセットの割り出しが違う
@@ -826,7 +826,7 @@ namespace Core::Memory
         pSplitMemoryBlock->_uAllocateSize -= in_uSplitSize;
 
         // アライン初期化
-        pSplitMemoryBlock->_alignSize = Manager::MinimumAlignSize;
+        pSplitMemoryBlock->_alignSize = minimumAlignSize;
 
 #ifdef HE_ENGINE_DEBUG
         // マジックNoセット
@@ -1116,7 +1116,7 @@ namespace Core::Memory
     void Manager::_FillFreeMemoryBlock(BlockHeader* in_pMemoryBlock)
     {
         ::memset(reinterpret_cast<Uint8*>(in_pMemoryBlock) + this->_GetMemoryBlockHeaderSize(),
-                 FreeMemoryFillData,
+                 freeMemoryFillData,
                  in_pMemoryBlock->_uAllocateSize + in_pMemoryBlock->_paddingSize);
     }
 
@@ -1127,7 +1127,7 @@ namespace Core::Memory
     void Manager::_FillNewMemoryBlock(BlockHeader* in_pMemoryBlock)
     {
         ::memset(reinterpret_cast<Uint8*>(in_pMemoryBlock) + this->_GetMemoryBlockHeaderSize(),
-                 NewMemoryFillData,
+                 newMemoryFillData,
                  in_pMemoryBlock->_uAllocateSize + in_pMemoryBlock->_paddingSize);
     }
 #endif

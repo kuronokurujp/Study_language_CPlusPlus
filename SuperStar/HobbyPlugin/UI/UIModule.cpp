@@ -9,7 +9,7 @@ namespace UI
     // クラス内のみで利用する
     namespace Local
     {
-        static Core::Common::CustomFixMap<Builder::EAnchor, Core::Math::Rect2::EAnchor, 3>
+        static Core::Common::FixedMap<Builder::EAnchor, Core::Math::Rect2::EAnchor, 3>
             mPosAnthorToRect2Anchor = {{Builder::EAnchor::EAnchor_Left,
                                         Core::Math::Rect2::EAnchor::EAnchor_Left},
                                        {Builder::EAnchor::EPosAnchor_Center,
@@ -126,18 +126,18 @@ namespace UI
 
         // レイアウトを作成
         UIWidgetHandlePack widgetHandlePack =
-            this->NewLayer(Core::Common::FixString64(layoutNode.data.szId), in_uSort,
+            this->NewLayer(Core::Common::FixedString64(layoutNode.data.szId), in_uSort,
                            in_rLevelHandle);
 
         // レイアウトノード下にあるWidgetを取得
         // MEMO: 要素数が1000を超えるとスタックサイズが足りずにスタックオーバーフローになるので注意
-        Core::Common::CustomFixStack<UI::Builder::Node, 16> stack;
+        Core::Common::FixedStack<UI::Builder::Node, 16> stack;
 
         Uint32 sort = 0;
-        Core::Common::CustomFixStack<UI::Builder::Node, 64> sNodeChildren;
+        Core::Common::FixedStack<UI::Builder::Node, 64> sNodeChildren;
         asset.OutputNodeChildren(&sNodeChildren, layoutNode);
 
-        Core::Common::CustomFixStack<UI::Builder::Node, 16> sTmpNodeChildren;
+        Core::Common::FixedStack<UI::Builder::Node, 16> sTmpNodeChildren;
         while (sNodeChildren.Empty() == FALSE)
         {
             auto hParentWidget = widgetHandlePack;
@@ -170,7 +170,7 @@ namespace UI
                                               Local::mPosAnthorToRect2Anchor[pLabel->eAnchor]);
 
                         auto h =
-                            this->NewLabelWidget(Core::Common::FixString64(pNodeData->szId), sort,
+                            this->NewLabelWidget(Core::Common::FixedString64(pNodeData->szId), sort,
                                                  pLabel->szLoc, pLabel->szText, rect, pStyle->color,
                                                  in_rViewHandle, in_rLevelHandle);
 
@@ -187,7 +187,7 @@ namespace UI
                         const UI::Builder::Style* pStyle = &pButton->style;
 
                         auto h = this->NewButtonWidget(
-                            Core::Common::FixString64(pNodeData->szId), sort,
+                            Core::Common::FixedString64(pNodeData->szId), sort,
                             Core::Math::Rect2(pButton->fX, pButton->fY, pStyle->w, pStyle->h,
                                               Local::mPosAnthorToRect2Anchor[pButton->eAnchor]),
                             pStyle->color, in_rViewHandle, in_rLevelHandle);

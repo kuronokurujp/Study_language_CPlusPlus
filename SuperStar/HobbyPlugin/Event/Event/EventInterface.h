@@ -48,7 +48,7 @@ namespace Event
 
     public:
         EventListenerWithRegistEventFunc(
-            const Core::Common::FixString128& in_szrName,
+            const Core::Common::FixedString128& in_szrName,
             std::function<Bool(Event::EventDataInterfacePtr const&)> in_func)
         {
             this->_func   = in_func;
@@ -71,7 +71,7 @@ namespace Event
 
     private:
         std::function<Bool(Event::EventDataInterfacePtr const&)> _func;
-        Core::Common::FixString128 _szName;
+        Core::Common::FixedString128 _szName;
     };
 
     using EventListenerPtr = Core::Memory::SharedPtr<EventListenerInterface>;

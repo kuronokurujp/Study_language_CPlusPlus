@@ -21,7 +21,7 @@ namespace Render
         HE_MODULE_GENRATE_DECLARATION(RenderModule);
 
     public:
-        using ViewHandleVector = Core::Common::CustomFixVector<Core::Common::Handle, 32>;
+        using ViewHandleVector = Core::Common::FixedVector<Core::Common::Handle, 32>;
 
         enum EPriority
         {
@@ -73,7 +73,7 @@ namespace Render
         Bool _VBeforeUpdate(const Float32 in_fDeltaTime) override final;
 
     private:
-        Core::Common::FixPoolManager<View, 32> _poolView;
+        Core::Common::FixedPoolManager<View, 32> _poolView;
         ViewHandleVector _vViewHandle;
     };
 

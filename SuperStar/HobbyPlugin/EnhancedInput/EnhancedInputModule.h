@@ -20,8 +20,8 @@ namespace EnhancedInput
     /// </summary>
     struct ActionData
     {
-        using ActionKeyMap   = Core::Common::CustomFixVector<Platform::EKeyboard, 4>;
-        using ActionTouchMap = Core::Common::CustomFixVector<Platform::EInputMouseType, 4>;
+        using ActionKeyMap   = Core::Common::FixedVector<Platform::EKeyboard, 4>;
+        using ActionTouchMap = Core::Common::FixedVector<Platform::EInputMouseType, 4>;
 
         // CustomFixMapクラスでバッファデータを作成時に使う
         ActionData() {}
@@ -42,12 +42,12 @@ namespace EnhancedInput
         /// <summary>
         /// キーボードキーデータ
         /// </summary>
-        Core::Common::CustomFixVector<Platform::EKeyboard, 4> aKeyboardKeys;
+        Core::Common::FixedVector<Platform::EKeyboard, 4> aKeyboardKeys;
 
         /// <summary>
         /// マウスやタッチ入力データ
         /// </summary>
-        Core::Common::CustomFixVector<Platform::EInputMouseType, 4> aTouchs;
+        Core::Common::FixedVector<Platform::EInputMouseType, 4> aTouchs;
         // Core::Common::CustomArray<Uint32, 4> aButtons;
         // Core::Common::CustomArray<Uint32, 4> aSticks;
     };
@@ -77,13 +77,13 @@ namespace EnhancedInput
     /// <summary>
     /// アクションデータのマップ型
     /// </summary>
-    using ActionMap = Core::Common::CustomFixMap<Core::Common::FixString64, ActionData, 32>;
+    using ActionMap = Core::Common::FixedMap<Core::Common::FixedString64, ActionData, 32>;
 
     /// <summary>
     /// 入力データのマップ型
     /// </summary>
-    using InputMap = Core::Common::CustomFixMap<Core::Common::FixString64,
-                                                Core::Common::CustomFixVector<InputData, 32>, 32>;
+    using InputMap = Core::Common::FixedMap<Core::Common::FixedString64,
+                                            Core::Common::FixedVector<InputData, 32>, 32>;
 
     /// <summary>
     /// インプット用の追加モジュール

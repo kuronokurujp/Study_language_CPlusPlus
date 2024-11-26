@@ -22,8 +22,8 @@ namespace Game::Asset
         Uint32 GetUInt32ByIdData(const UTF8* in_pIdName, const UTF8* in_pFieldName);
         Sint32 GetSInt32ByIdData(const UTF8* in_pIdName, const UTF8* in_pFieldName);
         Float32 GetFloat32ByIdData(const UTF8* in_pIdName, const UTF8* in_pFieldName);
-        Core::Common::FixString1024 GetCharByIdData(const UTF8* in_pIdName,
-                                                    const UTF8* in_pFieldName);
+        Core::Common::FixedString1024 GetCharByIdData(const UTF8* in_pIdName,
+                                                      const UTF8* in_pFieldName);
 
         Bool IsId(const UTF8* in_pIdName);
 
@@ -47,7 +47,7 @@ namespace Game::Asset
             return AssetDataJson::VGetFloat32(in_rTokens);
         }
 
-        virtual Core::Common::FixString1024 VGetChar(
+        virtual Core::Common::FixedString1024 VGetChar(
             const std::initializer_list<const UTF8*>& in_rTokens) override final
         {
             return AssetDataJson::VGetChar(in_rTokens);

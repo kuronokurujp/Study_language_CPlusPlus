@@ -24,11 +24,10 @@ namespace Core::Common
         HE_CLASS_MOVE_NG(ArrayBase);
 
     public:
-        explicit ArrayBase(TType* in_pArrayAddr, Uint32 in_uSize)
+        explicit ArrayBase(TType* in_pArrayAddr, const Uint32 in_uSize)
             : _pBuff(in_pArrayAddr), _uCapacity(in_uSize)
         {
         }
-        virtual ~ArrayBase() = default;
 
         inline Uint32 Capacity() const HE_NOEXCEPT { return this->_uCapacity; }
 
@@ -75,14 +74,14 @@ namespace Core::Common
     /// テンプレートで要素を決めている
     /// </summary>
     template <typename TType, Uint32 TCapacity>
-    class CustomArray final : public ArrayBase<TType>
+    class FixedArray final : public ArrayBase<TType>
     {
     public:
-        explicit CustomArray() : ArrayBase<TType>(this->_aBuff, TCapacity) {}
+        explicit FixedArray() : ArrayBase<TType>(this->_aBuff, TCapacity) {}
 
         // コンストラクタ
         // 配列宣言と同時に値を初期化できるようにしている
-        CustomArray(std::initializer_list<TType>& in_rInitList)
+        FixedArray(std::initializer_list<TType>& in_rInitList)
             : ArrayBase<TType>(this->_aBuff, TCapacity)
         {
             const Uint32 uMinCapacity = HE_MIN(TCapacity, in_rInitList.size());

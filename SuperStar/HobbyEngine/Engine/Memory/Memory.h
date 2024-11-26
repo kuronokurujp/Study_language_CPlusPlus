@@ -52,21 +52,21 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
 // NEWマクロ
 // メモリアライメント設定版
 // 通常はこちらを利用
-#define HE_NEW_MEM(type, page)                          \
-    new (page, Core::Memory::Manager::MinimumAlignSize, \
-         Core::Memory::Manager::EAllocateLocateType_Top, __FILE__, __LINE__)(type)
+#define HE_NEW_MEM(type, page)                                                                 \
+    new (page, Core::Memory::minimumAlignSize, Core::Memory::Manager::EAllocateLocateType_Top, \
+         __FILE__, __LINE__)(type)
 
 // マクロの引数で__FILE__と__LINE__を指定
-#define HE_NEW_MEM_INFO(type, page, file, line)         \
-    new (page, Core::Memory::Manager::MinimumAlignSize, \
-         Core::Memory::Manager::EAllocateLocateType_Top, file, line)(type)
+#define HE_NEW_MEM_INFO(type, page, file, line)                                                \
+    new (page, Core::Memory::minimumAlignSize, Core::Memory::Manager::EAllocateLocateType_Top, \
+         file, line)(type)
 
 // NEWの配列マクロ
 // メモリアライメント設定版
 // 通常はこちらを利用
-#define HE_NEW_MEM_ARRAY(type, num, page)               \
-    new (page, Core::Memory::Manager::MinimumAlignSize, \
-         Core::Memory::Manager::EAllocateLocateType_Top, __FILE__, __LINE__)(type[num])
+#define HE_NEW_MEM_ARRAY(type, num, page)                                                      \
+    new (page, Core::Memory::minimumAlignSize, Core::Memory::Manager::EAllocateLocateType_Top, \
+         __FILE__, __LINE__)(type[num])
 
 // NEWマクロ
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
@@ -86,16 +86,16 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
 // NEWマクロ
 // メモリをページの後ろから確保する
 // アライメント設定版
-#define HE_NEW_MEM_LAST(type, page)                     \
-    new (page, Core::Memory::Manager::MinimumAlignSize, \
-         Core::Memory::Manager::EAllocateLocateType_Last, __FILE__, __LINE__)(type)
+#define HE_NEW_MEM_LAST(type, page)                                                             \
+    new (page, Core::Memory::minimumAlignSize, Core::Memory::Manager::EAllocateLocateType_Last, \
+         __FILE__, __LINE__)(type)
 
 // NEW配列のマクロ
 // メモリをページの後ろから確保する
 // アライメント設定版
-#define HE_NEW_MEM_ARRAY_LAST(type, num, page)          \
-    new (page, Core::Memory::Manager::MinimumAlignSize, \
-         Core::Memory::Manager::EAllocateLocateType_Last, __FILE__, __LINE__)(type[num])
+#define HE_NEW_MEM_ARRAY_LAST(type, num, page)                                                  \
+    new (page, Core::Memory::minimumAlignSize, Core::Memory::Manager::EAllocateLocateType_Last, \
+         __FILE__, __LINE__)(type[num])
 
 // NEWマクロ
 // メモリをページの後ろから確保する
@@ -122,12 +122,12 @@ extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
                             const Core::Memory::Manager::EAllocateLocateType in_eLocateType,
                             const UTF8* in_pFile, Uint32 in_uLine);
 
-#define HE_ALLOC_MEM(size, page)                                          \
-    ::AllocateMemory(size, page, Core::Memory::Manager::MinimumAlignSize, \
+#define HE_ALLOC_MEM(size, page)                                 \
+    ::AllocateMemory(size, page, Core::Memory::minimumAlignSize, \
                      Core::Memory::Manager::EAllocateLocateType_Top, __FILE__, __LINE__);
 
-#define HE_ALLOC_MEM_LAST(size, page)                                     \
-    ::AllocateMemory(size, page, Core::Memory::Manager::MinimumAlignSize, \
+#define HE_ALLOC_MEM_LAST(size, page)                            \
+    ::AllocateMemory(size, page, Core::Memory::minimumAlignSize, \
                      Core::Memory::Manager::EAllocateLocateType_Last, __FILE__, __LINE__);
 
 #else
@@ -135,20 +135,18 @@ extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
 // NEWマクロ
 // メモリアライメント設定版
 // 通常はこちらを利用
-#define HE_NEW_MEM(type, page)                          \
-    new (page, Core::Memory::Manager::MinimumAlignSize, \
-         Core::Memory::Manager::EAllocateLocateType_Top)(type)
+#define HE_NEW_MEM(type, page) \
+    new (page, Core::Memory::minimumAlignSize, Core::Memory::Manager::EAllocateLocateType_Top)(type)
 
 // マクロの引数で__FILE__と__LINE__を指定
-#define HE_NEW_MEM_INFO(type, page, file, line)         \
-    new (page, Core::Memory::Manager::MinimumAlignSize, \
-         Core::Memory::Manager::EAllocateLocateType_Top)(type)
+#define HE_NEW_MEM_INFO(type, page, file, line) \
+    new (page, Core::Memory::minimumAlignSize, Core::Memory::Manager::EAllocateLocateType_Top)(type)
 
 // NEWの配列マクロ
 // メモリアライメント設定版
 // 通常はこちらを利用
-#define HE_NEW_MEM_ARRAY(type, num, page)               \
-    new (page, Core::Memory::Manager::MinimumAlignSize, \
+#define HE_NEW_MEM_ARRAY(type, num, page)      \
+    new (page, Core::Memory::minimumAlignSize, \
          Core::Memory::Manager::EAllocateLocateType_Top)(type[num])
 
 // NEWマクロ
@@ -168,15 +166,15 @@ extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
 // NEWマクロ
 // メモリをページの後ろから確保する
 // アライメント設定版
-#define HE_NEW_MEM_LAST(type, page)                       \
-    / new (page, Core::Memory::Manager::MinimumAlignSize, \
+#define HE_NEW_MEM_LAST(type, page)              \
+    / new (page, Core::Memory::minimumAlignSize, \
            Core::Memory::Manager::EAllocateLocteType_Last)(type)
 
 // NEW配列のマクロ
 // メモリをページの後ろから確保する
 // アライメント設定版
-#define HE_NEW_MEM_ARRAY_LAST(type, num, page)          \
-    new (page, Core::Memory::Manager::MinimumAlignSize, \
+#define HE_NEW_MEM_ARRAY_LAST(type, num, page) \
+    new (page, Core::Memory::minimumAlignSize, \
          Core::Memory::Manager::EAllocateLocteType_Last)(type[num])
 
 // NEWマクロ
@@ -200,12 +198,12 @@ extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
                             const Uint8 in_alignSize,
                             const Core::Memory::Manager::EAllocateLocateType in_eLocateType);
 
-#define HE_ALLOC_MEM(size, page)                                          \
-    ::AllocateMemory(size, page, Core::Memory::Manager::MinimumAlignSize, \
+#define HE_ALLOC_MEM(size, page)                                 \
+    ::AllocateMemory(size, page, Core::Memory::minimumAlignSize, \
                      Core::Memory::Manager::EAllocateLocateType_Top);
 
-#define HE_ALLOC_MEM_LAST(size, page)                                     \
-    ::AllocateMemory(size, page, Core::Memory::Manager::MinimumAlignSize, \
+#define HE_ALLOC_MEM_LAST(size, page)                            \
+    ::AllocateMemory(size, page, Core::Memory::minimumAlignSize, \
                      Core::Memory::Manager::EAllocateLocateType_Last);
 
 #endif
@@ -269,7 +267,6 @@ struct DeleterFreeMemory
 //        HE_LOG_LINE(HE_STR_TEXT("DeleteFreeMemory: %s(%d)"), this->szFilename, this->uLine);
 #endif
         HE_SAFE_DELETE_MEM(ptr);
-        //::FreeMemory(ptr);
     }
 };
 

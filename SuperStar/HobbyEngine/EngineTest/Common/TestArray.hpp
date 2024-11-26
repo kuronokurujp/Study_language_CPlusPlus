@@ -4,7 +4,7 @@
 
 TEST_CASE("Test Array Use")
 {
-    Core::Common::CustomArray<Sint32, 32> arr;
+    Core::Common::FixedArray<Sint32, 32> arr;
 
     CHECK(arr.Capacity() == 32);
 

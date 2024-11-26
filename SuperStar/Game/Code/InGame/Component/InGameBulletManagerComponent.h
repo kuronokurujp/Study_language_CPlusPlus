@@ -26,7 +26,7 @@ namespace InGame
 
     private:
         class WorkFixVector final
-            : public Core::Common::CustomFixVector<InGame::InGameBulletObject, 256>
+            : public Core::Common::FixedVector<InGame::InGameBulletObject, 256>
         {
         public:
             void RemoveAt(const Uint32 in_uIndex) { this->_RemoveAt(in_uIndex); }
@@ -82,9 +82,8 @@ namespace InGame
         Bool _HandleEvent(Event::EventDataInterfacePtr const&);
 
     private:
-        Core::Common::CustomFixMap<Core::Common::FixString128,
-                                   Core::Memory::UniquePtr<InGame::InGameBulletStrategyInterface>,
-                                   32>
+        Core::Common::FixedMap<Core::Common::FixedString128,
+                               Core::Memory::UniquePtr<InGame::InGameBulletStrategyInterface>, 32>
             _mBulletStrategy;
 
         WorkFixVector _vBullet;

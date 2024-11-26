@@ -48,7 +48,7 @@ namespace UI
 
     private:
         UIButtonMessageHandlerImpOnPush _onPush;
-        Core::Common::FixString128 _msg;
+        Core::Common::FixedString128 _msg;
     };
 
     /// <summary>

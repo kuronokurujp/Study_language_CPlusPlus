@@ -85,27 +85,27 @@ namespace Core::Common
     /// テンプレートで要素を決めている
     /// </summary>
     template <class TType, Uint32 TCapacity>
-    class CustomFixStack final : public StackBase<TType>
+    class FixedStack final : public StackBase<TType>
     {
-        HE_CLASS_COPY_NG(CustomFixStack);
-        HE_CLASS_MOVE_NG(CustomFixStack);
+        HE_CLASS_COPY_NG(FixedStack);
+        HE_CLASS_MOVE_NG(FixedStack);
 
     public:
-        CustomFixStack() : StackBase<TType>(_taBuff, TCapacity) {}
+        FixedStack() : StackBase<TType>(_taBuff, TCapacity) {}
 
     private:
         TType _taBuff[TCapacity];
     };
 
-    // テンプレートクラス CustomFixStack の部分的な型特性
+    // テンプレートクラス FixedStack の部分的な型特性
     template <typename T>
-    struct IsCustomFixStack : std::false_type
+    struct IsFixedStack : std::false_type
     {
     };
 
-    // CustomFixVector のインスタンスに対する特殊化
+    // FixedVector のインスタンスに対する特殊化
     template <typename TType, Uint32 TCapacity>
-    struct IsCustomFixStack<CustomFixStack<TType, TCapacity>> : std::true_type
+    struct IsFixedStack<FixedStack<TType, TCapacity>> : std::true_type
     {
     };
 

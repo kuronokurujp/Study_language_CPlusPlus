@@ -78,10 +78,10 @@ namespace AssetManager
         return static_cast<Float32>(val.get_double().value_unsafe());
     }
 
-    Core::Common::FixString1024 AssetDataJson::VGetChar(
+    Core::Common::FixedString1024 AssetDataJson::VGetChar(
         const std::initializer_list<const UTF8*>& in_rTokens)
     {
-        Core::Common::FixString1024 str;
+        Core::Common::FixedString1024 str;
 
         simdjson::fallback::ondemand::value val;
         if (_OutputValueBySimdJson(&val,

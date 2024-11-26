@@ -8,7 +8,7 @@ namespace Event
         Core::Common::Handle handle;
 
         ++this->_uAddEventMngCount;
-        handle.Init(this->_uAddEventMngCount);
+        handle.Set(this->_uAddEventMngCount);
 
         // ストラテジーの所有権を管理インスタンスへ
         this->_mEventMng.Add(handle, HE_NEW_MEM(EventManager, 0)(std::move(in_upStrategy)));

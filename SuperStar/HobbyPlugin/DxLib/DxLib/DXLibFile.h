@@ -25,6 +25,6 @@ namespace DXLib
         /// <summary>
         /// ファイルロードしたハンドルマップ
         /// </summary>
-        Core::Common::CustomFixMap<Uint32, Core::Common::Handle, 2048> _mFileHandle;
+        Core::Common::FixedMap<Uint32, Core::Common::Handle, 2048> _mFileHandle;
     };
 }  // namespace DXLib

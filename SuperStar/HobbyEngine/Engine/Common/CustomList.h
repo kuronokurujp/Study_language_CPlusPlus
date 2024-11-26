@@ -484,13 +484,13 @@ namespace Core::Common
         LinkedListNode<T> _tail;
     };
 
-    // テンプレートクラス CustomFixVector の部分的な型特性
+    // テンプレートクラス CustomList の部分的な型特性
     template <typename T>
     struct IsCustomList : std::false_type
     {
     };
 
-    // CustomFixVector のインスタンスに対する特殊化
+    // CustomList のインスタンスに対する特殊化
     template <typename TType>
     struct IsCustomList<CustomList<TType>> : std::true_type
     {

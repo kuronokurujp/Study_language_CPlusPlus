@@ -32,7 +32,7 @@ namespace Module
         template <class T>
         T* Get() const
         {
-            Core::Common::FixString128 szName(T::ModuleName());
+            Core::Common::FixedString128 szName(T::ModuleName());
             auto pModule = reinterpret_cast<T*>(this->Get(szName.Str()));
             HE_ASSERT(pModule && "モジュールが存在しない");
             return pModule;
@@ -73,13 +73,13 @@ namespace Module
         void _SortModuleVector(Core::Common::VectorBase<ModuleBase*>* out);
 
     private:
-        Core::Common::CustomFixVector<ModuleBase*, 16> _vAppModule;
-        Core::Common::CustomFixVector<ModuleBase*, 32> _vLogicModule;
-        Core::Common::CustomFixVector<ModuleBase*, 16> _vViewModule;
+        Core::Common::FixedVector<ModuleBase*, 16> _vAppModule;
+        Core::Common::FixedVector<ModuleBase*, 32> _vLogicModule;
+        Core::Common::FixedVector<ModuleBase*, 16> _vViewModule;
 
-        Core::Common::CustomFixMap<Core::Common::FixString128, ModuleBase*, 16> _mAppModule;
-        Core::Common::CustomFixMap<Core::Common::FixString128, ModuleBase*, 32> _mLogicModule;
-        Core::Common::CustomFixMap<Core::Common::FixString128, ModuleBase*, 16> _mViewModule;
+        Core::Common::FixedMap<Core::Common::FixedString128, ModuleBase*, 16> _mAppModule;
+        Core::Common::FixedMap<Core::Common::FixedString128, ModuleBase*, 32> _mLogicModule;
+        Core::Common::FixedMap<Core::Common::FixedString128, ModuleBase*, 16> _mViewModule;
     };
 
     // アプリ層とロジック層とビュー層で種類を分けるべきか
@@ -99,7 +99,7 @@ namespace Module
         template <typename T>
         T* GetDependenceModule()
         {
-            Core::Common::FixString64 szName(T::ModuleName());
+            Core::Common::FixedString64 szName(T::ModuleName());
             auto pTargetModule = reinterpret_cast<T*>(HE_ENGINE.ModuleManager().Get(szName.Str()));
             if (pTargetModule == NULL)
             {
@@ -126,7 +126,8 @@ namespace Module
         /// <summary>
         /// モジュールが依存しているモジュール名リスト
         /// </summary>
-        const Core::Common::VectorBase<Core::Common::FixString64>& GetDependenceModuleNames() const
+        const Core::Common::VectorBase<Core::Common::FixedString64>& GetDependenceModuleNames()
+            const
         {
             return this->_vDependenceModuleName;
         }
@@ -179,14 +180,14 @@ namespace Module
 #endif
 
     private:
-        Core::Common::FixString128 _szName;
+        Core::Common::FixedString128 _szName;
         ELayer _eLayer   = ELayer_Logic;
         Sint32 _priority = 0;
 
 #ifdef HE_ENGINE_DEBUG
-        Core::Common::CustomFixVector<ModuleBase*, 64> _vDependenceModule;
+        Core::Common::FixedVector<ModuleBase*, 64> _vDependenceModule;
 #endif
-        Core::Common::CustomFixVector<Core::Common::FixString64, 64> _vDependenceModuleName;
+        Core::Common::FixedVector<Core::Common::FixedString64, 64> _vDependenceModuleName;
 
     private:
         friend class ModuleManager;

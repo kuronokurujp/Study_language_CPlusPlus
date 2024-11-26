@@ -216,7 +216,7 @@ Platform::PlatformModule* Engine::_PlatformModule()
 {
     HE_ASSERT(this->_upModuleManager);
 
-    Core::Common::FixString128 szName(Platform::PlatformModule::ModuleName());
+    Core::Common::FixedString128 szName(Platform::PlatformModule::ModuleName());
     return reinterpret_cast<Platform::PlatformModule*>(this->_upModuleManager->Get(szName.Str()));
 }
 

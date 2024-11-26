@@ -52,7 +52,7 @@ namespace Core::File
         void _Append(const Char* in_szPath);
 
     private:
-        Core::Common::FixString256 _szPath;
+        Core::Common::FixedString256 _szPath;
     };
 
 }  // namespace Core::File

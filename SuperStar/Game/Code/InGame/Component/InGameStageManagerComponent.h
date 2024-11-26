@@ -119,7 +119,7 @@ namespace InGame
                 */
         Core::Common::Handle _characterEventHandle;
 
-        Core::Common::CustomFixMap<Uint32, Core::Common::Handle, 256> _mEnemyMap;
+        Core::Common::FixedMap<Uint32, Core::Common::Handle, 256> _mEnemyMap;
         Float32 _fTime      = 0.0f;
         Uint32 _uTimelineNo = 0;
         Uint32 _uEnemyId    = 0;

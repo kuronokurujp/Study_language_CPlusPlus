@@ -25,9 +25,9 @@ namespace Core::Common
     /// <typeparam name="TSize">TSizeで指定した値が最大要素数,
     /// 最大要素数を超えたらエラーとなる</typeparam>
     template <typename TKey, typename TData, Sint32 TSize>
-    class CustomFixMap final
+    class FixedMap final
     {
-        HE_CLASS_MOVE_NG(CustomFixMap);
+        HE_CLASS_MOVE_NG(FixedMap);
 
     public:
         // 前方宣言
@@ -102,17 +102,17 @@ namespace Core::Common
             }
 
         private:
-            friend class CustomFixMap;
+            friend class FixedMap;
 
             Node* _pNode = NULL;
         };
 
     public:
         // コンストラクタ
-        CustomFixMap() : _iteratorTail(&this->_tail) { this->_Init(); }
+        FixedMap() : _iteratorTail(&this->_tail) { this->_Init(); }
 
         // コピーのコンストラクタ
-        CustomFixMap(const CustomFixMap& in_mrOther) : _iteratorTail(&this->_tail)
+        FixedMap(const FixedMap& in_mrOther) : _iteratorTail(&this->_tail)
         {
             this->_Init();
             this->_DeepCopy(&in_mrOther);
@@ -120,7 +120,7 @@ namespace Core::Common
 
         // コンストラクタ
         // 宣言と同時に初期化できるようにしている
-        CustomFixMap(const std::initializer_list<std::pair<TKey, TData>>& in_rInitList)
+        FixedMap(const std::initializer_list<std::pair<TKey, TData>>& in_rInitList)
             : _iteratorTail(&this->_tail)
         {
             this->_Init();
@@ -132,20 +132,20 @@ namespace Core::Common
 
         // コピー処理
         // ディープコピーにする
-        CustomFixMap& operator=(CustomFixMap& in_mrOther)
+        FixedMap& operator=(FixedMap& in_mrOther)
         {
             this->_DeepCopy(&in_mrOther);
             return *this;
         }
 
-        CustomFixMap& operator=(const CustomFixMap& in_mrOther)
+        FixedMap& operator=(const FixedMap& in_mrOther)
         {
             this->_DeepCopy(&in_mrOther);
             return *this;
         }
 
         // デストラクタ
-        ~CustomFixMap()
+        ~FixedMap()
         {
             // ツリーを全て破棄する
             this->Clear();
@@ -726,7 +726,7 @@ namespace Core::Common
         /// <summary>
         /// ディープコピー処理
         /// </summary>
-        void _DeepCopy(const CustomFixMap* in_mpOther)
+        void _DeepCopy(const FixedMap* in_mpOther)
         {
             HE_ASSERT(in_mpOther);
             for (const Node* p = in_mpOther->_head._pNext; (p != &in_mpOther->_tail) && (p != NULL);
@@ -907,15 +907,15 @@ namespace Core::Common
             {
                 in_rData = NULL;
             }
-            else if constexpr (IsCustomFixStack<TData>::value)
+            else if constexpr (IsFixedStack<TData>::value)
             {
                 in_rData.Clear();
             }
-            else if constexpr (IsCustomFixVector<TData>::value)
+            else if constexpr (IsFixedVector<TData>::value)
             {
                 in_rData.Clear();
             }
-            else if constexpr (IsCustomFixString<TData>::value)
+            else if constexpr (IsFixedString<TData>::value)
             {
                 in_rData.Clear();
             }
@@ -923,7 +923,7 @@ namespace Core::Common
             {
                 in_rData.Clear();
             }
-            else if constexpr (IsCustomFixVector<TData>::value)
+            else if constexpr (IsFixedVector<TData>::value)
             {
                 in_rData.Clear();
             }
@@ -944,6 +944,6 @@ namespace Core::Common
         Iterator _iteratorTail;
 
         Uint32 _uNodeNum = 0;
-        Core::Common::FixPoolManager<Node, TSize> _poolObject;
+        Core::Common::FixedPoolManager<Node, TSize> _poolObject;
     };
 }  // namespace Core::Common

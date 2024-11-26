@@ -12,7 +12,7 @@ namespace AssetManager
         if (this->_result.failed())
         {
             // エラーログを出してアサートで止める
-            Core::Common::FixString256 errorMsg(this->_result.error().description().data());
+            Core::Common::FixedString256 errorMsg(this->_result.error().description().data());
             HE_LOG_LINE(HE_STR_TEXT("%s"), errorMsg.Str());
             HE_ASSERT(FALSE);
 
@@ -32,10 +32,10 @@ namespace AssetManager
         return Node(rNode);
     }
 
-    const Core::Common::FixString512 AssetDataToml::Node::GetString() const
+    const Core::Common::FixedString512 AssetDataToml::Node::GetString() const
     {
         std::optional<std::string_view> s = this->_node.value<std::string_view>();
-        return Core::Common::FixString512(s->data());
+        return Core::Common::FixedString512(s->data());
     }
 
     AssetDataToml::Node AssetDataToml::Node::_GetNode(const Char* in_szaName[],

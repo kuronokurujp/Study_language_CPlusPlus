@@ -4,7 +4,7 @@
 
 TEST_CASE("FixString Use")
 {
-    Core::Common::FixString<32> str(HE_STR_TEXT("test"));
+    Core::Common::FixedString<32> str(HE_STR_TEXT("test"));
     // テキストが存在するか
     CHECK_FALSE(str.Empty());
 
@@ -19,7 +19,7 @@ TEST_CASE("FixString Use")
     CHECK(str.Find(HE_STR_TEXT("s")) == 2);
 
     // 日本語が使えるか
-    Core::Common::FixString<128> str2(HE_STR_TEXT("日本語"));
+    Core::Common::FixedString<128> str2(HE_STR_TEXT("日本語"));
     CHECK(str2 == HE_STR_TEXT("日本語"));
 
     // 文字数が意図通りか
@@ -32,14 +32,14 @@ TEST_CASE("FixString Use")
 TEST_CASE("FixString OutputUTF8")
 {
     // Char型の文字列を作る
-    Core::Common::FixString128 szStr(HE_STR_TEXT("日本語"));
+    Core::Common::FixedString128 szStr(HE_STR_TEXT("日本語"));
     UTF8 szUTF8[32] = {NULL};
 
     // UTF8型に変える
     szStr.OutputUTF8(szUTF8, 32);
 
     // UTF8型のをChar型に変えて
-    Core::Common::FixString32 szStr32 = szUTF8;
+    Core::Common::FixedString32 szStr32 = szUTF8;
 
     // 正しい文字列になっているかチェック
     CHECK(szStr32.Length() == 3);

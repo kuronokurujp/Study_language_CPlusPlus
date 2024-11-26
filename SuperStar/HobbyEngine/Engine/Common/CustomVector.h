@@ -157,12 +157,12 @@ namespace Core::Common
             HE_ASSERT(in_uIndex < this->_uSize);
             HE_ASSERT(0 < this->_uSize);
 
-            Uint32 uLastIndex = this->_uSize - 1;
+            const Uint32 uLastIndex = this->_uSize - 1;
             if (in_uIndex < uLastIndex)
             {
                 // 削除する要素位置に上書きして削除
                 // メモリ移動のみで高速削除できる
-                Uint32 uSize = (uLastIndex - in_uIndex) * sizeof(TType);
+                const Uint32 uSize = (uLastIndex - in_uIndex) * sizeof(TType);
                 ::memmove(&this->_pBuff[in_uIndex], &this->_pBuff[in_uIndex + 1], uSize);
             }
             else
@@ -186,25 +186,25 @@ namespace Core::Common
     /// テンプレートで要素を決めている
     /// </summary>
     template <typename TType, Uint32 TCapacity>
-    class CustomFixVector : public VectorBase<TType>
+    class FixedVector : public VectorBase<TType>
     {
-        HE_CLASS_MOVE_NG(CustomFixVector);
+        HE_CLASS_MOVE_NG(FixedVector);
 
     public:
-        CustomFixVector() : VectorBase<TType>(this->_aBuff, TCapacity) {}
-        CustomFixVector(CustomFixVector& in_rSrc) : VectorBase<TType>(this->_aBuff, TCapacity)
+        FixedVector() : VectorBase<TType>(this->_aBuff, TCapacity) {}
+        FixedVector(FixedVector& in_rSrc) : VectorBase<TType>(this->_aBuff, TCapacity)
         {
             this->_DeepCopy(in_rSrc);
         }
 
-        CustomFixVector(const CustomFixVector& in_rSrc) : VectorBase<TType>(this->_aBuff, TCapacity)
+        FixedVector(const FixedVector& in_rSrc) : VectorBase<TType>(this->_aBuff, TCapacity)
         {
             this->_DeepCopy(in_rSrc);
         }
 
         // コンストラクタ
         // 宣言と同時に初期化できるようにしている
-        CustomFixVector(const std::initializer_list<TType>& in_rInitList)
+        FixedVector(const std::initializer_list<TType>& in_rInitList)
             : VectorBase<TType>(this->_aBuff, TCapacity)
         {
             if (in_rInitList.size() <= 0) return;
@@ -221,24 +221,24 @@ namespace Core::Common
             this->_uSize = uSize;
         }
 
-        virtual ~CustomFixVector() = default;
+        virtual ~FixedVector() = default;
 
-        void operator=(CustomFixVector& in_vrData) { this->_DeepCopy(in_vrData); }
-        void operator=(const CustomFixVector& in_vrData) { this->_DeepCopy(in_vrData); }
+        void operator=(FixedVector& in_vrData) { this->_DeepCopy(in_vrData); }
+        void operator=(const FixedVector& in_vrData) { this->_DeepCopy(in_vrData); }
 
     private:
         TType _aBuff[TCapacity];
     };
 
-    // テンプレートクラス CustomFixVector の部分的な型特性
+    // テンプレートクラス FixedVector の部分的な型特性
     template <typename T>
-    struct IsCustomFixVector : std::false_type
+    struct IsFixedVector : std::false_type
     {
     };
 
-    // CustomFixVector のインスタンスに対する特殊化
+    // FixedVector のインスタンスに対する特殊化
     template <typename TType, Uint32 TCapacity>
-    struct IsCustomFixVector<CustomFixVector<TType, TCapacity>> : std::true_type
+    struct IsFixedVector<FixedVector<TType, TCapacity>> : std::true_type
     {
     };
 

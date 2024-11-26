@@ -15,20 +15,15 @@
 
 namespace Core::Common
 {
-    FixString16 s_szTempFixString16;
-    FixString32 s_szTempFixString32;
-    FixString64 s_szTempFixString64;
-    FixString128 s_szTempFixString128;
-    FixString256 s_szTempFixString256;
-    FixString512 s_szTempFixString512;
-    FixString1024 s_szTempFixString1024;
+    FixedString16 g_szTempFixedString16;
+    FixedString32 g_szTempFixedString32;
+    FixedString64 g_szTempFixedString64;
+    FixedString128 g_szTempFixedString128;
+    FixedString256 g_szTempFixedString256;
+    FixedString512 g_szTempFixedString512;
+    FixedString1024 g_szTempFixedString1024;
 
-    StringBase::StringBase(Char* in_szBuff, Uint32 in_uCapacity)
-    {
-        this->_Init(in_szBuff, in_uCapacity);
-    }
-
-    void StringBase::_Init(Char* in_szBuff, Uint32 in_uCapacity)
+    StringBase::StringBase(Char* in_szBuff, const Uint32 in_uCapacity)
     {
         HE_ASSERT(in_szBuff && "文字列を格納する文字列バッファがない");
         HE_ASSERT(0 < in_uCapacity && "格納する文字最大数が0になっている");
@@ -70,7 +65,7 @@ namespace Core::Common
         return *this;
     }
 
-    StringBase& StringBase::Insert(Uint32 in_uIndex, const Char* in_szInsert)
+    StringBase& StringBase::Insert(const Uint32 in_uIndex, const Char* in_szInsert)
     {
         Char* szBuffEnd   = this->_szBuff + this->_uCapacity - 1;
         Uint32 uOriginLen = this->Length();
@@ -123,7 +118,7 @@ namespace Core::Common
         return *this;
     }
 
-    StringBase& StringBase::Remove(Uint32 in_uIndex, Uint32 in_uCount)
+    StringBase& StringBase::Remove(const Uint32 in_uIndex, const Uint32 in_uCount)
     {
         Uint32 uCapacity = this->Capacity();
         Char* szDst      = this->_szBuff + ((in_uIndex > uCapacity) ? uCapacity : in_uIndex);
@@ -163,7 +158,7 @@ namespace Core::Common
         return *this;
     }
 
-    Sint32 StringBase::Find(const Char* in_szName, Uint32 in_uStart) const
+    Sint32 StringBase::Find(const Char* in_szName, const Uint32 in_uStart) const
     {
         const Uint32 uLen = this->Length();
         if (uLen <= in_uStart) return -1;
@@ -305,7 +300,7 @@ namespace Core::Common
         return *this;
     }
 
-    StringBase& StringBase::_Add(Char c)
+    StringBase& StringBase::_Add(const Char c)
     {
         Uint32 uLen = this->Length();
         HE_ASSERT(uLen + 1 < this->_uCapacity &&

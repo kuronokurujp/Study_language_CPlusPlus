@@ -4,7 +4,7 @@
 
 TEST_CASE("CustomVector Use")
 {
-    Core::Common::CustomFixVector<Sint32, 32> vector;
+    Core::Common::FixedVector<Sint32, 32> vector;
 
     CHECK(vector.Capacity() == 32);
     vector.PopBack();
@@ -33,7 +33,7 @@ TEST_CASE("CustomVector Use")
 
 TEST_CASE("CustomVector Insert")
 {
-    Core::Common::CustomFixVector<Sint32, 32> vector;
+    Core::Common::FixedVector<Sint32, 32> vector;
 
     CHECK(vector.Capacity() == 32);
     vector.PopBack();
@@ -61,11 +61,11 @@ TEST_CASE("CustomVector Insert")
 TEST_CASE("CustomVector Copy")
 {
     // vector同士のコピー
-    Core::Common::CustomFixVector<Sint32, 32> src;
+    Core::Common::FixedVector<Sint32, 32> src;
     src.PushBack(10);
     src.PushBack(-10);
 
-    Core::Common::CustomFixVector<Sint32, 32> copy;
+    Core::Common::FixedVector<Sint32, 32> copy;
     copy = src;
 
     CHECK(copy[0] == 10);

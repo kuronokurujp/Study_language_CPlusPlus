@@ -3,14 +3,19 @@
 namespace Core::Common
 {
     // 65536未満で最大の素数
-    static const Uint32 uBase = 65521L;
+    constexpr Uint32 uBase = 65521L;
 
     // NMAXは 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1を満たすnの最大数
-    static const Uint32 uNMax = 5552;
+    constexpr const Uint32 uNMax = 5552;
 
     Uint64 HashName(const Char* in_szIdent)
     {
         if (in_szIdent == NULL) return 0;
+
+        if (HE_STR_CMP(in_szIdent, HE_STR_TEXT("*")) == 0) return 0;
+
+        Uint32 s1 = 0;
+        Uint32 s2 = 0;
 
 #define DO1(buf, i)                   \
     {                                 \
@@ -33,11 +38,6 @@ namespace Core::Common
 #define DO16(buf) \
     DO8(buf, 0);  \
     DO8(buf, 8);
-
-        if (HE_STR_CMP(in_szIdent, HE_STR_TEXT("*")) == 0) return 0;
-
-        Uint32 s1 = 0;
-        Uint32 s2 = 0;
 
         Uint32 k = 0;
         for (Uint32 len = static_cast<Uint32>(HE_STR_LEN(in_szIdent)); 0 < len;)

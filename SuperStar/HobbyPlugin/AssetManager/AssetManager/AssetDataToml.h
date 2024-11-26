@@ -26,7 +26,7 @@ namespace AssetManager
         class Node;
 
         // Nodeをマップで扱う型
-        using ToolNodeMapType = Core::Common::CustomFixMap<Core::Common::FixString128, Node, 64>;
+        using ToolNodeMapType = Core::Common::FixedMap<Core::Common::FixedString128, Node, 64>;
 
         class Node final
         {
@@ -35,7 +35,7 @@ namespace AssetManager
             Node(toml::node_view<toml::node> in_node) : _node(in_node) {}
             Node(toml::node& in_rNode) : _node(in_rNode) {}
 
-            const Core::Common::FixString512 GetString() const;
+            const Core::Common::FixedString512 GetString() const;
 
             template <typename... TArgs>
             typename std::enable_if<(std::is_same<TArgs, const Char*>::value && ...), Node>::type

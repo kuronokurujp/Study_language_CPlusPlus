@@ -92,7 +92,7 @@ namespace InGame
         Core::Math::Vector2 _pos;
         EEnemyTag _eEnemyTag = EEnemyTag::EEnemyTag_None;
         Uint32 _uId          = 0;
-        Core::Common::FixString32 _szIdName;
+        Core::Common::FixedString32 _szIdName;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterPutEnemy");

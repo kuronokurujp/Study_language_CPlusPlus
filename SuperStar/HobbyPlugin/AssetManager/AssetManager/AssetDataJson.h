@@ -31,7 +31,7 @@ namespace AssetManager
         virtual Uint32 VGetUInt32(const std::initializer_list<const UTF8*>&) override;
         virtual Sint32 VGetSInt32(const std::initializer_list<const UTF8*>&) override;
         virtual Float32 VGetFloat32(const std::initializer_list<const UTF8*>&) override;
-        virtual Core::Common::FixString1024 VGetChar(
+        virtual Core::Common::FixedString1024 VGetChar(
             const std::initializer_list<const UTF8*>&) override;
 
         /// <summary>

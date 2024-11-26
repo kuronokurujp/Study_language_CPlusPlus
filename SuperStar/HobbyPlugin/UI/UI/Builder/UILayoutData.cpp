@@ -123,7 +123,7 @@ namespace UI::Builder
             // TODO: ノードから反映する情報を抜き出す
             pData->eWidgetType = UI::Builder::EWidget_None;
 
-            Core::Common::FixString128 szAttrName = in_rNode.name();
+            Core::Common::FixedString128 szAttrName = in_rNode.name();
             if (szAttrName == HE_STR_TEXT("ui"))
             {
                 pData->eWidgetType = UI::Builder::EWidget_Root;
@@ -163,10 +163,10 @@ namespace UI::Builder
                 auto t = in_rNode.attribute("text").value();
                 if (0 < ::strlen(t))
                 {
-                    Core::Common::FixString1024 szTmp(t);
+                    Core::Common::FixedString1024 szTmp(t);
                     if (pLabel->bLoc)
                     {
-                        Core::Common::CustomArray<Core::Common::FixString1024, 3> aSplitName;
+                        Core::Common::FixedArray<Core::Common::FixedString1024, 3> aSplitName;
 
                         Core::Common::OutputSplitString(aSplitName, szTmp, s_locGroupDelimita);
                         HE_STR_CPY_S(pLabel->szLoc, HE_ARRAY_NUM(pLabel->szLoc),
@@ -194,7 +194,7 @@ namespace UI::Builder
                 _ParseStyle(&pLayout->style, s, static_cast<Uint32>(::strlen(s)));
             }
 
-            Core::Common::FixString1024 szIdName(in_rNode.attribute("id").value());
+            Core::Common::FixedString1024 szIdName(in_rNode.attribute("id").value());
             HE_STR_ERRNO e = HE_STR_CPY_S(pData->szId, HE_ARRAY_NUM(pData->szId), szIdName.Str(),
                                           szIdName.Length());
             HE_ASSERT(HE_STR_SUCCESS(e) && "文字列のコピーでエラー");
@@ -205,7 +205,7 @@ namespace UI::Builder
     {
         HE_ASSERT(out);
 
-        Core::Common::FixString256 nodeName(in_szName);
+        Core::Common::FixedString256 nodeName(in_szName);
         Uint64 ulTargetNodeHash = nodeName.Hash();
 
         auto libNode = this->_doc.child(in_szName);

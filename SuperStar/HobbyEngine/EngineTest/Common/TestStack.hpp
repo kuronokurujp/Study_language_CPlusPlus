@@ -4,7 +4,7 @@
 
 TEST_CASE("Test Stack Use")
 {
-    Core::Common::CustomFixStack<Sint32, 32> stack;
+    Core::Common::FixedStack<Sint32, 32> stack;
 
     CHECK(stack.Capacity() == 32);
     CHECK(stack.Empty());

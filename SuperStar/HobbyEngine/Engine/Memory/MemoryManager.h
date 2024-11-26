@@ -5,6 +5,14 @@
 
 namespace Core::Memory
 {
+    // 最低アラインサイズ（ヘッダもこのアラインである必要あり）
+    // X64であれば8byteなのでアライメントは8にする
+#ifdef HE_X64
+    constexpr Uint8 minimumAlignSize = 8;
+#else
+    constexpr Uint8 minimumAlignSize = 4;
+#endif
+
     /// <summary>
     /// メモリ管理
     /// アプリで使用するメモリをリークを検知するためにアプリ独自のメモリ管理を使う
@@ -19,14 +27,6 @@ namespace Core::Memory
         explicit Manager() = default;
 
     public:
-        // 最低アラインサイズ（ヘッダもこのアラインである必要あり）
-        // X64であれば8byteなのでアライメントは8にする
-#ifdef HE_X64
-        static const Uint8 MinimumAlignSize = 8;
-#else
-        static const Uint8 MinimumAlignSize = 4;
-#endif
-
         /// <summary>
         /// 確保の位置タイプ
         /// 確保位置を決めれる
@@ -41,7 +41,7 @@ namespace Core::Memory
 
     private:
         // メモリページの最大数。アラインはこのサイズの公倍数である必要あり
-        static const Uint8 MemoryPageMax = 64;
+        static constexpr Uint8 MemoryPageMax = 64;
 
         // 念のためアラインを１に
         // アラインが4とかになっていた場合
@@ -67,7 +67,7 @@ namespace Core::Memory
             // もしかしたら通常の場合と配列確保の場合で分けるかも
             Uint8 _useFlag = 0;
             // アラインサイズ
-            Uint8 _alignSize = MinimumAlignSize;
+            Uint8 _alignSize = minimumAlignSize;
             // 使用ページ番号
             Uint8 _page = 0;
             // 後ろのパディングサイズ
@@ -113,7 +113,7 @@ namespace Core::Memory
 
     public:
         // 無効なメモリページ（主に終端子用）
-        static const Uint8 InvalidMemoryPage = 0xff;
+        static constexpr Uint8 invalidMemoryPage = 0xff;
 
 #pragma pack(push, 1)
         /// <summary>
@@ -122,9 +122,9 @@ namespace Core::Memory
         struct PageSetupInfo
         {
             // ページ番号．
-            Uint8 _page = InvalidMemoryPage;
-            // ページに割り当てるサイズ（MINIMUM_ALIGN_SIZEの倍数であること）
-            Uint32 _uSize = 0xffffffff;
+            Uint8 _page = invalidMemoryPage;
+            // ページに割り当てるサイズ（MinimumAlignSizeの倍数であること）
+            Uint32 _uSize = uInvalidUint32;
         };
 #pragma pack(pop)
 
@@ -258,11 +258,11 @@ namespace Core::Memory
         // 門番（ビッグエンディアン）
         // static const Uint32 MAGIC_NUMBER = 0xDEADDEAD;
         // 門番(リトルエンディアン)
-        static const Uint32 uMagicNumber = 0xADEDADDE;
+        static constexpr Uint32 uMagicNumber = 0xADEDADDE;
         // 空きメモリ領域に埋めるデータ
-        static const Uint8 FreeMemoryFillData = 0xDD;
+        static constexpr Uint8 freeMemoryFillData = 0xDD;
         // 取得直後のメモリに埋めるデータ
-        static const Uint8 NewMemoryFillData = 0xCD;
+        static constexpr Uint8 newMemoryFillData = 0xCD;
 
         /// <summary>
         /// 指定メモリブロックが有効かチェック

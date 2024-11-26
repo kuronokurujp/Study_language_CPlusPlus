@@ -87,8 +87,8 @@ namespace InGame
         // 初期パラメータ
         Parameter _defaultParameter;
 
-        Core::Common::CustomFixMap<Core::Common::FixString32,
-                                   Core::Memory::SharedPtr<InGameShotStrategyInterface>, 6>
+        Core::Common::FixedMap<Core::Common::FixedString32,
+                               Core::Memory::SharedPtr<InGameShotStrategyInterface>, 6>
             _mShotStrategy;
     };
 

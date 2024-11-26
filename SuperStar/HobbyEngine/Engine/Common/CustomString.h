@@ -20,17 +20,17 @@ namespace Core::Common
         HE_CLASS_MOVE_NG(StringBase);
 
     public:
-        StringBase(Char* in_szBuff, Uint32 in_uCapacity);
+        StringBase(Char* in_szBuff, const Uint32 in_uCapacity);
 
         virtual ~StringBase() { this->Clear(); }
         StringBase& Replace(const Char* in_szOld, const Char* in_szNew);
-        StringBase& Insert(Uint32 in_uIndex, const Char* in_szInsert);
-        StringBase& Remove(Uint32 in_uIndex, Uint32 in_uCount = 1);
+        StringBase& Insert(const Uint32 in_uIndex, const Char* in_szInsert);
+        StringBase& Remove(const Uint32 in_uIndex, const Uint32 in_uCount = 1);
         StringBase& Format(const Char* in_cszFormat, ...);
         StringBase& FormatV(const Char* in_szFormat, va_list in_vlist);
         void Clear() HE_NOEXCEPT { this->_szBuff[0] = '\0'; }
 
-        Sint32 Find(const Char* in_szName, Uint32 in_uStart = 0) const;
+        Sint32 Find(const Char* in_szName, const Uint32 in_uStart = 0) const;
 
         Bool Empty() const HE_NOEXCEPT { return this->_szBuff[0] == '\0'; }
 
@@ -80,7 +80,7 @@ namespace Core::Common
             return *this;
         }
 
-        StringBase& operator+=(Char c)
+        StringBase& operator+=(const Char c)
         {
             this->_Add(c);
             return *this;
@@ -106,7 +106,7 @@ namespace Core::Common
         Concatenate(TArgs... args)
         {
             // 引数の個数を取得
-            Uint32 uCount = static_cast<Uint32>(sizeof...(args));
+            const Uint32 uCount = static_cast<Uint32>(sizeof...(args));
             if (uCount <= 0) return;
 
             // 初期化リストを使用して引数を処理
@@ -169,10 +169,8 @@ namespace Core::Common
         StringBase& _Copy(const Char* in_szName, const Uint32 in_uLen);
 
     private:
-        void _Init(Char* in_cpBuff, Uint32 in_uSize);
-
-        StringBase& _Add(const Char* in_szName);
-        StringBase& _Add(Char c);
+        StringBase& _Add(const Char*);
+        StringBase& _Add(const Char c);
 
     private:
         Char* _szBuff     = NULL;
@@ -183,32 +181,32 @@ namespace Core::Common
     /// 固定長の文字列クラス
     /// </summary>
     template <Uint32 TCapacity>
-    class FixString final : public StringBase
+    class FixedString final : public StringBase
     {
     public:
         // 基本クラスのオペレーターを使えるようにしている
         using StringBase::operator=;
 
     public:
-        FixString() : StringBase(this->_szBuff, TCapacity) {}
-        FixString(const Char* in_szName) : StringBase(this->_szBuff, TCapacity)
+        FixedString() : StringBase(this->_szBuff, TCapacity) {}
+        FixedString(const Char* in_szName) : StringBase(this->_szBuff, TCapacity)
         {
             this->_Copy(in_szName, HE_STR_LEN(in_szName));
         }
-        FixString(const FixString<TCapacity>& r) : StringBase(this->_szBuff, TCapacity)
+        FixedString(const FixedString<TCapacity>& r) : StringBase(this->_szBuff, TCapacity)
         {
             *this = r;
         }
-        FixString(const FixString<TCapacity>&& r) : StringBase(this->_szBuff, TCapacity)
+        FixedString(const FixedString<TCapacity>&& r) : StringBase(this->_szBuff, TCapacity)
         {
             *this = r;
         }
-        FixString(const StringBase& r) : StringBase(this->_szBuff, TCapacity)
+        FixedString(const StringBase& r) : StringBase(this->_szBuff, TCapacity)
         {
             this->_Copy(r.Str(), r.Length());
         }
 
-        FixString(const UTF8* in_szNameUTF8) : StringBase(this->_szBuff, TCapacity)
+        FixedString(const UTF8* in_szNameUTF8) : StringBase(this->_szBuff, TCapacity)
         {
             // Win版のみUTF8型がchar型なので切り替える
 #ifdef HE_WIN
@@ -219,7 +217,7 @@ namespace Core::Common
         }
 
 #ifdef HE_WIN
-        FixString(const std::string_view& in_szrName) : StringBase(this->_szBuff, TCapacity)
+        FixedString(const std::string_view& in_szrName) : StringBase(this->_szBuff, TCapacity)
         {
             this->_ConvUTF8toWide(in_szrName.data(), static_cast<Uint32>(in_szrName.length()));
         }
@@ -232,7 +230,7 @@ namespace Core::Common
 #endif
 
         // win版では文字列はwchar / charの二つの型がある
-        FixString<TCapacity>& operator=(const UTF8* in_szName)
+        FixedString<TCapacity>& operator=(const UTF8* in_szName)
         {
             // Win版のみUTF8型がchar型なので切り替える
 #ifdef HE_WIN
@@ -243,7 +241,7 @@ namespace Core::Common
             return *this;
         }
 
-        FixString<TCapacity>& operator=(const FixString<TCapacity>& r)
+        FixedString<TCapacity>& operator=(const FixedString<TCapacity>& r)
         {
             this->_Copy(r._szBuff, HE_STR_LEN(r._szBuff));
             return *this;
@@ -282,21 +280,21 @@ namespace Core::Common
     };
 
     // 固定長の文字列型
-    typedef FixString<16> FixString16;
-    typedef FixString<32> FixString32;
-    typedef FixString<64> FixString64;
-    typedef FixString<128> FixString128;
-    typedef FixString<256> FixString256;
-    typedef FixString<512> FixString512;
-    typedef FixString<1024> FixString1024;
+    typedef FixedString<16> FixedString16;
+    typedef FixedString<32> FixedString32;
+    typedef FixedString<64> FixedString64;
+    typedef FixedString<128> FixedString128;
+    typedef FixedString<256> FixedString256;
+    typedef FixedString<512> FixedString512;
+    typedef FixedString<1024> FixedString1024;
 
     /// <summary>
     /// 指定文字列を指定文字で区切って出力
     /// </summary>
-    static void OutputSplitString(ArrayBase<FixString1024>& out, StringBase& in_szrName,
+    static void OutputSplitString(ArrayBase<FixedString1024>& out, StringBase& in_szrName,
                                   const Char in_delim)
     {
-        FixString1024 name;
+        FixedString1024 name;
         Uint32 i          = 0;
         Uint32 arrayIndex = 0;
         Char c            = in_szrName[i];
@@ -326,15 +324,15 @@ namespace Core::Common
         }
     }
 
-    // テンプレートクラス CustomFixVector の部分的な型特性
+    // テンプレートクラス FixedString の部分的な型特性
     template <typename T>
-    struct IsCustomFixString : std::false_type
+    struct IsFixedString : std::false_type
     {
     };
 
-    // CustomFixVector のインスタンスに対する特殊化
+    // FixedStringのインスタンスに対する特殊化
     template <Uint32 TCapacity>
-    struct IsCustomFixString<FixString<TCapacity>> : std::true_type
+    struct IsFixedString<FixedString<TCapacity>> : std::true_type
     {
     };
 
@@ -343,12 +341,12 @@ namespace Core::Common
     /// ローカル内で文字列制御をする一時利用できる変数
     /// ※グローバルで利用は絶対してはいけない
     /// </summary>
-    extern FixString16 s_szTempFixString16;
-    extern FixString32 s_szTempFixString32;
-    extern FixString64 s_szTempFixString64;
-    extern FixString128 s_szTempFixString128;
-    extern FixString256 s_szTempFixString256;
-    extern FixString512 s_szTempFixString512;
-    extern FixString1024 s_szTempFixString1024;
+    extern FixedString16 g_szTempFixedString16;
+    extern FixedString32 g_szTempFixedString32;
+    extern FixedString64 g_szTempFixedString64;
+    extern FixedString128 g_szTempFixedString128;
+    extern FixedString256 g_szTempFixedString256;
+    extern FixedString512 g_szTempFixedString512;
+    extern FixedString1024 g_szTempFixedString1024;
 
 }  // namespace Core::Common

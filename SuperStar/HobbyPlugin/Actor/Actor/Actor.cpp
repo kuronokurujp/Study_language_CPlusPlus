@@ -139,7 +139,7 @@ namespace Actor
         auto itr    = this->_lstChildTask.BeginItr();
         auto endItr = this->_lstChildTask.EndItr();
 
-        Core::Common::CustomFixStack<Core::Common::CustomList<ChildTaskNode>::Iterator, 32>
+        Core::Common::FixedStack<Core::Common::CustomList<ChildTaskNode>::Iterator, 32>
             listItrStack;
 
         while (itr != endItr)

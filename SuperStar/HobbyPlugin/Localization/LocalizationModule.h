@@ -34,7 +34,7 @@ namespace Localization
         };
 
         using LocateMap =
-            Core::Common::CustomFixMap<Core::Common::FixString128, SystemAssetData::LocateData, 32>;
+            Core::Common::FixedMap<Core::Common::FixedString128, SystemAssetData::LocateData, 32>;
 
         virtual Bool _VLoad(Platform::FileInterface&) override;
 
@@ -49,7 +49,7 @@ namespace Localization
         /// <summary>
         /// 各言語毎のデータ
         /// </summary>
-        Core::Common::CustomFixMap<Core::Common::FixString128, LocateMap, 32> _locateDataMap;
+        Core::Common::FixedMap<Core::Common::FixedString128, LocateMap, 32> _locateDataMap;
     };
 
     /// <summary>
@@ -61,12 +61,12 @@ namespace Localization
         /// <summary>
         /// テキスト取得
         /// </summary>
-        const Core::Common::FixString1024& GetText(const UTF8*);
+        const Core::Common::FixedString1024& GetText(const UTF8*);
 
     private:
         // 一度読み込んだテキストをキャッシュするテキストバッファ
         // 同じデータを何度も読み込まないようにするため
-        Core::Common::CustomFixMap<Core::Common::FixString128, Core::Common::FixString1024, 128>
+        Core::Common::FixedMap<Core::Common::FixedString128, Core::Common::FixedString1024, 128>
             _textBuffMap;
     };
 
@@ -112,9 +112,9 @@ namespace Localization
 
     private:
         using LocateTextMap =
-            Core::Common::CustomFixMap<Core::Common::FixString128, Core::Common::Handle, 64>;
+            Core::Common::FixedMap<Core::Common::FixedString128, Core::Common::Handle, 64>;
 
         Core::Common::Handle _sysAssetDataHandle;
-        Core::Common::CustomFixMap<Core::Common::FixString128, LocateTextMap, 16> _locateDataMap;
+        Core::Common::FixedMap<Core::Common::FixedString128, LocateTextMap, 16> _locateDataMap;
     };
 }  // namespace Localization

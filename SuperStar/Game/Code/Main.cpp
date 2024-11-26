@@ -173,8 +173,8 @@ Bool AppEntryGameMain::VStart(const Bool in_bDebug)
     pAssetManagerModule->SetMountDir(HE_STR_TEXT("Assets"));
 
     auto pLocateModule = HE_ENGINE.ModuleManager().Get<Localization::LocalizationModule>();
-    pLocateModule->LoadSystemFile(Core::Common::FixString256(HE_STR_TEXT("Locate/System.toml")));
-    pLocateModule->LoadTextAll(Core::Common::FixString16(HE_STR_TEXT("JP")));
+    pLocateModule->LoadSystemFile(Core::Common::FixedString256(HE_STR_TEXT("Locate/System.toml")));
+    pLocateModule->LoadTextAll(Core::Common::FixedString16(HE_STR_TEXT("JP")));
 
     auto pLevelModule = HE_ENGINE.ModuleManager().Get<Level::LevelModule>();
 #ifdef HE_ENGINE_DEBUG

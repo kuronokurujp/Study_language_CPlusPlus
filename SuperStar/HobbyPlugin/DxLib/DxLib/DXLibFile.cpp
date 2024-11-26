@@ -11,7 +11,7 @@ namespace DXLib
 
         // ファイルハンドルをハンドルインデックスにしている
         Core::Common::Handle fileHandle;
-        fileHandle.Init(handle);
+        fileHandle.Set(handle);
         this->_mFileHandle.Add(fileHandle.Magic(), fileHandle);
 
         return fileHandle;

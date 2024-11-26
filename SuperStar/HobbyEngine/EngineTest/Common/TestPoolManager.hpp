@@ -4,7 +4,7 @@
 
 TEST_CASE("PoolManager FixPoolManager Basic")
 {
-    Core::Common::FixPoolManager<Uint32, 32> poolManagerWithUint32;
+    Core::Common::FixedPoolManager<Uint32, 32> poolManagerWithUint32;
 
     // 割り当てして正常かチェック
     Core::Common::Handle handle;
@@ -24,7 +24,7 @@ TEST_CASE("PoolManager FixPoolManager Basic")
 
 TEST_CASE("PoolManager FixPoolManager MaxAlloc")
 {
-    Core::Common::FixPoolManager<Uint32, 3> poolManagerWithUint32;
+    Core::Common::FixedPoolManager<Uint32, 3> poolManagerWithUint32;
 
     // 最大まで割り当てをする
     Core::Common::Handle handle;
@@ -43,7 +43,7 @@ TEST_CASE("PoolManager FixPoolManager MaxAlloc")
 
 TEST_CASE("PoolManager FixPoolManager Handle Check Index")
 {
-    Core::Common::FixPoolManager<Uint32, 3> poolManagerWithUint32;
+    Core::Common::FixedPoolManager<Uint32, 3> poolManagerWithUint32;
 
     // 最大まで割り当てをする
     Core::Common::Handle handle;

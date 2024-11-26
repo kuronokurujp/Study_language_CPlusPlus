@@ -145,10 +145,10 @@ namespace Lua
 
     private:
         void* _pLuaState = NULL;
-        Core::Common::FixPoolManager<LuaObject, 128> _luaObjectPool;
-        Core::Common::CustomFixMap<void*, Core::Common::Handle, 128> _mUseLuaObject;
+        Core::Common::FixedPoolManager<LuaObject, 128> _luaObjectPool;
+        Core::Common::FixedMap<void*, Core::Common::Handle, 128> _mUseLuaObject;
 
-        Core::Common::CustomFixMap<
+        Core::Common::FixedMap<
             std::uintptr_t,
             Core::Memory::SharedPtr<Core::Common::FunctionObject<void, LuaFuncData&>>, 128>
             _mScriptFuncAction;

@@ -122,8 +122,9 @@ namespace InGame
         UTF8 szTimelineNo[32] = {0};
         while (this->_bTimeline)
         {
-            Core::Common::s_szTempFixString16 = this->_uTimelineNo;
-            Core::Common::s_szTempFixString16.OutputUTF8(szTimelineNo, HE_ARRAY_NUM(szTimelineNo));
+            Core::Common::g_szTempFixedString16 = this->_uTimelineNo;
+            Core::Common::g_szTempFixedString16.OutputUTF8(szTimelineNo,
+                                                           HE_ARRAY_NUM(szTimelineNo));
 
             // ステージタイムラインがすでに終了しているか
             if (rParamaterAssetData.IsId(szTimelineNo) == FALSE)
@@ -147,9 +148,9 @@ namespace InGame
                 .OutputUTF8(szIdName, HE_ARRAY_NUM(szIdName));
 
             // イベント実行
-            Core::Common::s_szTempFixString1024 =
+            Core::Common::g_szTempFixedString1024 =
                 rParamaterAssetData.GetCharByIdData(szTimelineNo, "event");
-            if (Core::Common::s_szTempFixString1024 == HE_STR_TEXT("put_player"))
+            if (Core::Common::g_szTempFixedString1024 == HE_STR_TEXT("put_player"))
             {
                 // 自機を作成
                 auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterPutPlayer), 0,
@@ -158,7 +159,7 @@ namespace InGame
                 auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
                 pEventModule->QueueEvent(spEvent);
             }
-            else if (Core::Common::s_szTempFixString1024 == HE_STR_TEXT("put_zako"))
+            else if (Core::Common::g_szTempFixedString1024 == HE_STR_TEXT("put_zako"))
             {
                 // idはかぶらないようにする
 

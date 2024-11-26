@@ -5,7 +5,7 @@
 
 namespace Event
 {
-    using EventTypeStr = Core::Common::FixString128;
+    using EventTypeStr = Core::Common::FixedString128;
 
     class EventDataInterface
     {

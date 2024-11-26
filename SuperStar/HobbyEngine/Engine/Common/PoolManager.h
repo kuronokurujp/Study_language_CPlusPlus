@@ -172,7 +172,7 @@ namespace Core::Common
 
                         // キャッシュデータを利用したのでキャッシュリストから外す
                         this->_upCacheDatas->erase(b);
-                        handle.Init(uChkIndex);
+                        handle.Set(uChkIndex);
 
                         // TODO: 再利用する場合はコンストラクターを呼ばなくてもいいのか？
 
@@ -191,7 +191,7 @@ namespace Core::Common
             if (bNewSlot)
             {
                 ++this->_uIndexCount;
-                handle.Init(this->_uIndexCount);
+                handle.Set(this->_uIndexCount);
 
                 // Tを継承したSクラスのインスタンスを生成
                 // NEWは用意したマクロを使う
@@ -267,13 +267,13 @@ namespace Core::Common
     /// データを使いまわすのでクラス型を利用するとクラスのプロパティ値が残るので注意
     /// </summary>
     template <typename T, Uint32 TCapacity>
-    class FixPoolManager final
+    class FixedPoolManager final
     {
     private:
         struct Slot
         {
             T data;
-            Uint32 uIndex = Handle::uNonMagic;
+            Uint32 uIndex = uInvalidUint32;
         };
 
     public:
@@ -307,7 +307,7 @@ namespace Core::Common
             }
 
             uUserSlotIndex = this->_sFreeSlotIndex.PopBack();
-            out->Init(uUserSlotIndex);
+            out->Set(uUserSlotIndex);
 
             HE_ASSERT(uUserSlotIndex < this->_aUserSlot.Capacity() &&
                       "プールオブジェクトのフリーインデックス値が確保数を超えている");
@@ -326,16 +326,18 @@ namespace Core::Common
         /// </summary>
         Bool Free(const Handle& in_rHandle)
         {
-            --this->_uUseCount;
+            HE_ASSERT(in_rHandle.Null() == FALSE);
             if (in_rHandle.Null()) return FALSE;
+
+            --this->_uUseCount;
 
             const Uint32 uIndex = in_rHandle.Index();
             HE_ASSERT(uIndex < this->_aUserSlot.Capacity());
 
             Slot* pSlot = &this->_aUserSlot[uIndex];
-            HE_ASSERT(pSlot->uIndex != Handle::uNonMagic);
+            HE_ASSERT(pSlot->uIndex != uInvalidUint32);
 
-            pSlot->uIndex = Handle::uNonMagic;
+            pSlot->uIndex = uInvalidUint32;
 
             this->_sFreeSlotIndex.PushBack(uIndex);
 
@@ -351,7 +353,7 @@ namespace Core::Common
             HE_ASSERT(uIndex < this->_aUserSlot.Capacity());
 
             Slot* pSlot = &this->_aUserSlot[uIndex];
-            if (pSlot->uIndex == Handle::uNonMagic) return NULL;
+            if (pSlot->uIndex == uInvalidUint32) return NULL;
 
             return &pSlot->data;
         }
@@ -364,11 +366,10 @@ namespace Core::Common
         }
 
     private:
-        CustomArray<Slot, TCapacity> _aUserSlot;
-        CustomFixStack<Uint32, TCapacity> _sFreeSlotIndex;
+        FixedArray<Slot, TCapacity> _aUserSlot;
+        FixedStack<Uint32, TCapacity> _sFreeSlotIndex;
 
         Uint32 _uUseCount    = 0;
         Uint32 _uFreeSlotMax = 0;
     };
 }  // namespace Core::Common
-;  // namespace Core

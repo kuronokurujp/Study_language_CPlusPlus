@@ -55,7 +55,7 @@ namespace Event
 
     private:
         Uint32 _uAddEventMngCount = 0;
-        Core::Common::CustomFixMap<Core::Common::Handle, EventManager*, 32> _mEventMng;
+        Core::Common::FixedMap<Core::Common::Handle, EventManager*, 32> _mEventMng;
     };
 
 }  // namespace Event

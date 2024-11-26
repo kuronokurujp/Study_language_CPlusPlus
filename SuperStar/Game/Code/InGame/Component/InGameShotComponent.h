@@ -50,7 +50,7 @@ namespace InGame
 
     private:
         Core::Memory::SharedPtr<InGameShotStrategyInterface> _spStrategy;
-        Core::Common::CustomFixStack<InGameShotStrategyInterface::ShotConfig, 256> _sCatchShot;
+        Core::Common::FixedStack<InGameShotStrategyInterface::ShotConfig, 256> _sCatchShot;
     };
 
 }  // namespace InGame

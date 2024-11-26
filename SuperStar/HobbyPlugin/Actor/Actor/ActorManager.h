@@ -149,6 +149,6 @@ namespace Actor
         /// <summary>
         /// 更新保留アクターのデータ
         /// </summary>
-        Core::Common::CustomFixMap<Uint64, PendingData, 256> _pendingDataMap;
+        Core::Common::FixedMap<Uint64, PendingData, 256> _pendingDataMap;
     };
 }  // namespace Actor

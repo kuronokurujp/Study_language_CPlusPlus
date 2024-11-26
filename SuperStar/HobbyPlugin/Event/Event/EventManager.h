@@ -87,7 +87,7 @@ namespace Event
         // イベント型ごとに一つのリスト(マップに格納される)
         using EventListenerTable = std::list<EventListenerPtr>;
         // イベント識別子をリスナーリストにマッピング
-        using EventListenerMap = Core::Common::CustomFixMap<Uint64, EventListenerTable, 512>;
+        using EventListenerMap = Core::Common::FixedMap<Uint64, EventListenerTable, 512>;
         // 処理待ちイベントのキュー、または処理中のイベントのキュー
         using EventQueue = std::list<EventDataInterfacePtr>;
 

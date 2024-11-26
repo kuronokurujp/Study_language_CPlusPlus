@@ -32,7 +32,6 @@ namespace Level
         Core::Common::Handle _stageManagerComponentHandle;
         Core::Common::Handle _viewHandle;
 
-        Core::Common::CustomFixMap<Core::Common::FixString128, Core::Common::Handle, 64>
-            _mGameAsset;
+        Core::Common::FixedMap<Core::Common::FixedString128, Core::Common::Handle, 64> _mGameAsset;
     };
 }  // namespace Level
