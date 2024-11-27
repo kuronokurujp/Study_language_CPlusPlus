@@ -8,9 +8,11 @@ set(ENGINE_TARGET_FILES
     README.md
     ThirdPartyNotices.txt
 
+    ApplicationFramework.cpp
+    ApplicationFramework.h
+
     Engine/Engine.cpp
     Engine/Engine.h
-    Engine/GameMain.h
     Engine/MiniEngine.h
 
     Engine/Config.h

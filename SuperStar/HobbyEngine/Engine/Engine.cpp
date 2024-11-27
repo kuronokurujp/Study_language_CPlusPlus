@@ -4,7 +4,6 @@
 #include "Engine/Module/Module.h"
 #include "Engine/Platform/PlatformModule.h"
 #include "Engine/Time/FPS.h"
-#include "GameMain.h"
 
 /// <summary>
 /// 事前初期化
