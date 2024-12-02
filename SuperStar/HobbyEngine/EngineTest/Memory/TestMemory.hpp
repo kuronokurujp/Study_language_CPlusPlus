@@ -181,8 +181,21 @@ TEST_CASE("Memory Custom Shader Ptr")
     // 共有ポインターのメモリ確報がうまくいっているかチェック
     struct Data
     {
-        Data() { this->i = 0; };
-        Data(Uint32 a) { this->i = a; }
+        Data()
+        {
+            HE_LOG_LINE(HE_STR_TEXT("HE_MEMのメモリ確保でData型のコンストラクターが呼ばれている"));
+            this->i = 0;
+        };
+        Data(Uint32 a)
+        {
+            HE_LOG_LINE(HE_STR_TEXT("HE_MEMのメモリ確保でData型のコンストラクターが呼ばれている"));
+            this->i = a;
+        }
+        ~Data()
+        {
+            HE_LOG_LINE(HE_STR_TEXT("HE_MEMのメモリ確保でData型のデストラクターが呼ばれている"));
+        }
+
         Sint8 i = 0;
     };
 
@@ -199,6 +212,21 @@ TEST_CASE("Memory Custom Shader Ptr")
         CHECK(i == memArray[i]->i);
         memArray[i].reset();
     }
+
+    auto pData = HE_NEW_MEM(Data, 0);
+    HE_SAFE_DELETE_MEM(pData);
+
+    class DataClass
+    {
+    public:
+        DataClass() { HE_LOG_LINE(HE_STR_TEXT("DataClass型のコンストラクターが呼ばれている")); }
+        ~DataClass() { HE_LOG_LINE(HE_STR_TEXT("DataClass型のデストラクタが呼ばれている")); }
+    };
+    auto pDataClass = HE_NEW_MEM(DataClass, 0);
+    HE_SAFE_DELETE_MEM(pDataClass);
+
+    auto aDataClass = HE_NEW_MEM_ARRAY(DataClass, 10, 0);
+    HE_SAFE_DELETE_MEM_ARRAY(pDataClass);
 
     // new と deleteがうまくいっているかチェック
     CHECK(memoryManager.UsedAllBlock() == FALSE);
