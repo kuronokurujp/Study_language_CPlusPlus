@@ -20,4 +20,8 @@ rmdir %DST_DIR_PATH% /s /q
 xcopy %SRC_DIR_PATH% %DST_DIR_PATH%  /E /I
 
 echo "end"
+
 endlocal
+
+REM 成功
+exit /b 0
