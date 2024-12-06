@@ -33,25 +33,29 @@ REM ----------------
 REM ユーザー入力開始.
 REM ----------------
 
+REM x64のみにする.
 REM アーキテクチャ入力.
-echo.
-echo Select which architecture to use.
-echo **************************************************
-echo 1. x86 (Win32)
-echo 2. x64 (Win64)
-echo.
-choice /c:12 /n /m ">"
-set SELECTED=%errorlevel%
-if "%SELECTED%" equ "1" (
-  set ARCHITECTURE=x86
-  set CMAKE_A_OPTION=Win32
-) else if "%SELECTED%" equ "2" (
-  set ARCHITECTURE=x64
-  set CMAKE_A_OPTION=x64
-) else (
-  echo [GameProject] Invalid option.
-  exit /b 1
-)
+REM echo.
+REM echo Select which architecture to use.
+REM echo **************************************************
+REM echo 1. x86 (Win32)
+REM echo 2. x64 (Win64)
+REM echo.
+REM choice /c:12 /n /m ">"
+REM set SELECTED=%errorlevel%
+REM if "%SELECTED%" equ "1" (
+REM   set ARCHITECTURE=x86
+REM   set CMAKE_A_OPTION=Win32
+REM ) else if "%SELECTED%" equ "2" (
+REM   set ARCHITECTURE=x64
+REM   set CMAKE_A_OPTION=x64
+REM ) else (
+REM   echo [GameProject] Invalid option.
+REM   exit /b 1
+REM )
+
+set ARCHITECTURE=x64
+set CMAKE_A_OPTION=x64
 
 REM ランタイム入力.
 REM ランタイムを変えるケースが今ないのでマルチスレッドlibで固定にしておく
