@@ -83,7 +83,6 @@ int main(int argc, char* const argv[])
 #include "EngineTest/Common/TestList.hpp"
 // プール管理のテストコード
 #include "EngineTest/Common/TestPoolManager.hpp"
-
 // ランダム処理のテストコード
 #include "EngineTest/Math/TestRandom.hpp"
 
@@ -95,6 +94,9 @@ int main(int argc, char* const argv[])
 
 // メモリ処理のテストコード
 #include "EngineTest/Memory/TestMemory.hpp"
+
+// 非同期タスク処理のテストコード
+#include "EngineTest/AsyncTask/TestAsyncTask.hpp"
 
 // エンジン本体のテストコード
 #include "EngineTest/TestEngine.hpp"
