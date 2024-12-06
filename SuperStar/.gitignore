@@ -416,3 +416,6 @@ HobbyPlugin/DxLib/DxLib/ThirdParty/DxLib_VC/*
 User/*
 Build/*
 Bin/*
+VcPkg/
+vcpkg-configuration.json
+
