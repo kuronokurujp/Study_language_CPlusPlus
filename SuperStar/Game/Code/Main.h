@@ -11,27 +11,27 @@
 class WinGameMain final : public ApplicationEngineFramework
 {
 public:
-    WinGameMain(HINSTANCE in_instance, Int in_cmdShow);
+    WinGameMain(HINSTANCE in_instance, HE::Int in_cmdShow);
 
     /// <summary>
     /// ゲーム開始
     /// </summary>
-    Bool VStart(const Bool in_bDebug) override final;
+    HE::Bool VStart(const HE::Bool in_bDebug) override final;
 
     /// <summary>
     /// ゲーム終了
     /// </summary>
-    Bool VEnd() override final;
+    HE::Bool VEnd() override final;
 
 protected:
     /// <summary>
     /// エンジンのモジュールを登録・解除
     /// </summary>
-    virtual Bool _VRegistEngineModule();
-    virtual Bool _VUnRegistEngineModule();
+    virtual HE::Bool _VRegistEngineModule();
+    virtual HE::Bool _VUnRegistEngineModule();
 
 private:
-    static constexpr Uint32 uMaxLoadStringLength = 100;
+    static constexpr HE::Uint32 uMaxLoadStringLength = 100;
 
     // タイトル バーのテキスト
     WCHAR _szTitle[uMaxLoadStringLength] = {0};
@@ -40,7 +40,7 @@ private:
     WCHAR _szWindowClass[uMaxLoadStringLength] = {0};
 
     HINSTANCE _inst;
-    Int _cmdShow = 0;
+    HE::Int _cmdShow = 0;
 };
 
 #endif

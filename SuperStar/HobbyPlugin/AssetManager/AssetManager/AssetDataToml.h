@@ -38,37 +38,37 @@ namespace AssetManager
             const Core::Common::FixedString512 GetString() const;
 
             template <typename... TArgs>
-            typename std::enable_if<(std::is_same<TArgs, const Char*>::value && ...), Node>::type
+            typename std::enable_if<(std::is_same<TArgs, const HE::Char*>::value && ...), Node>::type
             GetNode(TArgs... args)
             {
                 // 引数の個数を取得
-                Uint32 uCount = static_cast<Uint32>(sizeof...(args));
+                HE::Uint32 uCount = static_cast<HE::Uint32>(sizeof...(args));
                 if (uCount <= 0) return Node();
 
                 // 初期化リストを使用して引数を処理
-                const Char* values[] = {args...};
+                const HE::Char* values[] = {args...};
 
                 return this->_GetNode(values, uCount);
             }
 
             template <typename... TArgs>
-            typename std::enable_if<(std::is_same<TArgs, const Char*>::value && ...),
-                                    const Bool>::type
+            typename std::enable_if<(std::is_same<TArgs, const HE::Char*>::value && ...),
+                                    const HE::Bool>::type
             OutputNodeMap(ToolNodeMapType* out, TArgs... args)
             {
                 // 引数の個数を取得
-                Uint32 uCount = static_cast<Uint32>(sizeof...(args));
+                HE::Uint32 uCount = static_cast<HE::Uint32>(sizeof...(args));
                 if (uCount <= 0) return FALSE;
 
                 // 初期化リストを使用して引数を処理
-                const Char* szaName[] = {args...};
+                const HE::Char* szaName[] = {args...};
                 return this->_OutputNodeMap(out, szaName, uCount);
             }
 
         private:
-            Bool _OutputNodeMap(ToolNodeMapType* out, const Char* in_szaName[],
-                                const Uint32 in_uCount);
-            Node _GetNode(const Char* in_szaName[], Uint32 in_uCount);
+            HE::Bool _OutputNodeMap(ToolNodeMapType* out, const HE::Char* in_szaName[],
+                                const HE::Uint32 in_uCount);
+            Node _GetNode(const HE::Char* in_szaName[], HE::Uint32 in_uCount);
 
         private:
             toml::node_view<toml::node> _node;
@@ -76,7 +76,7 @@ namespace AssetManager
 
         AssetDataToml() : AssetDataBase() {}
 
-        virtual Bool _VLoad(Platform::FileInterface&) override;
+        virtual HE::Bool _VLoad(Platform::FileInterface&) override;
         virtual void _VUnload() override;
 
         Node GetRootNode();

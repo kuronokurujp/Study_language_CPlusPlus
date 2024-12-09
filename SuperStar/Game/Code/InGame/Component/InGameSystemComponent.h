@@ -19,18 +19,18 @@ namespace InGame
     public:
         InGameSystemComponent() : Level::LevelBaseComponent() {}
 
-        Bool IsGameEnd() const { return this->_bGameEnd; }
-        void SetFlgGameEnd(const Bool in_bFlg) { this->_bGameEnd = in_bFlg; }
-        void SetPoint(const Uint32 in_uPoint) { this->_uPoint = in_uPoint; }
-        Uint32 GetPoint() const { return this->_uPoint; }
-        void AddPoint(const Uint32 in_uAddPoint) { this->_uPoint += in_uAddPoint; }
+        HE::Bool IsGameEnd() const { return this->_bGameEnd; }
+        void SetFlgGameEnd(const HE::Bool in_bFlg) { this->_bGameEnd = in_bFlg; }
+        void SetPoint(const HE::Uint32 in_uPoint) { this->_uPoint = in_uPoint; }
+        HE::Uint32 GetPoint() const { return this->_uPoint; }
+        void AddPoint(const HE::Uint32 in_uAddPoint) { this->_uPoint += in_uAddPoint; }
 
     private:
         void _Clear();
 
     private:
-        Bool _bGameEnd = FALSE;
-        Uint32 _uPoint = 0;
+        HE::Bool _bGameEnd = FALSE;
+        HE::Uint32 _uPoint = 0;
     };
 
 }  // namespace InGame

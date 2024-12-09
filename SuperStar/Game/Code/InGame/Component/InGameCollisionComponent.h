@@ -21,20 +21,20 @@ namespace InGame
     struct CollisionData
     {
         ECollisionType eType;
-        Uint32 uHashCode = 0;
+        HE::Uint32 uHashCode = 0;
 
         // メタデータ
         // 利用者が自由に使えるもの
-        Uint64 ulMetaData = 0;
+        HE::Uint64 ulMetaData = 0;
 
         union
         {
-            Uint8 aWork[256] = {0};
+            HE::Uint8 aWork[256] = {0};
 
             struct Circle2D
             {
                 Core::Math::Vector2 pos;
-                Float32 fRadius;
+                HE::Float32 fRadius;
             } circle2D;
 
         } data;
@@ -56,39 +56,39 @@ namespace InGame
         /// <summary>
         /// タスク開始
         /// </summary>
-        virtual Bool VBegin() override;
+        virtual HE::Bool VBegin() override;
 
         /// <summary>
         /// タスク終了
         /// </summary>
-        virtual Bool VEnd() override;
+        virtual HE::Bool VEnd() override;
 
-        virtual Uint32 VColCount() const                                           = 0;
-        virtual Bool VOutputColData(CollisionData* out, const Uint32 in_uColIndex) = 0;
+        virtual HE::Uint32 VColCount() const                                           = 0;
+        virtual HE::Bool VOutputColData(CollisionData* out, const HE::Uint32 in_uColIndex) = 0;
 
         /// <summary>
         /// 衝突発生
         /// </summary>
-        virtual Bool VOnHit(const CollisionData& in_rSelfColData,
+        virtual HE::Bool VOnHit(const CollisionData& in_rSelfColData,
                             const CollisionData& in_rHitColData);
 
-        void SetCollisionHashCode(const Char* in_szName);
-        void SetCollisionHashCode(const Uint32 in_uHashCode);
-        void SetMetaData(const Uint64 in_ulMetaData);
+        void SetCollisionHashCode(const HE::Char* in_szName);
+        void SetCollisionHashCode(const HE::Uint32 in_uHashCode);
+        void SetMetaData(const HE::Uint64 in_ulMetaData);
 
-        Uint32 HashCode() const { return this->_uHashCode; }
+        HE::Uint32 HashCode() const { return this->_uHashCode; }
 
-        void SetHitAction(std::function<Bool(const CollisionData&, const CollisionData&)> in_func)
+        void SetHitAction(std::function<HE::Bool(const CollisionData&, const CollisionData&)> in_func)
         {
             this->_hitAction = in_func;
         }
 
     protected:
-        Uint32 _uHashCode  = 0;
-        Uint64 _ulMetaData = 0;
+        HE::Uint32 _uHashCode  = 0;
+        HE::Uint64 _ulMetaData = 0;
 
     private:
-        std::function<Bool(const CollisionData&, const CollisionData&)> _hitAction = NULL;
+        std::function<HE::Bool(const CollisionData&, const CollisionData&)> _hitAction = NULL;
     };
 
     class InGameCircleCollision2DComponent final : public InGameCollisionComponent
@@ -101,13 +101,13 @@ namespace InGame
         InGameCircleCollision2DComponent() = default;
 
         // 半径値
-        void SetRadius(const Float32 in_fRadius) { this->_fRadius = in_fRadius; }
+        void SetRadius(const HE::Float32 in_fRadius) { this->_fRadius = in_fRadius; }
 
-        Uint32 VColCount() const override final { return 1; }
-        Bool VOutputColData(CollisionData* out, const Uint32 in_uColIndex) override final;
+        HE::Uint32 VColCount() const override final { return 1; }
+        HE::Bool VOutputColData(CollisionData* out, const HE::Uint32 in_uColIndex) override final;
 
     private:
-        Float32 _fRadius = 0.0f;
+        HE::Float32 _fRadius = 0.0f;
     };
 
     // 全ての衝突コンポーネント同士の衝突処理

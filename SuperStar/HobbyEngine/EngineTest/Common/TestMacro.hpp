@@ -28,4 +28,10 @@ TEST_CASE("Macro Text")
     CHECK(3.2f <= HE_LOOP_IN_RANGE(0.3f, 0.34f, 3.5f));
     CHECK(HE_LOOP_IN_RANGE(0.35f, 0.34f, 3.5f) == 0.35f);
     CHECK(HE_LOOP_IN_RANGE(3.6f, 0.34f, 3.5f) <= 0.44f);
+
+    // 配列のサイズや要素数のチェック
+    HE::Uint32 aArray[32] = {0};
+    CHECK(HE_ARRAY_NUM(aArray) == 32);
+
+    CHECK(HE_ARRAY_SIZE(aArray) == (4 * 32));
 }

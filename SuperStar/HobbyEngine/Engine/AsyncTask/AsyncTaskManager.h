@@ -23,14 +23,14 @@ namespace Core
         HE_CLASS_MOVE_NG(AsyncTaskManager);
 
     public:
-        AsyncTaskManager(const Uint32 in_uMemPage = 0);
+        AsyncTaskManager(const HE::Uint32 in_uMemPage = 0);
         ~AsyncTaskManager();
 
         /// <summary>
         /// 初期化
         /// 利用前に必ず呼び出す
         /// </summary>
-        Bool Init(const Uint32 in_uThreadNum);
+        HE::Bool Init(const HE::Uint32 in_uThreadNum);
 
         /// <summary>
         /// 終了時に呼び出す
@@ -51,15 +51,15 @@ namespace Core
         void _WorkerThread();
 
     private:
-        std::atomic<Bool> _bEnd{FALSE};
+        std::atomic<HE::Bool> _bEnd{FALSE};
         std::condition_variable _cv;
         std::mutex _mutex;
 
         // メモリ確保に利用するページ
-        Uint32 _uMemPage = 0;
+        HE::Uint32 _uMemPage = 0;
 
         // 用意するスレッド数
-        Uint32 _uThreadNum = 0;
+        HE::Uint32 _uThreadNum = 0;
 
         // スレッド配列
         class std::thread** _apThread = NULL;

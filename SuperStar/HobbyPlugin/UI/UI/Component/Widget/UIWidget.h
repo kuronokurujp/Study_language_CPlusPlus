@@ -25,24 +25,24 @@ namespace UI
         /// 登録に必要な情報を設定
         /// </summary>
         /// <param name="bAutoDelete">TRUEだとタスク破棄と同時に削除
-        virtual void VSetup(const Bool in_bReleaseMem = TRUE) override;
+        virtual void VSetup(const HE::Bool in_bReleaseMem = TRUE) override;
 
         /// <summary>
         /// タスク開始
         /// </summary>
-        virtual Bool VBegin() override;
+        virtual HE::Bool VBegin() override;
 
         /// <summary>
         /// タスク終了
         /// </summary>
         /// <returns></returns>
-        virtual Bool VEnd() override;
+        virtual HE::Bool VEnd() override;
 
         virtual void VOnTouch(const EnhancedInput::InputData::Item::Touch& in_rTouch) {}
         virtual void VOnKey(const EnhancedInput::InputData::Item::Key& in_rKeyboard) {}
 
         void SetPos(const Core::Math::Vector2 in_pos);
-        void SetColor(const Uint32 in_color) { this->_color = in_color; }
+        void SetColor(const HE::Uint32 in_color) { this->_uColor = in_color; }
         void SetViewHandle(const Core::Common::Handle& in_rHandle)
         {
             this->_viewHandle = in_rHandle;
@@ -54,14 +54,14 @@ namespace UI
         void _Clear()
         {
             this->_pos.Zero();
-            this->_color = 0;
+            this->_uColor = 0;
             this->_viewHandle.Clear();
             this->_transformHandle.Clear();
         }
 
     protected:
         Core::Math::Vector2 _pos;
-        Uint32 _color = 0;
+        HE::Uint32 _uColor = 0;
         Core::Common::Handle _viewHandle;
         Core::Common::Handle _transformHandle;
     };

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Engine/Core.h"
+#include "Engine/Memory/Memory.h"
 #include "Engine/Module/Module.h"
 
 // プラットフォームのインターフェイス
@@ -27,44 +28,41 @@ namespace Platform
         PlatformModule() : ModuleBase(ModuleName(), Module::ELayer_App) {}
         virtual ~PlatformModule() = default;
 
-        virtual Bool VCreateMainWindow() { return FALSE; }
-        virtual Bool VReleaseAllWindows() { return FALSE; }
-
         /// <summary>
         /// やめる状態になっているか
         /// </summary>
-        virtual Bool VIsQuit() = 0;
+        virtual HE::Bool VIsQuit() = 0;
 
         /// <summary>
         /// 時間関連の処理
         /// </summary>
-        virtual TimeInterface* VTime() = 0;
+        virtual Core::Memory::SharedPtr<Platform::TimeInterface> VTime() = 0;
 
         /// <summary>
         /// 入力関連の処理
         /// </summary>
-        virtual InputInterface* VInput() = 0;
+        virtual Core::Memory::SharedPtr<Platform::InputInterface> VInput() = 0;
 
         /// <summary>
         /// ファイル関連の処理
         /// </summary>
-        virtual FileInterface* VFile() = 0;
+        virtual Core::Memory::SharedPtr<Platform::FileInterface> VFile() = 0;
 
         /// <summary>
         /// スクリーン関連の処理
         /// </summary>
-        virtual ScreenInterface* VScreen() = 0;
+        virtual Core::Memory::SharedPtr<Platform::ScreenInterface> VScreen() = 0;
 
         /// <summary>
         /// システム関連の処理
         /// </summary>
-        virtual SystemInterface* VSystem() = 0;
+        virtual Core::Memory::SharedPtr<Platform::SystemInterface> VSystem() = 0;
 
     protected:
         /// <summary>
         /// モジュール開始
         /// </summary>
-        virtual Bool _VStart() override
+        virtual HE::Bool _VStart() override
         {
             HE_ASSERT(FALSE);
             return FALSE;
@@ -73,16 +71,11 @@ namespace Platform
         /// <summary>
         /// 前更新
         /// </summary>
-        virtual Bool _VBeforeUpdate(const Float32 in_fDeltaTime) override = 0;
+        virtual HE::Bool _VBeforeUpdate(const HE::Float32 in_fDeltaTime) override = 0;
 
         /// <summary>
         /// 更新
         /// </summary>
-        virtual Bool _VUpdate(const Float32 in_fDeltaTime) override = 0;
-
-        /// <summary>
-        /// 後更新
-        /// </summary>
-        virtual Bool _VLateUpdate(const Float32 in_fDeltaTime) override = 0;
+        virtual HE::Bool _VUpdate(const HE::Float32 in_fDeltaTime) override { return TRUE; }
     };
 }  // namespace Platform

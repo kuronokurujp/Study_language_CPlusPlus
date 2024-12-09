@@ -80,7 +80,7 @@ namespace PlatformSDL2
     class DXLibSceneView2D : public Render::SceneViewBase
     {
     protected:
-        Bool _VBegin() override final { return TRUE; }
+        HE::Bool _VBegin() override final { return TRUE; }
         void _VEnd() override final {}
 
         void _VUpdate(const HE::Float32) override final {}
@@ -224,7 +224,7 @@ namespace PlatformSDL2
         return handle;
     }
 
-    Bool Screen::VReleaseAllWindows()
+    HE::Bool Screen::VReleaseAllWindows()
     {
         auto pRenderModule = this->_pSDL2Module->GetDependenceModule<Render::RenderModule>();
         HE_ASSERT_RETURN_VALUE(FALSE, pRenderModule);

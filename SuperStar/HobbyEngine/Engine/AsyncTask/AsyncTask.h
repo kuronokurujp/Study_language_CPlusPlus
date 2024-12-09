@@ -30,30 +30,30 @@ namespace Core
         /// 非同期処理が終わるまで一定時間メインスレッド待機する
         /// </summary>
         /// <returns>TRUE: タスク継続 / FALSE: タスク終了</returns>
-        Bool Contiune(const Uint32 in_uMsSec);
+        HE::Bool Contiune(const HE::Uint32);
 
         /// <summary>
         /// タスクが終わっているか
         /// </summary>
-        inline Bool IsEnd() const { return this->_bEnd; }
+        inline HE::Bool IsEnd() const { return this->_bEnd; }
 
         /// <summary>
         /// タスクが成功しているか
         /// </summary>
-        Bool IsSuccess() const;
+        HE::Bool IsSuccess() const;
 
     protected:
-        virtual Bool _VBeginWithThread();
-        virtual Bool _VUpdateWithThread() = 0;
-        virtual Bool _VEndWithThread();
+        virtual HE::Bool _VBeginWithThread();
+        virtual HE::Bool _VUpdateWithThread() = 0;
+        virtual HE::Bool _VEndWithThread();
 
     protected:
-        Bool _bSuccess = FALSE;
+        HE::Bool _bSuccess = FALSE;
 
     private:
-        std::atomic<Bool> _bEnd{FALSE};
-        std::promise<Bool> _promise;
-        std::future<Bool> _future;
+        std::atomic<HE::Bool> _bEnd{FALSE};
+        std::promise<HE::Bool> _promise;
+        std::future<HE::Bool> _future;
     };
 
     /// <summary>
@@ -73,7 +73,7 @@ namespace Core
         }
 
     protected:
-        virtual Bool _VUpdateWithThread() override = 0;
+        virtual HE::Bool _VUpdateWithThread() override = 0;
 
     protected:
         TResult _result;

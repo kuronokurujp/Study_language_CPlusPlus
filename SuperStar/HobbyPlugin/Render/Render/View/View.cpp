@@ -2,18 +2,19 @@
 
 namespace Render
 {
-    Bool View::Release()
+    HE::Bool View::Release()
     {
         this->ClearCmd();
         return TRUE;
     }
 
-    Bool View::PushCmd(const Command&& in_rrCmd)
+    HE::Bool View::PushCmd(const Command&& in_rrCmd)
     {
         // コマンドをコピー
         // 要素を先頭に追加
         // 最後に追加したコマンドは配列先頭に
         // 最初に追加したコマンドは配列末尾に
+        // TODO: コピーなってしまっている
         this->_commandBuff.PushFront(in_rrCmd);
 
         return TRUE;

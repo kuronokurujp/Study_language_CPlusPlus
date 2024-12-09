@@ -17,51 +17,54 @@
 
 #ifdef HE_ENGINE_DEBUG
 
-// ログ表示
-// リリース時には無効化
 #ifdef HE_WIN
-
 #include <Windows.h>
+#endif
+
+// ログ表示
+// TODO: ログはプラットフォーム毎に用意するのがいいかも
+// リリース時には無効化
+#if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
+
 
 #define HE_LOG_MSG_SIZE (2046)
 #define HE_FILE __FILEW__
 
-// 引数が文字列で2000の文字数があると以下のエラーになる
-// Expression: ("Buffer too small", 0)
-
 // 書式指定子の更新処理
 template <typename T>
-void HE_LOG_UPDATE_FORMAT_STRING(std::wstring& in_szFormat, size_t& in_pos, const T& in_arg)
+void HE_LOG_UPDATE_FORMAT_STRING(std::wstring& in_szFormat, size_t& in_rPos, const T& in_arg)
 {
     using DecayedT = std::decay_t<T>;  // 修飾子を除去した型
 
-    if constexpr (std::is_same_v<DecayedT, wchar_t*> || std::is_same_v<DecayedT, const wchar_t*>)
+    if constexpr (std::is_same_v<DecayedT, HE::WChar*> || std::is_same_v<DecayedT, const HE::WChar*>)
     {
-        if (in_pos != std::wstring::npos)
+        if (in_rPos != std::wstring::npos)
         {
-            in_szFormat.replace(in_pos, 2, L"%ls");
+            in_szFormat.replace(in_rPos, 2, L"%ls");
         }
     }
-    else if constexpr (std::is_same_v<DecayedT, char*> || std::is_same_v<DecayedT, const char*>)
+    else if constexpr (std::is_same_v<DecayedT, HE::UTF8*> || std::is_same_v<DecayedT, const HE::UTF8*>)
     {
-        if (in_pos != std::wstring::npos)
+        if (in_rPos != std::wstring::npos)
         {
-            in_szFormat.replace(in_pos, 2, L"%hs");
+            in_szFormat.replace(in_rPos, 2, L"%hs");
         }
     }
 
     // 次の書式指定子を探す
-    in_pos = in_szFormat.find(L"%", in_pos + 1);
+    in_rPos = in_szFormat.find(L"%", in_rPos + 1);
 }
 
 // 共通処理を行う関数の作成
+// 文字列書式で%sが使える
 template <typename... TArgs>
-Bool HE_LOG_CREATE_FORMATERD_STRING(Char* out, const Char* in_szFormat, TArgs... in_args)
+HE::Bool HE_LOG_CREATE_FORMATERD_STRING(HE::WChar* out, const HE::Char* in_szFormat, TArgs... in_args)
 {
     std::wstring szDynamicFormat = in_szFormat;
     size_t pos                   = szDynamicFormat.find(L"%");
 
     // 各引数に応じてフォーマット文字列を変更する
+    // フォーマット置換データが文字列のwchar_t型とchart型と両方使える
     ((HE_LOG_UPDATE_FORMAT_STRING(szDynamicFormat, pos, in_args)), ...);
 
     // 変換された引数を連結してワイド文字列を作成
@@ -84,11 +87,11 @@ Bool HE_LOG_CREATE_FORMATERD_STRING(Char* out, const Char* in_szFormat, TArgs...
 // 文字列型の変数を入れるとコンパイルエラーになる
 // コンソールにも出力
 template <typename... TArgs>
-void HE_LOG(const Char* in_szFormat, TArgs... in_args)
+void HE_LOG(const HE::Char* in_szFormat, TArgs... in_args)
 {
     // 共通部分を関数で呼び出す
 
-    static Char szText[HE_LOG_MSG_SIZE] = {};
+    static HE::WChar szText[HE_LOG_MSG_SIZE] = {};
     if (HE_LOG_CREATE_FORMATERD_STRING(szText, in_szFormat, in_args...) == FALSE)
     {
         // エラーが発生した場合は何もしない
@@ -115,9 +118,9 @@ void HE_LOG(const Char* in_szFormat, TArgs... in_args)
 // 文字列型の変数を入れるとコンパイルエラーになる
 // コンソールにも出力
 template <typename... TArgs>
-void HE_LOG_LINE(const Char* in_szFormat, TArgs... in_args)
+void HE_LOG_LINE(const HE::Char* in_szFormat, TArgs... in_args)
 {
-    static Char szText[HE_LOG_MSG_SIZE] = {};
+    static HE::WChar szText[HE_LOG_MSG_SIZE] = {};
     if (HE_LOG_CREATE_FORMATERD_STRING(szText, in_szFormat, in_args...) == FALSE)
     {
         // エラーが発生した場合は何もしない
@@ -147,9 +150,9 @@ void HE_LOG_LINE(const Char* in_szFormat, TArgs... in_args)
 #define HE_PG_LOG_LINE(format, ...)                                                               \
     do                                                                                            \
     {                                                                                             \
-        static Char c[HE_LOG_MSG_SIZE] = {};                                                      \
+        static HE::WChar c[HE_LOG_MSG_SIZE] = {};                                                      \
         HE_LOG_CREATE_FORMATERD_STRING(c, format, __VA_ARGS__);                                   \
-        static Char c2[HE_LOG_MSG_SIZE * 2] = {};                                                 \
+        static HE::WChar c2[HE_LOG_MSG_SIZE * 2] = {};                                                 \
         _snwprintf_s(c2, HE_LOG_MSG_SIZE * 2, HE_LOG_MSG_SIZE * 2, L"%ls:%d %ls", __FILEW__,      \
                      __LINE__, c);                                                                \
         OutputDebugString(c2);                                                                    \
@@ -164,6 +167,7 @@ void HE_LOG_LINE(const Char* in_szFormat, TArgs... in_args)
     } while (0)
 
 #else
+// TODO: win以外の対応は不十分
 
 #define HE_FILE __FILE__
 #define HE_LOG_MSG_SIZE (2046)
@@ -180,9 +184,9 @@ void HE_LOG_LINE(const Char* in_szFormat, TArgs... in_args)
 #define HE_PG_LOG_LINE(format, ...)                                                                \
     do                                                                                             \
     {                                                                                              \
-        Char c[HE_LOG_MSG_SIZE] = {};                                                              \
+        static HE::Char c[HE_LOG_MSG_SIZE] = {};                                                       \
         _snprintf_s(c, HE_LOG_MSG_SIZE, HE_LOG_MSG_SIZE, format, __VA_ARGS__);                     \
-        Char c2[HE_LOG_MSG_SIZE * 2] = {};                                                         \
+        HE::Char c2[HE_LOG_MSG_SIZE * 2] = {};                                                         \
         _snprintf_s(c2, HE_LOG_MSG_SIZE * 2, HE_LOG_MSG_SIZE * 2, "%s:%d %s\n", HE_FILE, __LINE__, \
                     c);                                                                            \
         printf(c2);                                                                                \
@@ -192,6 +196,29 @@ void HE_LOG_LINE(const Char* in_szFormat, TArgs... in_args)
 
 // アサートマクロ
 #define HE_ASSERT(...) assert(__VA_ARGS__)
+#define HE_ASSERT_RETURN(...) \
+    {                         \
+        assert(__VA_ARGS__);  \
+        if (__VA_ARGS__)      \
+        {                     \
+        }                     \
+        else                  \
+        {                     \
+            return;           \
+        }                     \
+    }
+
+#define HE_ASSERT_RETURN_VALUE(_x_, ...) \
+    {                                    \
+        assert(__VA_ARGS__);             \
+        if (__VA_ARGS__)                 \
+        {                                \
+        }                                \
+        else                             \
+        {                                \
+            return (_x_);                \
+        }                                \
+    }
 
 #else
 
@@ -213,13 +240,7 @@ void HE_LOG_LINE(const Char* in_szFormat, TArgs... in_args)
 #define HE_ARRAY_SIZE(_tbl_) (sizeof(_tbl_))
 
 // コンパイル時のアサート
-#define HE_STATIC_ASSERT(...)                                                      \
-    static_assert(__VA_ARGS__) /*                                                  \
-                                  {                                                \
-                                      Sint8 static_assert_error[(_expr_) ? 1 : 0]; \
-                                      (void)static_assert_error;                   \
-                                  }                                                \
-                              */
+#define HE_STATIC_ASSERT(...) static_assert(__VA_ARGS__)
 
 // デフォルトコンストラクタを封印
 #define HE_CLASS_DEFAULT_CONSTRUCT_NG(_x_) _x_() = delete;
@@ -244,9 +265,11 @@ void HE_LOG_LINE(const Char* in_szFormat, TArgs... in_args)
     _x_& operator=(_x_&&)       = delete; \
     _x_& operator=(const _x_&&) = delete;
 
-#define HE_CLASS_MOVE_NG(_x_)  \
-    _x_(_x_&&)       = delete; \
-    _x_(const _x_&&) = delete;
+#define HE_CLASS_MOVE_NG(_x_)             \
+    _x_(_x_&&)                  = delete; \
+    _x_(const _x_&&)            = delete; \
+    _x_& operator=(_x_&&)       = delete; \
+    _x_& operator=(const _x_&&) = delete;
 
 // 値のmin/maxマクロ
 // 上限値の制御

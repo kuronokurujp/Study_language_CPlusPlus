@@ -27,12 +27,12 @@ namespace InGame
         /// <summary>
         /// 終了
         /// </summary>
-        Bool VEnd() override final;
+        HE::Bool VEnd() override final;
 
         /// <summary>
         /// コンポーネントの更新
         /// </summary>
-        void VUpdate(const Float32 in_fDt) override final;
+        void VUpdate(const HE::Float32 in_fDt) override final;
 
         /// <summary>
         /// 弾を打つ機能設定
@@ -46,7 +46,7 @@ namespace InGame
         /// 弾を打つ
         /// </summary>
         void Shot(const Core::Math::Vector2& in_rPos, const Core::Math::Vector2& in_rDir,
-                  const Uint32 in_uCollisionHashCode);
+                  const HE::Uint32 in_uCollisionHashCode);
 
     private:
         Core::Memory::SharedPtr<InGameShotStrategyInterface> _spStrategy;

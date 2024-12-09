@@ -34,10 +34,10 @@ namespace Core
         public:
             EffectTask() : Task() {}
 
-            Bool VBegin() override final { return TRUE; }
-            Bool VEnd() override final { return TRUE; }
+            HE::Bool VBegin() override final { return TRUE; }
+            HE::Bool VEnd() override final { return TRUE; }
 
-            void VUpdate(const Float32 in_fDt) override final
+            void VUpdate(const HE::Float32 in_fDt) override final
             {
                 this->_time += in_fDt;
                 HE_LOG(HE_STR_TEXT("F"));
@@ -47,7 +47,7 @@ namespace Core
             }
 
         private:
-            Float32 _time = 0.0f;
+            HE::Float32 _time = 0.0f;
         };
 
         class ObjectTask : public Task
@@ -57,10 +57,10 @@ namespace Core
         public:
             ObjectTask() : Task() {}
 
-            Bool VBegin() override final { return TRUE; }
-            Bool VEnd() override final { return TRUE; }
+            HE::Bool VBegin() override final { return TRUE; }
+            HE::Bool VEnd() override final { return TRUE; }
 
-            void VUpdate(const Float32 in_fDt) override
+            void VUpdate(const HE::Float32 in_fDt) override
             {
                 this->_time += in_fDt;
                 HE_LOG(HE_STR_TEXT("P"));
@@ -71,7 +71,7 @@ namespace Core
             }
 
         private:
-            Float32 _time = 0.0f;
+            HE::Float32 _time = 0.0f;
         };
 
         class EnemyTask : public ObjectTask
@@ -81,14 +81,14 @@ namespace Core
         public:
             EnemyTask() : ObjectTask() {}
 
-            void VUpdate(const Float32 in_fDt) override final
+            void VUpdate(const HE::Float32 in_fDt) override final
             {
                 this->_time += in_fDt;
                 HE_LOG(HE_STR_TEXT("E"));
             }
 
         private:
-            Float32 _time = 0.0f;
+            HE::Float32 _time = 0.0f;
         };
 
         class DummySystemTask : public Task
@@ -98,17 +98,17 @@ namespace Core
         public:
             DummySystemTask() {}
 
-            Bool VBegin() override final { return TRUE; }
-            Bool VEnd() override final { return TRUE; }
+            HE::Bool VBegin() override final { return TRUE; }
+            HE::Bool VEnd() override final { return TRUE; }
 
-            void VUpdate(const Float32 in_fDt) override final
+            void VUpdate(const HE::Float32 in_fDt) override final
             {
                 this->_time += in_fDt;
                 HE_LOG(HE_STR_TEXT("S"));
             }
 
         private:
-            Float32 _time = 0.0f;
+            HE::Float32 _time = 0.0f;
         };
 
     }  // namespace Local
@@ -131,7 +131,7 @@ namespace Core
         }
 
         static TaskManager manager;
-        static const Uint32 taskNum = 32;
+        static const HE::Uint32 taskNum = 32;
 
         // タスクシステムの初期化
         CHECK(manager.Init(taskNum, 3));
@@ -166,7 +166,7 @@ namespace Core
         }
 
         static TaskManager manager;
-        static const Uint32 taskNum = 32;
+        static const HE::Uint32 taskNum = 32;
 
         // タスクシステムの初期化
         CHECK(manager.Init(taskNum, Local::EGroup_Num));
@@ -200,14 +200,14 @@ namespace Core
         CHECK(manager.UseCount() == 8);
         {
             // 擬似ゲームループ
-            const Sint32 FPS       = 60;
-            Float32 msec_one_frame = 1000.0f / FPS;
-            Float32 end_time       = 10 * 1000.0f;  // 10秒
-            Float32 delta_time = 0.0f, boot_time = 0.0f;
+            const HE::Sint32 FPS       = 60;
+            HE::Float32 msec_one_frame = 1000.0f / FPS;
+            HE::Float32 end_time       = 10 * 1000.0f;  // 10秒
+            HE::Float32 delta_time = 0.0f, boot_time = 0.0f;
 
             while (boot_time < end_time)
             {
-                Sint64 beginTimeMSec = std::chrono::duration_cast<std::chrono::milliseconds>(
+                HE::Sint64 beginTimeMSec = std::chrono::duration_cast<std::chrono::milliseconds>(
                                            std::chrono::system_clock::now().time_since_epoch())
                                            .count();
 
@@ -221,11 +221,11 @@ namespace Core
                 // フレーム更新間隔まで待つ
                 do
                 {
-                    Sint64 nowTimeMSec = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    HE::Sint64 nowTimeMSec = std::chrono::duration_cast<std::chrono::milliseconds>(
                                              std::chrono::system_clock::now().time_since_epoch())
                                              .count();
 
-                    delta_time = static_cast<Float32>(nowTimeMSec - beginTimeMSec);
+                    delta_time = static_cast<HE::Float32>(nowTimeMSec - beginTimeMSec);
                 } while (delta_time < msec_one_frame);
 
                 // 設定したタスクが取得できるか
@@ -269,7 +269,7 @@ namespace Core
             CHECK(memoryManager.CheckAllMemoryBlock());
         }
         static TaskManager manager;
-        static const Uint32 taskNum = 32;
+        static const HE::Uint32 taskNum = 32;
 
         // タスクシステムの初期化
         CHECK(manager.Init(taskNum, Local::EGroup_Num));
@@ -345,7 +345,7 @@ namespace Core
             CHECK(memoryManager.CheckAllMemoryBlock());
         }
         static TaskManager manager;
-        static const Uint32 taskNum = 32;
+        static const HE::Uint32 taskNum = 32;
 
         // タスクシステムの初期化
         CHECK(manager.Init(taskNum, Local::EGroup_Num));
@@ -424,7 +424,7 @@ namespace Core
         public:
             EffectTask() : TaskTree() {}
 
-            void VUpdate(const Float32 in_fDt) override
+            void VUpdate(const HE::Float32 in_fDt) override
             {
                 TaskTree::VUpdate(in_fDt);
 
@@ -436,7 +436,7 @@ namespace Core
             }
 
         private:
-            Float32 _time = 0.0f;
+            HE::Float32 _time = 0.0f;
         };
 
         class ObjectTask : public TaskTree
@@ -444,21 +444,21 @@ namespace Core
         public:
             ObjectTask() : TaskTree() {}
 
-            Bool VBegin() override final { return TRUE; }
-            Bool VEnd() override final { return TRUE; }
+            HE::Bool VBegin() override final { return TRUE; }
+            HE::Bool VEnd() override final { return TRUE; }
 
-            void VUpdate(const Float32 in_fDt) override
+            void VUpdate(const HE::Float32 in_fDt) override
             {
                 this->_time += in_fDt;
                 HE_LOG(HE_STR_TEXT("P"));
             }
 
         private:
-            Float32 _time = 0.0f;
+            HE::Float32 _time = 0.0f;
         };
 
         static TaskManager manager;
-        static const Uint32 taskNum = 32;
+        static const HE::Uint32 taskNum = 32;
 
         // タスクシステムの初期化
         CHECK(manager.Init(taskNum, EGroup_Num));

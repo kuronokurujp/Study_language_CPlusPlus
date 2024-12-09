@@ -10,7 +10,7 @@ namespace Level
     /// <summary>
     /// イベント受け取るためのハンドラー
     /// </summary>
-    using LevelUserInputEventHandler = std::function<void(const Char*)>;
+    using LevelUserInputEventHandler = std::function<void(const HE::Char*)>;
 
     class LevelUserInputMessage final
     {
@@ -21,7 +21,7 @@ namespace Level
         LevelUserInputMessage() {}
         LevelUserInputMessage(LevelUserInputEventHandler in_func) : _eventHandler(in_func) {}
 
-        void Message(const Char* in_szMsg) { this->_eventHandler(in_szMsg); }
+        void Message(const HE::Char* in_szMsg) { this->_eventHandler(in_szMsg); }
 
     private:
         LevelUserInputEventHandler _eventHandler;
@@ -44,11 +44,11 @@ namespace Level
         /// 登録に必要な情報を設定
         /// </summary>
         /// <param name="bAutoDelete">TRUEだとタスク破棄と同時に削除
-        virtual void VSetup(const Bool in_bReleaseMem = TRUE) override final;
+        virtual void VSetup(const HE::Bool in_bReleaseMem = TRUE) override final;
 
-        virtual Bool VEnd() override final;
+        virtual HE::Bool VEnd() override final;
 
-        void Message(const Char* in_szMsg);
+        void Message(const HE::Char* in_szMsg);
 
         void SetReceiver(Core::Memory::UniquePtr<LevelUserInputMessage> in_spReciver)
         {

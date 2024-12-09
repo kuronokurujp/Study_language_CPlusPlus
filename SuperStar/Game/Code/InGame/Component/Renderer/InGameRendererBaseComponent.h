@@ -25,12 +25,12 @@ namespace InGame
         /// <summary>
         /// タスク開始
         /// </summary>
-        Bool VBegin() override;
+        HE::Bool VBegin() override;
 
         /// <summary>
         /// コンポーネントの更新
         /// </summary>
-        void VUpdate(const Float32 in_fDt) override final;
+        void VUpdate(const HE::Float32 in_fDt) override final;
 
     protected:
         virtual void _VRenderer(const Core::Common::Handle& in_rViewHandle,

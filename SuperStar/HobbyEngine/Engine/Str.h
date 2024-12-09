@@ -5,11 +5,12 @@
 #include "Type.h"
 
 // プラットフォームがWindows
-#ifdef HE_WIN
+
+#if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
 
 #include <wchar.h>
 
-#define HE_STR_LEN(t) static_cast<Uint32>(::wcslen((t)))
+#define HE_STR_SIZE(t) static_cast<HE::Uint32>(::wcslen((t)))
 #define HE_STR_CMP(a, b) ::wcscmp(a, b)
 
 // 第二引数にはコピー配列の要素数を設定
@@ -21,6 +22,7 @@
 #define HE_STR_LOWER(s, size) ::_wcslwr_s(s, (size))
 #define HE_STR_UPPER(s, size) ::_wcsupr_s(s, (size))
 
+// wchar_t型を標準テキスト型に
 #define HE_STR_TEXT(t) L##t
 #define HE_STR_EMPTY L""
 
@@ -30,7 +32,9 @@
 // プラットフォームがCLI
 #else
 
-#define HE_STR_LEN(t) static_cast<Uint32>(::strlen(t))
+#include <cctype>
+
+#define HE_STR_SIZE(t) static_cast<HE::Uint32>(::strlen(t))
 #define HE_STR_CMP(a, b) ::strcmp(a, b)
 
 #define HE_STR_CPY_S(dst, dst_size, src, src_len) ::strncpy_s(dst, dst_size, src, src_len)
@@ -38,11 +42,28 @@
 #define HE_STR_VSNPRINTF(dst, len, count, fmt, arg) ::vsnprintf_s(dst, len, count, fmt, arg)
 
 // TODO: 未対応
-#define HE_STR_LOWER(s, size)
-#define HE_STR_UPPER(s, size)
+#define HE_STR_LOWER(s, size)                 \
+    {                                         \
+        for (HE::Uint32 i = 0; i < size; ++i) \
+        {                                     \
+            s[i] = ::tolower(s[i]);              \
+        }                                     \
+    }
+#define HE_STR_UPPER(s, size)                 \
+    {                                         \
+        for (HE::Uint32 i = 0; i < size; ++i) \
+        {                                     \
+            s[i] = ::toupper(s[i]);              \
+        }                                     \
+    }
 
-#define HE_STR_TEXT(t) t
-#define HE_STR_EMPTY ""
+// HE::UTF8を標準テキスト型に
+#define HE_STR_TEXT(t) u8##t
+#define HE_STR_EMPTY u8""
+
+// TODO: 未対応
+// 1文字を小文字に変える
+#define HE_CHAR_LOWWER(c) ::tolower(c)
 
 #endif
 

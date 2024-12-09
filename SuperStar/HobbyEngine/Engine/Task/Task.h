@@ -17,7 +17,7 @@ namespace Core
     struct TaskData
     {
     public:
-        Uint32 uId  = 0;
+        HE::Uint32 uId  = 0;
         void* pData = NULL;
     };
 
@@ -35,8 +35,8 @@ namespace Core
         HE_GENERATED_CLASS_BASE_BODY_HEADER(Task);
 
     public:
-        static const Uint32 uNoneId      = 0;
-        static const Sint32 iNoneGroupId = -1;
+        static const HE::Uint32 uNoneId      = 0;
+        static const HE::Sint32 iNoneGroupId = -1;
 
         // タスクは生成したインスタンスが再利用されるのでコンストラクタで初期化はできない
         Task() { this->_Clear(); }
@@ -46,22 +46,22 @@ namespace Core
         /// <summary>
         /// タスク実行前の初期セットアップ
         /// </summary>
-        virtual void VSetup(const Bool in_bAutoDelete);
+        virtual void VSetup(const HE::Bool in_bAutoDelete);
 
         /// <summary>
         /// タスク開始
         /// </summary>
-        virtual Bool VBegin() { return TRUE; }
+        virtual HE::Bool VBegin() { return TRUE; }
 
         /// <summary>
         /// タスク終了
         /// </summary>
-        virtual Bool VEnd() { return TRUE; }
+        virtual HE::Bool VEnd() { return TRUE; }
 
         /// <summary>
         /// 更新
         /// </summary>
-        virtual void VUpdate(const Float32) {}
+        virtual void VUpdate(const HE::Float32) {}
 
         /// <summary>
         /// イベント通知
@@ -82,7 +82,7 @@ namespace Core
         /// <summary>
         /// グループID
         /// </summary>
-        inline Sint32 GetGropuId() const { return this->_iGroupId; }
+        inline HE::Sint32 GetGropuId() const { return this->_iGroupId; }
 
     protected:
         /// <summary>
@@ -107,14 +107,14 @@ namespace Core
         TaskManager* _pTaskManager = NULL;
 
     private:
-        Sint32 _iGroupId = Task::iNoneGroupId;
-        Bool _bStart     = FALSE;
-        Bool _bKill      = FALSE;
+        HE::Sint32 _iGroupId = Task::iNoneGroupId;
+        HE::Bool _bStart     = FALSE;
+        HE::Bool _bKill      = FALSE;
         Common::Handle _selfHandle;
 
         // タスクを解放した時にメモリからも解放するか
         // 解放しない場合はキャッシュして使いまわすことになる
-        Bool _bReleaseMem = FALSE;
+        HE::Bool _bReleaseMem = FALSE;
 
         Task* _pPrev = NULL;
         Task* _pNext = NULL;

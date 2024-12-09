@@ -112,7 +112,7 @@ namespace InGame
         return NULL;
     }
 
-    Bool InGameActorManager::VStart(Actor::ActorManager* in_pOwner)
+    HE::Bool InGameActorManager::VStart(Actor::ActorManager* in_pOwner)
     {
         // TODO: Luaの利用準備
         /*
@@ -124,7 +124,7 @@ namespace InGame
         return TRUE;
     }
 
-    void InGameActorManager::VLateUpdate(const Float32 in_fDt, Actor::ActorManager* in_pOwner)
+    void InGameActorManager::VLateUpdate(const HE::HE::Float32 in_fDt, Actor::ActorManager* in_pOwner)
     {
 //        auto actors = in_pOwner->Get();
         /*
@@ -186,7 +186,7 @@ namespace InGame
         */
     }
 
-    void InGameActorManager::LateUpdate(const Float32 in_fDt, Actor::ActorManager*)
+    void InGameActorManager::LateUpdate(const HE::HE::Float32 in_fDt, Actor::ActorManager*)
     {
 
     }

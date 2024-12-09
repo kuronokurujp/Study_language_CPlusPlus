@@ -13,9 +13,9 @@ namespace Event
         virtual ~EventDataInterface() = default;
 
         // virtual const EventTypeStr& VEventTypeStr() const = 0;
-        virtual Uint64 VEventTypeHash() const = 0;
-        virtual Uint64 VDataTypeHash() const  = 0;
-        virtual Float32 VTimeStamp() const    = 0;
+        virtual HE::Uint64 VEventTypeHash() const = 0;
+        virtual HE::Uint64 VDataTypeHash() const  = 0;
+        virtual HE::Float32 VTimeStamp() const    = 0;
         // virtual void VSerialize(std::ostrstream& out) const = 0;
     };
 
@@ -31,7 +31,7 @@ namespace Event
         };
 
         explicit BaseEventData(const EventTypeStr& in_rEventType, const EventTypeStr& in_rDataType,
-                               const Float32 in_fTimeStamp = 0.0f)
+                               const HE::Float32 in_fTimeStamp = 0.0f)
             : _fTimeStamp(in_fTimeStamp),
               _ulEventTypeHash(in_rEventType.Hash()),
               _ulDataTypeHash(in_rDataType.Hash())
@@ -40,13 +40,13 @@ namespace Event
 
         virtual ~BaseEventData() = default;
 
-        Uint64 VEventTypeHash() const override final { return this->_ulEventTypeHash; }
-        Uint64 VDataTypeHash() const override final { return this->_ulDataTypeHash; }
-        Float32 VTimeStamp() const override final { return this->_fTimeStamp; }
+        HE::Uint64 VEventTypeHash() const override final { return this->_ulEventTypeHash; }
+        HE::Uint64 VDataTypeHash() const override final { return this->_ulDataTypeHash; }
+        HE::Float32 VTimeStamp() const override final { return this->_fTimeStamp; }
 
     protected:
-        const Float32 _fTimeStamp     = 0.0f;
-        const Uint64 _ulEventTypeHash = 0;
-        const Uint64 _ulDataTypeHash  = 0;
+        const HE::Float32 _fTimeStamp     = 0.0f;
+        const HE::Uint64 _ulEventTypeHash = 0;
+        const HE::Uint64 _ulDataTypeHash  = 0;
     };
 }  // namespace Event

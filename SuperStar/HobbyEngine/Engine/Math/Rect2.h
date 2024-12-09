@@ -20,10 +20,10 @@ namespace Core::Math
 
         Rect2() { this->Clear(); }
 
-        Rect2(const Float32 in_fX, const Float32 in_fY, const Float32 in_fW, const Float32 in_fH,
+        Rect2(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW, const HE::Float32 in_fH,
               const EAnchor in_eAnchor);
 
-        void Set(const Float32 in_fX, const Float32 in_fY, const Float32 in_fW, const Float32 in_fH,
+        void Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW, const HE::Float32 in_fH,
                  const EAnchor in_eAnchor);
 
         /// <summary>
@@ -34,32 +34,32 @@ namespace Core::Math
         /// <summary>
         /// Widthes this instance.
         /// </summary>
-        inline Float32 Width() const HE_NOEXCEPT { return fabsf(this->_fRight - this->_fLeft); }
+        inline HE::Float32 Width() const HE_NOEXCEPT { return fabsf(this->_fRight - this->_fLeft); }
 
         /// <summary>
         /// Widthes the half.
         /// </summary>
-        inline Float32 WidthHalf() const HE_NOEXCEPT { return (this->Width() * 0.5f); }
+        inline HE::Float32 WidthHalf() const HE_NOEXCEPT { return (this->Width() * 0.5f); }
 
         /// <summary>
         /// Heights this instance.
         /// </summary>
-        inline Float32 Height() const HE_NOEXCEPT { return fabsf(this->_fBottom - this->_fTop); }
+        inline HE::Float32 Height() const HE_NOEXCEPT { return fabsf(this->_fBottom - this->_fTop); }
 
         /// <summary>
         /// Heights the half.
         /// </summary>
-        inline Float32 HeightHalf() const HE_NOEXCEPT { return (this->Height() * 0.5f); }
+        inline HE::Float32 HeightHalf() const HE_NOEXCEPT { return (this->Height() * 0.5f); }
 
         /// <summary>
         /// Ins the side rect.
         /// </summary>
-        Bool InSideRect(const Rect2& in_rOrderRect) const;
+        HE::Bool InSideRect(const Rect2& in_rOrderRect) const;
 
         /// <summary>
         /// 座標が矩形の中に入っているか
         /// </summary>
-        Bool InSidePoint(const Vector2& in_rPos) const;
+        HE::Bool InSidePoint(const Vector2& in_rPos) const;
 
         /// <summary>
         /// Clears this instance.
@@ -90,16 +90,16 @@ namespace Core::Math
             this->_fBottom += in_rVec._fY;
         }
 
-        Float32 _fLeft   = 0.0f;
-        Float32 _fTop    = 0.0f;
-        Float32 _fRight  = 0.0f;
-        Float32 _fBottom = 0.0f;
+        HE::Float32 _fLeft   = 0.0f;
+        HE::Float32 _fTop    = 0.0f;
+        HE::Float32 _fRight  = 0.0f;
+        HE::Float32 _fBottom = 0.0f;
         EAnchor _eAnchor = EAnchor_Left;
 
     private:
         /// <summary>
         /// Sets the position.
         /// </summary>
-        void _SetPos(const Float32 in_fX, const Float32 in_fY);
+        void _SetPos(const HE::Float32 in_fX, const HE::Float32 in_fY);
     };
 }  // namespace Core::Math

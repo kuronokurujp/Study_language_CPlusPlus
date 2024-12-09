@@ -26,13 +26,13 @@ namespace InGame
         {
         }
 
-        Bool VIsEventTypeHash(const Uint64 in_ulHash)
+        HE::Bool VIsEventTypeHash(const HE::Uint64 in_ulHash)
         {
             return (this->_ulEventTypeHash == in_ulHash);
         }
 
     private:
-        Uint64 _ulEventTypeHash = 0;
+        HE::Uint64 _ulEventTypeHash = 0;
     };
 
     /// <summary>
@@ -41,19 +41,19 @@ namespace InGame
     class EventCharacterMove final : public Event::BaseEventData
     {
     public:
-        EventCharacterMove(const Float32 in_fTimeStamp, const EObjectTag in_eTag,
-                           const Uint32 in_uId, const Core::Math::Vector2& in_rMove);
+        EventCharacterMove(const HE::Float32 in_fTimeStamp, const EObjectTag in_eTag,
+                           const HE::Uint32 in_uId, const Core::Math::Vector2& in_rMove);
 
-        static inline Uint32 EventTypeHash() { return s_uEventTypeHash; }
+        static inline HE::Uint32 EventTypeHash() { return s_uEventTypeHash; }
 
     public:
         Core::Math::Vector2 _move;
         EObjectTag _eTag = EObjectTag::EObjectTag_None;
-        Uint32 _uId      = 0;
+        HE::Uint32 _uId      = 0;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterMove");
-        static inline Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+        static inline HE::Uint32 s_uEventTypeHash           = s_szEventType.Hash();
     };
 
     /// <summary>
@@ -62,18 +62,18 @@ namespace InGame
     class EventCharacterAttack final : public Event::BaseEventData
     {
     public:
-        EventCharacterAttack(const Float32 in_fTimeStamp, const EObjectTag in_eTag,
-                             const Uint32 in_uId);
+        EventCharacterAttack(const HE::Float32 in_fTimeStamp, const EObjectTag in_eTag,
+                             const HE::Uint32 in_uId);
 
-        static inline Uint32 EventTypeHash() { return s_uEventTypeHash; }
+        static inline HE::Uint32 EventTypeHash() { return s_uEventTypeHash; }
 
     public:
         EObjectTag _eTag = EObjectTag::EObjectTag_None;
-        Uint32 _uId      = 0;
+        HE::Uint32 _uId      = 0;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterAttack");
-        static inline Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+        static inline HE::Uint32 s_uEventTypeHash           = s_szEventType.Hash();
     };
 
     /// <summary>
@@ -82,21 +82,21 @@ namespace InGame
     class EventCharacterPutEnemy final : public Event::BaseEventData
     {
     public:
-        EventCharacterPutEnemy(const Float32 in_fTimeStamp, const Core::Math::Vector2& in_rPos,
-                               const EEnemyTag in_eTag, const Uint32 in_uId,
-                               const UTF8* in_szIdName);
+        EventCharacterPutEnemy(const HE::Float32 in_fTimeStamp, const Core::Math::Vector2& in_rPos,
+                               const EEnemyTag in_eTag, const HE::Uint32 in_uId,
+                               const HE::UTF8* in_szIdName);
 
-        static inline Uint32 EventTypeHash() { return s_uEventTypeHash; }
+        static inline HE::Uint32 EventTypeHash() { return s_uEventTypeHash; }
 
     public:
         Core::Math::Vector2 _pos;
         EEnemyTag _eEnemyTag = EEnemyTag::EEnemyTag_None;
-        Uint32 _uId          = 0;
+        HE::Uint32 _uId          = 0;
         Core::Common::FixedString32 _szIdName;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterPutEnemy");
-        static inline Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+        static inline HE::Uint32 s_uEventTypeHash           = s_szEventType.Hash();
     };
 
     /// <summary>
@@ -105,16 +105,16 @@ namespace InGame
     class EventCharacterPutPlayer final : public Event::BaseEventData
     {
     public:
-        EventCharacterPutPlayer(const Float32 in_fTimeStamp, const Core::Math::Vector2& in_rPos);
+        EventCharacterPutPlayer(const HE::Float32 in_fTimeStamp, const Core::Math::Vector2& in_rPos);
 
-        static inline Uint32 EventTypeHash() { return s_uEventTypeHash; }
+        static inline HE::Uint32 EventTypeHash() { return s_uEventTypeHash; }
 
     public:
         Core::Math::Vector2 _pos;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterPutPlayer");
-        static inline Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+        static inline HE::Uint32 s_uEventTypeHash           = s_szEventType.Hash();
     };
 
     /// <summary>
@@ -123,18 +123,18 @@ namespace InGame
     class EventCharacterDamage final : public Event::BaseEventData
     {
     public:
-        EventCharacterDamage(const Float32 in_fTimeStamp, EObjectTag in_eObjectTag,
-                             const Uint64 in_ulHandle, const Sint32 in_sDamage);
+        EventCharacterDamage(const HE::Float32 in_fTimeStamp, EObjectTag in_eObjectTag,
+                             const HE::Uint64 in_ulHandle, const HE::Uint32 in_sDamage);
 
-        static inline Uint32 EventTypeHash() { return s_uEventTypeHash; }
+        static inline HE::Uint32 EventTypeHash() { return s_uEventTypeHash; }
 
     public:
-        Sint32 _sDamage        = 0;
+        HE::Uint32 _sDamage        = 0;
         EObjectTag _eObjectTag = EObjectTag::EObjectTag_None;
-        Uint64 _ulHandle       = 0;
+        HE::Uint64 _ulHandle       = 0;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterDamage");
-        static inline Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+        static inline HE::Uint32 s_uEventTypeHash           = s_szEventType.Hash();
     };
 }  // namespace InGame

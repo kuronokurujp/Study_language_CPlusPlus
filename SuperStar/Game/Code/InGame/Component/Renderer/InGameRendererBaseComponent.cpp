@@ -15,7 +15,7 @@ namespace InGame
         this->_transformHandle = in_rHandle;
     }
 
-    Bool InGameRendererBaseComponent::VBegin()
+    HE::Bool InGameRendererBaseComponent::VBegin()
     {
         if (Actor::Component::VBegin() == FALSE) return FALSE;
 
@@ -29,7 +29,7 @@ namespace InGame
         return TRUE;
     }
 
-    void InGameRendererBaseComponent::VUpdate(const Float32 in_fDt)
+    void InGameRendererBaseComponent::VUpdate(const HE::Float32 in_fDt)
     {
         Actor::Component::VUpdate(in_fDt);
 

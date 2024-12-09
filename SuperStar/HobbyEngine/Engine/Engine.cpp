@@ -8,10 +8,18 @@
 /// <summary>
 /// 事前初期化
 /// </summary>
-Bool Engine::Init()
+HE::Bool Engine::Init()
 {
     HE_ASSERT(this->_bInit == FALSE);
     if (this->_bInit) return TRUE;
+
+#ifdef HE_WIN
+#ifdef HE_CHARACTER_CODE_UTF8
+    // UTF-8 を使うようにコードページを設定
+    // ウィンドウズだが文字コードはUTF8を使うのでwchar_tが使えないのでコンソール設定をUTF8にして日本語表示を文字化けしないようにする
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+#endif
 
     HE_LOG_LINE(HE_STR_TEXT("エンジンの前準備"));
 
@@ -61,7 +69,7 @@ Bool Engine::Init()
 /// <summary>
 /// 起動
 /// </summary>
-Bool Engine::Start()
+HE::Bool Engine::Start()
 {
     HE_ASSERT(this->_bStart == FALSE);
     if (this->_bStart) return TRUE;
@@ -77,7 +85,7 @@ Bool Engine::Start()
 
     // FPSタイマーを作成
     // ゲームを固定フレームレートにするため
-    auto pPlatformModule = this->_PlatformModule();
+    auto pPlatformModule = this->PlatformModule();
     if (pPlatformModule)
     {
         this->_spFPS = HE_MAKE_CUSTOM_SHARED_PTR((Core::Time::FPS), pPlatformModule->VTime());
@@ -89,7 +97,7 @@ Bool Engine::Start()
     return TRUE;
 }
 
-Bool Engine::VRelease()
+HE::Bool Engine::VRelease()
 {
     HE_ASSERT(this->_bInit);
     HE_ASSERT(this->_bStart);
@@ -118,42 +126,60 @@ Bool Engine::VRelease()
     return TRUE;
 }
 
+#if 0
 /// <summary>
 /// ゲームウィンドウ生成.
 /// </summary>
-Bool Engine::CreateMainWindow()
+Core::Common::Handle Engine::CreateGameWindow()
 {
     HE_ASSERT(this->_bStart);
 
-    auto pPlatform = this->_PlatformModule();
-    if (pPlatform == NULL) return FALSE;
+    auto pPlatform = this->PlatformModule();
+    if (pPlatform == NULL) return NullHandle;
 
-    // windowを作成
-    if (pPlatform->VCreateMainWindow() == FALSE) return FALSE;
+    // TODO: ウィンドウを作成
+    // ゲームウィンドウとして扱う
+    auto pScreen = pPlatform->VScreen();
+    if (pScreen == NULL) return NullHandle;
 
-    return TRUE;
+    auto [handle] = pScreen->VCreateWindow();
+
+    return handle;
 }
 
 /// <summary>
 /// ゲームウィンドウを解放.
 /// </summary>
-void Engine::ReleseWindows()
+void Engine::ReleseAllWindows()
 {
-    auto pPlatform = this->_PlatformModule();
+    auto pPlatform = this->PlatformModule();
     if (pPlatform == NULL) return;
+
+    auto pScreen = pPlatform->VScreen();
+    if (pScreen == NULL) return NullHandle;
+
 
     pPlatform->VReleaseAllWindows();
 }
 
-Bool Engine::BeforeUpdateLoop(const Float32 in_fDt)
+void Engine::ShowWindow(Core::Common::Handle& in_rHandle)
+{
+    auto pPlatform = this->PlatformModule();
+    if (pPlatform == NULL) return;
+
+    pPlatform->VShowWindow(in_rHandle);
+}
+#endif
+
+HE::Bool Engine::BeforeUpdateLoop(const HE::Float32 in_fDt)
 {
     this->_upModuleManager->BeforeUpdate(in_fDt);
     return TRUE;
 }
 
-Bool Engine::WaitFrameLoop()
+HE::Bool Engine::WaitFrameLoop()
 {
-    auto pPlatform = this->_PlatformModule();
+    auto pPlatform = this->PlatformModule();
     if (pPlatform == NULL) return FALSE;
 
     // 1 / 60 秒経過しないと更新しない
@@ -173,7 +199,7 @@ Bool Engine::WaitFrameLoop()
     return TRUE;
 }
 
-Bool Engine::MainUpdateLoop(const Float32 in_fDt)
+HE::Bool Engine::MainUpdateLoop(const HE::Float32 in_fDt)
 {
     // モジュール更新
     HE_ASSERT(this->_upModuleManager);
@@ -183,7 +209,7 @@ Bool Engine::MainUpdateLoop(const Float32 in_fDt)
     return TRUE;
 }
 
-Bool Engine::LateUpdateLoop(const Float32 in_fDt)
+HE::Bool Engine::LateUpdateLoop(const HE::Float32 in_fDt)
 {
     HE_ASSERT(this->_upModuleManager);
 
@@ -192,26 +218,26 @@ Bool Engine::LateUpdateLoop(const Float32 in_fDt)
     return TRUE;
 }
 
-Float32 Engine::GetDeltaTimeSec()
+HE::Float32 Engine::GetDeltaTimeSec()
 {
     if (this->_spFPS == NULL) return 0.0f;
 
-    auto pPlatform = this->_PlatformModule();
+    auto pPlatform = this->PlatformModule();
     if (pPlatform == NULL) return 0.0f;
 
     return this->_spFPS->GetDeltaTimeSec();
 }
 
-Bool Engine::IsAppQuit()
+HE::Bool Engine::IsAppQuit()
 {
     // プラットフォームがない場合は閉じれない
-    auto pPlatform = this->_PlatformModule();
+    auto pPlatform = this->PlatformModule();
     if (pPlatform == NULL) return FALSE;
 
     return pPlatform->VIsQuit();
 }
 
-Platform::PlatformModule* Engine::_PlatformModule()
+Platform::PlatformModule* Engine::PlatformModule()
 {
     HE_ASSERT(this->_upModuleManager);
 
@@ -219,7 +245,7 @@ Platform::PlatformModule* Engine::_PlatformModule()
     return reinterpret_cast<Platform::PlatformModule*>(this->_upModuleManager->Get(szName.Str()));
 }
 
-Bool Engine::_AddModule(class Module::ModuleBase* in_pModule)
+HE::Bool Engine::_AddModule(class Module::ModuleBase* in_pModule)
 {
     HE_ASSERT(in_pModule);
     HE_ASSERT(this->_upModuleManager);

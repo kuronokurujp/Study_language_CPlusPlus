@@ -31,39 +31,39 @@ namespace Level
         /// <summary>
         /// 必ず最初に呼び出す
         /// </summary>
-        Bool Init();
+        HE::Bool Init();
 
         /// <summary>
         /// 使い終わったら実行
         /// そのあとに利用したらエラーになる
         /// </summary>
-        Bool Release();
+        HE::Bool Release();
 
         /// <summary>
         /// ユーザー入力処理
         /// </summary>
-        void ProcessInput(const Float32 in_fDt, const EnhancedInput::InputMap&);
+        void ProcessInput(const HE::Float32 in_fDt, const EnhancedInput::InputMap&);
 
         /// <summary>
         /// 前更新
         /// </summary>
-        void BeforeUpdate(const Float32);
+        void BeforeUpdate(const HE::Float32);
 
         /// <summary>
         /// 更新
         /// </summary>
-        void Update(const Float32);
+        void Update(const HE::Float32);
 
         /// <summary>
         /// 後更新
         /// </summary>
-        void LateUpdate(const Float32);
+        void LateUpdate(const HE::Float32);
 
         /// <summary>
         /// 起動するレベルを設定
         /// </summary>
         template <class T>
-        Bool StartLevel()
+        HE::Bool StartLevel()
         {
             HE_STATIC_ASSERT(std::is_base_of<Node, T>::value,
                              "Tクラスはレベルのノードクラスを継承していない");
@@ -81,7 +81,7 @@ namespace Level
         Node* GetLevel(const Core::Common::Handle&);
 
     private:
-        Bool _StartLevel(const Core::Common::Handle&);
+        HE::Bool _StartLevel(const Core::Common::Handle&);
 
     private:
         // レベルのノードをアクターとして管理

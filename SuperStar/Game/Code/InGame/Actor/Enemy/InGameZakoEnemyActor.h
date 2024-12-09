@@ -24,22 +24,22 @@ namespace InGame
         struct Parameter
         {
             // 移動スピード
-            Float32 speed = 5.0f;
+            HE::Float32 speed = 5.0f;
 
             // HP
-            Sint32 ulife = 3;
+            HE::Sint32 ulife = 3;
         };
 
     public:
         InGameEnemyZakoActor(const Parameter& in_rParameter);
 
-        Bool VBegin() override final;
+        HE::Bool VBegin() override final;
 
-        void VUpdate(const Float32 in_fDt) override final;
+        void VUpdate(const HE::Float32 in_fDt) override final;
 
         void SetSize(const Core::Math::Vector2& in_rSize);
 
-        Bool Damage(const Sint32 in_sDamage);
+        HE::Bool Damage(const HE::Sint32 in_sDamage);
 
         // virtual bool update(void);
         // virtual void draw(void);

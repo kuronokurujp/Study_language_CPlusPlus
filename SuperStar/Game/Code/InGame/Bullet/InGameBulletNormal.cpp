@@ -9,10 +9,10 @@ namespace InGame
 {
     namespace Local
     {
-        static const Char* szObjectName = HE_STR_TEXT("InGameBulletNormal");
+        static const HE::Char* szObjectName = HE_STR_TEXT("InGameBulletNormal");
     }
 
-    const Char* InGameBulletNormalFactory::VName() const
+    const HE::Char* InGameBulletNormalFactory::VName() const
     {
         return Local::szObjectName;
     }
@@ -29,17 +29,17 @@ namespace InGame
         in_pWork->uCollisionHashCode  = this->_uCollisionHashCode;
     }
 
-    Uint32 InGameBulletNormalStrategy::VWorkSize() const
+    HE::Uint32 InGameBulletNormalStrategy::VWorkSize() const
     {
         return sizeof(InGameBulletNormalWork);
     }
 
-    const Char* InGameBulletNormalStrategy::VName() const
+    const HE::Char* InGameBulletNormalStrategy::VName() const
     {
         return Local::szObjectName;
     }
 
-    Bool InGameBulletNormalStrategy::VUpdate(InGameBulletWork* in_pWork,
+    HE::Bool InGameBulletNormalStrategy::VUpdate(InGameBulletWork* in_pWork,
                                              Core::Common::Handle& in_rViewHandle)
     {
         InGameBulletNormalWork* pWork = reinterpret_cast<InGameBulletNormalWork*>(in_pWork->aWork);
@@ -56,7 +56,7 @@ namespace InGame
         return TRUE;
     }
 
-    Bool InGameBulletNormalStrategy::VIsScreenInSide(const InGameBulletWork* const in_pWork,
+    HE::Bool InGameBulletNormalStrategy::VIsScreenInSide(const InGameBulletWork* const in_pWork,
                                                      const Core::Math::Rect2& in_rScreenInSide)
     {
         const InGameBulletNormalWork* const pWork =
@@ -70,7 +70,7 @@ namespace InGame
         return FALSE;
     }
 
-    Bool InGameBulletNormalStrategy::VOutputCollisionData(CollisionData* out,
+    HE::Bool InGameBulletNormalStrategy::VOutputCollisionData(CollisionData* out,
                                                           const InGameBulletWork* const in_pObj)
     {
         const InGameBulletNormalWork* const pWork =

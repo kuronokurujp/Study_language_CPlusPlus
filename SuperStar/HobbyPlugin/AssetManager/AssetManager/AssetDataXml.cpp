@@ -5,20 +5,22 @@
 
 namespace AssetManager
 {
-    Bool AssetDataXml::_VLoad(Platform::FileInterface& in_rFileSystem)
+    HE::Bool AssetDataXml::_VLoad(Platform::FileInterface& in_rFileSystem)
     {
-        Bool bRet = TRUE;
+        HE::Bool bRet = TRUE;
 
         // ファイルを開く
         this->_fileHandle = in_rFileSystem.VFileOpen(this->_path);
         HE_ASSERT(this->_fileHandle.Null() == FALSE);
         {
-            UTF8* pReadTmpBuff = NULL;
+            HE::UTF8* pReadTmpBuff = NULL;
             {
                 // 開いたファイルのデータサイズを取得して読み込むメモリを確保
-                Sint32 iSize    = in_rFileSystem.VFileSize(this->_fileHandle);
-                Sint32 iMemSize = iSize + 1;
-                pReadTmpBuff    = HE_NEW_MEM_ARRAY(UTF8, iMemSize, 0);  // new UTF8[iMemSize];
+                HE::Sint32 iSize    = in_rFileSystem.VFileSize(this->_fileHandle);
+                HE::Sint32 iMemSize = iSize + 1;
+
+                // HE_NEW_MEM_ARRAY(UTF8, iMemSize, 0);
+                pReadTmpBuff = reinterpret_cast<HE::UTF8*>(HE_ALLOC_MEM(sizeof(HE::UTF8) * iMemSize, 0));
                 ::memset(pReadTmpBuff, '\0', iMemSize);
 
                 // ファイルの読み込み
@@ -42,7 +44,7 @@ namespace AssetManager
                 }
             }
             // 展開した時のメモリを利用するので読み込んだメモリを解放
-            HE_SAFE_DELETE_MEM_ARRAY(pReadTmpBuff);
+            HE_SAFE_DELETE_MEM(pReadTmpBuff);
         }
         // ファイルを閉じる
         in_rFileSystem.VFileClose(this->_fileHandle);

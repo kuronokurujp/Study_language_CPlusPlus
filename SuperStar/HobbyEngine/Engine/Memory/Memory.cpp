@@ -13,18 +13,27 @@
 /// <param name="in_pFile">呼び出したファイル</param>
 /// <param name="in_line">呼び出したファイル行</param>
 /// <returns>NULL 失敗 / 非NULL 確保したメモリのアドレス</returns>
-void* operator new(size_t in_size, Uint8 in_page, Uint8 in_alignSize,
-                   Core::Memory::Manager::EAllocateLocateType in_eLocateType, const UTF8* in_pFile,
-                   Uint32 in_uLine)
+void* operator new(size_t in_size, HE::Uint8 in_page, HE::Uint8 in_alignSize,
+                   Core::Memory::Manager::EAllocateLocateType in_eLocateType, const HE::UTF8* in_pFile,
+                   HE::Uint32 in_uLine)
 {
     // VSのx64だとsize_tがunsigned int64になるが, 8byteフルサイズでの確保はないと思うので,
     // Uint32でサイズを調整した
-    Uint32 uMemSize = static_cast<Uint32>(in_size);
-    void* pMem      = (Core::Memory::Manager::I().Allocate(uMemSize, in_page, in_alignSize,
-                                                           in_eLocateType, in_pFile, in_uLine));
-    return pMem;
+    if (Core::Memory::Manager::Exist())
+    {
+        HE::Uint32 uMemSize = static_cast<HE::Uint32>(in_size);
+
+        void* pMem = (Core::Memory::Manager::I().Allocate(uMemSize, in_page, in_alignSize,
+                                                          in_eLocateType, in_pFile, in_uLine));
+        return pMem;
+    }
+
+    HE_LOG_LINE(HE_STR_TEXT("警告: アプリ用のメモリアロケーターがない"));
+
+    return NULL;
 }
 
+#if 0
 /// <summary>
 /// new[]のオーバーロード
 /// </summary>
@@ -35,21 +44,31 @@ void* operator new(size_t in_size, Uint8 in_page, Uint8 in_alignSize,
 /// <param name="in_pFile">呼び出したファイル名</param>
 /// <param name="in_line">呼び出したファイル行数</param>
 /// <returns>NULL 失敗 / 非NULL 確保したメモリのアドレス</returns>
-void* ::operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
+void* ::operator new[](size_t in_size, HE::Uint8 in_page, HE::Uint8 in_alignSize,
                        Core::Memory::Manager::EAllocateLocateType in_eLocateType,
-                       const UTF8 * in_pFile, Uint32 in_uLine)
+                       const HE::UTF8 * in_pFile, HE::Uint32 in_uLine)
 {
     // VSのx64だとsize_tがunsigned int64になるが, 8byteフルサイズでの確保はないと思うので,
     // Uint32でサイズを調整した
-    Uint32 uMemSize = static_cast<Uint32>(in_size);
-    void* pMem      = (Core::Memory::Manager::I().Allocate(uMemSize, in_page, in_alignSize,
-                                                           in_eLocateType, in_pFile, in_uLine));
-    return pMem;
-}
+    if (Core::Memory::Manager::Exist())
+    {
+        HE::Uint32 uMemSize = static_cast<HE::Uint32>(in_size);
+        void* pMem      = (Core::Memory::Manager::I().Allocate(uMemSize, in_page, in_alignSize,
+                                                               in_eLocateType, in_pFile, in_uLine));
+        // TODO: クラスでかつデストラクターがあると返った時のメモリアドレスが変わってしまう
 
-void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page, const Uint8 in_alignSize,
+        return pMem;
+    }
+
+    HE_LOG_LINE(HE_STR_TEXT("警告: アプリ用のメモリアロケーターがない"));
+
+    return NULL;
+}
+#endif
+
+void* AllocateMemory(const HE::Uint32 in_uAllocateSize, const HE::Uint8 in_page, const HE::Uint8 in_alignSize,
                      const Core::Memory::Manager::EAllocateLocateType in_eLocateType,
-                     const UTF8* in_pFile, Uint32 in_uLine)
+                     const HE::UTF8* in_pFile, HE::Uint32 in_uLine)
 {
     void* pMem = (Core::Memory::Manager::I().Allocate(in_uAllocateSize, in_page, in_alignSize,
                                                       in_eLocateType, in_pFile, in_uLine));
@@ -69,12 +88,12 @@ void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page, const U
 /// <param name="in_pFile">呼び出したファイル</param>
 /// <param name="in_line">呼び出したファイル行</param>
 /// <returns>NULL 失敗 / 非NULL 確保したメモリのアドレス</returns>
-void* operator new(size_t in_size, Uint8 in_page, Uint8 in_alignSize,
+void* operator new(size_t in_size, HE::Uint8 in_page, HE::Uint8 in_alignSize,
                    Core::Memory::Manager::EAllocateLocateType in_eLocateType)
 {
     // VSのx64だとsize_tがunsigned int64になるが, 8byteフルサイズでの確保はないと思うので,
     // Uint32でサイズを調整した
-    Uint32 uMemSize = static_cast<Uint32>(in_size);
+    HE::Uint32 uMemSize = static_cast<HE::Uint32>(in_size);
     return (
         Core::Memory::Manager::I().AllocateMemory(uMemSize, in_page, in_alignSize, in_eLocateType));
 }
@@ -89,18 +108,18 @@ void* operator new(size_t in_size, Uint8 in_page, Uint8 in_alignSize,
 /// <param name="in_pFile">呼び出したファイル名</param>
 /// <param name="in_line">呼び出したファイル行数</param>
 /// <returns>NULL 失敗 / 非NULL 確保したメモリのアドレス</returns>
-void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
+void* operator new[](size_t in_size, HE::Uint8 in_page, HE::Uint8 in_alignSize,
                      Core::Memory::Manager::EAllocateLocateType in_eLocateType)
 {
     // VSのx64だとsize_tがunsigned int64になるが, 8byteフルサイズでの確保はないと思うので,
     // Uint32でサイズを調整した
-    Uint32 uMemSize = static_cast<Uint32>(in_size);
+    HE::Uint32 uMemSize = static_cast<HE::Uint32>(in_size);
     return (
         Core::Memory::Manager::I().AllocateMemory(uMemSize, in_page, in_alignSize, in_eLocateType));
 }
 
 // メモリ確保
-void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page, const Uint8 in_alignSize,
+void* AllocateMemory(const HE::Uint32 in_uAllocateSize, const HE::Uint8 in_page, const HE::Uint8 in_alignSize,
                      const Core::Memory::Manager::EAllocateLocateType in_eLocateType)
 {
     void* pMem = (Core::Memory::Manager::I().AllocateMemory(in_uAllocateSize, in_page, in_alignSize,

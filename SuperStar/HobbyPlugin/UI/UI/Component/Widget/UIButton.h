@@ -38,17 +38,17 @@ namespace UI
 
     public:
         UIButtonMessageHandlerDefault() = default;
-        UIButtonMessageHandlerDefault(const Char* in_szMsg, UIButtonMessageHandlerImpOnPush in_func)
-            : _onPush(in_func), _msg(in_szMsg)
+        UIButtonMessageHandlerDefault(const HE::Char* in_szMsg, UIButtonMessageHandlerImpOnPush in_func)
+            : _onPush(in_func), _szMsg(in_szMsg)
         {
         }
 
     protected:
-        void _VOnPushInternal() override final { this->_onPush(this->_msg); }
+        void _VOnPushInternal() override final { this->_onPush(this->_szMsg); }
 
     private:
         UIButtonMessageHandlerImpOnPush _onPush;
-        Core::Common::FixedString128 _msg;
+        Core::Common::FixedString128 _szMsg;
     };
 
     /// <summary>
@@ -68,18 +68,18 @@ namespace UI
         /// 登録に必要な情報を設定
         /// </summary>
         /// <param name="bAutoDelete">TRUEだとタスク破棄と同時に削除
-        virtual void VSetup(const Bool in_bAutoDelete = TRUE) override;
+        virtual void VSetup(const HE::Bool in_bAutoDelete = TRUE) override;
 
         /// <summary>
         /// コンポーネントの終了
         /// </summary>
-        virtual Bool VEnd() override;
+        virtual HE::Bool VEnd() override;
 
         /// <summary>
         /// コンポーネントの更新
         /// 必ず処理を記述
         /// </summary>
-        void VUpdate(const Float32 in_fDeltaTime) override;
+        void VUpdate(const HE::Float32 ) override;
 
         /// <summary>
         /// プッシュ通知のハンドラーを設定
@@ -90,8 +90,8 @@ namespace UI
             this->_pushHandler = std::move(in_spHandler);
         }
 
-        void SetWidth(const Float32 in_fW) { this->_fWidth = in_fW; }
-        void SetHeight(const Float32 in_fH) { this->_fHeight = in_fH; }
+        void SetWidth(const HE::Float32 in_fW) { this->_fWidth = in_fW; }
+        void SetHeight(const HE::Float32 in_fH) { this->_fHeight = in_fH; }
         void SetAnchor(const Core::Math::Rect2::EAnchor in_eAnchor) { this->_eAnchor = in_eAnchor; }
 
         /// <summary>
@@ -112,8 +112,8 @@ namespace UI
 
     private:
         Core::Memory::UniquePtr<UIButtonMessageHandler> _pushHandler;
-        Float32 _fWidth                     = 0.0f;
-        Float32 _fHeight                    = 0.0f;
+        HE::Float32 _fWidth                     = 0.0f;
+        HE::Float32 _fHeight                    = 0.0f;
         Core::Math::Rect2::EAnchor _eAnchor = Core::Math::Rect2::EAnchor_Left;
     };
 }  // namespace UI

@@ -31,29 +31,28 @@ namespace AssetManager
         template <class T>
         typename std::enable_if<std::is_base_of<AssetDataBase, T>::value,
                                 const Core::Common::Handle>::type
-        Load(const Char* in_pName, const Core::File::Path& in_rFilePath)
+        Load(const HE::Char* in_pName, const Core::File::Path& in_rFilePath)
         {
             HE_ASSERT(in_rFilePath.Empty() == FALSE);
             HE_ASSERT(in_pName);
             // TODO: 名前が重複した時はどうするかは考える
 
             // インスタンスを確保
-            auto p = this->_Alloc<T>();
+            auto [handle, p] = this->_Alloc<T>();
 
-            AssetDataBase* pAsset = p._pItem;
+            AssetDataBase* pAsset = p;
             pAsset->_VInit(in_pName,
                            Core::File::Path(this->_mountDirPath.Str(), in_rFilePath.Str()));
 
             // アセットのロードをして失敗したら確保したインスタンスを解放
             if (this->_Load(pAsset))
             {
-                return p._handle;
+                return handle;
             }
 
-            this->_Free(p._handle, TRUE);
-            p._handle.Clear();
+            this->_Free(handle, TRUE);
 
-            return Core::Common::Handle();
+            return NullHandle;
         }
 
         void Unload(const Core::Common::Handle&);
@@ -70,24 +69,24 @@ namespace AssetManager
         /// <summary>
         /// アセット格納ディレクトリ設定
         /// </summary>
-        void SetMountDir(const Char* in_szMountDir) { this->_mountDirPath = in_szMountDir; }
+        void SetMountDir(const HE::Char* in_szMountDir) { this->_mountDirPath = in_szMountDir; }
 
     protected:
         /// <summary>
         /// モジュール開始
         /// </summary>
-        Bool _VStart() override final;
+        HE::Bool _VStart() override final;
 
         /// <summary>
         /// モジュール解放
         /// インスタンス破棄時に呼ばれる
         /// </summary>
-        Bool _VRelease() override final;
+        HE::Bool _VRelease() override final;
 
-        Bool _VUpdate(const Float32 in_fDeltaTime) override final;
+        HE::Bool _VUpdate(const HE::Float32 in_fDeltaTime) override final;
 
     private:
-        Bool _Load(AssetDataBase* out_pAssetData);
+        HE::Bool _Load(AssetDataBase* out_pAssetData);
 
     private:
         Core::File::Path _mountDirPath;

@@ -22,17 +22,17 @@ namespace Core
             /// <summary>
             /// タスク開始
             /// </summary>
-            Bool VBegin() override final { return TRUE; }
+            HE::Bool VBegin() override final { return TRUE; }
 
             /// <summary>
             /// タスク終了
             /// </summary>
-            Bool VEnd() override final { return TRUE; }
+            HE::Bool VEnd() override final { return TRUE; }
 
             /// <summary>
             /// 更新
             /// </summary>
-            void VUpdate(const Float32) override final {}
+            void VUpdate(const HE::Float32) override final {}
         };
 
     }  // namespace Local
@@ -42,26 +42,27 @@ namespace Core
         this->End();
     }
 
-    Bool TaskManager::Init(const Uint32 in_taskMax, const Sint32 in_groupNum)
+    HE::Bool TaskManager::Init(const HE::Uint32 in_uTaskMax, const HE::Sint32 in_iGroupNum)
     {
         // 管理グループ数が0以下なら失敗
-        if (in_groupNum <= 0) return FALSE;
+        if (in_iGroupNum <= 0) return FALSE;
 
         // プールのバッファ予約
-        this->_ReservePool(in_taskMax);
+        this->_ReservePool(in_uTaskMax);
 
         // タスクグループを確保
-        this->_pTasks = HE_NEW_MEM_ARRAY(TaskGroup, in_groupNum, 0);
-        for (Uint32 i = 0; i < in_groupNum; ++i)
+        this->_pTasks = reinterpret_cast<TaskGroup*>( HE_ALLOC_MEM(sizeof(TaskGroup) * in_iGroupNum, 0));
+        for (HE::Uint32 i = 0; i < in_iGroupNum; ++i)
         {
             // 先頭と終端タスクを作成して設定
             this->_pTasks[i]._pRootTask = HE_NEW_MEM(Local::RootTask, 0);
             this->_pTasks[i]._pTailTask = this->_pTasks[i]._pRootTask;
             this->_pTasks[i]._uFlags    = 0;
+            this->_pTasks[i]._uCount    = 0;
         }
         HE_ASSERT(this->_pTasks && "タスクグループのメモリ確保に失敗");
 
-        this->_iGroupNum = in_groupNum;
+        this->_iGroupNum = in_iGroupNum;
 
         return TRUE;
     }
@@ -73,24 +74,24 @@ namespace Core
         // タスクを全て削除
         this->RemoveAll();
 
-        for (Uint32 i = 0; i < this->_iGroupNum; ++i)
+        for (HE::Uint32 i = 0; i < this->_iGroupNum; ++i)
         {
             // 先頭と終端タスクを作成して設定
             HE_SAFE_DELETE_MEM(this->_pTasks[i]._pRootTask);
         }
 
         // グループを削除
-        HE_SAFE_DELETE_MEM_ARRAY(this->_pTasks);
+        HE_SAFE_DELETE_MEM(this->_pTasks);
 
         this->_ReleasePool();
     }
 
-    void TaskManager::ForeachByGroup(const Sint32 in_sGroupId, std::function<void(Task*)> in_func)
+    void TaskManager::ForeachByGroup(const HE::Sint32 in_iGroupId, std::function<void(Task*)> in_func)
     {
-        HE_ASSERT(in_sGroupId < this->_iGroupNum);
+        HE_ASSERT(in_iGroupId < this->_iGroupNum);
 
         // 登録タスクを全更新
-        TaskGroup* pGroup = &this->_pTasks[in_sGroupId];
+        TaskGroup* pGroup = &this->_pTasks[in_iGroupId];
         Task* pTask       = pGroup->_pRootTask;
 
         // グループにポーズフラグが付いてるなら何もしない
@@ -109,17 +110,17 @@ namespace Core
         }
     }
 
-    void TaskManager::UpdateAll(const Float32 in_fDt)
+    void TaskManager::UpdateAll(const HE::Float32 in_fDt)
     {
-        for (Sint32 i = 0; i < this->_iGroupNum; ++i) this->UpdateByGroup(i, in_fDt);
+        for (HE::Sint32 i = 0; i < this->_iGroupNum; ++i) this->UpdateByGroup(i, in_fDt);
     }
 
-    void TaskManager::UpdateByGroup(const Sint32 in_sGroupId, const Float32 in_fDt)
+    void TaskManager::UpdateByGroup(const HE::Sint32 in_iGroupId, const HE::Float32 in_fDt)
     {
-        HE_ASSERT(in_sGroupId < this->_iGroupNum);
+        HE_ASSERT(in_iGroupId < this->_iGroupNum);
 
         // 登録タスクを全更新
-        TaskGroup* pGroup = &this->_pTasks[in_sGroupId];
+        TaskGroup* pGroup = &this->_pTasks[in_iGroupId];
         Task* pTask       = pGroup->_pRootTask;
 
         // グループにポーズフラグが付いてるなら何もしない
@@ -167,14 +168,14 @@ namespace Core
 
     void TaskManager::EventAll(const TaskData& in_rTaskData)
     {
-        for (Sint32 i = 0; i < this->_iGroupNum; ++i) this->EventByGroup(i, in_rTaskData);
+        for (HE::Sint32 i = 0; i < this->_iGroupNum; ++i) this->EventByGroup(i, in_rTaskData);
     }
 
-    void TaskManager::EventByGroup(const Sint32 in_sGroupId, const TaskData& in_rTaskData)
+    void TaskManager::EventByGroup(const HE::Sint32 in_iGroupId, const TaskData& in_rTaskData)
     {
-        HE_ASSERT(in_sGroupId < this->_iGroupNum);
+        HE_ASSERT(in_iGroupId < this->_iGroupNum);
 
-        TaskGroup* pGroup = &this->_pTasks[in_sGroupId];
+        TaskGroup* pGroup = &this->_pTasks[in_iGroupId];
         Task* pTask       = pGroup->_pRootTask;
 
         // グループにポーズフラグが付いてるなら何もしない
@@ -211,18 +212,18 @@ namespace Core
         pTask->_pTaskManager = NULL;
 
         // ハンドルを返却する + メモリから削除するかしないか
-        const Bool bCache = pTask->_bReleaseMem == FALSE;
+        const HE::Bool bCache = pTask->_bReleaseMem == FALSE;
         this->_Free(*in_pTask, bCache);
 
         in_pTask->Clear();
     }
 
-    void TaskManager::RemoveGroup(Sint32 in_groupId)
+    void TaskManager::RemoveGroup(HE::Sint32 in_iGroupId)
     {
-        HE_ASSERT(in_groupId < this->_iGroupNum);
+        HE_ASSERT(in_iGroupId < this->_iGroupNum);
 
         // 登録されているタスクを全て更新
-        TaskGroup* pGroup = &_pTasks[in_groupId];
+        TaskGroup* pGroup = &_pTasks[in_iGroupId];
         Task* pTask       = pGroup->_pRootTask;
         pTask             = pGroup->_pRootTask->_pNext;
         while (pTask)
@@ -242,20 +243,20 @@ namespace Core
         HE_ASSERT(this->_pTasks);
 
         // タスクを全て削除
-        for (Sint32 i = 0; i < this->_iGroupNum; ++i) this->RemoveGroup(i);
+        for (HE::Sint32 i = 0; i < this->_iGroupNum; ++i) this->RemoveGroup(i);
     }
 
-    Bool TaskManager::MoveGroupAll(const Sint32 in_orgGroupId, const Sint32 in_targetGroupId)
+    HE::Bool TaskManager::MoveGroupAll(const HE::Sint32 in_iGrgGroupId, const HE::Sint32 in_iTargetGroupId)
     {
-        HE_ASSERT(in_orgGroupId < this->_iGroupNum && "グループ元のグループID値が間違っている");
-        HE_ASSERT(in_targetGroupId < this->_iGroupNum &&
+        HE_ASSERT(in_iGrgGroupId < this->_iGroupNum && "グループ元のグループID値が間違っている");
+        HE_ASSERT(in_iTargetGroupId < this->_iGroupNum &&
                   "グループ移動させるグループID値が間違っている");
 
         // 付け替え元と付け替え先のグループIDが同じなので何もしない
-        if (in_orgGroupId == in_targetGroupId) return FALSE;
+        if (in_iGrgGroupId == in_iTargetGroupId) return FALSE;
 
         // 登録されているグループタスクを全て更新
-        TaskGroup* pGroup = &_pTasks[in_orgGroupId];
+        TaskGroup* pGroup = &_pTasks[in_iGrgGroupId];
         Task* pTask       = pGroup->_pRootTask;
         pTask             = pGroup->_pRootTask->_pNext;
         while (pTask)
@@ -268,7 +269,7 @@ namespace Core
                 this->_Dettach(pTask);
 
                 // 別のグループに付け替える
-                this->_Attach(pTask, in_targetGroupId);
+                this->_Attach(pTask, in_iTargetGroupId);
             }
 
             // 逃がしておいた次のポインタを得る
@@ -278,7 +279,7 @@ namespace Core
         return TRUE;
     }
 
-    Bool TaskManager::MoveGropuTask(const Common::Handle& in_hTask, const Sint32 in_groupId)
+    HE::Bool TaskManager::MoveGropuTask(const Common::Handle& in_hTask, const HE::Sint32 in_iGroupId)
     {
         HE_ASSERT(in_hTask.Null() == FALSE);
 
@@ -287,7 +288,7 @@ namespace Core
 
         if (this->_Dettach(pTask) == Task::iNoneGroupId) return FALSE;
 
-        if (this->_Attach(pTask, in_groupId) == FALSE) return FALSE;
+        if (this->_Attach(pTask, in_iGroupId) == FALSE) return FALSE;
 
         return TRUE;
     }
@@ -303,65 +304,65 @@ namespace Core
         return pTask;
     }
 
-    void TaskManager::EnableFlag(const Sint32 in_groupId, const Uint32 in_flags)
+    void TaskManager::EnableFlag(const HE::Sint32 in_iGroupId, const HE::Uint32 in_uFlags)
     {
-        HE_ASSERT(in_groupId < this->_iGroupNum);
+        HE_ASSERT(in_iGroupId < this->_iGroupNum);
 
-        TaskGroup* pGroup = &this->_pTasks[in_groupId];
-        pGroup->_uFlags |= in_flags;
+        TaskGroup* pGroup = &this->_pTasks[in_iGroupId];
+        pGroup->_uFlags |= in_uFlags;
     }
 
-    void TaskManager::DisableFlag(const Sint32 in_groupId, const Uint32 in_flags)
+    void TaskManager::DisableFlag(const HE::Sint32 in_iGroupId, const HE::Uint32 in_uFlags)
     {
-        HE_ASSERT(in_groupId < this->_iGroupNum);
-        TaskGroup* pGroup = &this->_pTasks[in_groupId];
-        pGroup->_uFlags &= ~in_flags;
+        HE_ASSERT(in_iGroupId < this->_iGroupNum);
+        TaskGroup* pGroup = &this->_pTasks[in_iGroupId];
+        pGroup->_uFlags &= ~in_uFlags;
     }
 
-    Uint32 TaskManager::Flag(const Sint32 in_groupId) const
+    HE::Uint32 TaskManager::Flag(const HE::Sint32 in_iGroupId) const
     {
-        HE_ASSERT(in_groupId < this->_iGroupNum);
-        TaskGroup* pGroup = &this->_pTasks[in_groupId];
+        HE_ASSERT(in_iGroupId < this->_iGroupNum);
+        TaskGroup* pGroup = &this->_pTasks[in_iGroupId];
         return pGroup->_uFlags;
     }
 
-    Uint32 TaskManager::Count(const Sint32 in_groupId) const
+    HE::Uint32 TaskManager::Count(const HE::Sint32 in_iGroupId) const
     {
-        HE_ASSERT(in_groupId < this->_iGroupNum);
-        TaskGroup* pGroup = &this->_pTasks[in_groupId];
+        HE_ASSERT(in_iGroupId < this->_iGroupNum);
+        TaskGroup* pGroup = &this->_pTasks[in_iGroupId];
         return pGroup->_uCount;
     }
 
     /// <summary>
     /// タスク追加する
     /// </summary>
-    Bool TaskManager::_Attach(Task* in_pTask, const Sint32 in_groupId)
+    HE::Bool TaskManager::_Attach(Task* in_pTask, const HE::Sint32 in_iGroupId)
     {
-        HE_ASSERT(Task::iNoneGroupId < in_groupId);
-        HE_ASSERT(in_groupId < this->_iGroupNum);
+        HE_ASSERT(Task::iNoneGroupId < in_iGroupId);
+        HE_ASSERT(in_iGroupId < this->_iGroupNum);
 
         HE_ASSERT((in_pTask != NULL) && "タスクに割り当ている数がいっぱいで割り当てに失敗");
 
         // アタッチ
         Task** ppTask        = &in_pTask;
-        (*ppTask)->_iGroupId = in_groupId;
+        (*ppTask)->_iGroupId = in_iGroupId;
 
         // グループの終端に登録
-        Task* pTailTask   = this->_pTasks[in_groupId]._pTailTask;
+        Task* pTailTask   = this->_pTasks[in_iGroupId]._pTailTask;
         pTailTask->_pNext = in_pTask;
 
         // タスクの初期化
         (*ppTask)->_pPrev        = pTailTask;
         (*ppTask)->_pNext        = NULL;
-        (*ppTask)->_iGroupId     = in_groupId;
+        (*ppTask)->_iGroupId     = in_iGroupId;
         (*ppTask)->_bStart       = FALSE;
         (*ppTask)->_bKill        = FALSE;
         (*ppTask)->_pTaskManager = this;
 
         // 新たな終端に据える
-        this->_pTasks[in_groupId]._pTailTask = in_pTask;
+        this->_pTasks[in_iGroupId]._pTailTask = in_pTask;
 
-        ++this->_pTasks[in_groupId]._uCount;
+        ++this->_pTasks[in_iGroupId]._uCount;
 
         return TRUE;
     }
@@ -369,7 +370,7 @@ namespace Core
     /// <summary>
     /// タスクをグループから外す
     /// </summary>
-    Sint32 TaskManager::_Dettach(Task* in_pTask)
+    HE::Sint32 TaskManager::_Dettach(Task* in_pTask)
     {
         // タスクの前後付け替え
         Task* pPrevTask = in_pTask->_pPrev;
@@ -382,7 +383,7 @@ namespace Core
         if (pNextTask != NULL) pNextTask->_pPrev = pPrevTask;
 
         // 今回削除するのが終端タスクか
-        Sint32 iGroupId = in_pTask->_iGroupId;
+        HE::Uint32 iGroupId = in_pTask->_iGroupId;
         if (iGroupId != Task::iNoneGroupId)
         {
             if (0 <= iGroupId && iGroupId < this->_iGroupNum)

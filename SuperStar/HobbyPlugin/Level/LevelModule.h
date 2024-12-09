@@ -42,27 +42,27 @@ namespace Level
         /// <summary>
         /// モジュール初期化
         /// </summary>
-        Bool _VStart() override final;
+        HE::Bool _VStart() override final;
 
         /// <summary>
         /// インスタンス破棄時に呼ばれる
         /// </summary>
-        Bool _VRelease() override final;
+        HE::Bool _VRelease() override final;
 
         /// <summary>
         /// 前更新
         /// </summary>
-        Bool _VBeforeUpdate(const Float32) override final;
+        HE::Bool _VBeforeUpdate(const HE::Float32) override final;
 
         /// <summary>
         /// 更新
         /// </summary>
-        Bool _VUpdate(const Float32) override final;
+        HE::Bool _VUpdate(const HE::Float32) override final;
 
         /// <summary>
         /// 後更新
         /// </summary>
-        Bool _VLateUpdate(const Float32) override final;
+        HE::Bool _VLateUpdate(const HE::Float32) override final;
 
     private:
         std::shared_ptr<Manager> _spLevelManager = NULL;

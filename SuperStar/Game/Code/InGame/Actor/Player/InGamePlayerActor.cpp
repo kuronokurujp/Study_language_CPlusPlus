@@ -30,7 +30,7 @@ namespace InGame
         this->_parameter        = this->_defaultParameter;
     }
 
-    Bool InGamePlayerActor::VBegin()
+    HE::Bool InGamePlayerActor::VBegin()
     {
         if (InGameScene2DActor::VBegin() == FALSE) return FALSE;
 
@@ -113,7 +113,7 @@ namespace InGame
         return TRUE;
     }
 
-    Bool InGamePlayerActor::VEnd()
+    HE::Bool InGamePlayerActor::VEnd()
     {
         // 弾の機能解放
         for (auto itr = this->_mShotStrategy.Begin(); itr != this->_mShotStrategy.End(); ++itr)
@@ -124,7 +124,7 @@ namespace InGame
         return InGameScene2DActor::VEnd();
     }
 
-    void InGamePlayerActor::VUpdate(const Float32 in_fDt)
+    void InGamePlayerActor::VUpdate(const HE::Float32 in_fDt)
     {
         InGameScene2DActor::VUpdate(in_fDt);
 
@@ -225,7 +225,7 @@ namespace InGame
 #endif
     }
 
-    Bool InGamePlayerActor::Damage(const Sint32 in_sDamage)
+    HE::Bool InGamePlayerActor::Damage(const HE::Sint32 in_sDamage)
     {
         this->_parameter.ulife -= in_sDamage;
         if (this->_parameter.ulife <= 0) return TRUE;

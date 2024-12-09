@@ -3,19 +3,19 @@
 namespace Core::Common
 {
     // 65536未満で最大の素数
-    constexpr Uint32 uBase = 65521L;
+    constexpr HE::Uint32 uBase = 65521L;
 
     // NMAXは 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1を満たすnの最大数
-    constexpr const Uint32 uNMax = 5552;
+    constexpr const HE::Uint32 uNMax = 5552;
 
-    Uint64 HashName(const Char* in_szIdent)
+    HE::Uint64 HashName(const HE::Char* in_szIdent)
     {
         if (in_szIdent == NULL) return 0;
 
         if (HE_STR_CMP(in_szIdent, HE_STR_TEXT("*")) == 0) return 0;
 
-        Uint32 s1 = 0;
-        Uint32 s2 = 0;
+        HE::Uint32 s1 = 0;
+        HE::Uint32 s2 = 0;
 
 #define DO1(buf, i)                   \
     {                                 \
@@ -39,8 +39,8 @@ namespace Core::Common
     DO8(buf, 0);  \
     DO8(buf, 8);
 
-        Uint32 k = 0;
-        for (Uint32 len = static_cast<Uint32>(HE_STR_LEN(in_szIdent)); 0 < len;)
+        HE::Uint32 k = 0;
+        for (HE::Uint32 len = static_cast<HE::Uint32>(HE_STR_SIZE(in_szIdent)); 0 < len;)
         {
             k = len < uNMax ? len : uNMax;
             len -= k;
@@ -68,7 +68,7 @@ namespace Core::Common
 #pragma warning(push)
 #pragma warning(disable : 4312)
 
-        return static_cast<Uint64>((s2 << 16) | s1);
+        return static_cast<HE::Uint64>((s2 << 16) | s1);
 
 #pragma warning(pop)
 #undef DO1

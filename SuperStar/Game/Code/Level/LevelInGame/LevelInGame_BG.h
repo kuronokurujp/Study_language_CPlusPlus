@@ -22,18 +22,16 @@ namespace Level
     public:
         LevelInGame_BG() : Level::Node() {}
 
-        Bool VBegin() override final;
-        Bool VEnd() override final;
+        HE::Bool VBegin() override final;
+        HE::Bool VEnd() override final;
 
         /// <summary>
         /// 更新
         /// </summary>
-        void VUpdate(const Float32 in_fDt) override final;
+        void VUpdate(const HE::Float32 in_fDt) override final;
 
     private:
         Render::Point2D* _aPoint  = NULL;
-        const Uint32 _uPointCount = 64;
-
-        Core::Common::Handle _viewHandle;
+        const HE::Uint32 _uPointCount = 64;
     };
 }  // namespace Level

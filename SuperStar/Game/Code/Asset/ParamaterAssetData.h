@@ -16,48 +16,48 @@ namespace Game::Asset
         /// <summary>
         /// パラメータのバージョン値
         /// </summary>
-        inline Uint32 Version() const { return this->_version; }
+        inline HE::Uint32 Version() const { return this->_version; }
 
         // パラメータの取得
-        Uint32 GetUInt32ByIdData(const UTF8* in_pIdName, const UTF8* in_pFieldName);
-        Sint32 GetSInt32ByIdData(const UTF8* in_pIdName, const UTF8* in_pFieldName);
-        Float32 GetFloat32ByIdData(const UTF8* in_pIdName, const UTF8* in_pFieldName);
-        Core::Common::FixedString1024 GetCharByIdData(const UTF8* in_pIdName,
-                                                      const UTF8* in_pFieldName);
+        HE::Uint32 GetUInt32ByIdData(const HE::UTF8* in_pIdName, const HE::UTF8* in_pFieldName);
+        HE::Sint32 GetSInt32ByIdData(const HE::UTF8* in_pIdName, const HE::UTF8* in_pFieldName);
+        HE::Float32 GetFloat32ByIdData(const HE::UTF8* in_pIdName, const HE::UTF8* in_pFieldName);
+        Core::Common::FixedString1024 GetCharByIdData(const HE::UTF8* in_pIdName,
+                                                      const HE::UTF8* in_pFieldName);
 
-        Bool IsId(const UTF8* in_pIdName);
+        HE::Bool IsId(const HE::UTF8* in_pIdName);
 
     protected:
         // パラメータ取得用のを別途用意していているので汎用取得のは使えないようにする
-        virtual Uint32 VGetUInt32(
-            const std::initializer_list<const UTF8*>& in_rTokens) override final
+        virtual HE::Uint32 VGetUInt32(
+            const std::initializer_list<const HE::UTF8*>& in_rTokens) override final
         {
             return AssetDataJson::VGetUInt32(in_rTokens);
         }
 
-        virtual Sint32 VGetSInt32(
-            const std::initializer_list<const UTF8*>& in_rTokens) override final
+        virtual HE::Sint32 VGetSInt32(
+            const std::initializer_list<const HE::UTF8*>& in_rTokens) override final
         {
             return AssetDataJson::VGetSInt32(in_rTokens);
         }
 
-        virtual Float32 VGetFloat32(
-            const std::initializer_list<const UTF8*>& in_rTokens) override final
+        virtual HE::Float32 VGetFloat32(
+            const std::initializer_list<const HE::UTF8*>& in_rTokens) override final
         {
             return AssetDataJson::VGetFloat32(in_rTokens);
         }
 
         virtual Core::Common::FixedString1024 VGetChar(
-            const std::initializer_list<const UTF8*>& in_rTokens) override final
+            const std::initializer_list<const HE::UTF8*>& in_rTokens) override final
         {
             return AssetDataJson::VGetChar(in_rTokens);
         }
 
     protected:
-        virtual Bool _VLoad(::Platform::FileInterface&) override final;
+        virtual HE::Bool _VLoad(::Platform::FileInterface&) override final;
         virtual void _VUnload() override final;
 
     private:
-        Uint32 _version = 0;
+        HE::Uint32 _version = 0;
     };
 }  // namespace Game::Asset

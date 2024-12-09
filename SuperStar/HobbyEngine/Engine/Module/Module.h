@@ -3,7 +3,7 @@
 #include "Engine/Common/CustomMap.h"
 #include "Engine/Common/CustomVector.h"
 #include "Engine/Common/Singleton.h"
-#include "Engine/Engine.h"
+// #include "Engine/Engine.h"
 
 namespace Module
 {
@@ -27,7 +27,7 @@ namespace Module
     class ModuleManager
     {
     public:
-        ModuleBase* Get(const Char* in_szName) const;
+        ModuleBase* Get(const HE::Char* in_szName) const;
 
         template <class T>
         T* Get() const
@@ -41,35 +41,35 @@ namespace Module
         /// <summary>
         /// ヒープ作成したモジュールを登録
         /// </summary>
-        Bool RegistHeapModule(ModuleBase* in_pModule);
+        HE::Bool RegistHeapModule(ModuleBase* in_pModule);
 
         /// <summary>
         /// モジュールの利用開始
         /// </summary>
-        Bool Start(const ELayer);
+        HE::Bool Start(const ELayer);
 
         /// <summary>
         /// 解放
         /// </summary>
-        Bool Release();
+        HE::Bool Release();
 
         /// <summary>
         /// モジュール群の前更新
         /// </summary>
-        void BeforeUpdate(const Float32 in_fDeltaTime);
+        void BeforeUpdate(const HE::Float32 in_fDeltaTime);
 
         /// <summary>
         /// モジュール群の更新
         /// </summary>
-        void Update(const Float32 in_fDeltaTime);
+        void Update(const HE::Float32 in_fDeltaTime);
 
         /// <summary>
         /// モジュール群の後更新
         /// </summary>
-        void LateUpdate(const Float32 in_fDeltaTime);
+        void LateUpdate(const HE::Float32 in_fDeltaTime);
 
     private:
-        Bool _StartModule(ModuleBase&);
+        HE::Bool _StartModule(ModuleBase&);
         void _SortModuleVector(Core::Common::VectorBase<ModuleBase*>* out);
 
     private:
@@ -93,23 +93,19 @@ namespace Module
 
     public:
         ModuleBase(const char* in_szName, ELayer const in_eLayer = ELayer::ELayer_Logic,
-                   const Sint32 in_prioriry = 0);
+                   const HE::Uint32 in_prioriry = 0);
         virtual ~ModuleBase() = default;
 
         template <typename T>
         T* GetDependenceModule()
         {
             Core::Common::FixedString64 szName(T::ModuleName());
-            auto pTargetModule = reinterpret_cast<T*>(HE_ENGINE.ModuleManager().Get(szName.Str()));
-            if (pTargetModule == NULL)
-            {
-                HE_PG_LOG_LINE(HE_STR_TEXT("指定したモジュール(%s)が存在しない"), szName.Str());
-                return NULL;
-            }
+            auto pTargetModule = reinterpret_cast<T*>(this->_GetModule(szName));
+            if (pTargetModule == NULL) return NULL;
 
             // 依存対象のモジュールかどうかチェック
-            Bool bHit = FALSE;
-            for (Uint32 i = 0; i < this->_vDependenceModuleName.Size(); ++i)
+            HE::Bool bHit = FALSE;
+            for (HE::Uint32 i = 0; i < this->_vDependenceModuleName.Size(); ++i)
             {
                 if (this->_vDependenceModuleName[i] == szName)
                 {
@@ -132,41 +128,41 @@ namespace Module
             return this->_vDependenceModuleName;
         }
 
-        inline const Char* Name() const HE_NOEXCEPT { return this->_szName.Str(); }
+        inline const HE::Char* Name() const HE_NOEXCEPT { return this->_szName.Str(); }
         inline ELayer Layer() const HE_NOEXCEPT { return this->_eLayer; }
 
         /// <summary>
         /// モジュール処理優先度
         /// 値が大きいほど後に処理
         /// </summary>
-        inline Sint32 Priority() const { return this->_priority; }
+        inline HE::Uint32 Priority() const { return this->_priority; }
 
     protected:
         /// <summary>
         /// モジュールの開始
         /// </summary>
-        virtual Bool _VStart() = 0;
+        virtual HE::Bool _VStart() = 0;
 
         /// <summary>
         /// モジュールの解放
         /// インスタンス破棄時に呼ばれる
         /// </summary>
-        virtual Bool _VRelease() = 0;
+        virtual HE::Bool _VRelease() = 0;
 
         /// <summary>
         /// モジュール前更新
         /// </summary>
-        virtual Bool _VBeforeUpdate(const Float32 in_fDeltaTime) { return TRUE; }
+        virtual HE::Bool _VBeforeUpdate(const HE::Float32 in_fDeltaTime) { return TRUE; }
 
         /// <summary>
         /// モジュール更新
         /// </summary>
-        virtual Bool _VUpdate(const Float32 in_fDeltaTime) { return TRUE; }
+        virtual HE::Bool _VUpdate(const HE::Float32 in_fDeltaTime) { return TRUE; }
 
         /// <summary>
         /// モジュール後更新
         /// </summary>
-        virtual Bool _VLateUpdate(const Float32 in_fDeltaTime) { return TRUE; }
+        virtual HE::Bool _VLateUpdate(const HE::Float32 in_fDeltaTime) { return TRUE; }
 
         template <class T>
         void _AppendDependenceModule()
@@ -175,14 +171,16 @@ namespace Module
         }
 
     private:
+        ModuleBase* _GetModule(Core::Common::StringBase&);
+
 #ifdef HE_ENGINE_DEBUG
-        Bool _ValidateDependenceModule();
+        HE::Bool _ValidateDependenceModule();
 #endif
 
     private:
         Core::Common::FixedString128 _szName;
         ELayer _eLayer   = ELayer_Logic;
-        Sint32 _priority = 0;
+        HE::Uint32 _priority = 0;
 
 #ifdef HE_ENGINE_DEBUG
         Core::Common::FixedVector<ModuleBase*, 64> _vDependenceModule;
@@ -199,7 +197,7 @@ namespace Module
 // _type_にクラス型を記述
 #define HE_MODULE_GENRATE_DECLARATION(_type_) \
 public:                                       \
-    static const UTF8* ModuleName()           \
+    static const HE::UTF8* ModuleName()           \
     {                                         \
         return #_type_;                       \
     }

@@ -31,7 +31,7 @@ namespace Render
         return handle;
     }
 
-    Bool Window::RemoveViewPort(const Core::Common::Handle& in_rHandle)
+    HE::Bool Window::RemoveViewPort(const Core::Common::Handle& in_rHandle)
     {
         auto pViewPort = this->_Ref(in_rHandle);
         HE_ASSERT(pViewPort);
@@ -49,7 +49,7 @@ namespace Render
         this->_bShow = TRUE;
     }
 
-    Bool Window::_Setup(Core::Memory::UniquePtr<WindowStrategy> in_upConfig)
+    HE::Bool Window::_Setup(Core::Memory::UniquePtr<WindowStrategy> in_upConfig)
     {
         this->_upStrategy = std::move(in_upConfig);
         HE_ASSERT(0 < this->_upStrategy->ViewPortCount());
@@ -146,7 +146,7 @@ namespace Render
         return this->_upConfig.get();
     }
 
-    Bool ViewPort::_Setup(Core::Memory::UniquePtr<ViewPortConfig> in_upConfig)
+    HE::Bool ViewPort::_Setup(Core::Memory::UniquePtr<ViewPortConfig> in_upConfig)
     {
         this->_upConfig = std::move(in_upConfig);
         this->_ReleasePool();
@@ -173,7 +173,7 @@ namespace Render
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upConfig);
     }
 
-    Bool SceneViewBase::_PushCommand(Command&& in_rrCmd)
+    HE::Bool SceneViewBase::_PushCommand(Command&& in_rrCmd)
     {
         // コマンドをコピー
         // 要素を先頭に追加

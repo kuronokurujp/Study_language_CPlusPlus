@@ -69,7 +69,7 @@ namespace EnhancedInput
             struct Touch
             {
                 Platform::EInputMouseType eType;
-                Float32 fX, fY;
+                HE::Float32 fX, fY;
             } touch;
         } item;
     };
@@ -111,7 +111,7 @@ namespace EnhancedInput
         /// </summary>
         /// <param name="in_pActonName"></param>
         void RemoveCommonMappingAction(const ActionMap&);
-        void RemoveCommonMappingAction(const Char*);
+        void RemoveCommonMappingAction(const HE::Char*);
 
         const InputMap& GetInputMap() const { return this->_mInputAction; }
 
@@ -119,15 +119,15 @@ namespace EnhancedInput
         /// <summary>
         /// モジュール初期化
         /// </summary>
-        Bool _VStart() override final;
+        HE::Bool _VStart() override final;
 
         /// <summary>
         /// インスタンス破棄時に呼ばれる
         /// </summary>
-        Bool _VRelease() override final;
+        HE::Bool _VRelease() override final;
 
-        Bool _VBeforeUpdate(const Float32 in_fDeltaTime) override final;
-        Bool _VUpdate(const Float32 in_fDeltaTime) override final;
+        HE::Bool _VBeforeUpdate(const HE::Float32 in_fDeltaTime) override final;
+        HE::Bool _VUpdate(const HE::Float32 in_fDeltaTime) override final;
 
     private:
         /// <summary>

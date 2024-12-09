@@ -15,8 +15,8 @@ namespace UI::Builder
     /// </summary>
     namespace Local
     {
-        static const Char s_treeNodeDelimita = HE_STR_TEXT('.');
-        static const Char s_locGroupDelimita = HE_STR_TEXT('.');
+        static const HE::Char s_treeNodeDelimita = HE_STR_TEXT('.');
+        static const HE::Char s_locGroupDelimita = HE_STR_TEXT('.');
 
         /// <summary>
         /// UIのスタイルカラー
@@ -24,13 +24,13 @@ namespace UI::Builder
         struct StyleColor
         {
         public:
-            StyleColor(const UTF8* in_szName, Render::Color in_rgba)
+            StyleColor(const HE::UTF8* in_szName, Render::Color in_rgba)
             {
                 this->szName = in_szName;
                 this->rgba   = in_rgba;
             }
 
-            const UTF8* szName = NULL;
+            const HE::UTF8* szName = NULL;
             Render::Color rgba;
         };
 
@@ -60,21 +60,21 @@ namespace UI::Builder
             return EAnchor_Left;
         }
 
-        static void _ParseStyle(Style* out, const UTF8* in_szName, const Uint32 in_uSize)
+        static void _ParseStyle(Style* out, const HE::UTF8* in_szName, const HE::Uint32 in_uSize)
         {
-            static UTF8 buff[1024] = {0};
+            static HE::UTF8 buff[1024] = {0};
 
             HE_ASSERT(in_uSize < HE_ARRAY_SIZE(buff));
             ::memset(out, 0, sizeof(Style));
 
             ::memcpy_s(buff, HE_ARRAY_SIZE(buff), in_szName, in_uSize);
-            UTF8* pRestartToken = NULL;
-            UTF8* pToken        = ::strtok_s(buff, ";", &pRestartToken);
+            HE::UTF8* pRestartToken = NULL;
+            HE::UTF8* pToken        = ::strtok_s(buff, ";", &pRestartToken);
 
             while (pToken != NULL)
             {
-                UTF8* szKey  = ::strtok(pToken, ":");
-                UTF8* pValue = ::strtok(NULL, ":");
+                HE::UTF8* szKey  = ::strtok(pToken, ":");
+                HE::UTF8* pValue = ::strtok(NULL, ":");
 
                 if (szKey && pValue)
                 {
@@ -83,23 +83,23 @@ namespace UI::Builder
 
                     if (::strcmp(szKey, "w") == 0)
                     {
-                        out->w = static_cast<Float32>(::atof(pValue));
+                        out->fW = static_cast<HE::Float32>(::atof(pValue));
                     }
                     else if (::strcmp(szKey, "h") == 0)
                     {
-                        out->h = static_cast<Float32>(::atoi(pValue));
+                        out->fH = static_cast<HE::Float32>(::atoi(pValue));
                     }
                     else if (::strcmp(szKey, "color") == 0)
                     {
-                        UTF8 szColorName[128] = {0};
+                        HE::UTF8 szColorName[128] = {0};
                         ::strncpy_s(szColorName, HE_ARRAY_NUM(szColorName), pValue,
                                     HE_ARRAY_NUM(szColorName));
                         // TODO: キーワードと色名の対応テーブルを作る
-                        for (Uint32 i = 0; i < HE_ARRAY_NUM(s_aColorTable); ++i)
+                        for (HE::Uint32 i = 0; i < HE_ARRAY_NUM(s_aColorTable); ++i)
                         {
                             if (::strcmp(s_aColorTable[i].szName, szColorName) == 0)
                             {
-                                out->color = s_aColorTable[i].rgba.c;
+                                out->uColor = s_aColorTable[i].rgba.c;
                                 break;
                             }
                         }
@@ -144,7 +144,7 @@ namespace UI::Builder
                 pBtn->eAnchor      = _GetPosAnchor(in_rNode);
 
                 auto s = in_rNode.attribute("style").value();
-                _ParseStyle(&pBtn->style, s, static_cast<Uint32>(::strlen(s)));
+                _ParseStyle(&pBtn->style, s, static_cast<HE::Uint32>(::strlen(s)));
             }
             else if (szAttrName == HE_STR_TEXT("t"))
             {
@@ -170,20 +170,20 @@ namespace UI::Builder
 
                         Core::Common::OutputSplitString(aSplitName, szTmp, s_locGroupDelimita);
                         HE_STR_CPY_S(pLabel->szLoc, HE_ARRAY_NUM(pLabel->szLoc),
-                                     aSplitName[0].Str(), aSplitName[0].Length());
+                                     aSplitName[0].Str(), aSplitName[0].Size());
 
                         HE_STR_CPY_S(pLabel->szText, HE_ARRAY_NUM(pLabel->szText),
-                                     aSplitName[1].Str(), aSplitName[1].Length());
+                                     aSplitName[1].Str(), aSplitName[1].Size());
                     }
                     else
                     {
                         HE_STR_CPY_S(pLabel->szText, HE_ARRAY_NUM(pLabel->szText), szTmp.Str(),
-                                     szTmp.Length());
+                                     szTmp.Size());
                     }
                 }
 
                 auto s = in_rNode.attribute("style").value();
-                _ParseStyle(&pLabel->style, s, static_cast<Uint32>(::strlen(s)));
+                _ParseStyle(&pLabel->style, s, static_cast<HE::Uint32>(::strlen(s)));
             }
             else if (szAttrName == HE_STR_TEXT("l"))
             {
@@ -191,22 +191,22 @@ namespace UI::Builder
                 auto pLayout       = &pData->exData.layout;
 
                 auto s = in_rNode.attribute("style").value();
-                _ParseStyle(&pLayout->style, s, static_cast<Uint32>(::strlen(s)));
+                _ParseStyle(&pLayout->style, s, static_cast<HE::Uint32>(::strlen(s)));
             }
 
             Core::Common::FixedString1024 szIdName(in_rNode.attribute("id").value());
             HE_STR_ERRNO e = HE_STR_CPY_S(pData->szId, HE_ARRAY_NUM(pData->szId), szIdName.Str(),
-                                          szIdName.Length());
+                                          szIdName.Size());
             HE_ASSERT(HE_STR_SUCCESS(e) && "文字列のコピーでエラー");
         }
     }  // namespace Local
 
-    Bool UILayoutData::OutputNodeByRootPos(Node* out, const UTF8* in_szName)
+    HE::Bool UILayoutData::OutputNodeByRootPos(Node* out, const HE::UTF8* in_szName)
     {
         HE_ASSERT(out);
 
         Core::Common::FixedString256 nodeName(in_szName);
-        Uint64 ulTargetNodeHash = nodeName.Hash();
+        HE::Uint64 ulTargetNodeHash = nodeName.Hash();
 
         auto libNode = this->_doc.child(in_szName);
         HE_ASSERT(libNode.empty() == FALSE && "ノードがない");
@@ -216,7 +216,7 @@ namespace UI::Builder
         return TRUE;
     }
 
-    Bool UILayoutData::OutputNode(Node* out, const Node& in_rParentNode, const UTF8* in_szName)
+    HE::Bool UILayoutData::OutputNode(Node* out, const Node& in_rParentNode, const HE::UTF8* in_szName)
     {
         HE_ASSERT(out);
         HE_ASSERT(in_rParentNode.pNode);

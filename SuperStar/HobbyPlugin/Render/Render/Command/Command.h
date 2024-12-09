@@ -9,8 +9,8 @@ namespace Render
 {
     struct Point2D
     {
-        Float32 fX = 0.0f;
-        Float32 fY = 0.0f;
+        HE::Float32 fX = 0.0f;
+        HE::Float32 fY = 0.0f;
         Color color;
     };
 
@@ -36,12 +36,12 @@ namespace Render
     /// </summary>
     struct Cmd2DTextDraw
     {
-        Float32 fX = 0.0f;
-        Float32 fY = 0.0f;
+        HE::Float32 fX = 0.0f;
+        HE::Float32 fY = 0.0f;
         Color color;
         Core::Math::Rect2::EAnchor anchor = Core::Math::Rect2::EAnchor_Left;
 
-        Char szChars[128] = {0};
+        HE::Char szChars[128] = {0};
     };
 
     /// <summary>
@@ -49,11 +49,11 @@ namespace Render
     /// </summary>
     struct Cmd2DRectDraw
     {
-        Float32 fLeftX = 0.0f;
-        Float32 fLeftY = 0.0f;
+        HE::Float32 fLeftX = 0.0f;
+        HE::Float32 fLeftY = 0.0f;
 
-        Float32 fRightX = 0.0f;
-        Float32 fRightY = 0.0f;
+        HE::Float32 fRightX = 0.0f;
+        HE::Float32 fRightY = 0.0f;
 
         Color color;
     };
@@ -72,7 +72,7 @@ namespace Render
     struct Cmd2DPointArrayDraw
     {
         const Point2D* aPoint = NULL;
-        Uint32 uCount         = 0;
+        HE::Uint32 uCount         = 0;
     };
 
     /// <summary>
@@ -86,7 +86,7 @@ namespace Render
     struct Cmd2DCircleDraw
     {
         Point2D point;
-        Float32 fSize = 0.0f;
+        HE::Float32 fSize = 0.0f;
         Color color;
     };
 
@@ -96,11 +96,11 @@ namespace Render
     /// </summary>
     struct Command
     {
-        Uint32 uType = 0;
+        HE::Uint32 uType = 0;
         union
         {
             // バッファ
-            Uint64 ulaWork[128] = {};
+            HE::Uint64 ulaWork[128] = {};
 
             // TODO: バッファ超えていた場合はコンパイルエラーを出すことはできるのだろうか？
             CmdClsScreen clsScree;
@@ -137,7 +137,7 @@ namespace Render
     /// 2D点群描画
     /// </summary>
     extern void Command2DPointArrayDraw(const Core::Common::Handle& in_rViewHandle,
-                                        const Point2D* in_aPoint, const Uint32 in_uCount);
+                                        const Point2D* in_aPoint, const HE::Uint32 in_uCount);
 
     /// <summary>
     /// 画面クリア
@@ -149,7 +149,7 @@ namespace Render
     /// 2D円の描画
     /// </summary>
     extern void Command2DCircleDraw(const Core::Common::Handle& in_rViewHandle,
-                                    const Core::Math::Vector2& in_rPos, const Float32 in_fSize,
+                                    const Core::Math::Vector2& in_rPos, const HE::Float32 in_fSize,
                                     const Color& in_rColor);
 
 }  // namespace Render

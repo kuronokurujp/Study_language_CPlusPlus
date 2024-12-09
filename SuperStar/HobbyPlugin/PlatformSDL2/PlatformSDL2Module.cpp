@@ -22,7 +22,7 @@ namespace PlatformSDL2
     /// <summary>
     /// モジュール初期化
     /// </summary>
-    Bool PlatformSDL2Module::_VStart()
+    HE::Bool PlatformSDL2Module::_VStart()
     {
         // SDLの初期化
         // 初期化にも色々な種類があるが、いったんVideoのみで
@@ -65,14 +65,14 @@ namespace PlatformSDL2
             this->_spSysmte = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::System));
         }
 
-        Bool bRet = TRUE;
+        HE::Bool bRet = TRUE;
         return TRUE;
     }
 
     /// <summary>
     /// インスタンス破棄時に呼ばれる
     /// </summary>
-    Bool PlatformSDL2Module::_VRelease()
+    HE::Bool PlatformSDL2Module::_VRelease()
     {
         this->_spTime.reset();
         this->_spInput.reset();
@@ -85,7 +85,7 @@ namespace PlatformSDL2
         return TRUE;
     }
 
-    Bool PlatformSDL2Module::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
+    HE::Bool PlatformSDL2Module::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
     {
         // 入力更新
         this->_spInput->VUpdate(in_fDeltaTime);

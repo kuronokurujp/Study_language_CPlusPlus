@@ -1,6 +1,8 @@
 ﻿#include "LevelInGame.h"
 
+#include "Common.h"
 #include "Engine/Common/Hash.h"
+#include "Engine/Engine.h"
 #include "Engine/Math/Vector2.h"
 
 // ゲーム専用アセット
@@ -30,11 +32,11 @@ namespace Level
     namespace Local
     {
         // プレイヤーのユーザー入力
-        static const Char* szInputMoveUp    = HE_STR_TEXT("Player_MoveUp");
-        static const Char* szInputMoveLeft  = HE_STR_TEXT("Player_MoveLeft");
-        static const Char* szInputMoveDown  = HE_STR_TEXT("Player_MoveDown");
-        static const Char* szInputMoveRight = HE_STR_TEXT("Player_MoveRight");
-        static const Char* szInputShot      = HE_STR_TEXT("Player_Shot");
+        static const HE::Char* szInputMoveUp    = HE_STR_TEXT("Player_MoveUp");
+        static const HE::Char* szInputMoveLeft  = HE_STR_TEXT("Player_MoveLeft");
+        static const HE::Char* szInputMoveDown  = HE_STR_TEXT("Player_MoveDown");
+        static const HE::Char* szInputMoveRight = HE_STR_TEXT("Player_MoveRight");
+        static const HE::Char* szInputShot      = HE_STR_TEXT("Player_Shot");
 
         static const EnhancedInput::ActionMap mInputActionByPlay =
             {{szInputMoveUp, EnhancedInput::ActionData({Platform::EKeyboard::EKeyboard_W})},
@@ -45,9 +47,9 @@ namespace Level
 
     };  // namespace Local
 
-    Bool LevelInGame::VBegin()
+    HE::Bool LevelInGame::VBegin()
     {
-        const Bool bRet = Node::VBegin();
+        const HE::Bool bRet = Node::VBegin();
         HE_ASSERT(bRet);
 
         auto pAssetManagerModule =
@@ -93,12 +95,6 @@ namespace Level
         // 背景のレベル追加
         this->AddLevel<LevelInGame_BG>();
 
-        // インゲームのレンダリングメインビュー作成
-        {
-            auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
-            this->_viewHandle  = pRenderModule->AddView();
-        }
-
         // インゲームのシステムコンポーネントを追加
         {
             this->_systemComponentHandle = this->AddComponent<InGame::InGameSystemComponent>(
@@ -117,7 +113,7 @@ namespace Level
             // 弾を描画ハンドルを渡す
             auto [handle, pComp] =
                 pActor->AddComponentByHandleAndComp<InGame::InGameBulletManagerComponent>(
-                    0, Actor::Component::EPriorty::EPriorty_Main, this->_viewHandle);
+                    0, Actor::Component::EPriorty::EPriorty_Main, Game::g_scene2DHandle);
             HE_ASSERT(handle.Null() == FALSE);
 
             pComp->SetCollisionHashCode(HE_STR_TEXT("Bullet"));
@@ -172,7 +168,7 @@ namespace Level
         {
             auto [handle, pComp] =
                 this->AddComponentByHandleAndComp<InGame::InGameStageManagerComponent>(
-                    0, Actor::Component::EPriorty::EPriorty_Main, this->_viewHandle,
+                    0, Actor::Component::EPriorty::EPriorty_Main, Game::g_scene2DHandle,
                     playerParamaterAssetHandle, enemyParamaterAssetHandle,
                     stageTimelineParamaterAssetHandle);
             this->_stageManagerComponentHandle = handle;
@@ -181,16 +177,13 @@ namespace Level
         return TRUE;
     }
 
-    Bool LevelInGame::VEnd()
+    HE::Bool LevelInGame::VEnd()
     {
         // ロードしたアセットを解放
         {
             auto pAssetManagerModule =
                 HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
         }
-
-        auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
-        pRenderModule->RemoveView(this->_viewHandle);
 
         // 専用の入力アクションを外す
         {
@@ -201,7 +194,7 @@ namespace Level
         return Node::VEnd();
     }
 
-    void LevelInGame::VUpdate(const Float32 in_fDt)
+    void LevelInGame::VUpdate(const HE::Float32 in_fDt)
     {
         Node::VUpdate(in_fDt);
 

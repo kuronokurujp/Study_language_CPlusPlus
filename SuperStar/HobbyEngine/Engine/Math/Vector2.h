@@ -12,7 +12,7 @@ namespace Core::Math
         explicit Vector2() { this->Zero(); }
 
         // コントラクト
-        explicit Vector2(const Float32 in_fX, const Float32 in_fY) : _fX(in_fX), _fY(in_fY) {}
+        explicit Vector2(const HE::Float32 in_fX, const HE::Float32 in_fY) : _fX(in_fX), _fY(in_fY) {}
 
         // コピーは代入文でできるようにするのがわかりやすいのでexplicitはつけない
         Vector2(const Vector2& in_v) { this->_fX = in_v._fX, this->_fY = in_v._fY; }
@@ -27,7 +27,7 @@ namespace Core::Math
             this->_fY = 0.f;
         }
 
-        Bool IsZero() HE_NOEXCEPT
+        HE::Bool IsZero() HE_NOEXCEPT
         {
             if (this->_fX != 0.0f) return FALSE;
             if (this->_fY != 0.0f) return FALSE;
@@ -38,7 +38,7 @@ namespace Core::Math
         /// <summary>
         /// スケールしたベクトルを加算
         /// </summary>
-        void Madd(const Vector2& in_rBase, const Float32 in_fScale) HE_NOEXCEPT
+        void Madd(const Vector2& in_rBase, const HE::Float32 in_fScale) HE_NOEXCEPT
         {
             this->_fX += (in_rBase._fX * in_fScale);
             this->_fY += (in_rBase._fY * in_fScale);
@@ -47,7 +47,7 @@ namespace Core::Math
         /// <summary>
         /// Sets the madd.
         /// </summary>
-        void SetMadd(const Vector2& in_rOffset, const Float32 in_fScale,
+        void SetMadd(const Vector2& in_rOffset, const HE::Float32 in_fScale,
                      const Vector2& in_rBase) HE_NOEXCEPT
         {
             this->_fX = in_rOffset._fX * in_fScale + in_rBase._fX;
@@ -84,8 +84,8 @@ namespace Core::Math
         /// <summary>
         /// Sets the specified in value.
         /// </summary>
-        inline void Set(const Float32 in_fValue) HE_NOEXCEPT { this->_fX = this->_fY = in_fValue; }
-        inline void Set(const Float32 in_fX, const Float32 in_fY) HE_NOEXCEPT
+        inline void Set(const HE::Float32 in_fValue) HE_NOEXCEPT { this->_fX = this->_fY = in_fValue; }
+        inline void Set(const HE::Float32 in_fX, const HE::Float32 in_fY) HE_NOEXCEPT
         {
             this->_fX = in_fX;
             this->_fY = in_fY;
@@ -104,8 +104,8 @@ namespace Core::Math
         /// ２次元補間を行う
         /// </summary>
         void SetInterporation(const Vector2& in_rBase, const Vector2& in_rULine,
-                              const Vector2& in_rVLIne, const Float32 in_fUScale,
-                              const Float32 in_fVScale) HE_NOEXCEPT
+                              const Vector2& in_rVLIne, const HE::Float32 in_fUScale,
+                              const HE::Float32 in_fVScale) HE_NOEXCEPT
         {
             // a + u(b - a)
             this->SetMadd(in_rULine, in_fUScale, in_rBase);
@@ -118,10 +118,10 @@ namespace Core::Math
         /// </summary>
         void Normalize() HE_NOEXCEPT
         {
-            const Float32 fMagSq = this->_fX * this->_fX + this->_fY * this->_fY;
+            const HE::Float32 fMagSq = this->_fX * this->_fX + this->_fY * this->_fY;
             if (fMagSq > 0.f)
             {
-                const Float32 fNewOverMag = 1.0f / sqrtf(fMagSq);
+                const HE::Float32 fNewOverMag = 1.0f / sqrtf(fMagSq);
                 this->_fX *= fNewOverMag;
                 this->_fY *= fNewOverMag;
             }
@@ -152,7 +152,7 @@ namespace Core::Math
         /// <summary>
         /// Operator*s the specified scale.
         /// </summary>
-        const Vector2 operator*(const Float32 in_fScale) HE_NOEXCEPT
+        const Vector2 operator*(const HE::Float32 in_fScale) HE_NOEXCEPT
         {
             return Vector2(this->_fX * in_fScale, this->_fY * in_fScale);
         }
@@ -185,7 +185,7 @@ namespace Core::Math
         // ベクトルの大きさを2乗したのを取得
         // こちらの方が計算が早い
         // 比較などで利用できる
-        static inline Float32 LengthSquared(const Vector2& in_rVec) HE_NOEXCEPT
+        static inline HE::Float32 LengthSquared(const Vector2& in_rVec) HE_NOEXCEPT
         {
             return (in_rVec._fX * in_rVec._fX + in_rVec._fY * in_rVec._fY);
         }
@@ -196,7 +196,7 @@ namespace Core::Math
         /// <param name="in_v">The in v.</param>
         /// <param name="in_v2">The in v2.</param>
         /// <returns></returns>
-        static inline Float32 DistanceSquared(const Vector2& in_rRight,
+        static inline HE::Float32 DistanceSquared(const Vector2& in_rRight,
                                               const Vector2& in_rLeft) HE_NOEXCEPT
         {
             Vector2 size;
@@ -206,10 +206,10 @@ namespace Core::Math
         }
 
         //	ベクトルの大きさ取得
-        static inline Float32 Length(const Vector2& in_v) { return sqrtf(LengthSquared(in_v)); }
+        static inline HE::Float32 Length(const Vector2& in_v) { return sqrtf(LengthSquared(in_v)); }
 
         //	2つのベクトルの距離取得
-        static inline Float32 Distance(const Vector2& in_rRight,
+        static inline HE::Float32 Distance(const Vector2& in_rRight,
                                        const Vector2& in_rLeft) HE_NOEXCEPT
         {
             Vector2 size;
@@ -221,7 +221,7 @@ namespace Core::Math
         /// <summary>
         /// Dots the specified in v.
         /// </summary>
-        static inline Float32 Dot(const Vector2& in_rLeft, const Vector2& in_rRight) HE_NOEXCEPT
+        static inline HE::Float32 Dot(const Vector2& in_rLeft, const Vector2& in_rRight) HE_NOEXCEPT
         {
             return (in_rLeft._fX * in_rRight._fX) + (in_rLeft._fY * in_rRight._fY);
         }
@@ -233,13 +233,13 @@ namespace Core::Math
                                            const Vector2& in_v2) HE_NOEXCEPT
         {
             Vector2 flipV(-in_v2._fX, -in_v2._fY);
-            const Float32 cfDot = 2 * Dot(in_nv, flipV);
+            const HE::Float32 cfDot = 2 * Dot(in_nv, flipV);
             Vector2 v(in_nv._fX * cfDot, in_nv._fY * cfDot);
             v -= flipV;
             out->Set(v);
         }
 
         // 頻繁にアクセスする変数にはprivate指定にはしない
-        Float32 _fX = 0.0f, _fY = 0.0f;
+        HE::Float32 _fX = 0.0f, _fY = 0.0f;
     };
 }  // namespace Core::Math

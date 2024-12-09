@@ -22,7 +22,7 @@ namespace UI
         /// 登録に必要な情報を設定
         /// </summary>
         /// <param name="bAutoDelete">TRUEだとタスク破棄と同時に削除
-        virtual void VSetup(const Bool in_bAutoDelete) override
+        virtual void VSetup(const HE::Bool in_bAutoDelete) override
         {
             UIWidgetComponent::VSetup(in_bAutoDelete);
 
@@ -33,17 +33,17 @@ namespace UI
         /// コンポーネントの更新
         /// 必ず処理を記述
         /// </summary>
-        void VUpdate(const Float32 in_fDeltaTime) override;
+        void VUpdate(const HE::Float32 in_fDeltaTime) override;
 
         /// <summary>
         /// テキスト設定
         /// </summary>
-        inline void SetText(const Char* in_szText) { this->_szText = in_szText; }
+        inline void SetText(const HE::Char* in_szText) { this->_szText = in_szText; }
 
         /// <summary>
         /// ローカライズグループ名
         /// </summary>
-        inline void SetLocGroupName(const Char* in_szName) { this->_szLocGroup = in_szName; }
+        inline void SetLocGroupName(const HE::Char* in_szName) { this->_szLocGroup = in_szName; }
 
         /// <summary>
         /// テキストの描画矩形を設定
@@ -54,14 +54,14 @@ namespace UI
         /// ローカライズグループ名を設定
         /// 文字列がある == ローカライズテキスト
         /// </summary>
-        inline void SetLogGroup(const Char* in_szGroupName) { this->_szLocGroup = in_szGroupName; }
+        inline void SetLogGroup(const HE::Char* in_szGroupName) { this->_szLocGroup = in_szGroupName; }
 
         inline void SetAnchor(const Core::Math::Rect2::EAnchor in_eAnchor)
         {
             this->_eAnchor = in_eAnchor;
         }
 
-        inline void SetFontSize(const Uint32 in_fontSize) { this->_fontSize = in_fontSize; }
+        inline void SetFontSize(const HE::Uint32 in_uFontSize) { this->_uFontSize = in_uFontSize; }
 
     private:
         void _Clear()
@@ -81,6 +81,6 @@ namespace UI
         Core::Common::FixedString128 _szLocGroup;
         Core::Math::Rect2 _rect;
         Core::Math::Rect2::EAnchor _eAnchor = Core::Math::Rect2::EAnchor_Left;
-        Uint32 _fontSize                    = 32;
+        HE::Uint32 _uFontSize                    = 32;
     };
 }  // namespace UI

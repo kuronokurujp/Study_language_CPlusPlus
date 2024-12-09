@@ -7,6 +7,9 @@ set(TARGET_FILES
 	.editorconfig
 	README.md
 
+	Code/Common.cpp
+	Code/Common.h
+
 	Code/Main.cpp
 	Code/Main.h
 	

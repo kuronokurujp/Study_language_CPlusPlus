@@ -8,7 +8,7 @@ namespace Event
         Core::Common::Handle handle;
 
         ++this->_uAddEventMngCount;
-        handle.Set(this->_uAddEventMngCount);
+        handle.SetIndex(this->_uAddEventMngCount);
 
         // ストラテジーの所有権を管理インスタンスへ
         this->_mEventMng.Add(handle, HE_NEW_MEM(EventManager, 0)(std::move(in_upStrategy)));
@@ -16,7 +16,7 @@ namespace Event
         return handle;
     }
 
-    Bool EventModule::RemoveEventManager(const Core::Common::Handle& in_rHandle)
+    HE::Bool EventModule::RemoveEventManager(const Core::Common::Handle& in_rHandle)
     {
         // TODO: 確保した管理インスタンスを破棄
         if (this->_mEventMng.Contains(in_rHandle) == FALSE) return FALSE;
@@ -29,7 +29,7 @@ namespace Event
         return this->_mEventMng.Erase(in_rHandle);
     }
 
-    Bool EventModule::AddListener(EventListenerPtr const& in_rListener,
+    HE::Bool EventModule::AddListener(EventListenerPtr const& in_rListener,
                                   EventTypeStr const& in_rType)
     {
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
@@ -41,7 +41,7 @@ namespace Event
         return TRUE;
     }
 
-    Bool EventModule::RemoveListener(EventListenerPtr const& in_rListener,
+    HE::Bool EventModule::RemoveListener(EventListenerPtr const& in_rListener,
                                      EventTypeStr const& in_rType)
     {
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
@@ -52,7 +52,7 @@ namespace Event
         return TRUE;
     }
 
-    Bool EventModule::RemoveAllListener(EventTypeStr const& in_rType)
+    HE::Bool EventModule::RemoveAllListener(EventTypeStr const& in_rType)
     {
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
         {
@@ -63,7 +63,7 @@ namespace Event
         return TRUE;
     }
 
-    Bool EventModule::QueueEvent(EventDataInterfacePtr const& in_spEventData)
+    HE::Bool EventModule::QueueEvent(EventDataInterfacePtr const& in_spEventData)
     {
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
         {
@@ -76,7 +76,7 @@ namespace Event
     /// <summary>
     /// モジュール初期化
     /// </summary>
-    Bool EventModule::_VStart()
+    HE::Bool EventModule::_VStart()
     {
         this->_mEventMng.Clear();
         return TRUE;
@@ -85,7 +85,7 @@ namespace Event
     /// <summary>
     /// インスタンス破棄時に呼ばれる
     /// </summary>
-    Bool EventModule::_VRelease()
+    HE::Bool EventModule::_VRelease()
     {
         // TODO: 全ての管理インスタンスを破棄
         auto itr = this->_mEventMng.Begin();
@@ -98,7 +98,7 @@ namespace Event
         return TRUE;
     }
 
-    Bool EventModule::_VLateUpdate(const Float32 in_fDeltaTime)
+    HE::Bool EventModule::_VLateUpdate(const HE::Float32 in_fDeltaTime)
     {
         // TODO: 全ての管理インスタンスを実行
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)

@@ -12,9 +12,9 @@ namespace Core::Math
         /// <summary>
         /// 行列式を取得.
         /// </summary>
-        Float32 GetDet();
+        HE::Float32 GetDet();
 
     public:
-        Float32 _faaMat[3][3];
+        HE::Float32 _faaMat[3][3];
     };
 }  // namespace Core::Math

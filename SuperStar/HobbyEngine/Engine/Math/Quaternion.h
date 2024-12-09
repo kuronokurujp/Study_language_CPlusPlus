@@ -8,15 +8,15 @@ namespace Core::Math
     {
     public:
         explicit Quaternion();
-        explicit Quaternion(const Float32 in_fX, const Float32 in_fY, const Float32 in_fZ,
-                            const Float32 in_fW);
-        explicit Quaternion(const Vector3& in_rAxis, const Float32 in_fAngle);
+        explicit Quaternion(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ,
+                            const HE::Float32 in_fW);
+        explicit Quaternion(const Vector3& in_rAxis, const HE::Float32 in_fAngle);
 
         /// <summary>
         /// Sets the specified in x.
         /// </summary>
-        void Set(const Float32 in_fX, const Float32 in_fY, const Float32 in_fZ,
-                 const Float32 in_fW);
+        void Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ,
+                 const HE::Float32 in_fW);
 
         /// <summary>
         /// Angles the specified in in r angle.
@@ -31,6 +31,6 @@ namespace Core::Math
         static const Quaternion Identity;
 
     public:
-        Float32 _fX = 0.0f, _fY = 0.0f, _fZ = 0.0f, _fW = 0.0f;
+        HE::Float32 _fX = 0.0f, _fY = 0.0f, _fZ = 0.0f, _fW = 0.0f;
     };
 }  // namespace Core::Math

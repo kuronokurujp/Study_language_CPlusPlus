@@ -29,8 +29,8 @@ namespace UI::Builder
 
     struct Style
     {
-        Float32 w, h;
-        Uint32 color;
+        HE::Float32 fW, fH;
+        HE::Uint32 uColor;
     };
 
     struct Node
@@ -43,30 +43,30 @@ namespace UI::Builder
         /// </summary>
         struct Data
         {
-            Char szId[64]       = {0};
+            HE::Char szId[64]       = {0};
             EWidget eWidgetType = EWidget::EWidget_None;
 
             union ExData
             {
                 struct Widget
                 {
-                    Float32 fX, fY;
+                    HE::Float32 fX, fY;
                 } widget;
 
                 struct Label
                 {
                     EAnchor eAnchor;
-                    Bool bLoc;
-                    Float32 fX, fY;
-                    Char szLoc[64];
-                    Char szText[64];
+                    HE::Bool bLoc;
+                    HE::Float32 fX, fY;
+                    HE::Char szLoc[64];
+                    HE::Char szText[64];
                     Style style;
                 } label;
 
                 struct Button
                 {
                     EAnchor eAnchor;
-                    Float32 fX, fY;
+                    HE::Float32 fX, fY;
                     Style style;
                 } button;
 
@@ -92,12 +92,12 @@ namespace UI::Builder
         /// <summary>
         /// 親ルート下にあるノードを名前で取得
         /// </summary>
-        Bool OutputNodeByRootPos(Node* out, const UTF8* in_szName);
+        HE::Bool OutputNodeByRootPos(Node* out, const HE::UTF8* in_szName);
 
         /// <summary>
         /// 指定したノード下にあるノードを名前で取得
         /// </summary>
-        Bool OutputNode(Node* out, const Node& in_rParentNode, const UTF8* in_szName);
+        HE::Bool OutputNode(Node* out, const Node& in_rParentNode, const HE::UTF8* in_szName);
 
         /// <summary>
         /// 指定したノード下にあるノード群を取得

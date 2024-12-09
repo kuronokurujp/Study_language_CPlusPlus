@@ -30,7 +30,7 @@ namespace Actor
         struct PendingData
         {
             Core::Common::Handle handle;
-            Sint32 sMoveGroupId = 0;
+            HE::Sint32 sMoveGroupId = 0;
         };
 
     public:
@@ -43,28 +43,28 @@ namespace Actor
         /// グループ最大数は2以上にする
         /// 保留のアクターを管理する専用グループを作るため
         /// </summary>
-        Bool Start(const Uint32 in_uActorCapacity, const Uint32 in_uActorGroupMax);
+        HE::Bool Start(const HE::Uint32 in_uActorCapacity, const HE::Uint32 in_uActorGroupMax);
 
         /// <summary>
         /// 終了
         /// これを呼び出した後は使えない
         /// </summary>
-        Bool End();
+        HE::Bool End();
 
         /// <summary>
         /// 前更新
         /// </summary>
-        void BeginUpdate(const Float32);
+        void BeginUpdate(const HE::Float32);
 
         /// <summary>
         /// 更新
         /// </summary>
-        void Update(const Float32);
+        void Update(const HE::Float32);
 
         /// <summary>
         /// 後更新
         /// </summary>
-        void LateUpdate(const Float32);
+        void LateUpdate(const HE::Float32);
 
         /// <summary>
         /// タスクイベント
@@ -82,11 +82,11 @@ namespace Actor
 
             // Actorが更新中の場合は保留グループIDに一旦登録
             // Actorは確保したメモリを使いまわさない
-            Sint32 sGroupId = 0;
-            if (this->_bUpdatingActors) sGroupId = this->_GetPendingGroupId();
+            HE::Sint32 iGroupId = 0;
+            if (this->_bUpdatingActors) iGroupId = this->_GetPendingGroupId();
 
             auto handle =
-                this->_taskManager.CreateAndAdd<T>(sGroupId, TRUE, std::forward<TArgs>(in_args)...);
+                this->_taskManager.CreateAndAdd<T>(iGroupId, TRUE, std::forward<TArgs>(in_args)...);
 
             Object* pObject = this->_taskManager.GetTask<Object>(handle);
             HE_ASSERT(pObject != NULL);
@@ -94,7 +94,7 @@ namespace Actor
 
             if (this->_bUpdatingActors)
             {
-                Uint32 dataIdx = this->_pendingDataMap.Size();
+                HE::Uint32 dataIdx = this->_pendingDataMap.Size();
                 this->_pendingDataMap.Add(handle, PendingData{handle, 0});
             }
 
@@ -122,12 +122,12 @@ namespace Actor
         void VOnActorUnRegistComponent(Component*);
 
     protected:
-        inline Sint32 _GetPendingGroupId() const { return this->_taskManager.GetMaxGroup() - 1; }
+        inline HE::Sint32 _GetPendingGroupId() const { return this->_taskManager.GetMaxGroup() - 1; }
 
         /// <summary>
         /// 最後のグループが保留グループなので更新グループ数は最大グループ数-1になる
         /// </summary>
-        inline Uint32 _GetUpdateGroupMax() const { return this->_taskManager.GetMaxGroup() - 1; }
+        inline HE::Sint32 _GetUpdateGroupMax() const { return this->_taskManager.GetMaxGroup() - 1; }
 
     private:
         /// <summary>
@@ -136,7 +136,7 @@ namespace Actor
         void _UpdatePending();
 
     protected:
-        Bool _bUpdatingActors = FALSE;
+        HE::Bool _bUpdatingActors = FALSE;
 
     private:
         Core::Memory::UniquePtr<ActorManagerDecoraterlnterface> _upDecorator = NULL;
@@ -149,6 +149,6 @@ namespace Actor
         /// <summary>
         /// 更新保留アクターのデータ
         /// </summary>
-        Core::Common::FixedMap<Uint64, PendingData, 256> _pendingDataMap;
+        Core::Common::FixedMap<HE::Uint64, PendingData, 256> _pendingDataMap;
     };
 }  // namespace Actor

@@ -20,7 +20,7 @@ namespace Event
     public:
         EventManagerStrategyInterface()             = default;
         virtual ~EventManagerStrategyInterface()    = default;
-        virtual Bool VIsEventTypeHash(const Uint64) = 0;
+        virtual HE::Bool VIsEventTypeHash(const HE::Uint64) = 0;
     };
 
     /// <summary>
@@ -43,7 +43,7 @@ namespace Event
         /// <summary>
         /// イベントがないかどうか
         /// </summary>
-        Bool EmptyEvent() const;
+        HE::Bool EmptyEvent() const;
 
         // 手動解放
         void Release();
@@ -53,41 +53,41 @@ namespace Event
         /// 登録したらTRUEを返す
         /// すでに登録済みなど登録失敗したらFALSE
         /// </summary>
-        Bool AddListener(EventListenerPtr const&, EventTypeStr const&);
+        HE::Bool AddListener(EventListenerPtr const&, EventTypeStr const&);
 
-        Bool RemoveListener(EventListenerPtr const&, EventTypeStr const&);
-        Bool RemoveAllListener(EventTypeStr const&);
+        HE::Bool RemoveListener(EventListenerPtr const&, EventTypeStr const&);
+        HE::Bool RemoveAllListener(EventTypeStr const&);
         /*
-                Bool VTrigger(EventDataInterfacePtr const&) const ;
+                HE::Bool VTrigger(EventDataInterfacePtr const&) const ;
         */
 
-        Bool QueueEvent(EventDataInterfacePtr const&);
+        HE::Bool QueueEvent(EventDataInterfacePtr const&);
 
 #if 0
-        Bool VAbortEvent(EventTypeStr const&) override final;
+        HE::Bool VAbortEvent(EventTypeStr const&) override final;
 #endif
 
-        Bool Tick(const Uint32);
+        HE::Bool Tick(const HE::Uint32);
 
-        Bool ValidateType(EventTypeStr const&) const;
-        Bool ValidateHash(const Uint64) const;
+        HE::Bool ValidateType(EventTypeStr const&) const;
+        HE::Bool ValidateHash(const HE::Uint64) const;
 
         // 情報探索メソッド
 
         // 特定のイベント型に関連づけられたリスナーのリストを取得
-        Bool OutputListenerList(EventListenerList*, EventTypeStr const&) const;
+        HE::Bool OutputListenerList(EventListenerList*, EventTypeStr const&) const;
 
     private:
         // TODO: stdのデータ構造はすべて自前で作成したカスタム用に差し替える予定
 
         // グローバルインスタンスを一つ定義
-        using EventTypeSet = std::set<Uint64>;
+        using EventTypeSet = std::set<HE::Uint64>;
         // イベント型のセットに結果を導入
-        using EventTypeSetRes = std::pair<EventTypeSet::iterator, Bool>;
+        using EventTypeSetRes = std::pair<EventTypeSet::iterator, HE::Bool>;
         // イベント型ごとに一つのリスト(マップに格納される)
         using EventListenerTable = std::list<EventListenerPtr>;
         // イベント識別子をリスナーリストにマッピング
-        using EventListenerMap = Core::Common::FixedMap<Uint64, EventListenerTable, 512>;
+        using EventListenerMap = Core::Common::FixedMap<HE::Uint64, EventListenerTable, 512>;
         // 処理待ちイベントのキュー、または処理中のイベントのキュー
         using EventQueue = std::list<EventDataInterfacePtr>;
 
@@ -99,7 +99,7 @@ namespace Event
 
         // どのキューがアクティブ処理されているか？
         // キューに入ろうとするイベントは他方のキューに置かれる
-        Sint32 _iActiveQueue = 0;
+        HE::Sint32 _iActiveQueue = 0;
 
         Core::Memory::UniquePtr<EventManagerStrategyInterface> _upStrategy;
     };

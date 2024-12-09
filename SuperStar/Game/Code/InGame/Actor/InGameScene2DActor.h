@@ -20,7 +20,7 @@ namespace InGame
         /// 開始
         /// 継承したクラスで必ず基本クラスのメソッドを呼ぶ
         /// </summary>
-        Bool VBegin() override;
+        HE::Bool VBegin() override;
 
         void SetPos(const Core::Math::Vector2&);
 

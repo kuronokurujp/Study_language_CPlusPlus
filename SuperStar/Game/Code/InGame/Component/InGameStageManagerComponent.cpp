@@ -1,5 +1,6 @@
 ﻿#include "InGameStageManagerComponent.h"
 
+#include "Engine/Engine.h"
 #include "InGame/Actor/Enemy/InGameZakoEnemyActor.h"
 #include "InGame/Actor/Player/InGamePlayerActor.h"
 #include "InGame/Component/Renderer/InGameRendererEnemyZakoComponent.h"
@@ -56,7 +57,7 @@ namespace InGame
         this->_stageTimelineParamaterAssetHandle = in_rStageTimelineParamaterAssetHandle;
     }
 
-    Bool InGameStageManagerComponent::VBegin()
+    HE::Bool InGameStageManagerComponent::VBegin()
     {
         if (Level::LevelBaseComponent::VBegin() == FALSE) return FALSE;
         this->_Clear();
@@ -86,7 +87,7 @@ namespace InGame
         return TRUE;
     }
 
-    Bool InGameStageManagerComponent::VEnd()
+    HE::Bool InGameStageManagerComponent::VEnd()
     {
         auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
 
@@ -106,7 +107,7 @@ namespace InGame
         return LevelBaseComponent::VEnd();
     }
 
-    void InGameStageManagerComponent::VUpdate(const Float32 in_dt)
+    void InGameStageManagerComponent::VUpdate(const HE::Float32 in_dt)
     {
         Level::LevelBaseComponent::VUpdate(in_dt);
 
@@ -119,10 +120,10 @@ namespace InGame
                                         ->GetAsset<Game::Asset::ParamaterAssetData>(
                                             this->_stageTimelineParamaterAssetHandle);
 
-        UTF8 szTimelineNo[32] = {0};
+        HE::UTF8 szTimelineNo[32] = {0};
         while (this->_bTimeline)
         {
-            Core::Common::g_szTempFixedString16 = this->_uTimelineNo;
+            Core::Common::g_szTempFixedString16.operator=(this->_uTimelineNo);
             Core::Common::g_szTempFixedString16.OutputUTF8(szTimelineNo,
                                                            HE_ARRAY_NUM(szTimelineNo));
 
@@ -133,7 +134,7 @@ namespace InGame
                 break;
             }
 
-            const Float32 fPeroid =
+            const HE::Float32 fPeroid =
                 rParamaterAssetData.GetFloat32ByIdData(szTimelineNo, "peroid_sec");
             if (this->_fTime < fPeroid)
             {
@@ -143,7 +144,7 @@ namespace InGame
             const auto fPosX = rParamaterAssetData.GetFloat32ByIdData(szTimelineNo, "pos_x");
             const auto fPosY = rParamaterAssetData.GetFloat32ByIdData(szTimelineNo, "pos_y");
 
-            UTF8 szIdName[32] = {};
+            HE::UTF8 szIdName[32] = {};
             rParamaterAssetData.GetCharByIdData(szTimelineNo, "parameter_id")
                 .OutputUTF8(szIdName, HE_ARRAY_NUM(szIdName));
 
@@ -178,11 +179,11 @@ namespace InGame
         }
     }
 
-    Bool InGameStageManagerComponent::_HandleCharacterEvent(
+    HE::Bool InGameStageManagerComponent::_HandleCharacterEvent(
         Event::EventDataInterfacePtr const& in_spEventData)
     {
         // ゲームのキャラクターイベント処理
-        const Uint32 uEventHash = in_spEventData->VDataTypeHash();
+        const HE::Uint32 uEventHash = in_spEventData->VDataTypeHash();
 
         // 移動処理をする
         if (uEventHash == EventCharacterMove::EventTypeHash())
@@ -247,7 +248,7 @@ namespace InGame
                                                         this->_enemyParamaterAssetHandle);
 
                     // TODO: パラメータ設定
-                    UTF8 szIdName[32] = {0};
+                    HE::UTF8 szIdName[32] = {0};
                     pEvent->_szIdName.OutputUTF8(szIdName, HE_ARRAY_NUM(szIdName));
 
                     InGameEnemyZakoActor::Parameter parameter;
@@ -289,7 +290,7 @@ namespace InGame
                 this->RemoveActor(&this->_playerParamaterAssetHandle);
             }
 
-            const UTF8* szParamaterIdName = "player_default";
+            const HE::UTF8* szParamaterIdName = "player_default";
 
             auto& rParamaterAssetData =
                 HE_ENGINE.ModuleManager()

@@ -6,7 +6,7 @@ namespace Actor
     /// モジュール初期化
     /// </summary>
     /// <returns></returns>
-    Bool ActorModule::_VStart()
+    HE::Bool ActorModule::_VStart()
     {
         return TRUE;
     }
@@ -15,7 +15,7 @@ namespace Actor
     /// インスタンス破棄時に呼ばれる
     /// </summary>
     /// <returns></returns>
-    Bool ActorModule::_VRelease()
+    HE::Bool ActorModule::_VRelease()
     {
         return TRUE;
     }

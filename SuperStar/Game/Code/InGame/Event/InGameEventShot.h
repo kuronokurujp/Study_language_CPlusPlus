@@ -25,13 +25,13 @@ namespace InGame
         {
         }
 
-        Bool VIsEventTypeHash(const Uint64 in_ulHash)
+        HE::Bool VIsEventTypeHash(const HE::Uint64 in_ulHash)
         {
             return (this->_ulEventTypeHash == in_ulHash);
         }
 
     private:
-        Uint64 _ulEventTypeHash = 0;
+        HE::Uint64 _ulEventTypeHash = 0;
     };
 
     /// <summary>
@@ -40,19 +40,19 @@ namespace InGame
     class EventShotNormalBullet final : public Event::BaseEventData
     {
     public:
-        EventShotNormalBullet(const Float32 in_fTimeStamp, const Core::Math::Vector2& in_rPos,
+        EventShotNormalBullet(const HE::Float32 in_fTimeStamp, const Core::Math::Vector2& in_rPos,
                               const Core::Math::Vector2& in_rDir,
-                              const Uint32 in_uCollisionHashCode);
+                              const HE::Uint32 in_uCollisionHashCode);
 
-        static Uint32 EventTypeHash();
+        static HE::Uint32 EventTypeHash();
 
     public:
         Core::Math::Vector2 _pos;
         Core::Math::Vector2 _dir;
-        Uint32 _uCollisionHashCode = 0;
+        HE::Uint32 _uCollisionHashCode = 0;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("ShotNormalBullet");
-        static inline Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+        static inline HE::Uint32 s_uEventTypeHash           = s_szEventType.Hash();
     };
 }  // namespace InGame

@@ -7,6 +7,14 @@
 
 namespace Core::File
 {
+    // カスタム型制約
+    template <typename T>
+    struct TemplateIsPathItem : std::disjunction<std::is_same<T, Core::Common::StringBase>,
+                                                 std::is_same<T, const HE::Char*>,
+                                                 std::is_convertible<T, Core::Common::StringBase> >
+    {
+    };
+
     /// <summary>
     /// ファイルパス制御
     /// パスの連結とかできる
@@ -21,35 +29,48 @@ namespace Core::File
         /// <summary>
         /// パス文字列を一つのみ設定
         /// </summary>
-        Path(const Char* in_szPath) { this->_Set(in_szPath); }
+        Path(const HE::Char* in_szPath) { this->_Set(in_szPath); }
+#if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
+        Path(const HE::UTF8* in_szPathUTF8) : _szPath(in_szPathUTF8) {}
+#endif
+
         Path(const Path& in_rPath) { this->_Set(in_rPath.Str()); }
 
         /// <summary>
         /// パス文字列を複数設定
         /// </summary>
         template <typename... TArgs>
-        Path(TArgs... in_args)
+        Path(TArgs... in_TArgs)
         {
             // TODO: 未対応の型でエラーになった場合, 追跡ができない
             // これ非対応にして変わりのを用意する
-            (this->_Append(in_args), ...);
+
+            // 型チェック
+            HE_STATIC_ASSERT((std::conjunction_v<TemplateIsPathItem<TArgs>...>), "");
+
+            // 要素を処理
+            (
+                [this](const auto& arg)
+                {
+                    Core::Common::g_szTempFixedString1024 = arg;
+                    this->_Append(Core::Common::g_szTempFixedString1024);
+                }(in_TArgs),
+                ...);
+
+            //(this->_Append(in_TArgs), ...);
         }
 
-#ifdef HE_WIN
-        Path(const UTF8* in_szPathUTF8) : _szPath(in_szPathUTF8) {}
-#endif
-
         void operator=(const Path&);
-        void operator=(const Char*);
+        void operator=(const HE::Char*);
 
         Path& operator+=(const Path&);
 
-        inline const Char* Str() const { return this->_szPath.Str(); }
-        inline Bool Empty() const { return this->_szPath.Empty(); }
+        inline const HE::Char* Str() const { return this->_szPath.Str(); }
+        inline HE::Bool Empty() const { return this->_szPath.Empty(); }
 
     private:
-        inline void _Set(const Char* in_szPath) HE_NOEXCEPT { this->_szPath = in_szPath; }
-        void _Append(const Char* in_szPath);
+        inline void _Set(const HE::Char* in_szPath) HE_NOEXCEPT { this->_szPath = in_szPath; }
+        void _Append(const Core::Common::StringBase& in_szPath);
 
     private:
         Core::Common::FixedString256 _szPath;

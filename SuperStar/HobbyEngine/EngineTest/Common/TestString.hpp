@@ -27,13 +27,17 @@ TEST_CASE("FixString Use")
 
     // 文字位置判定が意図通りか
     CHECK(str2.Find(HE_STR_TEXT("日")) == 0);
+
+    Core::Common::FixedString<128> str3(HE_STR_TEXT(
+        "このたびは誠にありがとうございます。今後ともどうかよろしくお願いいたします。"));
+    CHECK(str3.Length() == 38);
 }
 
 TEST_CASE("FixString OutputUTF8")
 {
     // Char型の文字列を作る
     Core::Common::FixedString128 szStr(HE_STR_TEXT("日本語"));
-    UTF8 szUTF8[32] = {NULL};
+    HE::UTF8 szUTF8[32] = {NULL};
 
     // UTF8型に変える
     szStr.OutputUTF8(szUTF8, 32);

@@ -36,14 +36,14 @@ namespace Localization
         using LocateMap =
             Core::Common::FixedMap<Core::Common::FixedString128, SystemAssetData::LocateData, 32>;
 
-        virtual Bool _VLoad(Platform::FileInterface&) override;
+        virtual HE::Bool _VLoad(Platform::FileInterface&) override;
 
         /// <summary>
         /// ロケートマップデータを探して取得
         /// 常駐しているメンバー変数を参照するようにしている
         /// 呼び出し側が参照したメンバー変数の書き換えたをできないようにするためにconstにしている
         /// </summary>
-        const LocateMap& FindLocate(const Char*);
+        const LocateMap& FindLocate(const HE::Char*);
 
     private:
         /// <summary>
@@ -61,7 +61,7 @@ namespace Localization
         /// <summary>
         /// テキスト取得
         /// </summary>
-        const Core::Common::FixedString1024& GetText(const UTF8*);
+        const Core::Common::FixedString1024& GetText(const HE::UTF8*);
 
     private:
         // 一度読み込んだテキストをキャッシュするテキストバッファ
@@ -82,17 +82,17 @@ namespace Localization
 
         // ローカライズ設定データをロード(テキストファイル版)
         // バイナリファイル版も用意する
-        Bool LoadSystemFile(const Core::Common::StringBase&);
+        HE::Bool LoadSystemFile(const Core::Common::StringBase&);
         // ローカライズ設定データをアンロード
-        Bool UnloadSystemFile();
+        HE::Bool UnloadSystemFile();
 
         // ローカライズデータをロード
-        Bool LoadTextAll(const Core::Common::StringBase&);
+        HE::Bool LoadTextAll(const Core::Common::StringBase&);
         // ローカライズデータをアンロード
-        Bool UnloadTextAll(const Core::Common::StringBase&);
+        HE::Bool UnloadTextAll(const Core::Common::StringBase&);
 
         // ローカライズテキストを取得
-        const Char* Text(const Core::Common::StringBase& in_szrLocateName,
+        const HE::Char* Text(const Core::Common::StringBase& in_szrLocateName,
                          const Core::Common::StringBase& in_szrGroupName,
                          const Core::Common::StringBase& in_szrKey);
 
@@ -101,14 +101,14 @@ namespace Localization
         /// モジュール初期化
         /// </summary>
         /// <returns></returns>
-        Bool _VStart() override final;
+        HE::Bool _VStart() override final;
 
         /// <summary>
         /// インスタンス破棄時に呼ばれる
         /// </summary>
-        Bool _VRelease() override final;
+        HE::Bool _VRelease() override final;
 
-        Bool _VUpdate(const Float32 in_fDeltaTime) override final;
+        HE::Bool _VUpdate(const HE::Float32 in_fDeltaTime) override final;
 
     private:
         using LocateTextMap =

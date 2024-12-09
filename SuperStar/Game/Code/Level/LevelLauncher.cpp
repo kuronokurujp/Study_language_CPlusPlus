@@ -1,8 +1,9 @@
-﻿#include "Engine/MiniEngine.h"
+﻿#include "Engine/Engine.h"
 
 // デバッグ用なのでリリース版には含めない
 #ifdef HE_ENGINE_DEBUG
 
+#include "Common.h"
 #include "Engine/Common/CustomMap.h"
 #include "Engine/Math/Math.h"
 #include "LevelLauncher.h"
@@ -15,16 +16,10 @@
 // デバッグ画面を表示してレベルを切り替える
 namespace Level
 {
-    Bool LevelLauncher::VBegin()
+    HE::Bool LevelLauncher::VBegin()
     {
-        const Bool bRet = Level::Node::VBegin();
+        const HE::Bool bRet = Level::Node::VBegin();
         HE_ASSERT(bRet);
-
-        // ランチャー用のレンダリングビュー作成
-        {
-            auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
-            this->_viewHandle  = pRenderModule->AddView();
-        }
 
         // UIイベントをキャッチするコンポーネントを追加
         {
@@ -34,7 +29,7 @@ namespace Level
 
             auto handler = HE_MAKE_CUSTOM_UNIQUE_PTR(
                 (Level::LevelUserInputMessage),
-                [this](const Char* in_pMsg)
+                [this](const HE::Char* in_pMsg)
                 {
                     HE_LOG_LINE(in_pMsg);
                     // 次のレベルへ遷移
@@ -56,28 +51,22 @@ namespace Level
                                  HE_STR_TEXT("Launcher.xml")));
             // widgetを作成
             // レベルが切り替わると自動的にwidgetは破棄される
-            pUIModule->NewLayoutByLayotuAsset(this->_layoutAssetHandle, 0, this->_viewHandle,
+            pUIModule->NewLayoutByLayotuAsset(this->_layoutAssetHandle, 0, Game::g_sceneUIHandle,
                                               this->Handle());
         }
 
         return bRet;
     }
 
-    Bool LevelLauncher::VEnd()
+    HE::Bool LevelLauncher::VEnd()
     {
-        // ビューのハンドルを外す
-        {
-            auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
-            pRenderModule->RemoveView(this->_viewHandle);
-        }
-
         // ロードしたアセットを破棄
         {
             auto pUIModule = HE_ENGINE.ModuleManager().Get<UI::UIModule>();
             pUIModule->UnloadAssetWithLayoutBuild(this->_layoutAssetHandle);
         }
 
-        const Bool bRet = Level::Node::VEnd();
+        const HE::Bool bRet = Level::Node::VEnd();
         HE_ASSERT(bRet);
 
         return TRUE;

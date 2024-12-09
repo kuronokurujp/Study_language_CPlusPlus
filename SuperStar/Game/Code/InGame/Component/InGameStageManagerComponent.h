@@ -34,17 +34,17 @@ namespace InGame
         /// <summary>
         /// タスク開始
         /// </summary>
-        Bool VBegin() override final;
+        HE::Bool VBegin() override final;
 
         /// <summary>
         /// タスク終了
         /// </summary>
-        Bool VEnd() override final;
+        HE::Bool VEnd() override final;
 
         /// <summary>
         /// 更新
         /// </summary>
-        void VUpdate(const Float32) override final;
+        void VUpdate(const HE::Float32) override final;
 
         /*
                 // 初期化、終了
@@ -61,10 +61,10 @@ namespace InGame
         /// <summary>
         /// リスナーがイベント受け取ったかどうか
         /// </summary>
-        // Bool VHandleEvent(Event::EventDataInterfacePtr const& in_rEventData) override final;
+        // HE::Bool VHandleEvent(Event::EventDataInterfacePtr const& in_rEventData) override final;
 
     private:
-        Bool _HandleCharacterEvent(Event::EventDataInterfacePtr const&);
+        HE::Bool _HandleCharacterEvent(Event::EventDataInterfacePtr const&);
 
         /*
             //	定義
@@ -119,11 +119,11 @@ namespace InGame
                 */
         Core::Common::Handle _characterEventHandle;
 
-        Core::Common::FixedMap<Uint32, Core::Common::Handle, 256> _mEnemyMap;
-        Float32 _fTime      = 0.0f;
-        Uint32 _uTimelineNo = 0;
-        Uint32 _uEnemyId    = 0;
-        Bool _bTimeline     = TRUE;
+        Core::Common::FixedMap<HE::Uint32, Core::Common::Handle, 256> _mEnemyMap;
+        HE::Float32 _fTime      = 0.0f;
+        HE::Uint32 _uTimelineNo = 0;
+        HE::Uint32 _uEnemyId    = 0;
+        HE::Bool _bTimeline     = TRUE;
     };
 
 }  // namespace InGame

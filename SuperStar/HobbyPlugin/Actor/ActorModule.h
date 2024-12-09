@@ -28,11 +28,11 @@ namespace Actor
         /// モジュール初期化
         /// </summary>
         /// <returns></returns>
-        Bool _VStart() override final;
+        HE::Bool _VStart() override final;
 
         /// <summary>
         /// インスタンス破棄時に呼ばれる
         /// </summary>
-        Bool _VRelease() override final;
+        HE::Bool _VRelease() override final;
     };
 }  // namespace Actor

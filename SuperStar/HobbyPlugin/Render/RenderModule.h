@@ -1,16 +1,39 @@
 ﻿#pragma once
 
+#include "Engine/Common/CustomMap.h"
 #include "Engine/Common/CustomVector.h"
+#include "Engine/Common/Hash.h"
 #include "Engine/Common/PoolManager.h"
 #include "Engine/Module/Module.h"
 
 // モジュールのヘッダーファイルは全てインクルードする
 #include "Render/Color.h"
 #include "Render/Command/Command.h"
-#include "Render/View/View.h"
+#include "Render/Window/Window.h"
 
 namespace Render
 {
+    // TODO: レンダリングのコンテキスト
+    struct RenderingContext
+    {
+    public:
+        void Setup(const Core::Common::Handle& in_rWindowHandle,
+                   const Core::Common::Handle& in_rViewPortHandle,
+                   const Core::Common::Handle& in_rSceneHandle);
+
+        inline Core::Common::Handle GetWindowHandle() const { return this->ulWindowHandle; }
+        inline Core::Common::Handle GetViewPortHandle() const { return this->ulViewPortHandle; }
+        inline Core::Common::Handle GetSceneHandle() const { return this->ulSceneHandle; }
+
+        // TODO: コンテキストが有効かどうか
+        HE::Bool IsValid() const;
+
+    private:
+        Core::Common::Handle ulWindowHandle;
+        Core::Common::Handle ulViewPortHandle;
+        Core::Common::Handle ulSceneHandle;
+    };
+
     /// <summary>
     /// 描画モジュール
     /// </summary>
@@ -21,60 +44,111 @@ namespace Render
         HE_MODULE_GENRATE_DECLARATION(RenderModule);
 
     public:
-        using ViewHandleVector = Core::Common::FixedVector<Core::Common::Handle, 32>;
-
-        enum EPriority
-        {
-            EPriority_None = 0xffff,
-        };
+        using ViewHandleVector   = Core::Common::FixedVector<Core::Common::Handle, 32>;
+        using WindowHandleKeyMap = Core::Common::FixedMap<HE::Uint64, Core::Common::Handle, 32>;
 
     public:
         RenderModule() : ModuleBase(ModuleName(), Module::ELayer_View, 10) {}
 
-        /// <summary>
-        /// レンダリングビューを追加
-        /// </summary>
-        const Core::Common::Handle AddView(const Uint32 in_uPriority = EPriority_None);
+        // TODO: ウィンドウの生成と破棄
+        const Core::Common::Handle NewWindow(Core::Memory::UniquePtr<Render::WindowStrategy>);
 
-        /// <summary>
-        /// 追加したレンダリングビューを削除
-        /// </summary>
-        Bool RemoveView(const Core::Common::Handle&);
+        HE::Bool DeleteWindow(const Core::Common::Handle&);
+        void DeleteAllWindow();
 
-        /// <summary>
-        /// レンダリングビュー取得
-        /// </summary>
-        inline View* GetView(const Core::Common::Handle& in_rHandle)
+        // TODO: ウィンドウ表示
+        void ShowWindow(const Core::Common::Handle&);
+
+        // TODO: ビューポート追加と解除
+        const Core::Common::Handle AddViewPort(const Core::Common::Handle&,
+                                               Core::Memory::UniquePtr<ViewPortConfig>);
+        HE::Bool RemoveViewPort(const Core::Common::Handle& in_rWindowHandle,
+                            const Core::Common::Handle& in_rViewPortHandle);
+
+        const ViewPortConfig* GetViewPortConfig(const Core::Common::Handle&);
+
+        // TODO: UI用シーン追加
+        template <typename TScene>
+        const Core::Common::Handle& AddSceneViewUI(const Core::Common::Handle& in_rWindowsHandle,
+                                                   const Core::Common::Handle& in_rViewPortHash)
         {
-            if (in_rHandle.Null()) return NULL;
+            auto pWindow   = this->_GetWindow(in_rWindowsHandle);
+            auto pViewPort = pWindow->_Ref(in_rViewPortHash);
 
-            return this->_poolView.Ref(in_rHandle);
+            auto sceneHandle = pViewPort->AddSceneViewUI<TScene>();
+            const Core::Common::Handle& handle =
+                this->_AddScene(in_rWindowsHandle, in_rViewPortHash, sceneHandle);
+            if (handle == NullHandle)
+            {
+                pViewPort->RemoveScene(sceneHandle);
+            }
+
+            return handle;
         }
 
-        /// <summary>
-        /// ビューのハンドル群を取得
-        /// </summary>
-        inline const ViewHandleVector& ViewHandles() const { return this->_vViewHandle; }
+        // TODO: 2D用シーン追加
+        template <typename TScene>
+        const Core::Common::Handle& AddSceneView2D(const Core::Common::Handle& in_rWindowsHandle,
+                                                   const Core::Common::Handle& in_rViewPortHash)
+
+        {
+            auto pWindow   = this->_GetWindow(in_rWindowsHandle);
+            auto pViewPort = pWindow->_Ref(in_rViewPortHash);
+
+            auto sceneHandle = pViewPort->AddSceneView2D<TScene>();
+
+            const Core::Common::Handle& handle =
+                this->_AddScene(in_rWindowsHandle, in_rViewPortHash, sceneHandle);
+            if (handle == NullHandle)
+            {
+                pViewPort->RemoveScene(sceneHandle);
+                return NullHandle;
+            }
+
+            return handle;
+        }
+
+        // TODO: シーンにレンダリングするコマンド追加
+        HE::Bool PushSceneRenderCommand(const Core::Common::Handle&, Command&&);
 
     protected:
         /// <summary>
         /// モジュール初期化
         /// </summary>
-        Bool _VStart() override final;
+        HE::Bool _VStart() override final;
 
         /// <summary>
         /// インスタンス破棄時に呼ばれる
         /// </summary>
-        Bool _VRelease() override final;
+        HE::Bool _VRelease() override final;
 
         /// <summary>
         /// 前更新
         /// </summary>
-        Bool _VBeforeUpdate(const Float32 in_fDeltaTime) override final;
+        HE::Bool _VBeforeUpdate(const HE::Float32) override final;
+
+        /// <summary>
+        /// モジュール更新
+        /// </summary>
+        HE::Bool _VUpdate(const HE::Float32) override final;
+
+        /// <summary>
+        /// モジュール後更新
+        /// </summary>
+        HE::Bool _VLateUpdate(const HE::Float32) override final;
 
     private:
-        Core::Common::FixedPoolManager<View, 32> _poolView;
-        ViewHandleVector _vViewHandle;
+        Window* _GetWindow(const Core::Common::Handle&);
+
+        const Core::Common::Handle& _AddScene(const Core::Common::Handle& in_rWindowHandle,
+                                              const Core::Common::Handle& in_rViewPortHandle,
+                                              const Core::Common::Handle& in_rSceneHandle);
+
+    private:
+        Core::Common::FixedPoolManager<Window, 32> _poolWindow;
+        Core::Common::FixedPoolManager<RenderingContext, 32> _poolRenderingContext;
+
+        Core::Common::FixedStack<Core::Common::Handle, 32> _sStandupWindow;
     };
 
 }  // namespace Render

@@ -8,7 +8,7 @@
 
 namespace UI
 {
-    void UIButtonComponent::VSetup(const Bool in_bAutoDelete)
+    void UIButtonComponent::VSetup(const HE::Bool in_bAutoDelete)
     {
         UIWidgetComponent::VSetup(in_bAutoDelete);
 
@@ -19,9 +19,9 @@ namespace UI
     /// ボタンコンポーネントが終了
     /// </summary>
     /// <returns></returns>
-    Bool UIButtonComponent::VEnd()
+    HE::Bool UIButtonComponent::VEnd()
     {
-        const Bool bRet = UIWidgetComponent::VEnd();
+        const HE::Bool bRet = UIWidgetComponent::VEnd();
 
         // プッシュハンドルを解放
         HE_SAFE_DELETE_UNIQUE_PTR(this->_pushHandler);
@@ -33,7 +33,7 @@ namespace UI
     /// コンポーネントの更新
     /// 必ず処理を記述
     /// </summary>
-    void UIButtonComponent::VUpdate(const Float32 in_fDeltaTime)
+    void UIButtonComponent::VUpdate(const HE::Float32 in_fDeltaTime)
     {
         UIWidgetComponent::VUpdate(in_fDeltaTime);
 
@@ -46,7 +46,7 @@ namespace UI
         pTrans->TransformLocalToWorldRect2D(&rect, srcRect);
 
         // 描画コマンドを追加
-        Render::Command2DRectDraw(this->_viewHandle, rect, {this->_color});
+        Render::Command2DRectDraw(this->_viewHandle, rect, {this->_uColor});
     }
 
     void UIButtonComponent::VOnTouch(const EnhancedInput::InputData::Item::Touch& in_rTouch)

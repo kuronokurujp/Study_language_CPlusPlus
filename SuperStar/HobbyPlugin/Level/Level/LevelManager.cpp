@@ -6,7 +6,7 @@
 
 namespace Level
 {
-    Bool Manager::Init()
+    HE::Bool Manager::Init()
     {
         // タスク管理を初期化
         // 利用するタスク設定は内部で固定する
@@ -16,7 +16,7 @@ namespace Level
         return TRUE;
     }
 
-    Bool Manager::Release()
+    HE::Bool Manager::Release()
     {
         if (this->_upNodeManager->End() == FALSE) return FALSE;
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upNodeManager);
@@ -24,7 +24,7 @@ namespace Level
         return TRUE;
     }
 
-    void Manager::ProcessInput(const Float32 in_fDt, const EnhancedInput::InputMap& in_rInputMap)
+    void Manager::ProcessInput(const HE::Float32 in_fDt, const EnhancedInput::InputMap& in_rInputMap)
     {
         // 入力更新
         {
@@ -35,7 +35,7 @@ namespace Level
         }
     }
 
-    void Manager::BeforeUpdate(const Float32 in_fDt)
+    void Manager::BeforeUpdate(const HE::Float32 in_fDt)
     {
         // レベルの切り替え先があればカレントと交換
         // 切り替えた後は古いカレントは破棄
@@ -55,13 +55,13 @@ namespace Level
         this->_upNodeManager->BeginUpdate(in_fDt);
     }
 
-    void Manager::Update(const Float32 in_fDt)
+    void Manager::Update(const HE::Float32 in_fDt)
     {
         // レベルノードを更新
         this->_upNodeManager->Update(in_fDt);
     }
 
-    void Manager::LateUpdate(const Float32 in_fDt)
+    void Manager::LateUpdate(const HE::Float32 in_fDt)
     {
         this->_upNodeManager->LateUpdate(in_fDt);
     }
@@ -72,7 +72,7 @@ namespace Level
         return pNode;
     }
 
-    Bool Manager::_StartLevel(const Core::Common::Handle& in_rHandle)
+    HE::Bool Manager::_StartLevel(const Core::Common::Handle& in_rHandle)
     {
         this->_nextLevelHandle = in_rHandle;
 

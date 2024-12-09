@@ -23,8 +23,8 @@ namespace Lua
 
         union
         {
-            Float32 fVal;
-            Char szText[128];
+            HE::Float32 fVal;
+            HE::Char szText[128];
         } data;
     };
 
@@ -34,12 +34,12 @@ namespace Lua
     struct LuaFuncData
     {
         // 関数名
-        Char szFuncName[128] = {NULL};
+        HE::Char szFuncName[128] = {NULL};
         // 各引数
         // 引数名は取れないので, 使う側が配列の要素位置を意識する必要がある
         LuaFuncArgData aArg[6];
 
-        Uint32 uArgCount = 0;
+        HE::Uint32 uArgCount = 0;
     };
 
     /// <summary>
@@ -52,7 +52,7 @@ namespace Lua
     private:
         struct LuaObject
         {
-            Char szName[128] = {NULL};
+            HE::Char szName[128] = {NULL};
             void* pLuaState  = NULL;
         };
 
@@ -62,17 +62,17 @@ namespace Lua
         /// <summary>
         /// Luaオブジェクト生成
         /// </summary>
-        const Core::Common::Handle CreateLuaObject(const Char* in_pName);
+        const Core::Common::Handle CreateLuaObject(const HE::Char* in_pName);
 
         /// <summary>
         /// Luaオブジェクトを破棄
         /// </summary>
-        Bool ReleaseLuaObject(const Core::Common::Handle&);
+        HE::Bool ReleaseLuaObject(const Core::Common::Handle&);
 
         /// <summary>
         /// Luaスクリプトテキストをロード
         /// </summary>
-        Bool LoadScriptText(const Core::Common::Handle&, const Char*);
+        HE::Bool LoadScriptText(const Core::Common::Handle&, const HE::Char*);
 
         /// <summary>
         /// Luaスクリプトのローカル関数を呼び出す
@@ -81,31 +81,31 @@ namespace Lua
         /// Luaスクリプトのコルーチンは非対応
         /// </summary>
         template <typename... TArgs>
-        Bool CallScriptFunc(const Core::Common::Handle&, const Char*, TArgs... args);
+        HE::Bool CallScriptFunc(const Core::Common::Handle&, const HE::Char*, TArgs... args);
 
         // TODO: c++側がキャッチできる関数を登録
-        Bool RegistScriptFunc(const Core::Common::Handle&, const Char*);
+        HE::Bool RegistScriptFunc(const Core::Common::Handle&, const HE::Char*);
 
         /// <summary>
         /// 登録した関数をLuaスクリプトで実行を受け取る関数を設定
         /// </summary>
-        Bool SetEventFunctionByLuaFunc(
+        HE::Bool SetEventFunctionByLuaFunc(
             Core::Memory::SharedPtr<Core::Common::FunctionObject<void, LuaFuncData&>>);
 
     protected:
         /// <summary>
         /// モジュール初期化
         /// </summary>
-        Bool _VStart() override final;
+        HE::Bool _VStart() override final;
         /// <summary>
         /// インスタンス破棄時に呼ばれる
         /// </summary>
-        Bool _VRelease() override final;
+        HE::Bool _VRelease() override final;
 
         /// <summary>
         /// モジュール後更新
         /// </summary>
-        Bool _VLateUpdate(const Float32 in_fDeltaTime) override final;
+        HE::Bool _VLateUpdate(const HE::Float32 in_fDeltaTime) override final;
 
     private:
         template <typename... TArgs>
@@ -119,29 +119,29 @@ namespace Lua
             // 何もしない
         }
 
-        // Int型をプッシュ
-        void _LuaStackPushValue(void*, const Int);
+        // HE::Int型をプッシュ
+        void _LuaStackPushValue(void*, const HE::Int);
 
-        // Sint32型をプッシュ
-        void _LuaStackPushValue(void*, const Sint32);
+        // HE::Sint32型をプッシュ
+        void _LuaStackPushValue(void*, const HE::Sint32);
 
         // Uint32型をプッシュ
-        void _LuaStackPushValue(void*, const Uint32);
+        void _LuaStackPushValue(void*, const HE::Uint32);
 
-        // Float32
-        void _LuaStackPushValue(void*, const Float32);
+        // HE::HE::Float32
+        void _LuaStackPushValue(void*, const HE::Float32);
 
-        // Bool型をプッシュ
-        void _LuaStackPushValue(void*, const Bool);
+        // HE::Bool型をプッシュ
+        void _LuaStackPushValue(void*, const HE::Bool);
 
         // const Char* 型をプッシュ
-        void _LuaStackPushValue(void*, const Char*);
+        void _LuaStackPushValue(void*, const HE::Char*);
 
         // StringBase型を
         void _LuaStackPushValue(void*, const Core::Common::StringBase&);
 
-        Bool _BeginLocalFunc(void*, const Char*);
-        Bool _EndLocalFunc(void*, const Uint32);
+        HE::Bool _BeginLocalFunc(void*, const HE::Char*);
+        HE::Bool _EndLocalFunc(void*, const HE::Uint32);
 
     private:
         void* _pLuaState = NULL;
@@ -159,13 +159,13 @@ namespace Lua
     /// Luaスクリプトのコルーチンは使えない
     /// </summary>
     template <typename... TArgs>
-    Bool LuaModule::CallScriptFunc(const Core::Common::Handle& in_rHandle,
-                                   const Char* in_pActionName, TArgs... args)
+    HE::Bool LuaModule::CallScriptFunc(const Core::Common::Handle& in_rHandle,
+                                   const HE::Char* in_pActionName, TArgs... args)
     {
         auto* pLuaObject = this->_luaObjectPool.Ref(in_rHandle);
         if (this->_BeginLocalFunc(pLuaObject->pLuaState, in_pActionName) == FALSE) return FALSE;
 
-        Uint32 uArgCount = sizeof...(args);
+        HE::Uint32 uArgCount = sizeof...(args);
         this->_LuaStackPushArguments(pLuaObject->pLuaState, args...);
 
         if (this->_EndLocalFunc(pLuaObject->pLuaState, uArgCount) == FALSE)

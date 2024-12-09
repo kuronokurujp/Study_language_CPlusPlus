@@ -17,15 +17,15 @@ namespace Core::Math
     {
     public:
         explicit Matrix4() { *this = Matrix4::Identity; }
-        explicit Matrix4(const Float32 in_faaMat[4][4])
+        explicit Matrix4(const HE::Float32 in_faaMat[4][4])
         {
-            ::memcpy(this->_faMat, in_faaMat, 4 * 4 * sizeof(Float32));
+            ::memcpy(this->_faMat, in_faaMat, 4 * 4 * sizeof(HE::Float32));
         }
 
         // Floatのポインタとして取得
-        const Float32* GetAsFloatPtr() const
+        const HE::Float32* GetAsFloatPtr() const
         {
-            return reinterpret_cast<const Float32*>(&this->_faMat[0][0]);
+            return reinterpret_cast<const HE::Float32*>(&this->_faMat[0][0]);
         }
 
         void Mul(const Matrix4& in_rSrcMat)
@@ -59,14 +59,14 @@ namespace Core::Math
             auto newRow04 = Vector4(row04.AddMul(col01), row04.AddMul(col02), row04.AddMul(col03),
                                     row04.AddMul(col04));
 
-            Float32 temp[4][4] = {
+            HE::Float32 temp[4][4] = {
                 {newRow01._fX, newRow01._fY, newRow01._fZ, newRow01._fW},
                 {newRow02._fX, newRow02._fY, newRow02._fZ, newRow02._fW},
                 {newRow03._fX, newRow03._fY, newRow03._fZ, newRow03._fW},
                 {newRow04._fX, newRow04._fY, newRow04._fZ, newRow04._fW},
             };
 
-            ::memcpy(this->_faMat, temp, sizeof(Float32) * 4 * 4);
+            ::memcpy(this->_faMat, temp, sizeof(HE::Float32) * 4 * 4);
         }
 
         // 平行移動ベクトル取得
@@ -80,7 +80,7 @@ namespace Core::Math
         /// <summary>
         /// 行列式を取得.
         /// </summary>
-        Float32 GetDet();
+        HE::Float32 GetDet();
 
         /// <summary>
         /// 余因子行列を出力.
@@ -90,7 +90,7 @@ namespace Core::Math
         /// <summary>
         /// 行と列を指定した3x3の余因子行列を出力.
         /// </summary>
-        void OutputYoinshi3x3(Matrix3* out_pMat, const Sint32 in_iRow, const Sint32 in_iCol);
+        void OutputYoinshi3x3(Matrix3* out_pMat, const HE::Uint32 in_iRow, const HE::Uint32 in_iCol);
 
         /// <summary>
         /// 転置行列に変換.
@@ -100,14 +100,14 @@ namespace Core::Math
         /// <summary>
         /// 各要素にスケール値を掛ける.
         /// </summary>
-        void Scale(const Float32);
+        void Scale(const HE::Float32);
 
         /// <summary>
         /// Creates the scale matrix4.
         /// </summary>
-        static Matrix4 CreateScale(const Float32 in_fX, const Float32 in_fY, const Float32 in_fZ)
+        static Matrix4 CreateScale(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ)
         {
-            const Float32 faTemp[4][4] = {
+            const HE::Float32 faTemp[4][4] = {
                 {in_fX, 0.0f, 0.0f, 0.0f},
                 {0.0f, in_fY, 0.0f, 0.0f},
                 {0.0f, 0.0f, in_fZ, 0.0f},
@@ -128,7 +128,7 @@ namespace Core::Math
         /// <summary>
         /// Creates the scale.
         /// </summary>
-        static Matrix4 CreateScale(const Float32 in_fScale)
+        static Matrix4 CreateScale(const HE::Float32 in_fScale)
         {
             return CreateScale(in_fScale, in_fScale, in_fScale);
         }
@@ -140,7 +140,7 @@ namespace Core::Math
         /// なぜ?
         ///   2pi = 360度なのでこれを360分割すれば1ラジアンになるから
         /// </summary>
-        static Matrix4 CreateRotationZ(const Float32 in_fRadian);
+        static Matrix4 CreateRotationZ(const HE::Float32 in_fRadian);
 
         /// <summary>
         /// Creates the translation.
@@ -148,25 +148,25 @@ namespace Core::Math
         static Matrix4 CreateTranslation(const Vector3& in_rPos);
 
         // 縦横のサイズを元に単位正方形の座標系に行列変換する行列作成
-        static Matrix4 CreateSimpleViewProj(const Float32 in_fWidth, const Float32 in_fHeight);
+        static Matrix4 CreateSimpleViewProj(const HE::Float32 in_fWidth, const HE::Float32 in_fHeight);
 
         // カメラ情報からビュー行列生成
         static Matrix4 CreateLookAt(const Vector3& in_rEye, const Vector3& in_rTarget,
                                     const Vector3& in_rUp);
 
         // 正射影行列作成
-        static Matrix4 CreateOrtho(const Float32 in_fWidth, const Float32 in_fHeight,
-                                   const Float32 in_fNear, const Float32 in_fFar);
+        static Matrix4 CreateOrtho(const HE::Float32 in_fWidth, const HE::Float32 in_fHeight,
+                                   const HE::Float32 in_fNear, const HE::Float32 in_fFar);
 
         // 透視射影行列作成
-        static Matrix4 CreatePerspectiveFOV(const Float32 in_fFov, const Float32 in_fWidth,
-                                            const Float32 in_fHeight, const Float32 in_fNear,
-                                            const Float32 in_fFar);
+        static Matrix4 CreatePerspectiveFOV(const HE::Float32 in_fFov, const HE::Float32 in_fWidth,
+                                            const HE::Float32 in_fHeight, const HE::Float32 in_fNear,
+                                            const HE::Float32 in_fFar);
 
     public:
         // 単位行列定義
         static const Matrix4 Identity;
 
-        Float32 _faMat[4][4];
+        HE::Float32 _faMat[4][4];
     };
 }  // namespace Core::Math

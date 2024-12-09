@@ -255,7 +255,7 @@ namespace Platform
         /// <summary>
         /// 指定キーを押しているか
         /// </summary>
-        Bool GetKeyValue(const EKeyboard in_eKeyCode) const
+        HE::Bool GetKeyValue(const EKeyboard in_eKeyCode) const
         {
             return (this->_aCurrState[in_eKeyCode] != EInputState_NONE);
         }
@@ -266,8 +266,8 @@ namespace Platform
         EInputState GetKeyState(const EKeyboard in_eKeyCode) const;
 
     public:
-        Uint8 _aCurrState[EKeyboard::EKeyboard_MAX];
-        Uint8 _aPrevState[EKeyboard::EKeyboard_MAX];
+        HE::Uint8 _aCurrState[EKeyboard::EKeyboard_MAX];
+        HE::Uint8 _aPrevState[EKeyboard::EKeyboard_MAX];
     };
 
     /// <summary>
@@ -278,16 +278,16 @@ namespace Platform
     public:
         const Core::Math::Vector2& GetWorldPos() const { return this->_pos; }
 
-        Bool GetTouchValue(const EInputMouseType) const;
+        HE::Bool GetTouchValue(const EInputMouseType) const;
         EInputState GetTouchState(const EInputMouseType) const;
 
         // 指定した矩形がタッチ範囲かどうか
-        Bool IsTouchInRect(const Core::Math::Rect2&) const;
+        HE::Bool IsTouchInRect(const Core::Math::Rect2&) const;
 
     public:
         Core::Math::Vector2 _pos;
-        Uint32 _uCurrTouchState;
-        Uint32 _uPrevTouchState;
+        HE::Uint32 _uCurrTouchState;
+        HE::Uint32 _uPrevTouchState;
     };
 
     /// <summary>
@@ -309,7 +309,8 @@ namespace Platform
         virtual ~InputInterface() = default;
 
         virtual void VInit()                              = 0;
-        virtual void VUpdate(const Float32 in_fDeltaTime) = 0;
+        virtual void VUpdate(const HE::Float32 in_fDeltaTime) = 0;
+        virtual HE::Bool VIsQuit() const                      = 0;
 
         const InputState& GetState() const { return this->_state; }
 

@@ -14,7 +14,7 @@ namespace Core::Common
         // 値をコピーする
         Handle(Handle& in_rHandle) { this->_ulHandle = in_rHandle._ulHandle; }
         Handle(const Handle& in_rHandle) { this->_ulHandle = in_rHandle._ulHandle; }
-        Handle(const Uint64 in_ulHandle) { this->_ulHandle = in_ulHandle; }
+        Handle(const HE::Uint64 in_ulHandle) { this->_ulHandle = in_ulHandle; }
 
         // ムーブセマンティクス
         // コピーと同じにする
@@ -23,18 +23,18 @@ namespace Core::Common
         /// <summary>
         /// 管理するindexを設定
         /// </summary>
-        void Set(const Uint32 in_uIndex);
+        void SetIndex(const HE::Uint32 in_uIndex);
 
-        inline void Clear() HE_NOEXCEPT { this->_ulHandle = ulInvalidUint64; }
-        inline Uint32 Index() const HE_NOEXCEPT { return this->_handleField._uIndex; }
-        inline Uint32 Magic() const HE_NOEXCEPT { return this->_handleField._uMagic; }
-        inline Bool Null() const HE_NOEXCEPT { return (this->_ulHandle == ulInvalidUint64); }
+        inline void Clear() HE_NOEXCEPT { this->_ulHandle = HE::ulInvalidUint64; }
+        inline HE::Uint32 Index() const HE_NOEXCEPT { return this->_handleField._uIndex; }
+        inline HE::Uint32 Magic() const HE_NOEXCEPT { return this->_handleField._uMagic; }
+        inline HE::Bool Null() const HE_NOEXCEPT { return (this->_ulHandle == HE::ulInvalidUint64); }
 
-        operator Uint64() const HE_NOEXCEPT { return this->_ulHandle; }
+        operator HE::Uint64() const HE_NOEXCEPT { return this->_ulHandle; }
 
-        Bool operator!=(Handle& r) HE_NOEXCEPT { return (this->_ulHandle != r._ulHandle); }
+        HE::Bool operator!=(Handle& r) HE_NOEXCEPT { return (this->_ulHandle != r._ulHandle); }
 
-        Bool operator==(Handle& r) HE_NOEXCEPT { return (this->_ulHandle == r._ulHandle); }
+        HE::Bool operator==(Handle& r) HE_NOEXCEPT { return (this->_ulHandle == r._ulHandle); }
 
         void operator=(const Handle& r) HE_NOEXCEPT { this->_ulHandle = r._ulHandle; }
 
@@ -62,12 +62,12 @@ namespace Core::Common
             struct
             {
                 // マジックナンバー
-                Uint64 _uMagic : ESize_MagicBit;
+                HE::Uint64 _uMagic : ESize_MagicBit;
                 // インデックス
-                Uint64 _uIndex : ESize_IndexBit;
+                HE::Uint64 _uIndex : ESize_IndexBit;
             } _handleField;
 
-            Uint64 _ulHandle = ulInvalidUint64;
+            HE::Uint64 _ulHandle = HE::ulInvalidUint64;
         };
     };
 
@@ -83,7 +83,7 @@ namespace std
     class hash<Core::Common::Handle>
     {
     public:
-        size_t operator()(const Core::Common::Handle& p) const { return p.operator Uint64(); }
+        size_t operator()(const Core::Common::Handle& p) const { return p.operator HE::Uint64(); }
     };
 }  // namespace std
 

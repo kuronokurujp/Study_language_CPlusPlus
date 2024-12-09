@@ -22,7 +22,7 @@ struct FuncHelper<TResult (TClass::*)(TArgs...) const>
 TEST_CASE("Test Lambda 01")
 {
     // テストするラムダ式を用意
-    auto myLambda = [](Uint32 in_uCommand, Char* in_szText) { return "hello"; };
+    auto myLambda = [](HE::Uint32 in_uCommand, HE::Char* in_szText) { return "hello"; };
 
     // ラムダ式の型
     using MyLambdaType = decltype(myLambda);
@@ -34,7 +34,7 @@ TEST_CASE("Test Lambda 01")
 TEST_CASE("Test Lambda 02")
 {
     // テストするラムダ式を用意
-    auto myLambda = [](Uint32 in_command, Char* in_szText) { return "hello"; };
+    auto myLambda = [](HE::Uint32 in_command, HE::Char* in_szText) { return "hello"; };
 
     // ラムダ式の型
     using MyLambdaType = decltype(myLambda);

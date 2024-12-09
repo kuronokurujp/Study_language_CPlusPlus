@@ -28,19 +28,19 @@ namespace AssetManager
         virtual ~AssetDataJson() = default;
 
         // 指定するノードのトークン名はアルファベットと数値のみなのでUTF8型にした
-        virtual Uint32 VGetUInt32(const std::initializer_list<const UTF8*>&) override;
-        virtual Sint32 VGetSInt32(const std::initializer_list<const UTF8*>&) override;
-        virtual Float32 VGetFloat32(const std::initializer_list<const UTF8*>&) override;
+        virtual HE::Uint32 VGetUInt32(const std::initializer_list<const HE::UTF8*>&) override;
+        virtual HE::Sint32 VGetSInt32(const std::initializer_list<const HE::UTF8*>&) override;
+        virtual HE::Float32 VGetFloat32(const std::initializer_list<const HE::UTF8*>&) override;
         virtual Core::Common::FixedString1024 VGetChar(
-            const std::initializer_list<const UTF8*>&) override;
+            const std::initializer_list<const HE::UTF8*>&) override;
 
         /// <summary>
         /// 指定したトークンが存在するか
         /// </summary>
-        Bool IsToken(const std::initializer_list<const UTF8*>&);
+        HE::Bool IsToken(const std::initializer_list<const HE::UTF8*>&);
 
     protected:
-        virtual Bool _VLoad(Platform::FileInterface&) override;
+        virtual HE::Bool _VLoad(Platform::FileInterface&) override;
         virtual void _VUnload() override;
 
     protected:

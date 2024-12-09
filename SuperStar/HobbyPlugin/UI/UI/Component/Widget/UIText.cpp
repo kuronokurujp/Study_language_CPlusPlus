@@ -1,5 +1,7 @@
 ﻿#include "UIText.h"
 
+#include "Engine/Engine.h"
+
 // 依存するモジュール一覧
 #include "ActorModule.h"
 #include "LocalizationModule.h"
@@ -7,12 +9,12 @@
 
 namespace UI
 {
-    void UITextComponent::VUpdate(const Float32 in_fDeltaTime)
+    void UITextComponent::VUpdate(const HE::Float32 in_fDeltaTime)
     {
         UIWidgetComponent::VUpdate(in_fDeltaTime);
 
         // ローカライズテキストならローカライズテキストを取得
-        if (0 < this->_szLocGroup.Length())
+        if (0 < this->_szLocGroup.Size())
         {
             // TODO: 言語切り替えが必要
             auto pLocalModule = HE_ENGINE.ModuleManager().Get<Localization::LocalizationModule>();
@@ -33,7 +35,7 @@ namespace UI
 
         pTrans->TransformLocalToWorldPos2D(&pos, this->_rect.Pos());
 
-        Render::Command2DTextDraw(this->_viewHandle, pos, this->_szDrawText, {this->_color},
+        Render::Command2DTextDraw(this->_viewHandle, pos, this->_szDrawText, {this->_uColor},
                                   this->_eAnchor);
     }
 }  // namespace UI

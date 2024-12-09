@@ -15,14 +15,13 @@ namespace Level
     public:
         LevelTitle() = default;
 
-        Bool VBegin() override final;
-        Bool VEnd() override final;
+        HE::Bool VBegin() override final;
+        HE::Bool VEnd() override final;
 
     protected:
         void _VProcessInput(const EnhancedInput::InputMap* in_pInputMap) override final;
 
     private:
         Core::Common::Handle _layoutAssetHandle;
-        Core::Common::Handle _viewHandle;
     };
 }  // namespace Level

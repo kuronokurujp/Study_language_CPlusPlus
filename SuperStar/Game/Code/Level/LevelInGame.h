@@ -16,13 +16,13 @@ namespace Level
     public:
         LevelInGame() = default;
 
-        Bool VBegin() override final;
-        Bool VEnd() override final;
+        HE::Bool VBegin() override final;
+        HE::Bool VEnd() override final;
 
         /// <summary>
         /// 更新
         /// </summary>
-        void VUpdate(const Float32 in_fDt) override final;
+        void VUpdate(const HE::Float32 in_fDt) override final;
 
     protected:
         void _VProcessInput(const EnhancedInput::InputMap* in_pInputMap) override final;
@@ -30,7 +30,6 @@ namespace Level
     private:
         Core::Common::Handle _systemComponentHandle;
         Core::Common::Handle _stageManagerComponentHandle;
-        Core::Common::Handle _viewHandle;
 
         Core::Common::FixedMap<Core::Common::FixedString128, Core::Common::Handle, 64> _mGameAsset;
     };

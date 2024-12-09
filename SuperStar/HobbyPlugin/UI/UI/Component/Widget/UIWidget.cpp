@@ -2,13 +2,13 @@
 
 namespace UI
 {
-    void UIWidgetComponent::VSetup(const Bool in_bAutoDelete)
+    void UIWidgetComponent::VSetup(const HE::Bool in_bAutoDelete)
     {
         Actor::Component::VSetup(in_bAutoDelete);
         this->_Clear();
     }
 
-    Bool UIWidgetComponent::VBegin()
+    HE::Bool UIWidgetComponent::VBegin()
     {
         if (Component::VBegin() == FALSE) return FALSE;
 
@@ -23,7 +23,7 @@ namespace UI
         return TRUE;
     }
 
-    Bool UIWidgetComponent::VEnd()
+    HE::Bool UIWidgetComponent::VEnd()
     {
         if (Component::VEnd() == FALSE) return FALSE;
         if (this->_pOwner->RemoveComponent(&this->_transformHandle) == FALSE)

@@ -13,43 +13,69 @@ namespace Core::File
         this->_szPath = in_rPath._szPath;
     }
 
-    void Path::operator=(const Char* in_szPath)
+    void Path::operator=(const HE::Char* in_szPath)
     {
         this->_szPath = in_szPath;
     }
 
     Path& Path::operator+=(const Path& in_rPath)
     {
-#ifdef HE_WIN
-        Char szTmp[512] = {};
+        this->_Append(in_rPath._szPath);
 
-        // WindowsAPIを利用
-        // https://learn.microsoft.com/ja-jp/windows/win32/api/pathcch/nf-pathcch-pathcchcombine
-        ::PathCchCombine(szTmp, 512, this->_szPath.Str(), in_rPath._szPath.Str());
-        this->_szPath = szTmp;
-#else
-        E_ASSERT(0);
-#endif
         return *this;
     }
 
-    void Path::_Append(const Char* in_szPath)
+    void Path::_Append(const Core::Common::StringBase& in_szPath)
     {
+        if (in_szPath.Empty()) return;
+
         if (this->_szPath.Empty())
         {
-            this->_Set(in_szPath);
+            this->_Set(in_szPath.Str());
         }
         else
         {
-#ifdef HE_WIN
-            Char szTmp[512] = {};
+#if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
+            HE::Char szTmp[512] = {};
 
             // WindowsAPIを利用
             // https://learn.microsoft.com/ja-jp/windows/win32/api/pathcch/nf-pathcch-pathcchcombine
             ::PathCchCombine(szTmp, 512, this->_szPath.Str(), in_szPath);
             this->_szPath = szTmp;
 #else
-            E_ASSERT(0);
+            // TODO: パス連結未対応
+            constexpr HE::Char deilmiter = HE_STR_TEXT('/');
+
+            // パスの後ろに区切り文字がある
+            if (this->_szPath.LastChar() == deilmiter)
+            {
+                // 後ろに付けるパスの先頭に区切り文字がある
+                if (in_szPath.FirstChar() == deilmiter)
+                {
+                    // 区切り文字が二つになるので一つ消して連結
+                    auto szChar = in_szPath.Str();
+                    this->_szPath += &szChar[1];
+
+                    return;
+                }
+
+                // 後ろに付けるパスに区切り文字がないのでそのまま連結
+                this->_szPath += in_szPath;
+                return;
+            }
+            // 前のパスの後ろに区切り文字がない
+            else
+            {
+                if (in_szPath.LastChar() == deilmiter)
+                {
+                    this->_szPath += in_szPath;
+                    return;
+                }
+            }
+
+            this->_szPath += deilmiter;
+            this->_szPath += in_szPath;
+
 #endif
         }
     }

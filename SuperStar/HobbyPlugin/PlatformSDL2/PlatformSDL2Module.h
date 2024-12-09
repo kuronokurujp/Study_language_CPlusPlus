@@ -19,7 +19,7 @@ namespace PlatformSDL2
         /// <summary>
         /// やめる状態になっているか
         /// </summary>
-        Bool VIsQuit() override final { return this->_bQuit; }
+        HE::Bool VIsQuit() override final { return this->_bQuit; }
 
         Core::Memory::SharedPtr<Platform::TimeInterface> VTime() override final
         {
@@ -50,16 +50,16 @@ namespace PlatformSDL2
         /// <summary>
         /// モジュール初期化
         /// </summary>
-        Bool _VStart() override final;
+        HE::Bool _VStart() override final;
         /// <summary>
         /// インスタンス破棄時に呼ばれる
         /// </summary>
-        Bool _VRelease() override final;
+        HE::Bool _VRelease() override final;
 
         /// <summary>
         /// 前更新
         /// </summary>
-        Bool _VBeforeUpdate(const HE::Float32 in_fDeltaTime) override final;
+        HE::Bool _VBeforeUpdate(const HE::Float32 in_fDeltaTime) override final;
 
     private:
         Core::Memory::SharedPtr<Platform::TimeInterface> _spTime;
@@ -68,6 +68,6 @@ namespace PlatformSDL2
         Core::Memory::SharedPtr<Platform::ScreenInterface> _spScreen;
         Core::Memory::SharedPtr<Platform::SystemInterface> _spSysmte;
 
-        Bool _bQuit = FALSE;
+        HE::Bool _bQuit = FALSE;
     };
 }  // namespace PlatformSDL2

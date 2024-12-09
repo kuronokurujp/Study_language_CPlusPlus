@@ -20,41 +20,41 @@ namespace Event
 
         const Core::Common::Handle AddEventManager(
             Core::Memory::UniquePtr<EventManagerStrategyInterface>);
-        Bool RemoveEventManager(const Core::Common::Handle&);
+        HE::Bool RemoveEventManager(const Core::Common::Handle&);
 
         /// <summary>
         /// リスナー登録 / 解除
         /// 登録したらTRUEを返す
         /// すでに登録済みなど登録失敗したらFALSE
         /// </summary>
-        Bool AddListener(EventListenerPtr const&, EventTypeStr const&);
-        Bool RemoveListener(EventListenerPtr const&, EventTypeStr const&);
+        HE::Bool AddListener(EventListenerPtr const&, EventTypeStr const&);
+        HE::Bool RemoveListener(EventListenerPtr const&, EventTypeStr const&);
         // 指定タイプのリスナーを一括で破棄
-        Bool RemoveAllListener(EventTypeStr const&);
+        HE::Bool RemoveAllListener(EventTypeStr const&);
 
         /// <summary>
         /// 実行したいイベントを設定
         /// </summary>
-        Bool QueueEvent(EventDataInterfacePtr const&);
+        HE::Bool QueueEvent(EventDataInterfacePtr const&);
 
     protected:
         /// <summary>
         /// モジュール初期化
         /// </summary>
-        Bool _VStart() override final;
+        HE::Bool _VStart() override final;
 
         /// <summary>
         /// インスタンス破棄時に呼ばれる
         /// </summary>
-        Bool _VRelease() override final;
+        HE::Bool _VRelease() override final;
 
         /// <summary>
         /// モジュール後更新
         /// </summary>
-        Bool _VLateUpdate(const Float32 in_fDeltaTime) override final;
+        HE::Bool _VLateUpdate(const HE::Float32 in_fDeltaTime) override final;
 
     private:
-        Uint32 _uAddEventMngCount = 0;
+        HE::Uint32 _uAddEventMngCount = 0;
         Core::Common::FixedMap<Core::Common::Handle, EventManager*, 32> _mEventMng;
     };
 

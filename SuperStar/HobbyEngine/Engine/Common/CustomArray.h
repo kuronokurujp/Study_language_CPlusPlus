@@ -24,23 +24,23 @@ namespace Core::Common
         HE_CLASS_MOVE_NG(ArrayBase);
 
     public:
-        explicit ArrayBase(TType* in_pArrayAddr, const Uint32 in_uSize)
+        explicit ArrayBase(TType* in_pArrayAddr, const HE::Uint32 in_uSize)
             : _pBuff(in_pArrayAddr), _uCapacity(in_uSize)
         {
         }
 
-        inline Uint32 Capacity() const HE_NOEXCEPT { return this->_uCapacity; }
+        inline HE::Uint32 Capacity() const HE_NOEXCEPT { return this->_uCapacity; }
 
         /// <summary>
         /// 指定した要素に値をコピーして設定
         /// </summary>
-        inline void Set(const Uint32 in_uIndex, const TType& in_data) HE_NOEXCEPT
+        inline void Set(const HE::Uint32 in_uIndex, const TType& in_data) HE_NOEXCEPT
         {
             HE_ASSERT(in_uIndex < this->_uCapacity);
             this->_pBuff[in_uIndex] = in_data;
         }
 
-        inline void Set(const Uint32 in_uIndex, TType&& in_data) HE_NOEXCEPT
+        inline void Set(const HE::Uint32 in_uIndex, TType&& in_data) HE_NOEXCEPT
         {
             HE_ASSERT(in_uIndex < this->_uCapacity);
             this->_pBuff[in_uIndex] = std::move(in_data);
@@ -54,11 +54,11 @@ namespace Core::Common
             HE_ASSERT(0 < this->_uCapacity);
             HE_ASSERT(0 < in_arArray._uCapacity);
 
-            const Uint32 uMinCapacity = HE_MIN(this->_uCapacity, in_arArray._uCapacity);
+            const HE::Uint32 uMinCapacity = HE_MIN(this->_uCapacity, in_arArray._uCapacity);
             std::copy(this->_pBuff, this->_pBuff + uMinCapacity, this->_pBuff);
         }
 
-        TType& operator[](const Uint32 in_uIndex) const
+        TType& operator[](const HE::Uint32 in_uIndex) const
         {
             HE_ASSERT(0 < this->_uCapacity);
             return this->_pBuff[in_uIndex];
@@ -66,14 +66,14 @@ namespace Core::Common
 
     private:
         TType* _pBuff     = NULL;
-        Uint32 _uCapacity = 0;
+        HE::Uint32 _uCapacity = 0;
     };
 
     /// <summary>
     /// 固定長配列
     /// テンプレートで要素を決めている
     /// </summary>
-    template <typename TType, Uint32 TCapacity>
+    template <typename TType, HE::Uint32 TCapacity>
     class FixedArray final : public ArrayBase<TType>
     {
     public:

@@ -6,9 +6,9 @@
 // ハッシュ値がかぶっていないか
 TEST_CASE("Test Hash Duplication Check")
 {
-    const Uint32 uCount          = 3;
-    const Char* aszTexts[uCount] = {HE_STR_TEXT("a"), HE_STR_TEXT("b"), HE_STR_TEXT("c")};
-    Uint64 auuHash[uCount]       = {};
+    const HE::Uint32 uCount          = 3;
+    const HE::Char* aszTexts[uCount] = {HE_STR_TEXT("a"), HE_STR_TEXT("b"), HE_STR_TEXT("c")};
+    HE::Uint64 auuHash[uCount]       = {};
 
     HE_LOG_LINE(HE_STR_EMPTY);
     for (auto i = 0; i < HE_ARRAY_NUM(aszTexts); ++i)

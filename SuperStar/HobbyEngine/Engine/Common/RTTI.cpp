@@ -2,7 +2,7 @@
 
 namespace Core::Common
 {
-    Bool RTTI::DerivesFrom(const RTTI* in_pRtti) const
+    HE::Bool RTTI::DerivesFrom(const RTTI* in_pRtti) const
     {
         const RTTI* pCompare = this;
         while (pCompare != NULL)

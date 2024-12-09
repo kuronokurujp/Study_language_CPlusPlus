@@ -48,7 +48,7 @@ namespace Core::Common
         /// インスタンスがリリースされたときに呼ばれる
         /// 終了処理だが, 大抵はアプリ終了時に呼ばれる
         /// </summary>
-        virtual Bool VRelease() { return FALSE; }
+        virtual HE::Bool VRelease() { return FALSE; }
 
         /// <summary>
         /// インスタンスの参照を返す
@@ -64,7 +64,7 @@ namespace Core::Common
         /// インスタンスがあるかどうか
         /// </summary>
         /// <returns></returns>
-        static Bool Exist() HE_NOEXCEPT { return (T::_pInstance != NULL); }
+        static HE::Bool Exist() HE_NOEXCEPT { return (T::_pInstance != NULL); }
 
         /// <summary>
         /// シングルトン対象から解放

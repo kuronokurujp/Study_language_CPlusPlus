@@ -41,7 +41,7 @@ namespace PlatformSDL2
     {
         // キー入力初期化
         {
-            for (Uint32 i = 0; i < Platform::EKeyboard::EKeyboard_MAX; ++i)
+            for (HE::Uint32 i = 0; i < Platform::EKeyboard::EKeyboard_MAX; ++i)
             {
                 // this->_state._keyboard._aCurrState[i] = CheckHitKey(s_iaKeyMaps[i]);
             }
@@ -67,7 +67,7 @@ namespace PlatformSDL2
     {
         // キー入力の処理
         {
-            for (Uint32 i = 0; i < Platform::EKeyboard::EKeyboard_MAX; ++i)
+            for (HE::Uint32 i = 0; i < Platform::EKeyboard::EKeyboard_MAX; ++i)
             {
                 // キーの前情報を設定
                 this->_state._keyboard._aPrevState[i] = this->_state._keyboard._aCurrState[i];

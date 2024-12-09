@@ -80,10 +80,14 @@ set(ENGINE_TARGET_FILES
     Engine/Platform/PlatformFile.h
     Engine/Platform/PlatformInput.cpp
     Engine/Platform/PlatformInput.h
+    Engine/Platform/PlatformScreen.cpp
     Engine/Platform/PlatformScreen.h
     Engine/Platform/PlatformSystem.h
     Engine/Platform/PlatformTime.h
     Engine/Platform/PlatformModule.h
     
-    
+    Engine/AsyncTask/AsyncTask.cpp
+    Engine/AsyncTask/AsyncTask.h
+    Engine/AsyncTask/AsyncTaskManager.cpp
+    Engine/AsyncTask/AsyncTaskManager.h
 )

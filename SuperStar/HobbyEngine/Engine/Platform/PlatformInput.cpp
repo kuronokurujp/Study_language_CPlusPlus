@@ -30,7 +30,7 @@ namespace Platform
         return EInputState::EInputState_NONE;
     }
 
-    Bool TouchInput::GetTouchValue(const EInputMouseType in_type) const
+    HE::Bool TouchInput::GetTouchValue(const EInputMouseType in_type) const
     {
         return ((this->_uCurrTouchState & in_type) != 0);
     }
@@ -63,7 +63,7 @@ namespace Platform
         return EInputState::EInputState_NONE;
     }
 
-    Bool TouchInput::IsTouchInRect(const Core::Math::Rect2& in_rRect) const
+    HE::Bool TouchInput::IsTouchInRect(const Core::Math::Rect2& in_rRect) const
     {
         return in_rRect.InSidePoint(this->GetWorldPos());
     }

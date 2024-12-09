@@ -15,16 +15,16 @@ namespace PlatformSDL2
     {
     public:
         virtual const Core::Common::Handle VFileOpen(const Core::File::Path& in_rPath) override;
-        Bool VFileClose(const Core::Common::Handle&) override final;
+        HE::Bool VFileClose(const Core::Common::Handle&) override final;
 
-        Bool VFileRead(void* out_pBuff, const Core::Common::Handle& in_rHandle,
-                       const HE::HE::Uint32 in_size) override final;
-        HE::HE::Uint32 VFileSize(const Core::Common::Handle&) override final;
+        HE::Bool VFileRead(void* out_pBuff, const Core::Common::Handle& in_rHandle,
+                       const HE::Uint32 in_size) override final;
+        HE::Sint32 VFileSize(const Core::Common::Handle&) override final;
 
     private:
         /// <summary>
         /// ファイルロードしたハンドルマップ
         /// </summary>
-        Core::Common::FixedMap<Uint32, Core::Common::Handle, 2048> _mFileHandle;
+        Core::Common::FixedMap<Core::Common::Handle, struct FileInfo*, 2048> _mFileHandle;
     };
 }  // namespace Platform::SDL2

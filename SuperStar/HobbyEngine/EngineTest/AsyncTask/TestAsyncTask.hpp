@@ -6,16 +6,16 @@
 
 TEST_CASE("Test AsyncTask")
 {
-    class AsyncTest : public Core::AsyncTaskResult<Uint32>
+    class AsyncTest : public Core::AsyncTaskResult<HE::Uint32>
     {
     public:
-        AsyncTest(const Uint32 in_count) : _count(in_count) {}
+        AsyncTest(const HE::Uint32 in_count) : _count(in_count) {}
 
     protected:
-        virtual Bool _VBeginWithThread() override final
+        virtual HE::Bool _VBeginWithThread() override final
         {
             HE_LOG_LINE(HE_STR_TEXT("%d"), this->_count);
-            if (Core::AsyncTaskResult<Uint32>::_VBeginWithThread() == FALSE)
+            if (Core::AsyncTaskResult<HE::Uint32>::_VBeginWithThread() == FALSE)
             {
                 return FALSE;
             }
@@ -25,7 +25,7 @@ TEST_CASE("Test AsyncTask")
             return TRUE;
         }
 
-        virtual Bool _VUpdateWithThread() override final
+        virtual HE::Bool _VUpdateWithThread() override final
         {
             ++this->_result;
 
@@ -33,9 +33,9 @@ TEST_CASE("Test AsyncTask")
             return (this->_result < this->_count);
         }
 
-        virtual Bool _VEndWithThread() override final
+        virtual HE::Bool _VEndWithThread() override final
         {
-            if (Core::AsyncTaskResult<Uint32>::_VEndWithThread() == FALSE) return FALSE;
+            if (Core::AsyncTaskResult<HE::Uint32>::_VEndWithThread() == FALSE) return FALSE;
 
             this->_bSuccess = TRUE;
 
@@ -43,7 +43,7 @@ TEST_CASE("Test AsyncTask")
         }
 
     private:
-        Uint32 _count = 0;
+        HE::Uint32 _count = 0;
     };
 
     // テストするためには専用アロケーターが必要なので作成
@@ -131,7 +131,7 @@ TEST_CASE("Test AsyncTask")
         {
             HE_LOG_LINE(HE_STR_TEXT("contiune"));
         }
-        Uint32 uNum = *asyncTask4->GetResult();
+        HE::Uint32 uNum = *asyncTask4->GetResult();
         CHECK(uNum == 1000);
     }
 

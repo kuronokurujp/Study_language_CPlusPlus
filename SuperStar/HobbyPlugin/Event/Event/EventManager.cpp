@@ -16,9 +16,9 @@ namespace Event
         this->_iActiveQueue = 0;
     }
 
-    Bool EventManager::EmptyEvent() const
+    HE::Bool EventManager::EmptyEvent() const
     {
-        for (Uint32 i = 0; i < HE_ARRAY_NUM(this->_aQueue); ++i)
+        for (HE::Uint32 i = 0; i < HE_ARRAY_NUM(this->_aQueue); ++i)
         {
             if (0 < this->_aQueue[i].size()) return FALSE;
         }
@@ -56,7 +56,7 @@ namespace Event
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upStrategy);
     }
 
-    Bool EventManager::AddListener(EventListenerPtr const& in_rListener,
+    HE::Bool EventManager::AddListener(EventListenerPtr const& in_rListener,
                                    EventTypeStr const& in_rType)
     {
         if (this->ValidateType(in_rType) == FALSE) return FALSE;
@@ -94,11 +94,11 @@ namespace Event
         return TRUE;
     }
 
-    Bool EventManager::RemoveListener(EventListenerPtr const& in_rListener,
+    HE::Bool EventManager::RemoveListener(EventListenerPtr const& in_rListener,
                                       EventTypeStr const& in_rType)
     {
         if (this->ValidateType(in_rType) == FALSE) return FALSE;
-        Bool bErase = FALSE;
+        HE::Bool bErase = FALSE;
 
         // 総当りの手法 合致するリスナーが見つかるまで、
         // 既存のマッピングのエントリをたどる、見つかったら削除する
@@ -129,7 +129,7 @@ namespace Event
         return bErase;
     }
 
-    Bool EventManager::RemoveAllListener(EventTypeStr const& in_rType)
+    HE::Bool EventManager::RemoveAllListener(EventTypeStr const& in_rType)
     {
         if (this->ValidateType(in_rType) == FALSE) return FALSE;
 
@@ -150,9 +150,9 @@ namespace Event
     }
 
     /*
-        Bool EventManager::VTrigger(EventDataInterfacePtr const& in_rEvent) const
+        HE::Bool EventManager::VTrigger(EventDataInterfacePtr const& in_rEvent) const
         {
-            Bool bProc = FALSE;
+            HE::Bool bProc = FALSE;
 
             auto itrSpecalEvant = this->_mRegistry.FindKey(BaseEventData::EType_SpecalEvent);
             if (itrSpecalEvant != this->_mRegistry.End())
@@ -190,7 +190,7 @@ namespace Event
         }
     */
 
-    Bool EventManager::QueueEvent(EventDataInterfacePtr const& in_spEvent)
+    HE::Bool EventManager::QueueEvent(EventDataInterfacePtr const& in_spEvent)
     {
         HE_ASSERT(0 <= this->_iActiveQueue);
         HE_ASSERT(this->_iActiveQueue < EConstants_NumQueues);
@@ -202,7 +202,7 @@ namespace Event
         return TRUE;
     }
 #if 0
-    Bool EventManager::VAbortEvent(EventTypeStr const& in_rType)
+    HE::Bool EventManager::VAbortEvent(EventTypeStr const& in_rType)
     {
         HE_ASSERT(0 <= this->_sActiveQueue);
         HE_ASSERT(this->_sActiveQueue < EConstants_NumQueues);
@@ -214,7 +214,7 @@ namespace Event
         // イベントタイプのハッシュに対応したリスナーがあるかどうか
         if (it == this->_mRegistry.End()) return FALSE;
 
-        Bool bProcResult     = FALSE;
+        HE::Bool bProcResult     = FALSE;
         EventQueue& evtQueue = this->_aQueue[this->_sActiveQueue];
 
         for (EventQueue::iterator it = evtQueue.begin(), itEnd = evtQueue.end(); it != itEnd; it++)
@@ -234,14 +234,14 @@ namespace Event
     }
 #endif
 
-    Bool EventManager::Tick(const Uint32 in_uMaxMillis)
+    HE::Bool EventManager::Tick(const HE::Uint32 in_uMaxMillis)
     {
         // 計測開始時間
         auto startClock = std::chrono::system_clock::now();
 
         // アクティブなキューを交換する。
         // 交換後の新しいキューは空でなければならない。
-        Sint32 sQueueToProcess = this->_iActiveQueue;
+        HE::Sint32 iQueueToProcess = this->_iActiveQueue;
 
         // 新しいキューのイベントはクリア
         this->_iActiveQueue = (this->_iActiveQueue + 1) % EConstants_NumQueues;
@@ -250,11 +250,11 @@ namespace Event
         // 特殊イベントをリスナーが受け取り処理
         auto itSpecalListener = this->_mRegistry.FindKey(BaseEventData::EType_SpecalEvent);
 
-        while (0 < this->_aQueue[sQueueToProcess].size())
+        while (0 < this->_aQueue[iQueueToProcess].size())
         {
             // リスナーに投げるイベント取り出す
-            EventDataInterfacePtr spEvent = this->_aQueue[sQueueToProcess].front();
-            this->_aQueue[sQueueToProcess].pop_front();
+            EventDataInterfacePtr spEvent = this->_aQueue[iQueueToProcess].front();
+            this->_aQueue[iQueueToProcess].pop_front();
 
             // 特殊イベントタイプのリスナー処理
             {
@@ -280,7 +280,7 @@ namespace Event
                 if (itListeners == this->_mRegistry.End()) continue;
 
                 // イベントタイプに対応したリスナーを呼ぶ
-                const Uint32 uEventId            = itListeners->key;
+                const HE::Uint32 uEventId            = itListeners->key;
                 EventListenerTable const& lTable = itListeners->data;
 
                 for (EventListenerTable::const_iterator listener = lTable.begin(),
@@ -298,7 +298,7 @@ namespace Event
 
                     // 指定時間を超えたらイベント処理を中断
                     // 処理に要した時間をミリ秒に変換
-                    const Uint32 uElapsed =
+                    const HE::Uint32 uElapsed =
                         std::chrono::duration_cast<std::chrono::milliseconds>(endClock - startClock)
                             .count();
                     if (in_uMaxMillis <= uElapsed) break;
@@ -306,14 +306,14 @@ namespace Event
             }
         }
 
-        const Bool bQueueFlushed = (this->_aQueue[sQueueToProcess].size() == 0);
+        const HE::Bool bQueueFlushed = (this->_aQueue[iQueueToProcess].size() == 0);
         {
             // キュー内にイベントが残っている場合は次のフレームでイベントを処理するようにアクティブリストに入れる
             // TODO: 数が多くなると負荷が高い
-            while (0 < this->_aQueue[sQueueToProcess].size())
+            while (0 < this->_aQueue[iQueueToProcess].size())
             {
-                EventDataInterfacePtr spEvent = this->_aQueue[sQueueToProcess].back();
-                this->_aQueue[sQueueToProcess].pop_back();
+                EventDataInterfacePtr spEvent = this->_aQueue[iQueueToProcess].back();
+                this->_aQueue[iQueueToProcess].pop_back();
                 this->_aQueue[this->_iActiveQueue].push_front(spEvent);
             }
         }
@@ -322,9 +322,9 @@ namespace Event
         return bQueueFlushed;
     }
 
-    Bool EventManager::ValidateType(EventTypeStr const& in_rType) const
+    HE::Bool EventManager::ValidateType(EventTypeStr const& in_rType) const
     {
-        if (in_rType.Length() <= 0) return FALSE;
+        if (in_rType.Size() <= 0) return FALSE;
 
         auto ulHash = in_rType.Hash();
         if ((in_rType.Hash() == 0) && (HE_STR_CMP(in_rType.Str(), HE_STR_TEXT("*")) != 0))
@@ -333,7 +333,7 @@ namespace Event
         return this->ValidateHash(ulHash);
     }
 
-    Bool EventManager::ValidateHash(const Uint64 in_ulHash) const
+    HE::Bool EventManager::ValidateHash(const HE::Uint64 in_ulHash) const
     {
         return this->_upStrategy->VIsEventTypeHash(in_ulHash);
     }
@@ -341,7 +341,7 @@ namespace Event
     // 情報探索メソッド
 
     // 特定のイベント型に関連づけられたリスナーのリストを取得
-    Bool EventManager::OutputListenerList(EventListenerList* out,
+    HE::Bool EventManager::OutputListenerList(EventListenerList* out,
                                           EventTypeStr const& in_rEventType) const
     {
         HE_ASSERT(out);

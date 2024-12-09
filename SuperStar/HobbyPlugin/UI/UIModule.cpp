@@ -43,7 +43,7 @@ namespace UI
     /// <summary>
     /// UIのモジュール初期化
     /// </summary>
-    Bool UIModule::_VStart()
+    HE::Bool UIModule::_VStart()
     {
         return TRUE;
     }
@@ -75,7 +75,7 @@ namespace UI
     }
 
     const UIWidgetHandlePack UIModule::NewLayer(const Core::Common::StringBase& in_szrName,
-                                                const Uint32 in_uSort,
+                                                const HE::Uint32 in_uSort,
                                                 const Core::Common::Handle& in_rLevelHandle)
     {
         auto handlePack = this->NewWidget(in_szrName, in_uSort, in_rLevelHandle);
@@ -97,7 +97,7 @@ namespace UI
     }
 
     const UIWidgetHandlePack UIModule::NewLayoutByLayotuAsset(
-        const Core::Common::Handle& in_rAssetHandle, const Uint32 in_uSort,
+        const Core::Common::Handle& in_rAssetHandle, const HE::Uint32 in_uSort,
         const Core::Common::Handle& in_rViewHandle, const Core::Common::Handle& in_rLevelHandle)
     {
         HE_ASSERT(in_rAssetHandle.Null() == FALSE);
@@ -133,7 +133,7 @@ namespace UI
         // MEMO: 要素数が1000を超えるとスタックサイズが足りずにスタックオーバーフローになるので注意
         Core::Common::FixedStack<UI::Builder::Node, 16> stack;
 
-        Uint32 sort = 0;
+        HE::Uint32 sort = 0;
         Core::Common::FixedStack<UI::Builder::Node, 64> sNodeChildren;
         asset.OutputNodeChildren(&sNodeChildren, layoutNode);
 
@@ -166,12 +166,12 @@ namespace UI
                             &pNodeData->exData.label;
                         const UI::Builder::Style* pStyle = &pLabel->style;
                         const Core::Math::Rect2 rect =
-                            Core::Math::Rect2(pLabel->fX, pLabel->fY, pStyle->w, pStyle->h,
+                            Core::Math::Rect2(pLabel->fX, pLabel->fY, pStyle->fW, pStyle->fH,
                                               Local::mPosAnthorToRect2Anchor[pLabel->eAnchor]);
 
                         auto h =
                             this->NewLabelWidget(Core::Common::FixedString64(pNodeData->szId), sort,
-                                                 pLabel->szLoc, pLabel->szText, rect, pStyle->color,
+                                                 pLabel->szLoc, pLabel->szText, rect, pStyle->uColor,
                                                  in_rViewHandle, in_rLevelHandle);
 
                         this->AddChildWidget(hParentWidget, h);
@@ -188,9 +188,9 @@ namespace UI
 
                         auto h = this->NewButtonWidget(
                             Core::Common::FixedString64(pNodeData->szId), sort,
-                            Core::Math::Rect2(pButton->fX, pButton->fY, pStyle->w, pStyle->h,
+                            Core::Math::Rect2(pButton->fX, pButton->fY, pStyle->fW, pStyle->fH,
                                               Local::mPosAnthorToRect2Anchor[pButton->eAnchor]),
-                            pStyle->color, in_rViewHandle, in_rLevelHandle);
+                            pStyle->uColor, in_rViewHandle, in_rLevelHandle);
 
                         // ボタンを押した時のイベントを設定
                         {
@@ -253,9 +253,9 @@ namespace UI
     }
 
     const UIWidgetHandlePack UIModule::NewLabelWidget(
-        const Core::Common::StringBase& in_szrName, const Uint32 in_uSort,
-        const Char* in_szLocGroupName, const Char* in_szText, const Core::Math::Rect2& in_rTextRect,
-        const Uint32 in_uTextColor, const Core::Common::Handle& in_rViewHandle,
+        const Core::Common::StringBase& in_szrName, const HE::Uint32 in_uSort,
+        const HE::Char* in_szLocGroupName, const HE::Char* in_szText, const Core::Math::Rect2& in_rTextRect,
+        const HE::Uint32 in_uTextColor, const Core::Common::Handle& in_rViewHandle,
         const Core::Common::Handle& in_rLevelHandle)
     {
         auto handlePack = this->NewWidget(in_szrName, in_uSort, in_rLevelHandle);
@@ -287,9 +287,9 @@ namespace UI
     }
 
     const UIWidgetHandlePack UIModule::NewButtonWidget(const Core::Common::StringBase& in_szrName,
-                                                       const Uint32 in_uSort,
+                                                       const HE::Uint32 in_uSort,
                                                        const Core::Math::Rect2& in_rBtnRect,
-                                                       const Uint32 in_uBtnColor,
+                                                       const HE::Uint32 in_uBtnColor,
                                                        const Core::Common::Handle& in_rViewHandle,
                                                        const Core::Common::Handle& in_rLevelHandle)
 
@@ -319,7 +319,7 @@ namespace UI
     }
 
     const UIWidgetHandlePack UIModule::NewWidget(const Core::Common::StringBase& in_szrName,
-                                                 const Uint32 in_uSort,
+                                                 const HE::Uint32 in_uSort,
                                                  const Core::Common::Handle& in_rLevelHandle)
     {
         auto pLevelModule = this->GetDependenceModule<Level::LevelModule>();
@@ -331,7 +331,7 @@ namespace UI
         return UIWidgetHandlePack(handle, in_rLevelHandle);
     }
 
-    Bool UIModule::AddChildWidget(UIWidgetHandlePack& in_rParent, UIWidgetHandlePack& in_rWidget)
+    HE::Bool UIModule::AddChildWidget(UIWidgetHandlePack& in_rParent, UIWidgetHandlePack& in_rWidget)
     {
         HE_ASSERT(in_rParent._levelHandle == in_rWidget._levelHandle);
         auto pLevelModule = this->GetDependenceModule<Level::LevelModule>();
@@ -341,7 +341,7 @@ namespace UI
             .ChainActor(in_rWidget._widgetHandle, in_rParent._widgetHandle);
     }
 
-    Bool UIModule::_VRelease()
+    HE::Bool UIModule::_VRelease()
     {
         return TRUE;
     }

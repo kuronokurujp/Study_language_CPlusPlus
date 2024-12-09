@@ -7,12 +7,12 @@ namespace Localization
         this->_AppendDependenceModule<AssetManager::AssetManagerModule>();
     }
 
-    Bool LocalizationModule::_VStart()
+    HE::Bool LocalizationModule::_VStart()
     {
         return TRUE;
     }
 
-    Bool LocalizationModule::_VRelease()
+    HE::Bool LocalizationModule::_VRelease()
     {
         // ロードしたアセットを全て破棄
         for (auto it = this->_locateDataMap.Begin(); it != this->_locateDataMap.End(); ++it)
@@ -28,12 +28,12 @@ namespace Localization
         return TRUE;
     }
 
-    Bool LocalizationModule::_VUpdate(const Float32 in_fDeltaTime)
+    HE::Bool LocalizationModule::_VUpdate(const HE::Float32 in_fDeltaTime)
     {
         return TRUE;
     }
 
-    Bool LocalizationModule::LoadSystemFile(const Core::Common::StringBase& in_szrFilePath)
+    HE::Bool LocalizationModule::LoadSystemFile(const Core::Common::StringBase& in_szrFilePath)
     {
         auto pLocalModule = this->GetDependenceModule<AssetManager::AssetManagerModule>();
         HE_ASSERT(pLocalModule);
@@ -49,7 +49,7 @@ namespace Localization
         return TRUE;
     }
 
-    Bool LocalizationModule::UnloadSystemFile()
+    HE::Bool LocalizationModule::UnloadSystemFile()
     {
         auto pLocalModule = this->GetDependenceModule<AssetManager::AssetManagerModule>();
         HE_ASSERT(pLocalModule);
@@ -58,7 +58,7 @@ namespace Localization
         return TRUE;
     }
 
-    Bool LocalizationModule::LoadTextAll(const Core::Common::StringBase& in_szLocateName)
+    HE::Bool LocalizationModule::LoadTextAll(const Core::Common::StringBase& in_szLocateName)
     {
         auto pLocalModule = this->GetDependenceModule<AssetManager::AssetManagerModule>();
         HE_ASSERT(pLocalModule);
@@ -84,7 +84,7 @@ namespace Localization
         return TRUE;
     }
 
-    Bool LocalizationModule::UnloadTextAll(const Core::Common::StringBase& in_szLocateName)
+    HE::Bool LocalizationModule::UnloadTextAll(const Core::Common::StringBase& in_szLocateName)
     {
         auto pLocalModule = this->GetDependenceModule<AssetManager::AssetManagerModule>();
         HE_ASSERT(pLocalModule);
@@ -99,7 +99,7 @@ namespace Localization
         return TRUE;
     }
 
-    const Char* LocalizationModule::Text(const Core::Common::StringBase& in_szLocateName,
+    const HE::Char* LocalizationModule::Text(const Core::Common::StringBase& in_szLocateName,
                                          const Core::Common::StringBase& in_szGroupName,
                                          const Core::Common::StringBase& in_szKey)
     {
@@ -115,17 +115,17 @@ namespace Localization
         LocateAssetData& rData = pLocalModule->GetAsset<LocateAssetData>(groupIter->data);
 
         // テキストを取得
-        HE_ASSERT(in_szKey.Length() <= 256);
+        HE_ASSERT(in_szKey.Size() <= 256);
         // 作業用の変数
-        static UTF8 szKeyByTempBuff[256] = {0};
+        static HE::UTF8 szKeyByTempBuff[256] = {0};
 
-        in_szKey.OutputUTF8(szKeyByTempBuff, in_szKey.Length());
+        in_szKey.OutputUTF8(szKeyByTempBuff, in_szKey.Size());
         return rData.GetText(szKeyByTempBuff).Str();
     }
 
-    Bool SystemAssetData::_VLoad(Platform::FileInterface& in_rFileSystem)
+    HE::Bool SystemAssetData::_VLoad(Platform::FileInterface& in_rFileSystem)
     {
-        const Bool bRet = AssetManager::AssetDataToml::_VLoad(in_rFileSystem);
+        const HE::Bool bRet = AssetManager::AssetDataToml::_VLoad(in_rFileSystem);
         HE_ASSERT(bRet);
 
         auto rootNode = this->GetRootNode();
@@ -175,7 +175,7 @@ namespace Localization
         return TRUE;
     }
 
-    const SystemAssetData::LocateMap& SystemAssetData::FindLocate(const Char* in_szLocateName)
+    const SystemAssetData::LocateMap& SystemAssetData::FindLocate(const HE::Char* in_szLocateName)
     {
         HE_ASSERT(in_szLocateName);
 
@@ -184,7 +184,7 @@ namespace Localization
         return it->data;
     }
 
-    const Core::Common::FixedString1024& LocateAssetData::GetText(const UTF8* in_szKey)
+    const Core::Common::FixedString1024& LocateAssetData::GetText(const HE::UTF8* in_szKey)
     {
         // キャッシュしているテキストがなければデータからテキストを取る
         if (this->_textBuffMap.Contains(in_szKey) == FALSE)

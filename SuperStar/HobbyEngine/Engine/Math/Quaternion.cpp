@@ -12,15 +12,15 @@ namespace Core::Math
         *this = Identity;
     }
 
-    Quaternion::Quaternion(const Float32 in_fX, const Float32 in_fY, const Float32 in_fZ,
-                           const Float32 in_fW)
+    Quaternion::Quaternion(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ,
+                           const HE::Float32 in_fW)
     {
         this->Set(in_fX, in_fY, in_fZ, in_fW);
     }
 
-    Quaternion::Quaternion(const Vector3& in_rAxis, const Float32 in_fAngle)
+    Quaternion::Quaternion(const Vector3& in_rAxis, const HE::Float32 in_fAngle)
     {
-        const Float32 scaler = Sin(in_fAngle * 0.5f);
+        const HE::Float32 scaler = Sin(in_fAngle * 0.5f);
         this->_fX            = in_rAxis._fX * scaler;
         this->_fY            = in_rAxis._fY * scaler;
         this->_fZ            = in_rAxis._fZ * scaler;
@@ -31,12 +31,12 @@ namespace Core::Math
     void Quaternion::AngleUnitRadian(const Vector3& in_rAngle)
     {
         // オイラー角をクォータニオンとして設定
-        const Float32 fCosXAxis = Cos(in_rAngle._fX * 0.5f);
-        const Float32 fSinXAxis = Sin(in_rAngle._fX * 0.5f);
-        const Float32 fCosYAxis = Cos(in_rAngle._fY * 0.5f);
-        const Float32 fSinYAxis = Sin(in_rAngle._fY * 0.5f);
-        const Float32 fCosZAxis = Cos(in_rAngle._fZ * 0.5f);
-        const Float32 fSinZAxis = Sin(in_rAngle._fZ * 0.5f);
+        const HE::Float32 fCosXAxis = Cos(in_rAngle._fX * 0.5f);
+        const HE::Float32 fSinXAxis = Sin(in_rAngle._fX * 0.5f);
+        const HE::Float32 fCosYAxis = Cos(in_rAngle._fY * 0.5f);
+        const HE::Float32 fSinYAxis = Sin(in_rAngle._fY * 0.5f);
+        const HE::Float32 fCosZAxis = Cos(in_rAngle._fZ * 0.5f);
+        const HE::Float32 fSinZAxis = Sin(in_rAngle._fZ * 0.5f);
 
         // ローカル座標系からワールド座標系への変換
         this->_fW = fCosYAxis * fCosXAxis * fCosZAxis + fSinYAxis * fSinXAxis * fSinZAxis;
@@ -45,8 +45,8 @@ namespace Core::Math
         this->_fZ = fCosYAxis * fCosXAxis * fSinZAxis - fSinYAxis * fSinXAxis * fCosZAxis;
     }
 
-    void Quaternion::Set(const Float32 in_fX, const Float32 in_fY, const Float32 in_fZ,
-                         const Float32 in_fW)
+    void Quaternion::Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ,
+                         const HE::Float32 in_fW)
     {
         this->_fX = in_fX;
         this->_fY = in_fY;

@@ -108,14 +108,14 @@ namespace InGame
     public:
         //static InGameActorManager& inst(void) { return m_Manager; }
 
-        Bool VStart(Actor::ActorManager*) override final;
+        HE::Bool VStart(Actor::ActorManager*) override final;
 
         /// <summary>
         /// アクター更新
         /// </summary>
-        //void Update(const Float32 in_fDt, const Core::TaskData&) override final;
+        //void Update(const HE::HE::Float32 in_fDt, const Core::TaskData&) override final;
 
-        void VLateUpdate(const Float32 in_fDt, Actor::ActorManager*) override final;
+        void VLateUpdate(const HE::HE::Float32 in_fDt, Actor::ActorManager*) override final;
 
         /*
                 // 追加時ハンドルを返す

@@ -33,7 +33,7 @@ TEST_CASE("Lua Module Script Func")
 
             auto handle = pModule->CreateLuaObject(HE_STR_TEXT("Test"));
             // Luaスクリプトテキストを読み込む
-            Char* szScriptText = HE_STR_TEXT(
+            HE::Char* szScriptText = HE_STR_TEXT(
                 "function Message()\n"
                 "   HE_LOG(\"田中太郎\")\n"
                 "end\n"
@@ -87,7 +87,7 @@ TEST_CASE("Lua Module Script Func")
 
 TEST_CASE("Lua Module Script Func Catch")
 {
-    Uint32 uCount = 0;
+    HE::Uint32 uCount = 0;
     UnitTestRunnerByModuleOnly<Lua::LuaModule>(
         [&uCount]()
         {
@@ -130,7 +130,7 @@ TEST_CASE("Lua Module Script Func Catch")
 
                 auto handle = pModule->CreateLuaObject(HE_STR_TEXT("Test"));
                 // Luaスクリプトテキストを読み込む
-                Char* szScriptText = HE_STR_TEXT(
+                HE::Char* szScriptText = HE_STR_TEXT(
                     "function Message()\n"
                     "   Test_TestFunc(\"test\")\n"
                     "end\n"

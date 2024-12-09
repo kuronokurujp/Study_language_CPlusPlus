@@ -43,7 +43,7 @@ namespace Core
                 this->_parentHandle.Clear();
             }
 
-            inline Bool Empty() const
+            inline HE::Bool Empty() const
             {
                 if (this->_handle.Null() == FALSE) return FALSE;
                 if (this->_parentHandle.Null() == FALSE) return FALSE;
@@ -61,18 +61,18 @@ namespace Core
     public:
         TaskTree() : Task() { this->_Clear(); }
 
-        virtual void VSetup(const Bool in_bAutoDelete);
+        virtual void VSetup(const HE::Bool in_bAutoDelete);
 
-        virtual void VUpdate(const Float32) override;
+        virtual void VUpdate(const HE::Float32) override;
         virtual void VEvent(const TaskData& in_rEvent) override;
 
         inline const ChildTaskNode& GetChildTaskNode() const { return this->_chainNode; }
-        inline Bool IsChild() const { return this->_bChild; }
+        inline HE::Bool IsChild() const { return this->_bChild; }
 
         /// <summary>
         /// 子タスクの追加
         /// </summary>
-        Bool AddChildTask(const Core::Common::Handle&);
+        HE::Bool AddChildTask(const Core::Common::Handle&);
 
         /// <summary>
         /// 子タスクを外す
@@ -105,6 +105,6 @@ namespace Core
         ChildTaskNode _chainNode;
 
     private:
-        Bool _bChild = FALSE;
+        HE::Bool _bChild = FALSE;
     };
 }  // namespace Core

@@ -4,12 +4,12 @@ namespace Core::Common
 {
     // Uint32の最大数は42億になるので,
     // インデックスとマジックナンバーの組み合わせでかぶる事はないと思う
-    static Uint32 s_uMagicNumber = 0;
+    static HE::Uint32 s_uMagicNumber = 0;
 
     /// <summary>
     /// 管理するindexを設定
     /// </summary>
-    void Handle::Set(const Uint32 in_uIndex)
+    void Handle::SetIndex(const HE::Uint32 in_uIndex)
     {
         HE_ASSERT(this->Null());
         HE_ASSERT(in_uIndex <= EMax_Index);

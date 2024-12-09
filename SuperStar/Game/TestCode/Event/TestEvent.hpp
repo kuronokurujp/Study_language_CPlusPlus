@@ -18,7 +18,7 @@ namespace EventTest
     public:
         inline static Event::EventTypeStr _szDataType = HE_STR_TEXT("test");
 
-        Sint32 _sCount = 0;
+        HE::Sint32 _sCount = 0;
     };
 }  // namespace EventTest
 
@@ -29,9 +29,9 @@ TEST_CASE("Event System")
     public:
         explicit TestListener() {}
 
-        const Char* VName() override final { return HE_STR_TEXT("C_TestListener"); }
+        const HE::Char* VName() override final { return HE_STR_TEXT("C_TestListener"); }
 
-        Bool VHandleEvent(Event::EventDataInterfacePtr const& in_spEvent) override final
+        HE::Bool VHandleEvent(Event::EventDataInterfacePtr const& in_spEvent) override final
         {
             if (EventTest::EvtDataTextPut::_szDataType.Hash() == in_spEvent->VDataTypeHash())
             {
@@ -51,7 +51,7 @@ TEST_CASE("Event System")
     class TestEventManagerStrategy final : public Event::EventManagerStrategyInterface
     {
     public:
-        Bool VIsEventTypeHash(const Uint64 in_ulHash)
+        HE::Bool VIsEventTypeHash(const HE::Uint64 in_ulHash)
         {
             return (EventTest::s_TestEventType.Hash() == in_ulHash);
         }
@@ -123,15 +123,15 @@ TEST_CASE("Event System All Remove Listener")
     public:
         explicit TestListener() {}
 
-        const Char* VName() override final { return HE_STR_TEXT("C_TestListener"); }
+        const HE::Char* VName() override final { return HE_STR_TEXT("C_TestListener"); }
 
-        Bool VHandleEvent(Event::EventDataInterfacePtr const&) override final { return TRUE; }
+        HE::Bool VHandleEvent(Event::EventDataInterfacePtr const&) override final { return TRUE; }
     };
 
     class TestEventManagerStrategy final : public Event::EventManagerStrategyInterface
     {
     public:
-        Bool VIsEventTypeHash(const Uint64 in_ulHash)
+        HE::Bool VIsEventTypeHash(const HE::Uint64 in_ulHash)
         {
             if (EventTest::s_TestEventType.Hash() == in_ulHash) return TRUE;
             if (EventTest::s_TestEventType2.Hash() == in_ulHash) return TRUE;

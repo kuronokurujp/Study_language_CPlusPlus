@@ -7,8 +7,10 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICTY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/Game/Config.cmake NO_POLICTY_SCOPE)
 # ゲームエンジン
 include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyEngine/Config.cmake NO_POLICTY_SCOPE)
-# DXLibプラグイン
-include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/DxLib/Config.cmake NO_POLICTY_SCOPE)
+# DXLibプラグイン(未使用)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/DxLib/Config.cmake NO_POLICTY_SCOPE)
+# SDL2プラットフォーム
+include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/PlatformSDL2/Config.cmake NO_POLICTY_SCOPE)
 # 描画プラグイン
 include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Render/Config.cmake NO_POLICTY_SCOPE)
 # アクタープラグイン
@@ -35,9 +37,13 @@ option(
 )
 
 # プロジェクトで参照するファイル群
-# プロジェクトにグループ分けするためにキャッシュ変数にしてグローバル参照できるようにしている
-set(PROJECT_CACHE_SRC_FILES CACHE INTERNAL description)
-set(PROJECT_CACHE_INC_FILES CACHE INTERNAL description)
+# vcpkgから取得するパッケージのライブラリタイプ
+set(CACHE_PROJECT_VCPKG_STATIC_LIB_TYPE "x64-windows-static" CACHE STRING "" FORCE)
+# vcpkgのルートディレクトリ
+set(CHACHE_VCPKG_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg" CACHE STRING "Vcpkg toolchain file" FORCE)
+
+# 環境変数からvcpkgのパスを取得してツールチェインを設定
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file" FORCE)
 
 # ワークスペース名と使用言語C++をプロジェクトに設定.
 project(${WORKSPACE_NAME} VERSION 2.0 LANGUAGES C CXX)
@@ -107,9 +113,14 @@ else()
   message(FATAL_ERROR "[${WORKSPACE_NAME}] Unsupported compiler used.")
 endif()
 
+if($CACHE{CACHE_CHARACTER_CODE_UTF8_FLAG})
+  add_compile_definitions(HE_CHARACTER_CODE_UTF8)
+endif()
+
 # 各プロジェクトを設定
 add_subdirectory(HobbyEngine EXCLUDE_FROM_ALL)
-add_subdirectory(HobbyPlugin/DxLib EXCLUDE_FROM_ALL)
+# add_subdirectory(HobbyPlugin/DxLib EXCLUDE_FROM_ALL)
+add_subdirectory(HobbyPlugin/PlatformSDL2 EXCLUDE_FROM_ALL)
 add_subdirectory(HobbyPlugin/Render EXCLUDE_FROM_ALL)
 add_subdirectory(HobbyPlugin/Actor EXCLUDE_FROM_ALL)
 add_subdirectory(HobbyPlugin/AssetManager EXCLUDE_FROM_ALL)
@@ -143,7 +154,8 @@ check_variable(LEVEL_PLUGIN_NAME)
 check_variable(ASSET_MANAGER_PLUGIN_NAME)
 check_variable(ACTOR_PLUGIN_NAME)
 check_variable(RENDER_PLUGIN_NAME)
-check_variable(DXLIB_PLUGIN_NAME)
+# check_variable(DXLIB_PLUGIN_NAME)
+check_variable(PLATFORMSDL2_PLUGIN_NAME)
 check_variable(ENGINE_NAME)
 
 # ライブラリ名をリストにまとめる
@@ -157,7 +169,8 @@ set(PLUGIN_LIBRARIES
   ${ASSET_MANAGER_PLUGIN_NAME}
   ${RENDER_PLUGIN_NAME}
   ${ACTOR_PLUGIN_NAME}
-  ${DXLIB_PLUGIN_NAME}
+#  ${DXLIB_PLUGIN_NAME}
+  ${PLATFORMSDL2_PLUGIN_NAME}
   ${ENGINE_NAME}
 )
 

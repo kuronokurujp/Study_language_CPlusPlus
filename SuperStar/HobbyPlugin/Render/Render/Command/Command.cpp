@@ -1,5 +1,6 @@
 ﻿#include "Command.h"
 
+#include "Engine/Engine.h"
 #include "RenderModule.h"
 
 namespace Render
@@ -29,11 +30,7 @@ namespace Render
         }
 
         auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
-        auto pView   = pModule->GetView(in_rViewHandle);
-        HE_ASSERT(pView);
-        if (pView == NULL) return;
-
-        pView->PushCmd(std::move(cmd));
+        pModule->PushSceneRenderCommand(in_rViewHandle, std::move(cmd));
     }
 
     void Command2DRectDraw(const Core::Common::Handle& in_rViewHandle,
@@ -56,11 +53,7 @@ namespace Render
         }
 
         auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
-        auto pView   = pModule->GetView(in_rViewHandle);
-        HE_ASSERT(pView);
-        if (pView == NULL) return;
-
-        pView->PushCmd(std::move(cmd));
+        pModule->PushSceneRenderCommand(in_rViewHandle, std::move(cmd));
     }
 
     void Command2DPointDraw(const Core::Common::Handle& in_rViewHandle,
@@ -81,23 +74,14 @@ namespace Render
         }
 
         auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
-        auto pView   = pModule->GetView(in_rViewHandle);
-        HE_ASSERT(pView);
-        if (pView == NULL) return;
-
-        pView->PushCmd(std::move(cmd));
+        pModule->PushSceneRenderCommand(in_rViewHandle, std::move(cmd));
     }
 
     void Command2DPointArrayDraw(const Core::Common::Handle& in_rViewHandle,
-                                 const Point2D* in_aPoint, const Uint32 in_uCount)
+                                 const Point2D* in_aPoint, const HE::Uint32 in_uCount)
     {
         // TODO: 点群描画コマンドを作る
         HE_ASSERT(in_rViewHandle.Null() == FALSE);
-        auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
-        auto pView   = pModule->GetView(in_rViewHandle);
-        HE_ASSERT(pView);
-        if (pView == NULL) return;
-
         // 必要なコマンド情報を作る
         Command cmd;
         {
@@ -108,7 +92,8 @@ namespace Render
             pCmd->aPoint = in_aPoint;
             pCmd->uCount = in_uCount;
         }
-        pView->PushCmd(std::move(cmd));
+        auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
+        pModule->PushSceneRenderCommand(in_rViewHandle, std::move(cmd));
     }
 
     void CommandClsScreen(const Core::Common::Handle& in_rViewHandle, const Color& in_rColor)
@@ -122,17 +107,12 @@ namespace Render
             CmdClsScreen* pClsScreen = &cmd.data.clsScree;
             HE_STATIC_ASSERT(sizeof(cmd.data.clsScree) <= sizeof(cmd.data.ulaWork));
         }
-
         auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
-        auto pView   = pModule->GetView(in_rViewHandle);
-        HE_ASSERT(pView);
-        if (pView == NULL) return;
-
-        pView->PushCmd(std::move(cmd));
+        pModule->PushSceneRenderCommand(in_rViewHandle, std::move(cmd));
     }
 
     void Command2DCircleDraw(const Core::Common::Handle& in_rViewHandle,
-                             const Core::Math::Vector2& in_rPos, const Float32 in_fSize,
+                             const Core::Math::Vector2& in_rPos, const HE::Float32 in_fSize,
                              const Color& in_rColor)
     {
         // TODO: 2D円の描画コマンドを作る
@@ -151,12 +131,7 @@ namespace Render
         }
 
         auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
-        auto pView   = pModule->GetView(in_rViewHandle);
-        HE_ASSERT(pView);
-
-        if (pView == NULL) return;
-
-        pView->PushCmd(std::move(cmd));
+        pModule->PushSceneRenderCommand(in_rViewHandle, std::move(cmd));
     }
 
 }  // namespace Render

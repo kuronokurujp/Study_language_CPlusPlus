@@ -23,38 +23,45 @@
 
 #endif
 
+namespace HE
+{
 // x64 / x84でのポインタを整数へキャストする型
 #ifdef HE_X64
-using Ptr = unsigned long long;
+    using Ptr = unsigned long long;
 #else
-using Ptr = unsigned int;
+    using Ptr = unsigned int;
 #endif
 
-using Int    = int;
-using Sint32 = signed long;
-using Sint64 = signed long long;
-using Uint32 = unsigned long;
-using Uint64 = unsigned long long;
-using Sint16 = signed short;
-using Uint16 = unsigned short;
-using Sint8  = signed char;
-using Uint8  = unsigned char;
+    using Int    = int;
+    using Sint32 = signed long;
+    using Sint64 = signed long long;
+    using Uint32 = unsigned long;
+    using Uint64 = unsigned long long;
+    using Sint16 = signed short;
+    using Uint16 = unsigned short;
+    using Sint8  = signed char;
+    using Uint8  = unsigned char;
 // WindowsではUnicode前提実装なのでwchar型にしている
-#ifdef HE_WIN
-using Char = wchar_t;
-using UTF8 = char;
+// TODO: UTF8型を利用する場合は
+#if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
+    using Char  = wchar_t;
+    using WChar = wchar_t;
+    using UTF8  = char;
 #else
-using Char = char;
-using UTF8 = char;
+    using Char  = char;
+    using UTF8  = char;
+    using WChar = wchar_t;
+
 #endif
 
-using Bool    = char;
-using Float32 = float;
-using Float64 = double;
+    using Bool    = char;
+    using Float32 = float;
+    using Float64 = double;
 
-// 無効値
-constexpr Uint32 uInvalidUint32  = 0xffffffff;
-constexpr Uint64 ulInvalidUint64 = 0xffffffffffffffff;
+    // 無効値
+    constexpr Uint32 uInvalidUint32  = 0xffffffff;
+    constexpr Uint64 ulInvalidUint64 = 0xffffffffffffffff;
+}  // namespace HE
 
 // 定数定義
 #ifndef FALSE

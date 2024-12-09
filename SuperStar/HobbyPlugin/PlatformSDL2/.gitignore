@@ -413,3 +413,4 @@ Log.txt
 # Project Only Setting
 VcPkg/
 vcpkg-configuration.json
+vcpkg.json

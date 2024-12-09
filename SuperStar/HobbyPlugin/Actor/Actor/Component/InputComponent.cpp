@@ -7,7 +7,7 @@ namespace Actor
         if (this->_spStrategy) this->_spStrategy = NULL;
     }
 
-    Bool InputComponent::VEnd()
+    HE::Bool InputComponent::VEnd()
     {
         if (this->_spStrategy)
         {

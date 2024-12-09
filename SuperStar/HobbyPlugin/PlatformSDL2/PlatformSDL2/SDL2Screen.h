@@ -19,7 +19,7 @@ namespace PlatformSDL2
         Screen(PlatformSDL2::PlatformSDL2Module*);
 
         const Core::Common::Handle VCreateWindow() override final;
-        Bool VReleaseAllWindows() override final;
+        HE::Bool VReleaseAllWindows() override final;
 
         void VShowWindow(const Core::Common::Handle&) override final;
 

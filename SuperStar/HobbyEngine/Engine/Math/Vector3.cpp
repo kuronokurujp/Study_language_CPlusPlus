@@ -10,22 +10,22 @@ namespace Core::Math
     Vector3 Vector3::Zero  = Vector3();
     Vector3 Vector3::One   = Vector3(1.0f, 1.0f, 1.0f);
 
-    Vector3::Vector3(const Sint32 in_iX, const Sint32 in_iY, const Sint32 in_iZ)
+    Vector3::Vector3(const HE::Uint32 in_iX, const HE::Uint32 in_iY, const HE::Uint32 in_iZ)
     {
-        _fX = static_cast<Float32>(in_iX);
-        _fY = static_cast<Float32>(in_iY);
-        _fZ = static_cast<Float32>(in_iZ);
+        _fX = static_cast<HE::Float32>(in_iX);
+        _fY = static_cast<HE::Float32>(in_iY);
+        _fZ = static_cast<HE::Float32>(in_iZ);
     }
 
     // 値設定
-    void Vector3::Set(const Float32 in_fX, const Float32 in_fY, const Float32 in_fZ)
+    void Vector3::Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ)
     {
         this->_fX = in_fX;
         this->_fY = in_fY;
         this->_fZ = in_fZ;
     }
 
-    void Vector3::Set(const Float32 in_fVal)
+    void Vector3::Set(const HE::Float32 in_fVal)
     {
         this->_fX = this->_fY = this->_fZ = in_fVal;
     }
@@ -67,7 +67,7 @@ namespace Core::Math
     }
 
     // 掛け算
-    void Vector3::Mul(const Float32 b)
+    void Vector3::Mul(const HE::Float32 b)
     {
         this->_fX *= b;
         this->_fY *= b;
@@ -77,7 +77,7 @@ namespace Core::Math
     // 積和
     // a 方向ベクトル
     // b 方向ベクトルのスカラー
-    void Vector3::Madd(const Vector3& a, const Float32 b)
+    void Vector3::Madd(const Vector3& a, const HE::Float32 b)
     {
         this->_fX += (a._fX * b);
         this->_fY += (a._fY * b);
@@ -88,7 +88,7 @@ namespace Core::Math
     // a 方向ベクトル
     // b 方向ベクトルの長さスカラー
     // c 視点ベクトル
-    void Vector3::SetMadd(const Vector3& a, const Float32 b, const Vector3& c)
+    void Vector3::SetMadd(const Vector3& a, const HE::Float32 b, const Vector3& c)
     {
         this->_fX = a._fX * b + c._fX;
         this->_fY = a._fY * b + c._fY;
@@ -121,7 +121,7 @@ namespace Core::Math
 
     // ２次元補間を行う
     void Vector3::SetInterporation(const Vector3& a, const Vector3& ab, const Vector3& ac,
-                                   Float32 u, Float32 v)
+                                   HE::Float32 u, HE::Float32 v)
     {
         // a + u(b - a)
         this->SetMadd(ab, u, a);
@@ -133,10 +133,10 @@ namespace Core::Math
     //	正規化
     void Vector3::Normalize()
     {
-        Float32 fMagSq = this->_fX * this->_fX + this->_fY * this->_fY + this->_fZ * this->_fZ;
+        HE::Float32 fMagSq = this->_fX * this->_fX + this->_fY * this->_fY + this->_fZ * this->_fZ;
         if (0.0f < fMagSq)
         {
-            Float32 fOnewOverMag = 1.f / static_cast<Float32>(sqrt(fMagSq));
+            HE::Float32 fOnewOverMag = 1.f / static_cast<HE::Float32>(sqrt(fMagSq));
             this->_fX *= fOnewOverMag;
             this->_fY *= fOnewOverMag;
             this->_fZ *= fOnewOverMag;
@@ -144,7 +144,7 @@ namespace Core::Math
     }
 
     // 内積
-    Float32 Vector3::Dot(const Vector3& in_rV, const Vector3& in_rV2)
+    HE::Float32 Vector3::Dot(const Vector3& in_rV, const Vector3& in_rV2)
     {
         return (in_rV._fX * in_rV2._fX + in_rV._fY * in_rV2._fY + in_rV._fZ * in_rV2._fZ);
     }
@@ -163,19 +163,19 @@ namespace Core::Math
     // ベクトルの大きさを2乗したのを取得
     // こちらの方が計算が早い
     // 比較などで利用できる
-    Float32 Vector3::LengthSquared(const Vector3& in_rV)
+    HE::Float32 Vector3::LengthSquared(const Vector3& in_rV)
     {
         return (in_rV._fX * in_rV._fX + in_rV._fY * in_rV._fY * in_rV._fZ * in_rV._fZ);
     }
 
     //	大きさ取得
-    Float32 Vector3::Mag(const Vector3& in_v)
+    HE::Float32 Vector3::Mag(const Vector3& in_v)
     {
-        return static_cast<Float32>(sqrt(LengthSquared(in_v)));
+        return static_cast<HE::Float32>(sqrt(LengthSquared(in_v)));
     }
 
     //	距離取得
-    Float32 Vector3::Distance(const Vector3& in_v, const Vector3& in_v2)
+    HE::Float32 Vector3::Distance(const Vector3& in_v, const Vector3& in_v2)
     {
         Vector3 size;
         size.SetSub(in_v2, in_v);

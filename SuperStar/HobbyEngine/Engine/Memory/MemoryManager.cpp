@@ -4,7 +4,7 @@
 
 namespace Core::Memory
 {
-    Bool Manager::VRelease()
+    HE::Bool Manager::VRelease()
     {
         if (this->_IsReady() == FALSE) return TRUE;
 
@@ -34,7 +34,7 @@ namespace Core::Memory
     /// 初期化
     /// 利用するメモリヒープ確保
     /// </summary>
-    Bool Manager::Start(const Uint32 in_uUseHeapSize)
+    HE::Bool Manager::Start(const HE::Uint32 in_uUseHeapSize)
     {
         //	既に初期化されているか、チェックする．
         if (this->_IsReady())
@@ -70,7 +70,7 @@ namespace Core::Memory
     /// <param name="in_pSetupInfoArray"></param>
     /// <param name="in_uNum">ぺーズ数</param>
     /// <returns>TRUE 成功 / FALSE 失敗</returns>
-    Bool Manager::SetupMemoryPage(PageSetupInfo* in_pSetupInfoArray, const Uint32 in_uNum)
+    HE::Bool Manager::SetupMemoryPage(PageSetupInfo* in_pSetupInfoArray, const HE::Uint32 in_uNum)
     {
         HE_ASSERT(in_pSetupInfoArray && "ページ設定情報がない");
 
@@ -81,7 +81,7 @@ namespace Core::Memory
         }
 
         // メモリページが一つでも初期化状態であればエラーにする
-        for (Uint8 i = 0; i < Manager::MemoryPageMax; i++)
+        for (HE::Uint8 i = 0; i < Manager::MemoryPageMax; i++)
         {
             if (this->_ValidMemoryPage(i))
             {
@@ -90,10 +90,10 @@ namespace Core::Memory
             }
         }
 
-        Uint32 uHeapOffset = 0;
+        HE::Uint32 uHeapOffset = 0;
 
         // 終端子まで繰り返してページを作成する
-        for (Uint32 i = 0; i < in_uNum; ++i)
+        for (HE::Uint32 i = 0; i < in_uNum; ++i)
         {
             const PageSetupInfo* pTempSetupInfo = &in_pSetupInfoArray[i];
 
@@ -124,7 +124,7 @@ namespace Core::Memory
     /// <param name="in_pSetupInfoArray">メモリページ設定情報の配列</param>
     /// <param name="in_uNum">ぺーズ数</param>
     /// <returns>TRUE 成功 / FALSE 失敗</returns>
-    Bool Manager::RemapMemoryPage(PageSetupInfo* in_pSetupInfoArray, const Uint32 in_uNum)
+    HE::Bool Manager::RemapMemoryPage(PageSetupInfo* in_pSetupInfoArray, const HE::Uint32 in_uNum)
     {
         // 初期化されていない
         if (this->_IsReady() == FALSE)
@@ -137,9 +137,9 @@ namespace Core::Memory
         // メモリブロックが壊れていないかチェック
         this->CheckAllMemoryBlock();
 #endif
-        Uint32 uaOffset[Manager::MemoryPageMax]     = {0};
-        Uint32 uaSize[Manager::MemoryPageMax]       = {0};
-        Bool baNeedInitFlag[Manager::MemoryPageMax] = {FALSE};
+        HE::Uint32 uaOffset[Manager::MemoryPageMax]     = {0};
+        HE::Uint32 uaSize[Manager::MemoryPageMax]       = {0};
+        HE::Bool baNeedInitFlag[Manager::MemoryPageMax] = {FALSE};
 
         //	サイズをクリアしておく(サイズが0ならいらないページ)
         ::memset(uaSize, 0, HE_ARRAY_SIZE(uaSize));
@@ -147,8 +147,8 @@ namespace Core::Memory
 
         // 最初にチェックとオフセット等の計算を別枠でする
         // そうしないとDEBUG時で一個前のサイズが大きくなったときメモリブロックのところがデバッグ情報で埋められてしまう
-        Uint32 uOffset = 0;
-        for (Uint32 i = 0; i < in_uNum; ++i)
+        HE::Uint32 uOffset = 0;
+        for (HE::Uint32 i = 0; i < in_uNum; ++i)
         {
             PageSetupInfo* pTempSetupInfo = &in_pSetupInfoArray[i];
 
@@ -172,13 +172,13 @@ namespace Core::Memory
                 if (this->_ValidMemoryPage(pTempSetupInfo->_page))
                 {
                     // オフセットが違う
-                    const Bool bDiffOffsetAddr =
-                        reinterpret_cast<Sint8*>(
+                    const HE::Bool bDiffOffsetAddr =
+                        reinterpret_cast<HE::Sint8*>(
                             this->_aMemoryPageInfoArray[pTempSetupInfo->_page]._pTopAddr) !=
-                        reinterpret_cast<Sint8*>(this->_pHeapTop) + uOffset;
+                        reinterpret_cast<HE::Sint8*>(this->_pHeapTop) + uOffset;
 
                     // サイズが違う
-                    const Bool bDiffSize =
+                    const HE::Bool bDiffSize =
                         this->_aMemoryPageInfoArray[pTempSetupInfo->_page]._uSize !=
                         pTempSetupInfo->_uSize;
 
@@ -212,7 +212,7 @@ namespace Core::Memory
         // 指定されていないページは消す
         // これも先にやっておかないと
         // DEBUG時で一個前のサイズが大きくなったときメモリブロックのところがデバッグ情報で埋められてしまう．
-        for (Uint8 i = 0; i < Manager::MemoryPageMax; ++i)
+        for (HE::Uint8 i = 0; i < Manager::MemoryPageMax; ++i)
         {
             // サイズが0になっているページは指定していないページなので消す
             if (uaSize[i] == 0)
@@ -231,7 +231,7 @@ namespace Core::Memory
         }
 
         // 最後に初期化が必要な場所を初期化
-        for (Uint8 i = 0; i < Manager::MemoryPageMax; ++i)
+        for (HE::Uint8 i = 0; i < Manager::MemoryPageMax; ++i)
         {
             //	初期化が必要ならしろ．
             if (baNeedInitFlag[i])
@@ -247,12 +247,12 @@ namespace Core::Memory
         return TRUE;
     }
 
-    Bool Manager::ValidMemory(void* in_pAllocatedMemory)
+    HE::Bool Manager::ValidMemory(void* in_pAllocatedMemory)
     {
 #ifdef HE_ENGINE_DEBUG
         // 受け取ったのは使用できるメモリの先頭
         BlockHeader* pMemoryBlock = reinterpret_cast<BlockHeader*>(
-            reinterpret_cast<Sint8*>(in_pAllocatedMemory) - this->_GetMemoryBlockHeaderSize());
+            reinterpret_cast<HE::Sint8*>(in_pAllocatedMemory) - this->_GetMemoryBlockHeaderSize());
 
         return this->_IsValidMemoryBlock(pMemoryBlock);
 #else
@@ -260,9 +260,9 @@ namespace Core::Memory
 #endif
     }
 
-    Bool Manager::UsedAllBlock() const
+    HE::Bool Manager::UsedAllBlock() const
     {
-        for (Uint8 i = 0; i < HE_ARRAY_NUM(this->_aMemoryPageInfoArray); ++i)
+        for (HE::Uint8 i = 0; i < HE_ARRAY_NUM(this->_aMemoryPageInfoArray); ++i)
         {
             if (this->UsedBlock(i)) return TRUE;
         }
@@ -270,7 +270,7 @@ namespace Core::Memory
         return FALSE;
     }
 
-    Bool Manager::UsedBlock(const Uint8 in_page) const
+    HE::Bool Manager::UsedBlock(const HE::Uint8 in_page) const
     {
         // ページのメモリブロック先頭にデータがなければ存在しない
         if (this->_aMemoryPageInfoArray[in_page]._pMemoryBlockTop == NULL) return FALSE;
@@ -292,8 +292,8 @@ namespace Core::Memory
     /// name="in_uHeepOffset">メモリページをどこから取るか(メモリマネージャー管理領域先頭からのオフセット。MINIMUM_ALIGN_SIZEの倍数であること)</param>
     /// <param
     /// name="in_uUseHeepSize">メモリページのサイズ（MINIMUM_ALIGN_SIZEの倍数であること）</param>
-    Bool Manager::_InitMemoryPage(const Uint8 in_page, const Uint32 in_uHeepOffset,
-                                  const Uint32 in_uUseHeepSize)
+    HE::Bool Manager::_InitMemoryPage(const HE::Uint8 in_page, const HE::Uint32 in_uHeepOffset,
+                                  const HE::Uint32 in_uUseHeepSize)
     {
         HE_ASSERT((in_page < HE_ARRAY_NUM(this->_aMemoryPageInfoArray)) &&
                   "指定ページが存在しない");
@@ -305,7 +305,7 @@ namespace Core::Memory
         // ページ情報の初期化
         // 確保したヒープからページで利用するヒープ分を割り当てる
         pPageInfo->_pTopAddr =
-            reinterpret_cast<void*>(reinterpret_cast<Sint8*>(this->_pHeapTop) + in_uHeepOffset);
+            reinterpret_cast<void*>(reinterpret_cast<HE::Sint8*>(this->_pHeapTop) + in_uHeepOffset);
         pPageInfo->_uSize = in_uUseHeepSize;
 
         // 最初のメモリブロックを設定する
@@ -348,9 +348,9 @@ namespace Core::Memory
     /// <param name="in_pFile">呼び出したファイル名(デバッグ限定)</param>
     /// <param name="in_line">呼び出したファイルの行数(デバッグ限定)</param>
     /// <returns>NULL 確保失敗 / 非NULL 確保したメモリアドレス</returns>
-    void* Manager::Allocate(Uint32 in_uAllocateSize, Uint8 in_page, Uint8 in_alignSize,
-                            EAllocateLocateType in_eLocateType, const UTF8* in_szFile,
-                            Uint32 in_uLine)
+    void* Manager::Allocate(HE::Uint32 in_uAllocateSize, HE::Uint8 in_page, HE::Uint8 in_alignSize,
+                            EAllocateLocateType in_eLocateType, const HE::UTF8* in_szFile,
+                            HE::Uint32 in_uLine)
 #else
     /// <summary>
     /// メモリ確保
@@ -361,7 +361,7 @@ namespace Core::Memory
     /// <param name="in_alignSize">メモリのアライメントサイズ</param>
     /// <param name="in_locateType">確保位置(前からなのか後ろからなのか)</param>
     /// <returns>NULL 確保失敗 / 非NULL 確保したメモリアドレス</returns>
-    void* Manager::Allocate(Uint32 in_uAllocateSize, Uint8 in_page, Uint8 in_alignSize,
+    void* Manager::Allocate(HE::Uint32 in_uAllocateSize, HE::Uint8 in_page, HE::Uint8 in_alignSize,
                             EAllocateLocateType in_eLocateType)
 #endif
     {
@@ -419,10 +419,10 @@ namespace Core::Memory
         // 空きのどこからとるかというオフセット
         // 0ならいらない
         // それ以外の場合はシステム使用分も含まれる
-        Uint32 uOffsetSize = 0;
+        HE::Uint32 uOffsetSize = 0;
         // 後ろのパディング
-        Uint32 uPaddingSize     = 0;
-        Uint32 uMemoryBlockSize = 0;
+        HE::Uint32 uPaddingSize     = 0;
+        HE::Uint32 uMemoryBlockSize = 0;
 
         while (pFreeMemoryBlock != NULL)
         {
@@ -446,11 +446,11 @@ namespace Core::Memory
                 {
                     // 前からとるとき
                     // アラインを考えて実際に置けるかどうか
-                    Sint8* pStartAddr = reinterpret_cast<Sint8*>(pFreeMemoryBlock) +
+                    HE::Sint8* pStartAddr = reinterpret_cast<HE::Sint8*>(pFreeMemoryBlock) +
                                         this->_GetMemoryBlockHeaderSize();
 
                     // 開始位置のオフセットを割り出す
-                    uOffsetSize = reinterpret_cast<Ptr>(pStartAddr) % in_alignSize;
+                    uOffsetSize = reinterpret_cast<HE::Ptr>(pStartAddr) % in_alignSize;
                     if (uOffsetSize != 0)
                     {
                         // ぴったりじゃないならスタート位置にオフセットが必要
@@ -474,8 +474,8 @@ namespace Core::Memory
                 {
                     // 後ろからとるとき
                     // アライン考慮せず一番後ろにおいた場合の開始アドレス
-                    Ptr pLastStartAddr = reinterpret_cast<Ptr>(
-                        reinterpret_cast<Sint8*>(pFreeMemoryBlock) + pFreeMemoryBlock->_uSize -
+                    HE::Ptr pLastStartAddr = reinterpret_cast<HE::Ptr>(
+                        reinterpret_cast<HE::Sint8*>(pFreeMemoryBlock) + pFreeMemoryBlock->_uSize -
                         _GetMemoryBlockFooterSize() - (in_uAllocateSize + uPaddingSize));
 
                     // 開始位置のオフセットを割り出す
@@ -577,15 +577,15 @@ namespace Core::Memory
         pAllocateMemoryBlock->_uSize         = uMemoryBlockSize;
         pAllocateMemoryBlock->_uAllocateSize = in_uAllocateSize;
         pAllocateMemoryBlock->_alignSize     = in_alignSize;
-        pAllocateMemoryBlock->_paddingSize   = static_cast<Uint8>(uPaddingSize);
+        pAllocateMemoryBlock->_paddingSize   = static_cast<HE::Uint8>(uPaddingSize);
         pAllocateMemoryBlock->_page          = in_page;
         pAllocateMemoryBlock->_useFlag       = 1;
 
 #ifdef HE_ENGINE_DEBUG
         // ファイル名をコピーする
         {
-            Sint32 uMaxCount = HE_ARRAY_NUM(pAllocateMemoryBlock->_szFileName);
-            Sint32 uCount    = HE_MIN(static_cast<Sint32>(::strlen(in_szFile)), uMaxCount);
+            HE::Uint32 uMaxCount = HE_ARRAY_NUM(pAllocateMemoryBlock->_szFileName);
+            HE::Uint32 uCount    = HE_MIN(static_cast<HE::Uint32>(::strlen(in_szFile)), uMaxCount);
             ::strncpy_s(pAllocateMemoryBlock->_szFileName, in_szFile,
                         uCount * sizeof(pAllocateMemoryBlock->_szFileName[0]));
         }
@@ -596,8 +596,8 @@ namespace Core::Memory
 #endif
 
         // 返すのは使用できる領域の先頭
-        const Uint32 headerSize = this->_GetMemoryBlockHeaderSize();
-        Sint8* pAddr            = reinterpret_cast<Sint8*>(pAllocateMemoryBlock) + headerSize;
+        const HE::Uint32 headerSize = this->_GetMemoryBlockHeaderSize();
+        HE::Sint8* pAddr            = reinterpret_cast<HE::Sint8*>(pAllocateMemoryBlock) + headerSize;
         return (reinterpret_cast<void*>(pAddr));
     }
 
@@ -607,8 +607,8 @@ namespace Core::Memory
     void Manager::Free(void* in_pAllocatedMemory)
     {
         // 受け取ったのは使用できるメモリの先頭
-        const Uint32 headerSize   = this->_GetMemoryBlockHeaderSize();
-        Sint8* pAddr              = reinterpret_cast<Sint8*>(in_pAllocatedMemory) - headerSize;
+        const HE::Uint32 headerSize   = this->_GetMemoryBlockHeaderSize();
+        HE::Sint8* pAddr              = reinterpret_cast<HE::Sint8*>(in_pAllocatedMemory) - headerSize;
         BlockHeader* pMemoryBlock = reinterpret_cast<BlockHeader*>(pAddr);
 
         HE_ASSERT(this->_IsValidMemoryBlock(pMemoryBlock) &&
@@ -660,11 +660,11 @@ namespace Core::Memory
     /// </summary>
     /// <param name="in_pAllocatedMemory">管理側で確保したメモリのポインタ</param>
     /// <returns></returns>
-    Uint32 Manager::GetAllocateSize(void* in_pAllocatedMemory)
+    HE::Uint32 Manager::GetAllocateSize(void* in_pAllocatedMemory)
     {
         // 受け取ったのは使用できるメモリの先頭
         BlockHeader* pMemoryBlock = reinterpret_cast<BlockHeader*>(
-            reinterpret_cast<Sint8*>(in_pAllocatedMemory) - this->_GetMemoryBlockHeaderSize());
+            reinterpret_cast<HE::Sint8*>(in_pAllocatedMemory) - this->_GetMemoryBlockHeaderSize());
 
         HE_ASSERT(_IsValidMemoryBlock(pMemoryBlock) &&
                   "メモリマネージャーの管理領域ではないか、メモリブロックが破損している．");
@@ -792,7 +792,7 @@ namespace Core::Memory
     /// <param name="in_splitSize">分割したいサイズ(システム使用分を含める)</param>
     /// <returns>NULL 分割失敗 / 非NULL 分割して新規作成したメモリブロック(後ろの方)</returns>
     Manager::BlockHeader* Manager::_SplitMemoryBlock(BlockHeader* in_pMemoryBlock,
-                                                     Uint32 in_uSplitSize)
+                                                     HE::Uint32 in_uSplitSize)
     {
         if (in_pMemoryBlock->_uAllocateSize < in_uSplitSize)
         {
@@ -807,7 +807,7 @@ namespace Core::Memory
         }
 
         BlockHeader* pSplitMemoryBlock = reinterpret_cast<BlockHeader*>(
-            reinterpret_cast<Sint8*>(in_pMemoryBlock) + in_uSplitSize);
+            reinterpret_cast<HE::Sint8*>(in_pMemoryBlock) + in_uSplitSize);
 
         // パディングは無効になる
         in_pMemoryBlock->_uAllocateSize += in_pMemoryBlock->_paddingSize;
@@ -854,7 +854,7 @@ namespace Core::Memory
     {
         HE_ASSERT(in_pMemoryBlock1->_page == in_pMemoryBlock2->_page && "ページが違う．");
         HE_ASSERT(in_pMemoryBlock1->_useFlag == in_pMemoryBlock2->_useFlag && "使用状況が違う．");
-        HE_ASSERT(reinterpret_cast<BlockHeader*>(reinterpret_cast<Sint8*>(in_pMemoryBlock1) +
+        HE_ASSERT(reinterpret_cast<BlockHeader*>(reinterpret_cast<HE::Sint8*>(in_pMemoryBlock1) +
                                                  in_pMemoryBlock1->_uSize) == in_pMemoryBlock2 &&
                   "メモリブロックが連続していない．");
 
@@ -884,12 +884,12 @@ namespace Core::Memory
     /// 指定メモリページの情報を出力
     /// </summary>
     /// <param name="in_page">ページ</param>
-    void Manager::PrintMemoryPageInfo(Uint8 in_page)
+    void Manager::PrintMemoryPageInfo(HE::Uint8 in_page)
     {
-        Uint32 uUsedTotal              = 0;
-        Uint32 uFreeTotal              = 0;
-        Uint32 uUsedCount              = 0;
-        Uint32 uFreeCount              = 0;
+        HE::Uint32 uUsedTotal              = 0;
+        HE::Uint32 uFreeTotal              = 0;
+        HE::Uint32 uUsedCount              = 0;
+        HE::Uint32 uFreeCount              = 0;
         BlockHeader* pLargestUsedBlock = NULL;
         BlockHeader* pLargestFreeBlock = NULL;
 
@@ -899,10 +899,10 @@ namespace Core::Memory
         HE_LOG_LINE(HE_STR_TEXT("============================================"));
 #ifdef HE_X64
         HE_LOG_LINE(HE_STR_TEXT("TopAddr    :0llx%8.8llx"),
-                    reinterpret_cast<Ptr>(this->_aMemoryPageInfoArray[in_page]._pTopAddr));
+                    reinterpret_cast<HE::Ptr>(this->_aMemoryPageInfoArray[in_page]._pTopAddr));
 #else
         E_LOG_LINE(E_STR_TEXT("TopAddr    :0lx%8.8lx"),
-                   reinterpret_cast<Ptr>(this->_aMemoryPageInfoArray[in_page]._pTopAddr));
+                   reinterpret_cast<HE::Ptr>(this->_aMemoryPageInfoArray[in_page]._pTopAddr));
 #endif
         HE_LOG_LINE(HE_STR_TEXT("Size       :0lx%8.8lx"),
                     this->_aMemoryPageInfoArray[in_page]._uSize);
@@ -918,7 +918,7 @@ namespace Core::Memory
         {
             if (pUsedMemoryBlock->_useFlag == 1)
             {
-                Ptr pBlockAddr = reinterpret_cast<Ptr>(pUsedMemoryBlock);
+                HE::Ptr pBlockAddr = reinterpret_cast<HE::Ptr>(pUsedMemoryBlock);
 #ifdef HE_X64
                 HE_LOG_LINE(HE_STR_TEXT("0llx%8.8llx: 0x%8.8x (0x%8.8x) [%d] {%d}: %s (%d)"),
                             pBlockAddr + this->_GetMemoryBlockHeaderSize(),
@@ -952,7 +952,7 @@ namespace Core::Memory
 
         if (pLargestUsedBlock != NULL)
         {
-            Ptr pBlockAddr = reinterpret_cast<Ptr>(pLargestFreeBlock);
+            HE::Ptr pBlockAddr = reinterpret_cast<HE::Ptr>(pLargestFreeBlock);
 #ifdef HE_X64
             HE_LOG_LINE(HE_STR_TEXT("maxUsed: 0llx%8.8llx 0x%8.8x (0x%8.8x)"),
                         pBlockAddr + this->_GetMemoryBlockHeaderSize(),
@@ -973,7 +973,7 @@ namespace Core::Memory
         {
             if (pFreeMemoryBlock->_useFlag == 0)
             {
-                Ptr pBlockAddr = reinterpret_cast<Ptr>(pFreeMemoryBlock);
+                HE::Ptr pBlockAddr = reinterpret_cast<HE::Ptr>(pFreeMemoryBlock);
 #ifdef HE_X64
                 HE_LOG_LINE(HE_STR_TEXT("0llx%8.8llx:0x%8.8x (0x%8.8x)"),
                             (pBlockAddr + this->_GetMemoryBlockHeaderSize()),
@@ -1013,7 +1013,7 @@ namespace Core::Memory
     /// </summary>
     void Manager::PrintAllMemoryInfo()
     {
-        for (Uint8 i = 0; i < MemoryPageMax; ++i)
+        for (HE::Uint8 i = 0; i < MemoryPageMax; ++i)
         {
             // 使用していないページは表示しない
             if (this->_ValidMemoryPage(i))
@@ -1028,7 +1028,7 @@ namespace Core::Memory
     /// </summary>
     /// <param name="in_page">ページ</param>
     /// <returns>TRUE 全メモリブロックが正常 / FALSE 異常なメモリブロックがある</returns>
-    Bool Manager::CheckMemoryBlockByPage(Uint8 in_page)
+    HE::Bool Manager::CheckMemoryBlockByPage(HE::Uint8 in_page)
     {
         BlockHeader* pMemoryBlock = this->_aMemoryPageInfoArray[in_page]._pMemoryBlockTop;
 
@@ -1051,9 +1051,9 @@ namespace Core::Memory
     /// </summary>
     /// <returns>TRUE 全てのページのメモリブロックは正常 / FALSE
     /// 異常なメモリブロックがある</returns>
-    Bool Manager::CheckAllMemoryBlock()
+    HE::Bool Manager::CheckAllMemoryBlock()
     {
-        for (Uint8 i = 0; i < MemoryPageMax; ++i)
+        for (HE::Uint8 i = 0; i < MemoryPageMax; ++i)
         {
             //	使用していないページはチェックしない．
             if (this->CheckMemoryBlockByPage(i))
@@ -1065,20 +1065,20 @@ namespace Core::Memory
         return TRUE;
     }
 
-    Bool Manager::CheckAllMemoryLeakByPage(const Uint8 in_page)
+    HE::Bool Manager::CheckAllMemoryLeakByPage(const HE::Uint8 in_page)
     {
         // 使用分の表示
         BlockHeader* pUsedMemoryBlock = this->_aMemoryPageInfoArray[in_page]._pMemoryBlockTop;
 
-        Uint32 uUsedTotal = 0;
-        Uint32 uUsedCount = 0;
+        HE::Uint32 uUsedTotal = 0;
+        HE::Uint32 uUsedCount = 0;
 
         BlockHeader* pLargestUsedBlock = NULL;
         while (pUsedMemoryBlock != NULL)
         {
             if (pUsedMemoryBlock->_useFlag == 1)
             {
-                Ptr pBlockAddr = reinterpret_cast<Ptr>(pUsedMemoryBlock);
+                HE::Ptr pBlockAddr = reinterpret_cast<HE::Ptr>(pUsedMemoryBlock);
                 uUsedTotal += pUsedMemoryBlock->_uAllocateSize;
                 ++uUsedCount;
 
@@ -1095,9 +1095,9 @@ namespace Core::Memory
         return (uUsedCount <= 0);
     }
 
-    Bool Manager::CheckAllMemoryLeak()
+    HE::Bool Manager::CheckAllMemoryLeak()
     {
-        for (Uint8 i = 0; i < MemoryPageMax; ++i)
+        for (HE::Uint8 i = 0; i < MemoryPageMax; ++i)
         {
             //	使用していないページはチェックしない．
             if (this->CheckMemoryBlockByPage(i))
@@ -1115,7 +1115,7 @@ namespace Core::Memory
     /// <param name="in_pMemoryBlock">塗りつぶすメモリブロック</param>
     void Manager::_FillFreeMemoryBlock(BlockHeader* in_pMemoryBlock)
     {
-        ::memset(reinterpret_cast<Uint8*>(in_pMemoryBlock) + this->_GetMemoryBlockHeaderSize(),
+        ::memset(reinterpret_cast<HE::Uint8*>(in_pMemoryBlock) + this->_GetMemoryBlockHeaderSize(),
                  freeMemoryFillData,
                  in_pMemoryBlock->_uAllocateSize + in_pMemoryBlock->_paddingSize);
     }
@@ -1126,7 +1126,7 @@ namespace Core::Memory
     /// <param name="in_pMemoryBlock">塗りつぶすメモリブロック</param>
     void Manager::_FillNewMemoryBlock(BlockHeader* in_pMemoryBlock)
     {
-        ::memset(reinterpret_cast<Uint8*>(in_pMemoryBlock) + this->_GetMemoryBlockHeaderSize(),
+        ::memset(reinterpret_cast<HE::Uint8*>(in_pMemoryBlock) + this->_GetMemoryBlockHeaderSize(),
                  newMemoryFillData,
                  in_pMemoryBlock->_uAllocateSize + in_pMemoryBlock->_paddingSize);
     }

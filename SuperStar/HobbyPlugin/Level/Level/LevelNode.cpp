@@ -10,7 +10,7 @@ namespace Level
     class ActorManagerDecorater final : public Actor::ActorManagerDecoraterlnterface
     {
     public:
-        Bool VStart(Actor::ActorManager*) override final
+        HE::Bool VStart(Actor::ActorManager*) override final
         {
             this->_lstInputComponent.Clear();
 
@@ -65,7 +65,7 @@ namespace Level
     {
     }
 
-    Bool Node::VBegin()
+    HE::Bool Node::VBegin()
     {
         if (Actor::Object::VBegin() == FALSE) return FALSE;
 
@@ -78,7 +78,7 @@ namespace Level
         return TRUE;
     }
 
-    Bool Node::VEnd()
+    HE::Bool Node::VEnd()
     {
         if (this->_actorManager.End() == FALSE)
         {
@@ -89,20 +89,20 @@ namespace Level
         return Actor::Object::VEnd();
     }
 
-    void Node::VBeginUpdate(const Float32 in_fDt)
+    void Node::VBeginUpdate(const HE::Float32 in_fDt)
     {
         Actor::Object::VBeginUpdate(in_fDt);
         this->_actorManager.BeginUpdate(in_fDt);
     }
 
-    void Node::VUpdate(const Float32 in_fDt)
+    void Node::VUpdate(const HE::Float32 in_fDt)
     {
         Actor::Object::VUpdate(in_fDt);
 
         this->_actorManager.Update(in_fDt);
     }
 
-    void Node::VLateUpdate(const Float32 in_fDt)
+    void Node::VLateUpdate(const HE::Float32 in_fDt)
     {
         Actor::Object::VLateUpdate(in_fDt);
         this->_actorManager.LateUpdate(in_fDt);
@@ -137,7 +137,7 @@ namespace Level
         this->_actorManager.Remove(in_pActor);
     }
 
-    Bool Node::ChainActor(const Core::Common::Handle& in_rChildActor,
+    HE::Bool Node::ChainActor(const Core::Common::Handle& in_rChildActor,
                           const Core::Common::Handle& in_rParentActor)
     {
         HE_ASSERT(in_rChildActor.Null() == FALSE);
@@ -158,7 +158,7 @@ namespace Level
     /// <summary>
     /// 追加したコンポーネントのセットアップ
     /// </summary>
-    Bool Node::_VSetupComponent(Actor::Component* in_pComp)
+    HE::Bool Node::_VSetupComponent(Actor::Component* in_pComp)
     {
         HE_ASSERT(in_pComp);
 

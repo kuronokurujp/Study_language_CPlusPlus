@@ -10,7 +10,7 @@ namespace PlatformSDL2
     class System final : public Platform::SystemInterface
     {
     public:
-        Uint32 VGetRand(const Uint32) override final;
-        Bool VSetSeedRand(const Uint32) override final;
+        HE::Uint32 VGetRand(const HE::Uint32) override final;
+        HE::Bool VSetSeedRand(const HE::Uint32) override final;
     };
 }  // namespace Platform::SDL2

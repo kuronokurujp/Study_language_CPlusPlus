@@ -5,7 +5,7 @@
 
 namespace AssetManager
 {
-    Bool AssetDataToml::_VLoad(Platform::FileInterface& in_rFileSystem)
+    HE::Bool AssetDataToml::_VLoad(Platform::FileInterface& in_rFileSystem)
     {
         // ファイルロード
         this->_result = toml::parse_file(this->_path.Str());
@@ -38,11 +38,11 @@ namespace AssetManager
         return Core::Common::FixedString512(s->data());
     }
 
-    AssetDataToml::Node AssetDataToml::Node::_GetNode(const Char* in_szaName[],
-                                                      const Uint32 in_uCount)
+    AssetDataToml::Node AssetDataToml::Node::_GetNode(const HE::Char* in_szaName[],
+                                                      const HE::Uint32 in_uCount)
     {
         toml::node_view<toml::node> node = this->_node;
-        for (Uint32 i = 0; i < in_uCount; ++i)
+        for (HE::Uint32 i = 0; i < in_uCount; ++i)
         {
             node = node.at_path(in_szaName[i]);
             if (node == FALSE) return Node();
@@ -51,14 +51,14 @@ namespace AssetManager
         return Node(node);
     }
 
-    Bool AssetDataToml::Node::_OutputNodeMap(ToolNodeMapType* out, const Char* in_szaName[],
-                                             const Uint32 in_uCount)
+    HE::Bool AssetDataToml::Node::_OutputNodeMap(ToolNodeMapType* out, const HE::Char* in_szaName[],
+                                             const HE::Uint32 in_uCount)
     {
         HE_ASSERT(out && "出力するポインターがNULL");
         HE_ASSERT(0 < in_uCount);
 
         toml::node_view<toml::node> node = this->_node;
-        for (Uint32 i = 0; i < in_uCount; ++i)
+        for (HE::Uint32 i = 0; i < in_uCount; ++i)
         {
             if (HE_STR_CMP(in_szaName[i], HE_STR_EMPTY) == 0) break;
 

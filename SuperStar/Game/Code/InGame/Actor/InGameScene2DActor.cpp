@@ -9,7 +9,7 @@ namespace InGame
         this->_Clear();
     }
 
-    Bool InGameScene2DActor::VBegin()
+    HE::Bool InGameScene2DActor::VBegin()
     {
         if (Actor::Object::VBegin() == FALSE) return FALSE;
 

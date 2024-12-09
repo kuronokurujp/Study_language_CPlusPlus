@@ -38,13 +38,13 @@ public:
     /// 初期化
     /// メモリシステムなどエンジンを動かす上で最低元の初期化をする
     /// </summary>
-    Bool Init();
+    HE::Bool Init();
 
     /// <summary>
     /// モジュールを作成して追加
     /// </summary>
     template <class T>
-    Bool AddModule()
+    HE::Bool AddModule()
     {
         HE_ASSERT(this->_bInit);
 
@@ -62,28 +62,18 @@ public:
     /// エンジン起動
     /// Initメソッドを事前に呼ばないとエラーになる
     /// </summary>
-    Bool Start();
+    HE::Bool Start();
 
     /// <summary>
     /// エンジン破棄
     /// </summary>
-    Bool VRelease() override final;
-
-    /// <summary>
-    /// メインゲームウィンドウ生成
-    /// </summary>
-    Bool CreateMainWindow();
-
-    /// <summary>
-    /// ゲームウィンドウを解放
-    /// </summary>
-    void ReleseWindows();
+    HE::Bool VRelease() override final;
 
     // エンジンを稼働させるためのループ用メソッド
-    Bool BeforeUpdateLoop(const Float32 in_fDt);
-    Bool WaitFrameLoop();
-    Bool MainUpdateLoop(const Float32 in_fDt);
-    Bool LateUpdateLoop(const Float32 in_fDt);
+    HE::Bool BeforeUpdateLoop(const HE::Float32);
+    HE::Bool WaitFrameLoop();
+    HE::Bool MainUpdateLoop(const HE::Float32);
+    HE::Bool LateUpdateLoop(const HE::Float32);
 
     /// <summary>
     /// メモリ管理を取得
@@ -96,10 +86,17 @@ public:
     Module::ModuleManager& ModuleManager() { return *this->_upModuleManager.get(); }
 
     /// <summary>
+    /// プラットフォームのモジュールを取得
+    /// windows / android / iosなどのプラットフォームが扱える予定
+    /// 現在はwindowsのみ
+    /// </summary>
+    Platform::PlatformModule* PlatformModule();
+
+    /// <summary>
     /// デバッグモードかどうか
     /// </summary>
     /// <returns></returns>
-    inline Bool IsDebugMode() const
+    inline HE::Bool IsDebugMode() const
     {
 #ifdef _DEBUG
         return TRUE;
@@ -110,29 +107,22 @@ public:
     /// <summary>
     /// １フレームの差分時間を秒で取得
     /// </summary>
-    Float32 GetDeltaTimeSec();
+    HE::Float32 GetDeltaTimeSec();
 
     /// <summary>
     /// アプリを辞める状態か
     /// </summary>
-    Bool IsAppQuit();
+    HE::Bool IsAppQuit();
 
 private:
-    /// <summary>
-    /// プラットフォームのモジュールを取得
-    /// windows / android / iosなどのプラットフォームが扱える予定
-    /// 現在はwindowsのみ
-    /// </summary>
-    Platform::PlatformModule* _PlatformModule();
-
     /// <summary>
     /// モジュール追加
     /// </summary>
-    Bool _AddModule(Module::ModuleBase* in_pModule);
+    HE::Bool _AddModule(Module::ModuleBase* in_pModule);
 
 private:
-    Bool _bInit  = FALSE;
-    Bool _bStart = FALSE;
+    HE::Bool _bInit  = FALSE;
+    HE::Bool _bStart = FALSE;
 
     // メモリ管理
     Core::Memory::Manager _memoryManager;
@@ -168,12 +158,12 @@ private:
 /// 一つのモジュールを単体テスト実行
 /// </summary>
 template <class... TArgs>
-static void UnitTestRunnerByModuleOnly(std::function<Bool()> in_func)
+static void UnitTestRunnerByModuleOnly(std::function<HE::Bool()> in_func)
 {
     // エンジン起動
     HE_CREATE_ENGINE;
 
-    const Bool bPreInitRet = HE_ENGINE.Init();
+    const HE::Bool bPreInitRet = HE_ENGINE.Init();
     HE_ASSERT(bPreInitRet && "事前初期化に失敗");
 
     // テストモジュールを登録
@@ -181,15 +171,15 @@ static void UnitTestRunnerByModuleOnly(std::function<Bool()> in_func)
         (HE_ENGINE.AddModule<TArgs>(), ...);
     }
 
-    const Bool bInitRet = HE_ENGINE.Start();
+    const HE::Bool bInitRet = HE_ENGINE.Start();
     HE_ASSERT(bInitRet && "初期化に失敗");
-    Bool bEnd = FALSE;
+    HE::Bool bEnd = FALSE;
     while (bEnd == FALSE)
     {
-        const Float32 d = HE_ENGINE.GetDeltaTimeSec();
+        const HE::Float32 d = HE_ENGINE.GetDeltaTimeSec();
         if (HE_ENGINE.BeforeUpdateLoop(d))
         {
-            const Float32 d = HE_ENGINE.GetDeltaTimeSec();
+            const HE::Float32 d = HE_ENGINE.GetDeltaTimeSec();
 
             if (HE_ENGINE.MainUpdateLoop(d))
             {

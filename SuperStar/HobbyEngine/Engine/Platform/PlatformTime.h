@@ -11,8 +11,8 @@ namespace Platform
     public:
         virtual ~TimeInterface() = default;
 
-        virtual Uint64 VNowMSec()                   = 0;
-        virtual void VSleepMSec(const Uint64 in_ms) = 0;
+        virtual HE::Uint64 VNowMSec()                   = 0;
+        virtual void VSleepMSec(const HE::Uint64 in_ms) = 0;
     };
 
 }  // namespace Platform

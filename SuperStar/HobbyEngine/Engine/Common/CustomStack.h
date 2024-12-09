@@ -14,16 +14,16 @@ namespace Core::Common
         HE_CLASS_MOVE_NG(StackBase);
 
     public:
-        StackBase(TType* in_tpArrayAddr, Uint32 in_uSize)
+        StackBase(TType* in_tpArrayAddr, HE::Uint32 in_uSize)
             : _pBuff(in_tpArrayAddr), _uCapacity(in_uSize)
         {
         }
 
         virtual ~StackBase() { this->Clear(); }
 
-        inline Uint32 Capacity() const HE_NOEXCEPT { return this->_uCapacity; }
-        inline Uint32 Size() const HE_NOEXCEPT { return this->_uNum; }
-        inline Bool Empty() const HE_NOEXCEPT { return (this->_uNum <= 0); }
+        inline HE::Uint32 Capacity() const HE_NOEXCEPT { return this->_uCapacity; }
+        inline HE::Uint32 Size() const HE_NOEXCEPT { return this->_uNum; }
+        inline HE::Bool Empty() const HE_NOEXCEPT { return (this->_uNum <= 0); }
 
         void Clear() HE_NOEXCEPT { this->_uNum = 0; }
 
@@ -55,7 +55,7 @@ namespace Core::Common
             if (0 < this->_uNum)
             {
                 // 配列先頭からのデータを一つ横にずらしてインデックス0に空きを作る
-                Uint32 uMemMoveSize = this->_uNum * sizeof(TType);
+                HE::Uint32 uMemMoveSize = this->_uNum * sizeof(TType);
                 ::memmove(&this->_pBuff[1], &this->_pBuff[0], uMemMoveSize);
             }
 
@@ -66,7 +66,7 @@ namespace Core::Common
 
         TType& PopBack()
         {
-            Sint32 i = this->_uNum - 1;
+            HE::Sint32 i = this->_uNum - 1;
             if (0 < this->_uNum) --this->_uNum;
             HE_ASSERT(0 <= i);
 
@@ -76,15 +76,15 @@ namespace Core::Common
 
     private:
         TType* _pBuff     = NULL;
-        Uint32 _uNum      = 0;
-        Uint32 _uCapacity = 0;
+        HE::Uint32 _uNum      = 0;
+        HE::Uint32 _uCapacity = 0;
     };
 
     /// <summary>
     /// 固定長の高速処理のスタック
     /// テンプレートで要素を決めている
     /// </summary>
-    template <class TType, Uint32 TCapacity>
+    template <class TType, HE::Uint32 TCapacity>
     class FixedStack final : public StackBase<TType>
     {
         HE_CLASS_COPY_NG(FixedStack);
@@ -104,7 +104,7 @@ namespace Core::Common
     };
 
     // FixedVector のインスタンスに対する特殊化
-    template <typename TType, Uint32 TCapacity>
+    template <typename TType, HE::Uint32 TCapacity>
     struct IsFixedStack<FixedStack<TType, TCapacity>> : std::true_type
     {
     };

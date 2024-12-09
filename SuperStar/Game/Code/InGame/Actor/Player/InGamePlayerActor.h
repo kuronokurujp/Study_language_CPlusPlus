@@ -20,12 +20,12 @@ namespace InGame
         struct Parameter
         {
             // 移動スピード
-            Float32 speed = 5.0f;
+            HE::Float32 speed = 5.0f;
 
             // 無敵時間
-            Float32 fInvincibleTimeSec = 1.5;
+            HE::Float32 fInvincibleTimeSec = 1.5;
             // HP
-            Sint32 ulife = 3;
+            HE::Sint32 ulife = 3;
         };
 
     public:
@@ -36,21 +36,21 @@ namespace InGame
         /// 開始
         /// 継承したクラスで必ず基本クラスのメソッドを呼ぶ
         /// </summary>
-        Bool VBegin() override final;
+        HE::Bool VBegin() override final;
 
         /// <summary>
         /// 終了
         /// 継承したクラスで必ず基本クラスのメソッドを呼ぶ
         /// </summary>
-        Bool VEnd() override final;
+        HE::Bool VEnd() override final;
 
-        void VUpdate(const Float32 in_fDt) override final;
+        void VUpdate(const HE::Float32 in_fDt) override final;
 
         void SetSize(const Core::Math::Vector2&);
 
         void Move(const Core::Math::Vector2&);
         void Shot();
-        Bool Damage(const Sint32 in_sDamage);
+        HE::Bool Damage(const HE::Sint32 in_sDamage);
 
         const Parameter& GetParameter() const { return this->_parameter; }
 

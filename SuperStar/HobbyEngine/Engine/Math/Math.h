@@ -12,16 +12,16 @@
 namespace Core::Math
 {
     // 円周率
-    static const Float32 fPI                = 3.1415926535f;
-    static const Float32 fTwoPI             = 2 * fPI;
-    static const Float32 fPIOver2           = fPI / 2.0f;
-    static const Float32 fRadiansUnit       = fPI / 180.0f;
-    static const Float32 fInvertRadiansUnit = 180.0f / fPI;
+    static const HE::Float32 fPI                = 3.1415926535f;
+    static const HE::Float32 fTwoPI             = 2 * fPI;
+    static const HE::Float32 fPIOver2           = fPI / 2.0f;
+    static const HE::Float32 fRadiansUnit       = fPI / 180.0f;
+    static const HE::Float32 fInvertRadiansUnit = 180.0f / fPI;
 
     /// <summary>
     /// Radianses to degrees.
     /// </summary>
-    static inline Float32 RadiansToDegrees(Float32 in_fRadians) HE_NOEXCEPT
+    static inline HE::Float32 RadiansToDegrees(HE::Float32 in_fRadians) HE_NOEXCEPT
     {
         return fInvertRadiansUnit * in_fRadians;
     }
@@ -29,7 +29,7 @@ namespace Core::Math
     /// <summary>
     /// Degreeses to radians.
     /// </summary>
-    static inline Float32 DegreesToRadians(Float32 in_fDegrees) HE_NOEXCEPT
+    static inline HE::Float32 DegreesToRadians(HE::Float32 in_fDegrees) HE_NOEXCEPT
     {
         return fRadiansUnit * in_fDegrees;
     }
@@ -37,7 +37,7 @@ namespace Core::Math
     /// <summary>
     /// Sins the specified in angle.
     /// </summary>
-    static inline Float32 Sin(const Float32 in_fAngle) HE_NOEXCEPT
+    static inline HE::Float32 Sin(const HE::Float32 in_fAngle) HE_NOEXCEPT
     {
         return sinf(in_fAngle);
     }
@@ -45,7 +45,7 @@ namespace Core::Math
     /// <summary>
     /// Coses the specified in angle.
     /// </summary>
-    static inline Float32 Cos(const Float32 in_fAngle) HE_NOEXCEPT
+    static inline HE::Float32 Cos(const HE::Float32 in_fAngle) HE_NOEXCEPT
     {
         return cosf(in_fAngle);
     }
@@ -53,7 +53,7 @@ namespace Core::Math
     /// <summary>
     /// Tans the specified in angle.
     /// </summary>
-    static inline Float32 Tan(const Float32 in_fAngle) HE_NOEXCEPT
+    static inline HE::Float32 Tan(const HE::Float32 in_fAngle) HE_NOEXCEPT
     {
         return tanf(in_fAngle);
     }
@@ -61,7 +61,7 @@ namespace Core::Math
     /// <summary>
     /// Acoses the specified in value.
     /// </summary>
-    static inline Float32 Acos(const Float32 in_fValue) HE_NOEXCEPT
+    static inline HE::Float32 Acos(const HE::Float32 in_fValue) HE_NOEXCEPT
     {
         return acosf(in_fValue);
     }
@@ -69,12 +69,12 @@ namespace Core::Math
     /// <summary>
     /// Atan2s the specified in x.
     /// </summary>
-    static inline Float32 Atan2(const Float32 in_fX, const Float32 in_fY) HE_NOEXCEPT
+    static inline HE::Float32 Atan2(const HE::Float32 in_fX, const HE::Float32 in_fY) HE_NOEXCEPT
     {
         return atan2f(in_fY, in_fX);
     }
 
-    static inline Float32 Cot(const Float32 in_fAngle)
+    static inline HE::Float32 Cot(const HE::Float32 in_fAngle)
     {
         return 1.0f / Tan(in_fAngle);
     }
@@ -82,8 +82,8 @@ namespace Core::Math
     /// <summary>
     /// 値が直近0かどうか.
     /// </summary>
-    static inline Bool NearZero(const Float32 in_fValue,
-                                const Float32 in_fEpsilon = 0.001f) HE_NOEXCEPT
+    static inline HE::Bool NearZero(const HE::Float32 in_fValue,
+                                const HE::Float32 in_fEpsilon = 0.001f) HE_NOEXCEPT
     {
         if (fabsf(in_fValue) <= in_fEpsilon)
         {
@@ -96,19 +96,19 @@ namespace Core::Math
     /// <summary>
     /// Rounds the f.
     /// </summary>
-    static inline Float32 RoundF(const Float32 in_fValue) HE_NOEXCEPT
+    static inline HE::Float32 RoundF(const HE::Float32 in_fValue) HE_NOEXCEPT
     {
         // 四捨五入する時に+/-でずらす方向を変えている
-        Float32 offset = (in_fValue >= 0.0f) ? 0.5f : -0.5f;
-        return static_cast<Float32>(static_cast<Sint32>(in_fValue + offset));
+        HE::Float32 fOffset = (in_fValue >= 0.0f) ? 0.5f : -0.5f;
+        return static_cast<HE::Float32>(static_cast<HE::Uint32>(in_fValue + fOffset));
     }
 
     /// <summary>
     /// Rounds the specified in r value.
     /// </summary>
-    static inline Sint32 Round(const Float32 in_fValue) HE_NOEXCEPT
+    static inline HE::Uint32 Round(const HE::Float32 in_fValue) HE_NOEXCEPT
     {
-        return static_cast<Sint32>(RoundF(in_fValue));
+        return static_cast<HE::Uint32>(RoundF(in_fValue));
     }
 
     /// <summary>

@@ -18,4 +18,7 @@ set(RENDER_PLUGIN_TARGET_FILES
 
     Render/View/View.cpp
     Render/View/View.h
+    
+    Render/Window/Window.cpp
+    Render/Window/Window.h
 )

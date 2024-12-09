@@ -31,27 +31,27 @@ namespace Level
         /// <summary>
         /// タスク開始
         /// </summary>
-        Bool VBegin() override;
+        HE::Bool VBegin() override;
 
         /// <summary>
         /// タスク終了
         /// </summary>
-        Bool VEnd() override;
+        HE::Bool VEnd() override;
 
         /// <summar>
         /// 更新
         /// </summary>
-        void VBeginUpdate(const Float32 in_fDt) override final;
+        void VBeginUpdate(const HE::Float32 in_fDt) override final;
 
         /// <summary>
         /// 更新
         /// </summary>
-        void VUpdate(const Float32 in_fDt) override;
+        void VUpdate(const HE::Float32 in_fDt) override;
 
         /// <summar>
         /// 更新
         /// </summary>
-        void VLateUpdate(const Float32 in_fDt) override final;
+        void VLateUpdate(const HE::Float32 in_fDt) override final;
 
         /// <summary>
         /// イベント
@@ -113,7 +113,7 @@ namespace Level
         /// <summary>
         /// アクター同士の関連付け設定
         /// </summary>
-        Bool ChainActor(const Core::Common::Handle& in_rActor,
+        HE::Bool ChainActor(const Core::Common::Handle& in_rActor,
                         const Core::Common::Handle& in_rParentActor);
 
     protected:
@@ -122,7 +122,7 @@ namespace Level
         /// <summary>
         /// 追加したコンポーネントのセットアップ
         /// </summary>
-        Bool _VSetupComponent(Actor::Component*) override final;
+        HE::Bool _VSetupComponent(Actor::Component*) override final;
 
     private:
         /// <summary>

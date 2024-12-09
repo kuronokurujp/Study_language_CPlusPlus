@@ -7,7 +7,7 @@
 
 namespace Core
 {
-    AsyncTaskManager::AsyncTaskManager(const Uint32 in_uMemPage)
+    AsyncTaskManager::AsyncTaskManager(const HE::Uint32 in_uMemPage)
         : _uMemPage(in_uMemPage), _bEnd(TRUE), _apThread(NULL)
     {
     }
@@ -17,7 +17,7 @@ namespace Core
         this->End();
     }
 
-    Bool AsyncTaskManager::Init(const Uint32 in_uThreadNum)
+    HE::Bool AsyncTaskManager::Init(const HE::Uint32 in_uThreadNum)
     {
         HE_ASSERT(this->_bEnd);
         HE_ASSERT(0 < in_uThreadNum);
@@ -28,7 +28,7 @@ namespace Core
         // スレッド生成
         this->_apThread = reinterpret_cast<std::thread**>(
             HE_ALLOC_MEM(sizeof(std::thread*) * in_uThreadNum, this->_uMemPage));
-        for (Uint32 i = 0; i < this->_uThreadNum; ++i)
+        for (HE::Uint32 i = 0; i < this->_uThreadNum; ++i)
         {
             this->_apThread[i] =
                 HE_NEW_MEM(std::thread, this->_uMemPage)(&AsyncTaskManager::_WorkerThread, this);
@@ -47,7 +47,7 @@ namespace Core
         {
             this->_cv.notify_all();
 
-            for (Uint32 i = 0; i < this->_uThreadNum; ++i)
+            for (HE::Uint32 i = 0; i < this->_uThreadNum; ++i)
             {
                 if (this->_apThread[i]->joinable()) this->_apThread[i]->join();
 
@@ -59,7 +59,7 @@ namespace Core
 
         // 固定長にしているので全要素で破棄処理が必要
         {
-            for (Uint32 i = 0; i < this->_vTaskQueue.Capacity(); ++i)
+            for (HE::Uint32 i = 0; i < this->_vTaskQueue.Capacity(); ++i)
             {
                 this->_vTaskQueue.GetPtr(i)->reset();
             }

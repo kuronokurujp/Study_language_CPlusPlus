@@ -10,8 +10,8 @@
 #include "Engine/Common/CustomStack.h"
 #include "Engine/Common/CustomString.h"
 #include "Engine/Common/CustomVector.h"
-#include "Engine/Common/PoolManager.h"
 #include "Engine/Macro.h"
+#include "Engine/Memory/Memory.h"
 #include "Engine/Type.h"
 
 namespace Core::Common
@@ -24,7 +24,7 @@ namespace Core::Common
     /// <typeparam name="TData">配列要素の型</typeparam>
     /// <typeparam name="TSize">TSizeで指定した値が最大要素数,
     /// 最大要素数を超えたらエラーとなる</typeparam>
-    template <typename TKey, typename TData, Sint32 TSize>
+    template <typename TKey, typename TData, HE::Sint32 TSize>
     class FixedMap final
     {
         HE_CLASS_MOVE_NG(FixedMap);
@@ -47,7 +47,7 @@ namespace Core::Common
         public:
             Iterator(Node* in_pNode) : _pNode(in_pNode) {}
 
-            inline const Bool IsValid() const HE_NOEXCEPT { return (this->_pNode != NULL); }
+            inline const HE::Bool IsValid() const HE_NOEXCEPT { return (this->_pNode != NULL); }
 
             // ペアポインタ参照
             Pair* operator->() { return &this->_pNode->_pair; }
@@ -247,7 +247,7 @@ namespace Core::Common
         /// <summary>
         /// 指定キーの要素があるか
         /// </summary>
-        Bool Contains(const TKey& in_rKey) const
+        HE::Bool Contains(const TKey& in_rKey) const
         {
             // ツリーが空なのでキーの要素はない
             if (this->Empty()) return FALSE;
@@ -261,7 +261,7 @@ namespace Core::Common
         /// <summary>
         /// データ削除(キー版)
         /// </summary>
-        Bool Erase(const TKey& in_rKey)
+        HE::Bool Erase(const TKey& in_rKey)
         {
             if (this->Contains(in_rKey) == FALSE) return FALSE;
 
@@ -277,7 +277,7 @@ namespace Core::Common
         /// <summary>
         /// データ削除(イテレータ版)
         /// </summary>
-        Bool Erase(Iterator in_iter)
+        HE::Bool Erase(Iterator in_iter)
         {
             // 終端ノードは消させない
             if (in_iter == this->End()) return FALSE;
@@ -306,12 +306,12 @@ namespace Core::Common
         /// <summary>
         /// マップが空かどうか
         /// </summary>
-        Bool Empty() const HE_NOEXCEPT { return (this->_pRoot == NULL); }
+        HE::Bool Empty() const HE_NOEXCEPT { return (this->_pRoot == NULL); }
 
         /// <summary>
         /// 要素数を返す
         /// </summary>
-        Uint32 Size() const HE_NOEXCEPT { return this->_uNodeNum; }
+        HE::Uint32 Size() const HE_NOEXCEPT { return this->_uNodeNum; }
 
         /// <summary>
         /// 先頭イテレーターを取得
@@ -336,10 +336,24 @@ namespace Core::Common
         /// </summary>
         virtual Node* _VCreateNode()
         {
-            Core::Common::Handle handle;
-            Node* pNode = this->_poolObject.Alloc(&handle);
-            HE_ASSERT(pNode != NULL);
-            pNode->handle = handle;
+            // Core::Common::Handle handle;
+            // Node* pNode = this->_poolObject.Alloc(&handle);
+            // HE_ASSERT(pNode != NULL);
+            // pNode->handle = handle;
+            HE_ASSERT(this->_uFreeStackSize < TSize);
+
+            HE::Uint32 uIndex = 0;
+            if (this->_sFreeIndex.Empty())
+            {
+                this->_sFreeIndex.PushBack(this->_uFreeStackSize);
+
+                ++this->_uFreeStackSize;
+            }
+
+            uIndex = this->_sFreeIndex.PopBack();
+
+            auto pNode     = &this->_aNode[uIndex];
+            pNode->_uIndex = uIndex;
 
             return pNode;
         }
@@ -361,17 +375,17 @@ namespace Core::Common
 #ifdef HE_ENGINE_DEBUG
     public:
         // ツリーの正当性チェック
-        Bool CheckValidByDebug(const Uint32 in_uNodeNum)
+        HE::Bool CheckValidByDebug(const HE::Uint32 in_uNodeNum)
         {
-            Uint32 uCheckCount = 0;
-            Bool bResult       = this->CheckNodeByDebug(&uCheckCount, _pRoot);
+            HE::Uint32 uCheckCount = 0;
+            HE::Bool bResult       = this->CheckNodeByDebug(&uCheckCount, _pRoot);
             if (bResult && in_uNodeNum == uCheckCount) return TRUE;
 
             return FALSE;
         }
 
         // ノードの正当性チェック
-        Bool CheckNodeByDebug(Uint32* out, Node* in_pNode)
+        HE::Bool CheckNodeByDebug(HE::Uint32* out, Node* in_pNode)
         {
             // 終端なのでOK
             if (in_pNode == NULL) return TRUE;
@@ -420,12 +434,12 @@ namespace Core::Common
             struct Node* _pNext = NULL;
 
             // 赤黒木カラー
-            Uint32 _uColor = 0;
+            HE::Uint32 _uColor = 0;
 
             // キーとデータのペア
             Pair _pair;
 
-            Core::Common::Handle handle;
+            HE::Uint32 _uIndex = HE::uInvalidUint32;
         };
 
         // ノードメモリ確保と初期化
@@ -464,17 +478,18 @@ namespace Core::Common
             in_pNode->_pRight = NULL;
             in_pNode->_uColor = 0;
             // 前と後を指すノードは初期化しない
-            // 初期化するとループ中のEraseでエラーなるから
+            // 破棄ノードだからマップからは利用する事がないのでNULLにしなくても問題ないと判断
+            // 初期化するとループ中のEraseでエラーとなる問題の方が大きい
             //            in_pNode->_pNext  = NULL;
             //            in_pNode->_pPrev  = NULL;
 
             // ノードのデータを破棄
-            Node* p = this->_poolObject.Ref(in_pNode->handle);
+            Node* p = &this->_aNode[in_pNode->_uIndex];
             if (p)
             {
                 this->_DestroyNodeData(p->_pair.data);
-                this->_poolObject.Free(in_pNode->handle);
             }
+            this->_sFreeIndex.PushBack(in_pNode->_uIndex);
 
             --this->_uNodeNum;
         }
@@ -519,7 +534,7 @@ namespace Core::Common
             if (in_pNode == NULL) return in_pAdd;
 
             // キーの比較
-            Sint32 iCmpResult = this->_CompareByKey(in_pNode->_pair.key, in_pAdd->_pair.key);
+            HE::Sint32 iCmpResult = this->_CompareByKey(in_pNode->_pair.key, in_pAdd->_pair.key);
 
             // ノード挿入
             if (iCmpResult == 0)
@@ -566,7 +581,7 @@ namespace Core::Common
         // キーの大小比較
         // クラスをキーにする場合
         // 比較演算子( >, < )を用意してください。
-        Sint32 _CompareByKey(const TKey& in_rLeft, const TKey& in_rRight) const HE_NOEXCEPT
+        HE::Sint32 _CompareByKey(const TKey& in_rLeft, const TKey& in_rRight) const HE_NOEXCEPT
         {
             if (in_rLeft < in_rRight)
             {
@@ -585,7 +600,7 @@ namespace Core::Common
 
         // データの大小比較
         // クラスをデータにする場合、比較演算子( >, < )を用意してください。
-        Sint32 _CompareByData(const TData& in_rLeft, const TData& in_rRight) const HE_NOEXCEPT
+        HE::Sint32 _CompareByData(const TData& in_rLeft, const TData& in_rRight) const HE_NOEXCEPT
         {
             // TODO:
             // 比較演算しを対応しているかどうかチェックして対応していない場合はスキップできるか？
@@ -611,7 +626,7 @@ namespace Core::Common
             if (in_pNode == NULL) return NULL;
 
             // 比較する
-            Sint32 iCmpResult = this->_CompareByKey(in_pNode->_pair.key, in_rKey);
+            HE::Sint32 iCmpResult = this->_CompareByKey(in_pNode->_pair.key, in_rKey);
             if (iCmpResult == 0)
             {
                 // 探しているノードだった
@@ -636,7 +651,7 @@ namespace Core::Common
             if (in_pNode == NULL) return NULL;
 
             // 比較する
-            Sint32 iCmpResult = this->_CompareByData(in_pNode->_pair.data, in_rData);
+            HE::Sint32 iCmpResult = this->_CompareByData(in_pNode->_pair.data, in_rData);
             if (iCmpResult == 0)
             {
                 // 探しているノードだった
@@ -875,7 +890,7 @@ namespace Core::Common
         }
 
         // ノードが赤かどうか
-        Bool _IsRed(Node* in_pNode)
+        HE::Bool _IsRed(Node* in_pNode)
         {
             if (in_pNode) return (in_pNode->_uColor == Node::EColor::EColor_Red);
 
@@ -943,7 +958,10 @@ namespace Core::Common
 
         Iterator _iteratorTail;
 
-        Uint32 _uNodeNum = 0;
-        Core::Common::FixedPoolManager<Node, TSize> _poolObject;
+        HE::Uint32 _uNodeNum       = 0;
+        HE::Uint32 _uFreeStackSize = 0;
+
+        Node _aNode[TSize];
+        Core::Common::FixedStack<HE::Uint32, TSize> _sFreeIndex;
     };
 }  // namespace Core::Common

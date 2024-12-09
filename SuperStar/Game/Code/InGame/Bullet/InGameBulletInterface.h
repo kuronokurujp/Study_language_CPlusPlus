@@ -13,14 +13,14 @@ namespace InGame
     /// </summary>
     struct InGameBulletWork
     {
-        Uint32 uCollisionHashCode = 0;
-        Uint8 aWork[256]          = {0};
+        HE::Uint32 uCollisionHashCode = 0;
+        HE::Uint8 aWork[256]          = {0};
     };
 
     struct InGameBulletObject
     {
-        Bool bKill     = FALSE;
-        Char aName[64] = {};
+        HE::Bool bKill     = FALSE;
+        HE::Char aName[64] = {};
         InGameBulletWork work;
     };
 
@@ -34,7 +34,7 @@ namespace InGame
     public:
         explicit InGameBulletFactoryInterface() = default;
 
-        virtual const Char* VName() const                       = 0;
+        virtual const HE::Char* VName() const                       = 0;
         virtual void VConfiguration(InGameBulletWork* in_pWork) = 0;
     };
 
@@ -49,14 +49,14 @@ namespace InGame
         InGameBulletStrategyInterface()          = default;
         virtual ~InGameBulletStrategyInterface() = default;
 
-        virtual Uint32 VWorkSize() const  = 0;
-        virtual const Char* VName() const = 0;
+        virtual HE::Uint32 VWorkSize() const  = 0;
+        virtual const HE::Char* VName() const = 0;
 
-        virtual Bool VUpdate(InGameBulletWork*, Core::Common::Handle&) = 0;
+        virtual HE::Bool VUpdate(InGameBulletWork*, Core::Common::Handle&) = 0;
 
-        virtual Bool VIsScreenInSide(const InGameBulletWork* const, const Core::Math::Rect2&) = 0;
+        virtual HE::Bool VIsScreenInSide(const InGameBulletWork* const, const Core::Math::Rect2&) = 0;
 
-        virtual Bool VOutputCollisionData(CollisionData* out, const InGameBulletWork* const) = 0;
+        virtual HE::Bool VOutputCollisionData(CollisionData* out, const InGameBulletWork* const) = 0;
 
 #if 0
         //	関数

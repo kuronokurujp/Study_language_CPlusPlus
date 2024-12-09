@@ -20,7 +20,7 @@ namespace Render
         friend class RenderModule;
 
     protected:
-        virtual Bool _VBegin() = 0;
+        virtual HE::Bool _VBegin() = 0;
         virtual void _VEnd()   = 0;
 
         virtual void _VUpdate(const HE::Float32) = 0;
@@ -29,7 +29,7 @@ namespace Render
 
         // 描画コマンドを追加
         // コマンドデータは呼び出し元のものにするためにstd::move()で渡す
-        Bool _PushCommand(Command&& in_rrCmd);
+        HE::Bool _PushCommand(Command&& in_rrCmd);
 
     protected:
         CommandBuffer _commandBuff;
@@ -37,9 +37,9 @@ namespace Render
 
     struct ViewPortConfig
     {
-        Uint32 uSceneCount = 0;
-        Uint32 uWidth      = 0;
-        Uint32 uHeight     = 0;
+        HE::Uint32 uSceneCount = 0;
+        HE::Uint32 uWidth      = 0;
+        HE::Uint32 uHeight     = 0;
     };
 
     class ViewPort : Core::Common::RuntimePoolManager<SceneViewBase>
@@ -68,7 +68,7 @@ namespace Render
         const ViewPortConfig* GetConfig();
 
     private:
-        Bool _Setup(Core::Memory::UniquePtr<ViewPortConfig>);
+        HE::Bool _Setup(Core::Memory::UniquePtr<ViewPortConfig>);
         void _Begin();
         void _End();
 
@@ -81,7 +81,7 @@ namespace Render
         friend class Window;
 
     public:
-        inline Uint32 ViewPortCount() const { return this->_uViewPortCount; }
+        inline HE::Uint32 ViewPortCount() const { return this->_uViewPortCount; }
 
     protected:
         virtual void _VBegin() = 0;
@@ -93,9 +93,9 @@ namespace Render
         virtual void _VEndRender()   = 0;
 
     protected:
-        Uint32 _uViewPortCount = 0;
-        Uint32 _uWidht         = 0;
-        Uint32 _uHeight        = 0;
+        HE::Uint32 _uViewPortCount = 0;
+        HE::Uint32 _uWidht         = 0;
+        HE::Uint32 _uHeight        = 0;
     };
 
     /// <summary>
@@ -107,7 +107,7 @@ namespace Render
 
     public:
         Core::Common::Handle AddViewPort(Core::Memory::UniquePtr<ViewPortConfig>);
-        Bool RemoveViewPort(const Core::Common::Handle&);
+        HE::Bool RemoveViewPort(const Core::Common::Handle&);
 
         /*
                 // TODO: UI用シーン追加
@@ -137,7 +137,7 @@ namespace Render
         void Show();
 
     private:
-        Bool _Setup(Core::Memory::UniquePtr<WindowStrategy>);
+        HE::Bool _Setup(Core::Memory::UniquePtr<WindowStrategy>);
         void _Begin();
         void _End();
 
@@ -147,8 +147,8 @@ namespace Render
 
     private:
         Core::Memory::UniquePtr<WindowStrategy> _upStrategy;
-        Bool _bShow  = FALSE;
-        Bool _bReady = FALSE;
+        HE::Bool _bShow  = FALSE;
+        HE::Bool _bReady = FALSE;
     };
 
 }  // namespace Render

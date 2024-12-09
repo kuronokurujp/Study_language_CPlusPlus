@@ -31,7 +31,7 @@ namespace InGame
         this->_Clear();
     }
 
-    Bool InGameEnemyZakoActor::VBegin()
+    HE::Bool InGameEnemyZakoActor::VBegin()
     {
         if (InGameScene2DActor::VBegin() == FALSE) return FALSE;
 
@@ -52,7 +52,7 @@ namespace InGame
         return TRUE;
     }
 
-    void InGameEnemyZakoActor::VUpdate(const Float32 in_fDt)
+    void InGameEnemyZakoActor::VUpdate(const HE::Float32 in_fDt)
     {
         InGameScene2DActor::VUpdate(in_fDt);
 
@@ -69,7 +69,7 @@ namespace InGame
         }
     }
 
-    Bool InGameEnemyZakoActor::Damage(const Sint32 in_sDamage)
+    HE::Bool InGameEnemyZakoActor::Damage(const HE::Sint32 in_sDamage)
     {
         this->_parameter.ulife -= in_sDamage;
         if (this->_parameter.ulife <= 0) return TRUE;

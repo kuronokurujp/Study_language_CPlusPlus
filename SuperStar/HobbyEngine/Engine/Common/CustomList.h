@@ -20,7 +20,7 @@ namespace Core::Common
         HE_CLASS_MOVE_CONSTRUCT_NG(LinkedListNode);
 
     public:
-        static const Uint32 uFlagLinked = 0x00000001;
+        static const HE::Uint32 uFlagLinked = 0x00000001;
 
     public:
         LinkedListNode()          = default;
@@ -48,7 +48,7 @@ namespace Core::Common
     private:
         LinkedListNode* _pPrev = NULL;
         LinkedListNode* _pNext = NULL;
-        Uint32 _uFlag          = 0;
+        HE::Uint32 _uFlag          = 0;
     };
 
     /// <summary>
@@ -148,7 +148,7 @@ namespace Core::Common
         /// <summary>
         /// 比較
         /// </summary>
-        Bool operator==(const ListNodeIterator<TDataType, TNodeType>& in_rRhs) const
+        HE::Bool operator==(const ListNodeIterator<TDataType, TNodeType>& in_rRhs) const
         {
             return (this->_pNode == in_rRhs._pNode);
         }
@@ -156,7 +156,7 @@ namespace Core::Common
         /// <summary>
         /// 比較
         /// </summary>
-        Bool operator!=(const ListNodeIterator<TDataType, TNodeType>& in_rRhs) const
+        HE::Bool operator!=(const ListNodeIterator<TDataType, TNodeType>& in_rRhs) const
         {
             return ((*this == in_rRhs) == FALSE);
         }
@@ -266,7 +266,7 @@ namespace Core::Common
         /// <summary>
         /// 比較
         /// </summary>
-        Bool operator==(const ListNodeReverseIterator<TDataType, TNodeType>& in_rRhs) const
+        HE::Bool operator==(const ListNodeReverseIterator<TDataType, TNodeType>& in_rRhs) const
         {
             return (this->_pNode == in_rRhs._pNode);
         }
@@ -274,7 +274,7 @@ namespace Core::Common
         /// <summary>
         /// 比較
         /// </summary>
-        Bool operator!=(const ListNodeReverseIterator<TDataType, TNodeType>& in_rRhs) const
+        HE::Bool operator!=(const ListNodeReverseIterator<TDataType, TNodeType>& in_rRhs) const
         {
             return ((*this == in_rRhs) == FALSE);
         }
@@ -310,7 +310,7 @@ namespace Core::Common
         /// <summary>
         /// ノードの消去
         /// </summary>
-        Bool Erase(LinkedListNode<T>* in_pNode)
+        HE::Bool Erase(LinkedListNode<T>* in_pNode)
         {
             // 既にリンクから外されているノードは無視
             if ((in_pNode->_uFlag & LinkedListNode<T>::uFlagLinked) == 0)
@@ -331,7 +331,7 @@ namespace Core::Common
         /// <summary>
         /// ノード挿入
         /// </summary>
-        Bool Insert(LinkedListNode<T>* in_pPrevNode, LinkedListNode<T>* in_pNewNode)
+        HE::Bool Insert(LinkedListNode<T>* in_pPrevNode, LinkedListNode<T>* in_pNewNode)
         {
             HE_ASSERT(in_pNewNode != in_pPrevNode);
 
@@ -387,7 +387,7 @@ namespace Core::Common
         /// <summary>
         /// リストの終端につなげる
         /// </summary>
-        Bool PushBack(LinkedListNode<T>& in_rNode)
+        HE::Bool PushBack(LinkedListNode<T>& in_rNode)
         {
             return LinkedListBase::Insert(this->_tail.GetPrev(), &in_rNode);
         }
@@ -395,7 +395,7 @@ namespace Core::Common
         /// <summary>
         /// リストの先頭につなげる
         /// </summary>
-        Bool PushFront(LinkedListNode<T>& in_rNode)
+        HE::Bool PushFront(LinkedListNode<T>& in_rNode)
         {
             return LinkedListBase::Insert(&this->_head, &in_rNode);
         }
@@ -403,7 +403,7 @@ namespace Core::Common
         /// <summary>
         /// 任意の位置の直前にノードを挿入
         /// </summary>
-        Bool Insert(Iterator& in_rIt, LinkedListNode<T>& in_rNode)
+        HE::Bool Insert(Iterator& in_rIt, LinkedListNode<T>& in_rNode)
         {
             return LinkedListBase<T>::Insert(in_rIt.GetNode()->GetPrev(), &in_rNode);
         }
@@ -411,7 +411,7 @@ namespace Core::Common
         /// <summary>
         /// 終端のノードを取る
         /// </summary>
-        Bool PopBack()
+        HE::Bool PopBack()
         {
             if (this->Empty()) return FALSE;
 
@@ -421,7 +421,7 @@ namespace Core::Common
         /// <summary>
         /// 先頭のノードを取る
         /// </summary>
-        Bool PopFront()
+        HE::Bool PopFront()
         {
             if (this->Empty()) return FALSE;
 
@@ -477,7 +477,7 @@ namespace Core::Common
         /// <summary>
         /// リストが空かどうか
         /// </summary>
-        Bool Empty() const { return this->_head.GetNext() == &this->_tail; }
+        HE::Bool Empty() const { return this->_head.GetNext() == &this->_tail; }
 
     private:
         LinkedListNode<T> _head;

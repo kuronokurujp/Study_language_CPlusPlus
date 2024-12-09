@@ -10,7 +10,7 @@ namespace Actor
     {
     }
 
-    Bool ActorManager::Start(const Uint32 in_uActorCapacity, const Uint32 in_uActorGroupMax)
+    HE::Bool ActorManager::Start(const HE::Uint32 in_uActorCapacity, const HE::Uint32 in_uActorGroupMax)
     {
         HE_ASSERT(1 < in_uActorGroupMax);
         if (this->_taskManager.Init(in_uActorCapacity, in_uActorGroupMax) == FALSE) return FALSE;
@@ -23,7 +23,7 @@ namespace Actor
         return TRUE;
     }
 
-    Bool ActorManager::End()
+    HE::Bool ActorManager::End()
     {
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upDecorator);
         this->_taskManager.End();
@@ -81,11 +81,11 @@ namespace Actor
         this->_upDecorator->VOnActorUnRegistComponent(in_pComponent);
     }
 
-    void ActorManager::BeginUpdate(const Float32 in_fDt)
+    void ActorManager::BeginUpdate(const HE::Float32 in_fDt)
     {
         {
-            const Uint32 uMax = this->_GetUpdateGroupMax();
-            for (Uint32 i = 0; i < uMax; ++i)
+            const HE::Sint32 iMax = this->_GetUpdateGroupMax();
+            for (HE::Sint32 i = 0; i < iMax; ++i)
             {
                 this->_taskManager.ForeachByGroup(i,
                                                   [in_fDt](Core::Task* in_pTask)
@@ -98,13 +98,13 @@ namespace Actor
         }
     }
 
-    void ActorManager::Update(const Float32 in_fDt)
+    void ActorManager::Update(const HE::Float32 in_fDt)
     {
         // アクター処理内で新しいアクターが追加した場合は保留リストにまず登録させる
         this->_bUpdatingActors = TRUE;
         {
-            const Uint32 uMax = this->_GetUpdateGroupMax();
-            for (Uint32 i = 0; i < uMax; ++i)
+            const HE::Sint32 iMax = this->_GetUpdateGroupMax();
+            for (HE::Sint32 i = 0; i < iMax; ++i)
             {
                 this->_taskManager.UpdateByGroup(i, in_fDt);
             }
@@ -112,13 +112,13 @@ namespace Actor
         this->_bUpdatingActors = FALSE;
     }
 
-    void ActorManager::LateUpdate(const Float32 in_fDt)
+    void ActorManager::LateUpdate(const HE::Float32 in_fDt)
     {
         this->_UpdatePending();
 
         {
-            const Uint32 uMax = this->_GetUpdateGroupMax();
-            for (Uint32 i = 0; i < uMax; ++i)
+            const HE::Sint32 iMax = this->_GetUpdateGroupMax();
+            for (HE::Sint32 i = 0; i < iMax; ++i)
             {
                 this->_taskManager.ForeachByGroup(i,
                                                   [in_fDt](Core::Task* in_pTask)
@@ -142,7 +142,7 @@ namespace Actor
         for (auto b = this->_pendingDataMap.Begin(); b != this->_pendingDataMap.End(); ++b)
         {
             const auto pData = &b->data;
-            const Bool bRet  = this->_taskManager.MoveGropuTask(pData->handle, pData->sMoveGroupId);
+            const HE::Bool bRet  = this->_taskManager.MoveGropuTask(pData->handle, pData->sMoveGroupId);
             HE_ASSERT(bRet && "保留中のタスクを稼働中に切り替え失敗した");
         }
         this->_pendingDataMap.Clear();

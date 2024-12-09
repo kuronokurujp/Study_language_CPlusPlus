@@ -10,7 +10,7 @@ namespace PlatformSDL2
     class Time final : public Platform::TimeInterface
     {
     public:
-        Uint64 VNowMSec() override final;
-        void VSleepMSec(const Uint64 in_uMs) override final;
+        HE::Uint64 VNowMSec() override final;
+        void VSleepMSec(const HE::Uint64 in_uMs) override final;
     };
 }  // namespace Platform::SDL2

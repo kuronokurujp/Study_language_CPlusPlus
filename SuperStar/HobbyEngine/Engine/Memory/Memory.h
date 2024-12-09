@@ -8,6 +8,20 @@
 // これはメモリ確保を繰り返してメモリが断片化して求めたサイズのメモリ確保ができない場合の対策
 // メモリ確保する上で前後どちらで確保するのかをルールで決めるのがいい
 
+// TODO: いずれ解決すべき問題
+/*
+   クラスを破棄した時にコンストラクターが呼ばれるが、デストラクターは呼ばれない
+   デストラクターがあるクラスをoperator
+   new[]で一括して取得すると確保したメモリにメタデータが付与されてずれたメモリアドレスが取得してしまう
+
+    operator new / operator deleteやめてテンプレートのメモリ確保関数を用意する。
+    そしてテンプレートからクラス・構造体を判別して独自のメタ情報を入れるようにする
+    メモリ解放後はそのメタ情報kからクラス判別をしてコンストラクタとデストラクタを呼ぶようにする
+
+    2024/12/03
+        - operator new[]を使うと予期しないエラーが起きるので使わないようにする
+*/
+
 #include <memory>
 #include <new>
 
@@ -20,31 +34,33 @@
 #ifdef HE_ENGINE_DEBUG
 
 // newのオーバーロード
-void* operator new(size_t in_size, Uint8 in_page, Uint8 in_alignSize,
-                   Core::Memory::Manager::EAllocateLocateType in_eLocateType, const UTF8* in_pFile,
-                   Uint32 in_line);
+void* operator new(size_t in_size, HE::Uint8 in_page, HE::Uint8 in_alignSize,
+                   Core::Memory::Manager::EAllocateLocateType in_eLocateType, const HE::UTF8* in_pFile,
+                   HE::Uint32 in_line);
 
 #else
 
 // newのオーバーロード
-void* operator new(size_t in_size, Uint8 in_page, Uint8 in_alignSize,
+void* operator new(size_t in_size, HE::Uint8 in_page, HE::Uint8 in_alignSize,
                    Core::Memory::Manager::EAllocateLocateType in_locateType);
 
 #endif
 
+#if 0
 #ifdef HE_ENGINE_DEBUG
 
 // new[]のオーバーロード
-void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
+void* operator new[](size_t in_size, HE::Uint8 in_page, HE::Uint8 in_alignSize,
                      Core::Memory::Manager::EAllocateLocateType in_eLocateType,
-                     const UTF8* in_pFile, Uint32 in_uLine);
+                     const HE::UTF8* in_pFile, Uint32 in_uLine);
 
 #else
 
 // new[]のオーバーロード
-void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
+void* operator new[](size_t in_size, HE::Uint8 in_page, HE::Uint8 in_alignSize,
                      Core::Memory::Manager::EAllocateLocateType in_locateType);
 
+#endif
 #endif
 
 #ifdef HE_ENGINE_DEBUG
@@ -61,12 +77,15 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
     new (page, Core::Memory::minimumAlignSize, Core::Memory::Manager::EAllocateLocateType_Top, \
          file, line)(type)
 
+#if 0
 // NEWの配列マクロ
 // メモリアライメント設定版
 // 通常はこちらを利用
 #define HE_NEW_MEM_ARRAY(type, num, page)                                                      \
     new (page, Core::Memory::minimumAlignSize, Core::Memory::Manager::EAllocateLocateType_Top, \
          __FILE__, __LINE__)(type[num])
+
+#endif
 
 // NEWマクロ
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
@@ -75,6 +94,7 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
 #define HE_NEW_MEM_ALIENT(type, page, alignSize) \
     new (page, alignSize, Core::Memory::Manager::EAllocateLocateType_Top, __FILE__, __LINE__)(type)
 
+#if 0
 // NEW配列マクロ
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
 // 細かなメモリ確保で使用
@@ -83,6 +103,8 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
     new (page, alignSize, Core::Memory::Manager::EAllocateLocateType_Top, __FILE__, \
          __LINE__)(type[num])
 
+#endif
+
 // NEWマクロ
 // メモリをページの後ろから確保する
 // アライメント設定版
@@ -90,12 +112,14 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
     new (page, Core::Memory::minimumAlignSize, Core::Memory::Manager::EAllocateLocateType_Last, \
          __FILE__, __LINE__)(type)
 
+#if 0
 // NEW配列のマクロ
 // メモリをページの後ろから確保する
 // アライメント設定版
 #define HE_NEW_MEM_ARRAY_LAST(type, num, page)                                                  \
     new (page, Core::Memory::minimumAlignSize, Core::Memory::Manager::EAllocateLocateType_Last, \
          __FILE__, __LINE__)(type[num])
+#endif
 
 // NEWマクロ
 // メモリをページの後ろから確保する
@@ -105,6 +129,7 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
 #define HE_NEW_MEM_LAST_ALIENT(type, page, alignSize) \
     new (page, alignSize, Core::Memory::Manager::EAllocateLocateType_Last, __FILE__, __LINE__)(type)
 
+#if 0
 // NEW配列マクロ
 // メモリをページの後ろから確保する
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
@@ -113,22 +138,35 @@ void* operator new[](size_t in_size, Uint8 in_page, Uint8 in_alignSize,
 #define HE_NEW_MEM_ARRAY_LAST_ALIENT(type, num, page, alignSize)                     \
     new (page, alignSize, Core::Memory::Manager::EAllocateLocateType_Last, __FILE__, \
          __LINE__)(type[num])
+#endif
 
 /// <summary>
 /// メモリ確保
 /// </summary>
-extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
-                            const Uint8 in_alignSize,
+extern void* AllocateMemory(const HE::Uint32 in_uAllocateSize, const HE::Uint8 in_page,
+                            const HE::Uint8 in_alignSize,
                             const Core::Memory::Manager::EAllocateLocateType in_eLocateType,
-                            const UTF8* in_pFile, Uint32 in_uLine);
+                            const HE::UTF8* in_pFile, HE::Uint32 in_uLine);
 
-#define HE_ALLOC_MEM(size, page)                                 \
-    ::AllocateMemory(size, page, Core::Memory::minimumAlignSize, \
-                     Core::Memory::Manager::EAllocateLocateType_Top, __FILE__, __LINE__);
+// メモリを塊で確報出来る
+// クラス/構造体もまとめて確保可能
+// しかしコンストラクタが呼ばれないのでメンバー変数は初期化されない
+/*
+    struct Data
+    {
+        Uint32 _uCount = 32;
+    };
+    メモリ確報した時に上記の_uCountのメンバー変数は32にはならなくて不定値になる
+    コンパイラが構造体のコンストラクタを自動生成してメンバー変数を初期化しているのだが
+    コンストラクタを呼ばないとので初期化されない
+*/
+#define HE_ALLOC_MEM(__size__, __page__)                                     \
+    ::AllocateMemory((__size__), (__page__), Core::Memory::minimumAlignSize, \
+                     Core::Memory::Manager::EAllocateLocateType_Top, __FILE__, __LINE__)
 
-#define HE_ALLOC_MEM_LAST(size, page)                            \
-    ::AllocateMemory(size, page, Core::Memory::minimumAlignSize, \
-                     Core::Memory::Manager::EAllocateLocateType_Last, __FILE__, __LINE__);
+#define HE_ALLOC_MEM_LAST(__size__, __page__)                                \
+    ::AllocateMemory((__size__), (__page__), Core::Memory::minimumAlignSize, \
+                     Core::Memory::Manager::EAllocateLocateType_Last, __FILE__, __LINE__)
 
 #else
 
@@ -142,12 +180,14 @@ extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
 #define HE_NEW_MEM_INFO(type, page, file, line) \
     new (page, Core::Memory::minimumAlignSize, Core::Memory::Manager::EAllocateLocateType_Top)(type)
 
+#if 0
 // NEWの配列マクロ
 // メモリアライメント設定版
 // 通常はこちらを利用
 #define HE_NEW_MEM_ARRAY(type, num, page)      \
     new (page, Core::Memory::minimumAlignSize, \
          Core::Memory::Manager::EAllocateLocateType_Top)(type[num])
+#endif
 
 // NEWマクロ
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
@@ -156,12 +196,14 @@ extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
 #define HE_NEW_MEM_ALIENT(type, page, alignSize) \
     new (page, alignSize, Core::Memory::Manager::EAllocateLocateType_Top)(type)
 
+#if 0
 // NEW配列マクロ
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
 // 細かなメモリ確保で使用
 // アライメント指定を間違えるとバグになるので蔵人向け
 #define HE_NEW_MEM_ARRAY_ALIENT(type, num, page, alignSize) \
     new (page, alignSize, Core::Memory::Manager::EAllocateLocateType_Top)(type[num])
+#endif
 
 // NEWマクロ
 // メモリをページの後ろから確保する
@@ -170,12 +212,14 @@ extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
     / new (page, Core::Memory::minimumAlignSize, \
            Core::Memory::Manager::EAllocateLocteType_Last)(type)
 
+#if 0
 // NEW配列のマクロ
 // メモリをページの後ろから確保する
 // アライメント設定版
 #define HE_NEW_MEM_ARRAY_LAST(type, num, page) \
     new (page, Core::Memory::minimumAlignSize, \
          Core::Memory::Manager::EAllocateLocteType_Last)(type[num])
+#endif
 
 // NEWマクロ
 // メモリをページの後ろから確保する
@@ -185,6 +229,7 @@ extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
 #define HE_NEW_MEM_LAST_ALIENT(type, page, alignSize) \
     new (page, alignSize, Core::Memory::Manager::EAllocateLocteType_Last)(type)
 
+#if 0
 // NEW配列マクロ
 // メモリをページの後ろから確保する
 // メモリアライメント指定(アライメントはMINIMUM_ALIGN_SIZEの倍数)
@@ -193,9 +238,11 @@ extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
 #define HE_NEW_MEM_ARRAY_LAST_ALIENT(type, num, page, alignSize) \
     new (page, alignSize, Core::Memory::Manager::EAllocateLocteType_Last)(type[num])
 
+#endif
+
 // メモリ確保
-extern void* AllocateMemory(const Uint32 in_uAllocateSize, const Uint8 in_page,
-                            const Uint8 in_alignSize,
+extern void* AllocateMemory(const Uint32 in_uAllocateSize, const HE::Uint8 in_page,
+                            const HE::Uint8 in_alignSize,
                             const Core::Memory::Manager::EAllocateLocateType in_eLocateType);
 
 #define HE_ALLOC_MEM(size, page)                                 \
@@ -224,6 +271,7 @@ extern void FreeMemory(void*);
         }                        \
     }
 
+#if 0
 // 確保した配列メモリをdeleteで安全する実行するためのマクロ
 // ポインターチェックをしてすでに解放済みの場合でもエラーにはならないようにしている
 #define HE_SAFE_DELETE_MEM_ARRAY(pPtr) \
@@ -234,6 +282,7 @@ extern void FreeMemory(void*);
             (pPtr) = NULL;             \
         }                              \
     }
+#endif
 
 // UniquePtrを解放して紐づいているメモリ削除
 #define HE_SAFE_DELETE_UNIQUE_PTR(ptr) \
@@ -250,10 +299,10 @@ extern void FreeMemory(void*);
 struct DeleterFreeMemory
 {
 #ifdef HE_ENGINE_DEBUG
-    const UTF8* szFilename = NULL;
-    Uint32 uLine           = 0;
+    const HE::UTF8* szFilename = NULL;
+    HE::Uint32 uLine           = 0;
 
-    DeleterFreeMemory(const UTF8* in_szFile, const Uint32 in_uLine)
+    DeleterFreeMemory(const HE::UTF8* in_szFile, const HE::Uint32 in_uLine)
         : szFilename(in_szFile), uLine(in_uLine)
     {
     }
@@ -278,6 +327,9 @@ namespace Core::Memory
     template <class T>
     using SharedPtr = std::shared_ptr<T>;
 
+    template <class T>
+    using WeakPtr = std::weak_ptr<T>;
+
     /// <summary>
     /// 任意の型Tのスマートポインタをカスタムアロケータとデリータで作成する関数
     /// クラスの場合はデフォルトコンストラクターが必要
@@ -285,7 +337,7 @@ namespace Core::Memory
     /// </summary>
     template <typename T, typename... TArgs>
 #ifdef HE_ENGINE_DEBUG
-    SharedPtr<T> MakeCustomSharedPtr(const UTF8* in_szFilename, const Uint32 in_uLine,
+    SharedPtr<T> MakeCustomSharedPtr(const HE::UTF8* in_szFilename, const HE::Uint32 in_uLine,
                                      TArgs&&... args)
 #else
     SharedPtr<T> MakeCustomSharedPtr(Args&&... args)
@@ -306,7 +358,7 @@ namespace Core::Memory
     /// </summary>
     template <typename T, typename... TArgs>
 #ifdef HE_ENGINE_DEBUG
-    UniquePtr<T> MakeCustomUniquePtr(const UTF8* in_szFilename, const Uint32 in_uLine,
+    UniquePtr<T> MakeCustomUniquePtr(const HE::UTF8* in_szFilename, const HE::Uint32 in_uLine,
                                      TArgs&&... args)
 #else
     UniquePtr<T> MakeCustomUniquePtr(Args&&... args)

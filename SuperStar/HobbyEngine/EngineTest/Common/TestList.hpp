@@ -6,13 +6,13 @@ TEST_CASE("List Push Pop ")
     class CCharacter : public Core::Common::LinkedListNode<CCharacter>
     {
     public:
-        CCharacter(Char* letter) { _pLetter = letter; }
+        CCharacter(HE::Char* letter) { _pLetter = letter; }
         virtual ~CCharacter() {}
 
         void Print() { HE_LOG(_pLetter); }
 
     private:
-        Char* _pLetter = NULL;
+        HE::Char* _pLetter = NULL;
     };
 
     Core::Common::CustomList<CCharacter> linearlist;
@@ -36,13 +36,13 @@ TEST_CASE("List Loop ")
     class CCharacter2 : public Core::Common::LinkedListNode<CCharacter2>
     {
     public:
-        CCharacter2(Char letter) { _pLetter = letter; }
+        CCharacter2(HE::Char letter) { _pLetter = letter; }
         virtual ~CCharacter2() {}
 
-        const Char GetChar() const { return this->_pLetter; }
+        const HE::Char GetChar() const { return this->_pLetter; }
 
     private:
-        Char _pLetter = 0;
+        HE::Char _pLetter = 0;
     };
 
     Core::Common::CustomList<CCharacter2> linearlist;
@@ -59,8 +59,8 @@ TEST_CASE("List Loop ")
     CHECK(linearlist.PushBack(d));
     CHECK_FALSE(linearlist.Empty());
 
-    const Char* pTextCode = HE_STR_TEXT("abcd");
-    Uint32 i              = 0;
+    const HE::Char* pTextCode = HE_STR_TEXT("abcd");
+    HE::Uint32 i              = 0;
     for (auto itr = linearlist.BeginItr(); itr != linearlist.EndItr(); ++itr)
     {
         CHECK((itr->GetChar() == pTextCode[i]));

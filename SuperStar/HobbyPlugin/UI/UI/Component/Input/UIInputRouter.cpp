@@ -29,13 +29,13 @@ namespace UI
         Core::Common::FixedStack<Actor::Component*, 128> sWidgetComponent;
         pWidget->OutputChildrenComponent(&sWidgetComponent, &UIWidgetComponent::CLASS_RTTI);
 
-        Uint32 uSize = sWidgetComponent.Size();
+        HE::Uint32 uSize = sWidgetComponent.Size();
         Core::Common::Handle handle;
 
         // UIに関わる, マウスのクリックやキーボードなどの結果を受け取り, 各入力端末へ通知する
         // ルーター側でUIの入力処理を制御
         // UIレイヤーに応じてボタンを押せないとか
-        for (Uint32 i = 0; i < input.Size(); ++i)
+        for (HE::Uint32 i = 0; i < input.Size(); ++i)
         {
             if (input[i].eType == EnhancedInput::EInputType::EInputType_Touch)
             {

@@ -57,41 +57,41 @@ namespace Actor
         /// 生成直後の設定処理
         /// データ初期化はここで行う
         /// </summary>
-        virtual void VSetup(const Bool in_bAutoDelete) override;
+        virtual void VSetup(const HE::Bool in_bAutoDelete) override;
 
         /// <summary>
         /// 開始
         /// 継承したクラスで必ず基本クラスのメソッドを呼ぶ
         /// </summary>
-        virtual Bool VBegin() override;
+        virtual HE::Bool VBegin() override;
 
         /// <summary>
         /// 終了
         /// 継承したクラスで必ず基本クラスのメソッドを呼ぶ
         /// </summary>
-        virtual Bool VEnd() override;
+        virtual HE::Bool VEnd() override;
 
         /// <summar>
         /// 更新
         /// </summary>
-        virtual void VBeginUpdate(const Float32 in_fDt);
+        virtual void VBeginUpdate(const HE::Float32 in_fDt);
 
         /// <summar>
         /// 更新
         /// </summary>
-        void VUpdate(const Float32 in_fDt) override;
+        void VUpdate(const HE::Float32 in_fDt) override;
 
         /// <summar>
         /// 更新
         /// </summary>
-        virtual void VLateUpdate(const Float32 in_fDt);
+        virtual void VLateUpdate(const HE::Float32 in_fDt);
 
         /// <summary>
         /// コンポーネントを追加
         /// TArgsにクラスのコンストラクタ引数を渡す
         /// </summary>
         template <class T, typename... TArgs>
-        Core::Common::Handle AddComponent(const Sint32 in_uUpdateOrder,
+        Core::Common::Handle AddComponent(const HE::Uint32 in_uUpdateOrder,
                                           const Component::EPriorty in_ePriorty, TArgs&&... in_args)
         {
             HE_STATIC_ASSERT(std::is_base_of<Component, T>::value,
@@ -114,7 +114,7 @@ namespace Actor
         /// </summary>
         template <class T, typename... TArgs>
         std::tuple<Core::Common::Handle, T*> AddComponentByHandleAndComp(
-            const Sint32 in_uUpdateOrder, const Component::EPriorty in_ePriorty, TArgs&&... in_args)
+            const HE::Uint32 in_uUpdateOrder, const Component::EPriorty in_ePriorty, TArgs&&... in_args)
         {
             HE_STATIC_ASSERT(std::is_base_of<Component, T>::value,
                              "TクラスはComponentクラスを継承していない");
@@ -131,10 +131,10 @@ namespace Actor
                 pCurrentComponents = &this->_lateComponents;
             }
 
-            HE_ASSERT(in_uUpdateOrder < static_cast<Sint32>(pCurrentComponents->GetMaxGroup()));
+            HE_ASSERT(in_uUpdateOrder < static_cast<HE::Uint32>(pCurrentComponents->GetMaxGroup()));
 
             auto handle     = pCurrentComponents->CreateAndAdd<T>(in_uUpdateOrder, FALSE,
-                                                              std::forward<TArgs>(in_args)...);
+                                                                  std::forward<TArgs>(in_args)...);
             auto pComponent = this->GetComponent<T>(handle);
             if (this->_VSetupComponent(pComponent) == FALSE)
             {
@@ -153,7 +153,7 @@ namespace Actor
         /// <summary>
         /// Removes the component.
         /// </summary>
-        Bool RemoveComponent(Core::Common::Handle*);
+        HE::Bool RemoveComponent(Core::Common::Handle*);
 
         /// <summary>
         /// 親アクターがあればその親アクターのコンポーネントを取得
@@ -240,9 +240,9 @@ namespace Actor
             const Core::Common::RTTI*);
 
         void ForeachComponents(
-            std::function<Bool(const Core::Common::Handle&, Component*)> in_func);
+            std::function<HE::Bool(const Core::Common::Handle&, Component*)> in_func);
 
-        inline Bool ValidComponent(const Core::Common::Handle& in_h)
+        inline HE::Bool ValidComponent(const Core::Common::Handle& in_h)
         {
             if (in_h.Null()) return FALSE;
 
@@ -322,7 +322,7 @@ namespace Actor
         /// <summary>
         /// 追加したコンポーネントのセットアップ
         /// </summary>
-        virtual Bool _VSetupComponent(Component* in_pComp);
+        virtual HE::Bool _VSetupComponent(Component* in_pComp);
 
     private:
         /// <summary>
@@ -330,7 +330,7 @@ namespace Actor
         /// </summary>
         void _RemoveAllComponent(Core::TaskManager*);
 
-        Bool _RemoveComponent(Core::Common::Handle*, Core::TaskManager*);
+        HE::Bool _RemoveComponent(Core::Common::Handle*, Core::TaskManager*);
 
         void _Clear()
         {

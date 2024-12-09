@@ -8,7 +8,7 @@
 
 namespace Lua
 {
-    static UTF8 s_szPushStackTempText[1024] = {NULL};
+    static HE::UTF8 s_szPushStackTempText[1024] = {NULL};
 
     // Luaモジュールのインスタンスは一つしかない前提
     static Core::Common::FixedStack<LuaFuncData, 128> s_sLuaFuncResultData;
@@ -18,7 +18,7 @@ namespace Lua
     /// </summary>
     int _LuaDebugTraceback(lua_State* L)
     {
-        const UTF8* msg = lua_tostring(L, 1);
+        const HE::UTF8* msg = lua_tostring(L, 1);
         if (msg)
         {
             luaL_traceback(L, L, msg, 1);
@@ -34,12 +34,12 @@ namespace Lua
     /// <summary>
     /// Luaスクリプトで実行する関数を追加
     /// </summary>
-    static Bool _LuaRegistFuncByState(lua_State* in_pState, const Char* in_szFuncName,
+    static HE::Bool _LuaRegistFuncByState(lua_State* in_pState, const HE::Char* in_szFuncName,
                                       lua_CFunction in_funcAddr)
     {
         Core::Common::g_szTempFixedString256 = in_szFuncName;
 
-        UTF8 szRegistFuncName[256] = {NULL};
+        HE::UTF8 szRegistFuncName[256] = {NULL};
         Core::Common::g_szTempFixedString256
             .OutputUTF8(szRegistFuncName, Core::Common::g_szTempFixedString256.Capacity());
 
@@ -63,16 +63,16 @@ namespace Lua
 
         // 関数名を取得
         {
-            const UTF8* szName = lua_tostring(in_pLuaState, lua_upvalueindex(1));
+            const HE::UTF8* szName = lua_tostring(in_pLuaState, lua_upvalueindex(1));
             // 関数名設定
             Core::Common::g_szTempFixedString128 = szName;
             HE_STR_CPY_S(pFuncData->szFuncName, HE_ARRAY_NUM(pFuncData->szFuncName),
                          Core::Common::g_szTempFixedString128.Str(),
-                         Core::Common::g_szTempFixedString128.Length());
+                         Core::Common::g_szTempFixedString128.Size());
         }
 
         // 関数の引数の数を取得
-        const Uint32 argCount = static_cast<Uint32>(lua_gettop(in_pLuaState));
+        const HE::Uint32 argCount = static_cast<HE::Uint32>(lua_gettop(in_pLuaState));
         HE_ASSERT(argCount <= HE_ARRAY_NUM(pFuncData->aArg));
 
         // スタックにプッシュしたデータをうめる
@@ -80,7 +80,7 @@ namespace Lua
 
         // TODO: 非型テンプレートで一行でCallを呼び出すようにする
         // 引数の各値を取得
-        for (Uint32 i = 1; i <= argCount; ++i)
+        for (HE::Uint32 i = 1; i <= argCount; ++i)
         {
             auto* pArgData = &pFuncData->aArg[i - 1];
             int type       = lua_type(in_pLuaState, i);
@@ -90,7 +90,7 @@ namespace Lua
                 {
                     pArgData->eValType = ELuaFuncArgType_Float32;
 
-                    const Float32 fVal  = lua_tonumber(in_pLuaState, i);
+                    const HE::Float32 fVal  = lua_tonumber(in_pLuaState, i);
                     pArgData->data.fVal = fVal;
                     break;
                 }
@@ -98,12 +98,12 @@ namespace Lua
                 {
                     pArgData->eValType = ELuaFuncArgType_Str;
 
-                    const UTF8* pStr                     = lua_tostring(in_pLuaState, i);
+                    const HE::UTF8* pStr                     = lua_tostring(in_pLuaState, i);
                     Core::Common::g_szTempFixedString128 = pStr;
 
                     HE_STR_CPY_S(pArgData->data.szText, HE_ARRAY_NUM(pArgData->data.szText),
                                  Core::Common::g_szTempFixedString128.Str(),
-                                 Core::Common::g_szTempFixedString128.Length());
+                                 Core::Common::g_szTempFixedString128.Size());
 
                     break;
                 }
@@ -130,7 +130,7 @@ namespace Lua
             return 0;
         }
 
-        const UTF8* pText = NULL;
+        const HE::UTF8* pText = NULL;
         if (lua_gettop(in_pLuaState) == 1)
         {
             pText = lua_tostring(in_pLuaState, 1);
@@ -216,15 +216,15 @@ namespace Lua
 #endif
     }
 
-    const Core::Common::Handle LuaModule::CreateLuaObject(const Char* in_pName)
+    const Core::Common::Handle LuaModule::CreateLuaObject(const HE::Char* in_pName)
     {
         HE_ASSERT(in_pName && "Luaオブジェクトの作成で名前指定がない");
 
         // TODO: スレッドを使った非同期対応が必要
         Core::Common::g_szTempFixedString128 = in_pName;
 
-        Core::Common::Handle handle;
-        auto* pLuaObject = this->_luaObjectPool.Alloc(&handle);
+        // Core::Common::Handle handle;
+        auto [handle, pLuaObject] = this->_luaObjectPool.Alloc();  //&handle);
 
         pLuaObject->pLuaState = lua_newstate(_LuaAllocator, NULL);
         HE_ASSERT(pLuaObject->pLuaState);
@@ -240,14 +240,14 @@ namespace Lua
 
         HE_STR_CPY_S(pLuaObject->szName, HE_ARRAY_NUM(pLuaObject->szName),
                      Core::Common::g_szTempFixedString128.Str(),
-                     Core::Common::g_szTempFixedString128.Length());
+                     Core::Common::g_szTempFixedString128.Size());
 
         this->_mUseLuaObject.Add(pLuaState, handle);
 
         return handle;
     }
 
-    Bool LuaModule::ReleaseLuaObject(const Core::Common::Handle& in_rHandle)
+    HE::Bool LuaModule::ReleaseLuaObject(const Core::Common::Handle& in_rHandle)
     {
         HE_ASSERT(in_rHandle.Null() == FALSE);
 
@@ -263,17 +263,17 @@ namespace Lua
         return this->_luaObjectPool.Free(in_rHandle);
     }
 
-    Bool LuaModule::LoadScriptText(const Core::Common::Handle& in_rHandle, const Char* in_pText)
+    HE::Bool LuaModule::LoadScriptText(const Core::Common::Handle& in_rHandle, const HE::Char* in_pText)
     {
         HE_ASSERT(in_rHandle.Null() == FALSE);
 
         Core::Common::g_szTempFixedString1024 = in_pText;
-        HE_ASSERT(0 < Core::Common::g_szTempFixedString1024.Length());
+        HE_ASSERT(0 < Core::Common::g_szTempFixedString1024.Size());
 
         auto* pLuaObject = this->_luaObjectPool.Ref(in_rHandle);
         if (pLuaObject == NULL) return FALSE;
 
-        UTF8 szText[1024] = {NULL};
+        HE::UTF8 szText[1024] = {NULL};
         Core::Common::g_szTempFixedString1024.OutputUTF8(szText, HE_ARRAY_NUM(szText));
 
         lua_State* pLuaState = reinterpret_cast<lua_State*>(pLuaObject->pLuaState);
@@ -282,7 +282,7 @@ namespace Lua
         if (luaL_loadstring(pLuaState, szText) != LUA_OK)
         {
             // スタックトップのエラーメッセージを取得
-            const UTF8* szError = lua_tostring(pLuaState, -1);
+            const HE::UTF8* szError = lua_tostring(pLuaState, -1);
             HE_LOG_LINE(HE_STR_TEXT("Lua load error: %s"), szError);
 
             // スタックトップのエラーメッセージをスタックから取り除く
@@ -310,7 +310,7 @@ namespace Lua
         else
         {
             // エラーメッセージとエラーハンドラをスタックから取り除く
-            const UTF8* szError = lua_tostring(pLuaState, -1);
+            const HE::UTF8* szError = lua_tostring(pLuaState, -1);
             HE_LOG_LINE(HE_STR_TEXT("Lua runtime error:\n%s"), szError);
             lua_pop(pLuaState, 2);
         }
@@ -319,13 +319,13 @@ namespace Lua
     }
 
     // c++側がキャッチできる関数を登録
-    Bool LuaModule::RegistScriptFunc(const Core::Common::Handle& in_rHandle,
-                                     const Char* in_pFuncName)
+    HE::Bool LuaModule::RegistScriptFunc(const Core::Common::Handle& in_rHandle,
+                                     const HE::Char* in_pFuncName)
     {
         HE_ASSERT(in_rHandle.Null() == FALSE);
 
         Core::Common::g_szTempFixedString1024 = in_pFuncName;
-        HE_ASSERT(0 < Core::Common::g_szTempFixedString1024.Length());
+        HE_ASSERT(0 < Core::Common::g_szTempFixedString1024.Size());
 
         auto* pLuaObject = this->_luaObjectPool.Ref(in_rHandle);
         if (pLuaObject == NULL) return FALSE;
@@ -345,7 +345,7 @@ namespace Lua
                                      &_LuaScriptCallFunc);
     }
 
-    Bool LuaModule::SetEventFunctionByLuaFunc(
+    HE::Bool LuaModule::SetEventFunctionByLuaFunc(
         Core::Memory::SharedPtr<Core::Common::FunctionObject<void, LuaFuncData&>> in_spFunc)
     {
         auto a = reinterpret_cast<std::uintptr_t>(in_spFunc.get());
@@ -357,7 +357,7 @@ namespace Lua
     /// <summary>
     /// モジュール初期化
     /// </summary>
-    Bool LuaModule::_VStart()
+    HE::Bool LuaModule::_VStart()
     {
         HE_ASSERT(this->_mUseLuaObject.Empty());
         this->_mScriptFuncAction.Clear();
@@ -370,7 +370,7 @@ namespace Lua
     /// <summary>
     /// インスタンス破棄時に呼ばれる
     /// </summary>
-    Bool LuaModule::_VRelease()
+    HE::Bool LuaModule::_VRelease()
     {
         while (this->_mUseLuaObject.Empty() == FALSE)
         {
@@ -392,7 +392,7 @@ namespace Lua
         return TRUE;
     }
 
-    Bool LuaModule::_VLateUpdate(const Float32 in_fDeltaTime)
+    HE::Bool LuaModule::_VLateUpdate(const HE::Float32 in_fDeltaTime)
     {
         // TODO: Luaスクリプトから呼び出した関数結果を出力
 
@@ -436,8 +436,8 @@ namespace Lua
         return TRUE;
     }
 
-    // Int型をプッシュ
-    void LuaModule::_LuaStackPushValue(void* in_pLuaState, const Int in_value)
+    // HE::Int型をプッシュ
+    void LuaModule::_LuaStackPushValue(void* in_pLuaState, const HE::Int in_value)
     {
         lua_State* pLuaState = reinterpret_cast<lua_State*>(in_pLuaState);
         HE_ASSERT(pLuaState);
@@ -445,8 +445,8 @@ namespace Lua
         lua_pushinteger(pLuaState, static_cast<lua_Integer>(in_value));
     }
 
-    // Sint32型をプッシュ
-    void LuaModule::_LuaStackPushValue(void* in_pLuaState, const Sint32 in_iValue)
+    // HE::Sint32型をプッシュ
+    void LuaModule::_LuaStackPushValue(void* in_pLuaState, const HE::Sint32 in_iValue)
     {
         lua_State* pLuaState = reinterpret_cast<lua_State*>(in_pLuaState);
         HE_ASSERT(pLuaState);
@@ -454,8 +454,8 @@ namespace Lua
         lua_pushinteger(pLuaState, static_cast<lua_Integer>(in_iValue));
     }
 
-    // Uint32型をプッシュ
-    void LuaModule::_LuaStackPushValue(void* in_pLuaState, const Uint32 in_uValue)
+    // HE:Uint32型をプッシュ
+    void LuaModule::_LuaStackPushValue(void* in_pLuaState, const HE::Uint32 in_uValue)
     {
         lua_State* pLuaState = reinterpret_cast<lua_State*>(in_pLuaState);
         HE_ASSERT(pLuaState);
@@ -463,8 +463,8 @@ namespace Lua
         lua_pushinteger(pLuaState, static_cast<lua_Integer>(in_uValue));
     }
 
-    // Float32
-    void LuaModule::_LuaStackPushValue(void* in_pLuaState, const Float32 in_fValue)
+    // HE::HE::Float32
+    void LuaModule::_LuaStackPushValue(void* in_pLuaState, const HE::Float32 in_fValue)
     {
         lua_State* pLuaState = reinterpret_cast<lua_State*>(in_pLuaState);
         HE_ASSERT(pLuaState);
@@ -472,8 +472,8 @@ namespace Lua
         lua_pushnumber(pLuaState, static_cast<lua_Number>(in_fValue));
     }
 
-    // Bool型をプッシュ
-    void LuaModule::_LuaStackPushValue(void* in_pLuaState, const Bool in_bValue)
+    // HE::Bool型をプッシュ
+    void LuaModule::_LuaStackPushValue(void* in_pLuaState, const HE::Bool in_bValue)
     {
         lua_State* pLuaState = reinterpret_cast<lua_State*>(in_pLuaState);
         HE_ASSERT(pLuaState);
@@ -481,7 +481,7 @@ namespace Lua
     }
 
     // const Char* 型をプッシュ
-    void LuaModule::_LuaStackPushValue(void* in_pLuaState, const Char* in_szValue)
+    void LuaModule::_LuaStackPushValue(void* in_pLuaState, const HE::Char* in_szValue)
     {
         lua_State* pLuaState = reinterpret_cast<lua_State*>(in_pLuaState);
         HE_ASSERT(pLuaState);
@@ -500,12 +500,12 @@ namespace Lua
         HE_ASSERT(pLuaState);
 
         in_rszValue.OutputUTF8(s_szPushStackTempText, HE_ARRAY_NUM(s_szPushStackTempText));
-        size_t size = HE_MIN(HE_ARRAY_NUM(s_szPushStackTempText), in_rszValue.Length());
+        size_t size = HE_MIN(HE_ARRAY_NUM(s_szPushStackTempText), in_rszValue.Size());
 
         lua_pushlstring(pLuaState, s_szPushStackTempText, size);
     }
 
-    Bool LuaModule::_BeginLocalFunc(void* in_pLuaState, const Char* in_szFuncName)
+    HE::Bool LuaModule::_BeginLocalFunc(void* in_pLuaState, const HE::Char* in_szFuncName)
     {
         lua_State* pLuaState = reinterpret_cast<lua_State*>(in_pLuaState);
         HE_ASSERT(pLuaState);
@@ -533,7 +533,7 @@ namespace Lua
         return TRUE;
     }
 
-    Bool LuaModule::_EndLocalFunc(void* in_pLuaState, const Uint32 in_uArgCount)
+    HE::Bool LuaModule::_EndLocalFunc(void* in_pLuaState, const HE::Uint32 in_uArgCount)
     {
         lua_State* pLuaState = reinterpret_cast<lua_State*>(in_pLuaState);
         HE_ASSERT(pLuaState);
@@ -542,7 +542,7 @@ namespace Lua
         // TODO: Lua関数のコルーチンは非対応
         if (lua_pcall(pLuaState, in_uArgCount, 0, 0) != LUA_OK)
         {
-            const UTF8* szError = lua_tolstring(pLuaState, -1, NULL);
+            const HE::UTF8* szError = lua_tolstring(pLuaState, -1, NULL);
             HE_LOG_LINE(HE_STR_TEXT("エラー: Lua関数の呼び出しに失敗\nエラー内容: %s"), szError);
             // エラーメッセージをポップ
             lua_pop(pLuaState, 1);

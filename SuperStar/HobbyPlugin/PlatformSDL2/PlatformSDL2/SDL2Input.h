@@ -13,11 +13,11 @@ namespace PlatformSDL2
     public:
         void VInit() override final;
         void VUpdate(const HE::Float32 in_fDeltaTime) override final;
-        Bool VIsQuit() const override final { return this->_bQuit; }
+        HE::Bool VIsQuit() const override final { return this->_bQuit; }
 
     private:
-        Uint32 _uCurrButton = 0;
-        Uint32 _uPrevButton = 0;
-        Bool _bQuit         = FALSE;
+        HE::Uint32 _uCurrButton = 0;
+        HE::Uint32 _uPrevButton = 0;
+        HE::Bool _bQuit         = FALSE;
     };
 }  // namespace Platform::SDL2

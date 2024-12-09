@@ -70,14 +70,14 @@ namespace UI
         /// アセットデータからレイアウトを新規作成
         /// </summary>
         const UIWidgetHandlePack NewLayoutByLayotuAsset(
-            const Core::Common::Handle& in_rAssetHandle, const Uint32 in_sort,
+            const Core::Common::Handle& in_rAssetHandle, const HE::Uint32 in_sort,
             const Core::Common::Handle& in_rViewHandle,
             const Core::Common::Handle& in_rLevelHandle);
 
         // UIのLayerを作成する
         // 描画ソート機能は未実装
         const UIWidgetHandlePack NewLayer(const Core::Common::StringBase& in_szrName,
-                                          const Uint32 in_sort,
+                                          const HE::Uint32 in_sort,
                                           const Core::Common::Handle& in_rLevelHandle);
 
         /// <summary>
@@ -86,10 +86,10 @@ namespace UI
         /// <param name="in_bLoc">ローカライズテキスト対象フラグ</param>
         /// <returns></returns>
         const UIWidgetHandlePack NewLabelWidget(const Core::Common::StringBase& in_szrName,
-                                                const Uint32 in_sort, const Char* in_pLocGroupName,
-                                                const Char* in_szText,
+                                                const HE::Uint32 in_sort, const HE::Char* in_pLocGroupName,
+                                                const HE::Char* in_szText,
                                                 const Core::Math::Rect2& in_rTextRect,
-                                                const Uint32 in_uTextColor,
+                                                const HE::Uint32 in_uTextColor,
                                                 const Core::Common::Handle& in_rViewHandle,
                                                 const Core::Common::Handle& in_rLevelHandle);
 
@@ -97,25 +97,25 @@ namespace UI
         /// ボタンWidget作成
         /// </summary>
         const UIWidgetHandlePack NewButtonWidget(const Core::Common::StringBase& in_szrName,
-                                                 const Uint32 in_sort,
+                                                 const HE::Uint32 in_sort,
                                                  const Core::Math::Rect2& in_rBtnRect,
-                                                 const Uint32 in_uBtnColor,
+                                                 const HE::Uint32 in_uBtnColor,
                                                  const Core::Common::Handle& in_rViewHandle,
                                                  const Core::Common::Handle& in_rLevelHandle);
 
         // UIのWidgetを作成する
         // TODO: 描画ソート機能は未実装
         const UIWidgetHandlePack NewWidget(const Core::Common::StringBase& in_szName,
-                                           const Uint32 in_uSort,
+                                           const HE::Uint32 in_uSort,
                                            const Core::Common::Handle& in_rLevelHandle);
 
         // 親Widgetに子Widgetを追加
-        Bool AddChildWidget(UIWidgetHandlePack& in_rParent, UIWidgetHandlePack& in_rWidget);
+        HE::Bool AddChildWidget(UIWidgetHandlePack& in_rParent, UIWidgetHandlePack& in_rWidget);
 
         // Widgetにコンポーネント追加
         template <class T>
         Core::Common::Handle AddComponent(const UIWidgetHandlePack& in_rWidgetHandle,
-                                          const Sint32 in_iUpdateOrder)
+                                          const HE::Uint32 in_iUpdateOrder)
         {
             auto pActor = this->GetWidget(in_rWidgetHandle);
             // アクターにコンポーネント追加
@@ -129,12 +129,12 @@ namespace UI
         /// <summary>
         /// UIのモジュール初期化
         /// </summary>
-        Bool _VStart() override final;
+        HE::Bool _VStart() override final;
 
         /// <summary>
         /// インスタンス破棄時に呼ばれる
         /// </summary>
-        Bool _VRelease() override final;
+        HE::Bool _VRelease() override final;
     };
 
 }  // namespace UI

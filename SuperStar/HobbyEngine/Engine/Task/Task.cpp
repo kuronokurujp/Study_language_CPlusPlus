@@ -4,7 +4,7 @@ const Core::TaskData NullTaskData;
 
 namespace Core
 {
-    void Task::VSetup(const Bool in_bReleaseMem)
+    void Task::VSetup(const HE::Bool in_bReleaseMem)
     {
         this->_Clear();
 

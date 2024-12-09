@@ -24,7 +24,7 @@ namespace Core
         }
     }
 
-    Bool TaskTree::AddChildTask(const Core::Common::Handle& in_rHandle)
+    HE::Bool TaskTree::AddChildTask(const Core::Common::Handle& in_rHandle)
     {
         HE_ASSERT(in_rHandle.Null() == FALSE);
         // 自分自身を子タスクとして設定できない
@@ -100,13 +100,13 @@ namespace Core
         return nextItr;
     }
 
-    void TaskTree::VSetup(const Bool in_bAutoDelete)
+    void TaskTree::VSetup(const HE::Bool in_bAutoDelete)
     {
         Task::VSetup(in_bAutoDelete);
         this->_Clear();
     }
 
-    void TaskTree::VUpdate(const Float32 in_fDt)
+    void TaskTree::VUpdate(const HE::Float32 in_fDt)
     {
         // 子タスクの実行
         this->ForeachChildTask(

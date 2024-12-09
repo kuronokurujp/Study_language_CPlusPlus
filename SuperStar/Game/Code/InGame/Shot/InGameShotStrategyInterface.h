@@ -16,7 +16,7 @@ namespace InGame
         {
             Core::Math::Vector2 pos;
             Core::Math::Vector2 dir;
-            Uint32 uCollisionHashCoee = 0;
+            HE::Uint32 uCollisionHashCoee = 0;
         };
 
     public:

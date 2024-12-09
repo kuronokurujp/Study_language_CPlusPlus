@@ -29,7 +29,7 @@ namespace InGame
             : public Core::Common::FixedVector<InGame::InGameBulletObject, 256>
         {
         public:
-            void RemoveAt(const Uint32 in_uIndex) { this->_RemoveAt(in_uIndex); }
+            void RemoveAt(const HE::Uint32 in_uIndex) { this->_RemoveAt(in_uIndex); }
         };
 
     public:
@@ -38,48 +38,48 @@ namespace InGame
         /// <summary>
         /// 初期化
         /// </summary>
-        void VSetup(const Bool in_bReleaseMem) override final;
+        void VSetup(const HE::Bool in_bReleaseMem) override final;
 
         /// <summary>
         /// コンポーネント開始
         /// </summary>
-        Bool VBegin() override final;
+        HE::Bool VBegin() override final;
 
         /// <summary>
         /// コンポーネント終了
         /// </summary>
-        Bool VEnd() override final;
+        HE::Bool VEnd() override final;
 
         /// <summary>
         /// コンポーネントの更新
         /// </summary>
-        void VUpdate(const Float32 in_fDt) override final;
+        void VUpdate(const HE::Float32 in_fDt) override final;
 
         /// <summary>
         /// 衝突発生
         /// </summary>
-        Bool VOnHit(const CollisionData& in_rSelfColData,
+        HE::Bool VOnHit(const CollisionData& in_rSelfColData,
                     const CollisionData& in_rHitColData) override final;
 
         /// <summary>
         /// 弾の生成
         /// </summary>
-        Bool MakeObject(Core::Memory::UniquePtr<InGameBulletFactoryInterface>);
+        HE::Bool MakeObject(Core::Memory::UniquePtr<InGameBulletFactoryInterface>);
 
         /// <summary>
         /// 弾のアルゴリズムを追加
         /// </summary>
-        Bool AddStrategy(Core::Memory::UniquePtr<InGameBulletStrategyInterface>);
+        HE::Bool AddStrategy(Core::Memory::UniquePtr<InGameBulletStrategyInterface>);
 
         // コリジョン処理
-        Uint32 VColCount() const override final { return this->_vBullet.Size(); }
-        Bool VOutputColData(CollisionData* out, const Uint32 in_uColIndex) override final;
+        HE::Uint32 VColCount() const override final { return this->_vBullet.Size(); }
+        HE::Bool VOutputColData(CollisionData* out, const HE::Uint32 in_uColIndex) override final;
 
     private:
-        void _ForEachObject(std::function<Bool(InGame::InGameBulletObject*,
+        void _ForEachObject(std::function<HE::Bool(InGame::InGameBulletObject*,
                                                InGame::InGameBulletStrategyInterface*)>);
 
-        Bool _HandleEvent(Event::EventDataInterfacePtr const&);
+        HE::Bool _HandleEvent(Event::EventDataInterfacePtr const&);
 
     private:
         Core::Common::FixedMap<Core::Common::FixedString128,

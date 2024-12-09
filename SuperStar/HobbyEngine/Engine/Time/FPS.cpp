@@ -4,31 +4,36 @@
 
 namespace Core::Time
 {
-    FPS::FPS(Platform::TimeInterface* in_pTimeInterface)
+    FPS::FPS(Core::Memory::WeakPtr<Platform::TimeInterface> in_wpTimeInterface)
     {
+        auto pTime = in_wpTimeInterface.lock();
+        HE_ASSERT(pTime);
+
         // 帰ってくる時間の単位はmsec
-        auto uCurrentTime = in_pTimeInterface->VNowMSec();
-        for (Uint32 i = 0; i < FPS::_uTimeAvgCount; ++i)
+        auto uCurrentTime = pTime->VNowMSec();
+        for (HE::Uint32 i = 0; i < FPS::_uTimeAvgCount; ++i)
             this->_uaPreviousTimeMSec[i] = uCurrentTime;
     }
 
-    Bool FPS::UpdateWait(Platform::TimeInterface* in_pTimeInterface, const Uint32 in_uWaitMSec)
+    HE::Bool FPS::UpdateWait(Core::Memory::WeakPtr<Platform::TimeInterface> in_wpTimeInterface,
+                         const HE::Uint32 in_uWaitMSec)
     {
-        HE_ASSERT(in_pTimeInterface);
         // ミリ秒単位で扱っている
+        auto pTime = in_wpTimeInterface.lock();
+        if (pTime == NULL) return FALSE;
 
-        const Uint64 uNowMSec = in_pTimeInterface->VNowMSec();
+        const HE::Uint64 uNowMSec = pTime->VNowMSec();
         // 最新の時間と前フレーム前の時間との差
-        const Uint64 uFrameTimeMSec = uNowMSec - this->_uaPreviousTimeMSec[0];
+        const HE::Uint64 uFrameTimeMSec = uNowMSec - this->_uaPreviousTimeMSec[0];
 
         // Waitタイムより早い場合は待機フラグを返す
-        Bool bWait = (uNowMSec - this->_uaPreviousTimeMSec[FPS::_uTimeAvgCount - 1]) < in_uWaitMSec;
+        HE::Bool bWait = (uNowMSec - this->_uaPreviousTimeMSec[FPS::_uTimeAvgCount - 1]) < in_uWaitMSec;
 
         // 更新時間より早い
         if (bWait) return TRUE;
 
         // 格納した時間をずらす
-        Uint32 uSize =
+        HE::Uint32 uSize =
             HE_ARRAY_SIZE(this->_uaPreviousTimeMSec) - sizeof(this->_uaPreviousTimeMSec[0]);
         ::memmove(this->_uaPreviousTimeMSec, &this->_uaPreviousTimeMSec[1], uSize);
 
@@ -38,7 +43,7 @@ namespace Core::Time
             if (0 < uFrameTimeMSec)
             {
                 // 1秒 / フレーム更新したミリ秒時間 = フレーム更新したレート値
-                this->_uFrameRate = FPS::_fFrameAvgTimeMSec / static_cast<Float32>(uFrameTimeMSec);
+                this->_uFrameRate = FPS::_fFrameAvgTimeMSec / static_cast<HE::Float32>(uFrameTimeMSec);
             }
             else
             {
@@ -52,14 +57,14 @@ namespace Core::Time
         return FALSE;
     }
 
-    Float32 FPS::GetDeltaTimeMSec() const
+    HE::Float32 FPS::GetDeltaTimeMSec() const
     {
         return (1.0f / this->_uFrameRate) * 1000.0f;
     }
 
-    Float32 FPS::GetDeltaTimeSec() const
+    HE::Float32 FPS::GetDeltaTimeSec() const
     {
-        Float32 fDeletaTime = this->GetDeltaTimeMSec();
+        HE::Float32 fDeletaTime = this->GetDeltaTimeMSec();
         if (fDeletaTime <= 0.0f) return 0.0f;
 
         // 秒に変換

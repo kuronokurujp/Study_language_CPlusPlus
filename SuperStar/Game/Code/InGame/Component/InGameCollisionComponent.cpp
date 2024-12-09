@@ -14,7 +14,7 @@ namespace InGame
         /// <summary>
         /// ２次元の円同士の衝突ヒット
         /// </summary>
-        static Bool IsHitWithCircle2D(const CollisionData& in_rSelfColData,
+        static HE::Bool IsHitWithCircle2D(const CollisionData& in_rSelfColData,
                                       const CollisionData& in_rTargetColData)
         {
             auto len = Core::Math::Vector2::Distance(in_rSelfColData.data.circle2D.pos,
@@ -34,12 +34,12 @@ namespace InGame
             CollisionData selfColData;
             CollisionData targetColData;
 
-            for (Uint32 selfColIndex = 0; selfColIndex < uSelfColCount; ++selfColIndex)
+            for (HE::Uint32 selfColIndex = 0; selfColIndex < uSelfColCount; ++selfColIndex)
             {
                 if (in_rSelf.VOutputColData(&selfColData, selfColIndex) == FALSE) continue;
 
                 auto uTargetColCount = in_rTarget.VColCount();
-                for (Uint32 targetColIndex = 0; targetColIndex < uTargetColCount; ++targetColIndex)
+                for (HE::Uint32 targetColIndex = 0; targetColIndex < uTargetColCount; ++targetColIndex)
                 {
                     if (in_rTarget.VOutputColData(&targetColData, targetColIndex) == FALSE)
                         continue;
@@ -81,12 +81,12 @@ namespace InGame
         auto size = Local::vCollision.Size();
         if (size <= 1) return;
 
-        for (Uint32 uSelfIndex = 0; uSelfIndex < size; ++uSelfIndex)
+        for (HE::Uint32 uSelfIndex = 0; uSelfIndex < size; ++uSelfIndex)
         {
-            auto pSelfCollision = *(Local::vCollision.GetPtr(uSelfIndex));
-            for (Uint32 uTargetIndex = uSelfIndex + 1; uTargetIndex < size; ++uTargetIndex)
+            auto pSelfCollision = Local::vCollision[uSelfIndex];
+            for (HE::Uint32 uTargetIndex = uSelfIndex + 1; uTargetIndex < size; ++uTargetIndex)
             {
-                auto pTargetCollision = *(Local::vCollision.GetPtr(uTargetIndex));
+                auto pTargetCollision = Local::vCollision[uTargetIndex];
 
                 // コリジョン処理
                 Local::ProcessCollision(*pSelfCollision, *pTargetCollision);
@@ -94,7 +94,7 @@ namespace InGame
         }
     }
 
-    Bool InGameCollisionComponent::VBegin()
+    HE::Bool InGameCollisionComponent::VBegin()
     {
         if (Actor::Component::VBegin() == FALSE) return FALSE;
 
@@ -103,7 +103,7 @@ namespace InGame
         return TRUE;
     }
 
-    Bool InGameCollisionComponent::VEnd()
+    HE::Bool InGameCollisionComponent::VEnd()
     {
         this->_hitAction = NULL;
 
@@ -114,7 +114,7 @@ namespace InGame
         return TRUE;
     }
 
-    Bool InGameCollisionComponent::VOnHit(const CollisionData& in_rSelfColData,
+    HE::Bool InGameCollisionComponent::VOnHit(const CollisionData& in_rSelfColData,
                                           const CollisionData& in_rHitColData)
     {
         if (this->_hitAction == NULL) return TRUE;
@@ -128,23 +128,23 @@ namespace InGame
         return FALSE;
     }
 
-    void InGameCollisionComponent::SetCollisionHashCode(const Char* in_szName)
+    void InGameCollisionComponent::SetCollisionHashCode(const HE::Char* in_szName)
     {
         this->SetCollisionHashCode(Core::Common::HashName(in_szName));
     }
 
-    void InGameCollisionComponent::SetCollisionHashCode(const Uint32 in_uHashCode)
+    void InGameCollisionComponent::SetCollisionHashCode(const HE::Uint32 in_uHashCode)
     {
         this->_uHashCode = in_uHashCode;
     }
 
-    void InGameCollisionComponent::SetMetaData(const Uint64 in_ulMetaData)
+    void InGameCollisionComponent::SetMetaData(const HE::Uint64 in_ulMetaData)
     {
         this->_ulMetaData = in_ulMetaData;
     }
 
-    Bool InGameCircleCollision2DComponent::VOutputColData(CollisionData* out,
-                                                          const Uint32 in_uColIndex)
+    HE::Bool InGameCircleCollision2DComponent::VOutputColData(CollisionData* out,
+                                                          const HE::Uint32 in_uColIndex)
     {
         auto pTrans = this->_pOwner->GetComponent<Actor::TransformComponent>();
         HE_ASSERT(pTrans);

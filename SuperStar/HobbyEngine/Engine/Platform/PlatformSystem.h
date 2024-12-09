@@ -10,8 +10,8 @@ namespace Platform
     {
     public:
         virtual ~SystemInterface()              = default;
-        virtual Uint32 VGetRand(const Uint32)   = 0;
-        virtual Bool VSetSeedRand(const Uint32) = 0;
+        virtual HE::Uint32 VGetRand(const HE::Uint32)   = 0;
+        virtual HE::Bool VSetSeedRand(const HE::Uint32) = 0;
     };
 
 }  // namespace Platform

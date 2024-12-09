@@ -36,7 +36,7 @@ namespace EnhancedInput
         }
     }
 
-    void EnhancedInputModule::RemoveCommonMappingAction(const Char* in_pActonName)
+    void EnhancedInputModule::RemoveCommonMappingAction(const HE::Char* in_pActonName)
     {
         HE_ASSERT(in_pActonName);
         this->_mMappingAction.Erase(in_pActonName);
@@ -46,23 +46,23 @@ namespace EnhancedInput
     /// UIのモジュール初期化
     /// </summary>
     /// <returns></returns>
-    Bool EnhancedInputModule::_VStart()
+    HE::Bool EnhancedInputModule::_VStart()
     {
         return TRUE;
     }
 
-    Bool EnhancedInputModule::_VRelease()
+    HE::Bool EnhancedInputModule::_VRelease()
     {
         return TRUE;
     }
 
-    Bool EnhancedInputModule::_VBeforeUpdate(const Float32 in_fDeltaTime)
+    HE::Bool EnhancedInputModule::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
     {
         this->_mInputAction.Clear();
         return TRUE;
     }
 
-    Bool EnhancedInputModule::_VUpdate(const Float32 in_fDeltaTime)
+    HE::Bool EnhancedInputModule::_VUpdate(const HE::Float32 in_fDeltaTime)
     {
         auto pPlatformModule = this->GetDependenceModule<Platform::PlatformModule>();
         HE_ASSERT(pPlatformModule);
@@ -79,7 +79,7 @@ namespace EnhancedInput
         for (auto it = this->_mMappingAction.Begin(); it != this->_mMappingAction.End(); ++it)
         {
             // 発生している場合は発生リストに登録
-            for (Uint32 i = 0; i < it->data.aKeyboardKeys.Size(); ++i)
+            for (HE::Uint32 i = 0; i < it->data.aKeyboardKeys.Size(); ++i)
             {
                 const auto eKey = it->data.aKeyboardKeys[i];
                 if (inputState._keyboard.GetKeyState(eKey))
@@ -92,7 +92,7 @@ namespace EnhancedInput
                 }
             }
 
-            for (Uint32 i = 0; i < it->data.aTouchs.Size(); ++i)
+            for (HE::Uint32 i = 0; i < it->data.aTouchs.Size(); ++i)
             {
                 const auto eTouch      = it->data.aTouchs[i];
                 const auto eTouchState = inputState._touch.GetTouchState(it->data.aTouchs[i]);

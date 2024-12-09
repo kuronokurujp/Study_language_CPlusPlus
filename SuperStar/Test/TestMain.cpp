@@ -29,6 +29,14 @@
 // Standard C/C++ Win32 Unicode wmain entry point
 int CATCH_INTERNAL_CDECL wmain(int argc, wchar_t* argv[], wchar_t*[])
 {
+#ifdef HE_WIN
+#ifdef HE_CHARACTER_CODE_UTF8
+    // UTF-8 を使うようにコードページを設定
+    // ウィンドウズだが文字コードはUTF8を使うのでwchar_tが使えないのでコンソール設定をUTF8にして日本語表示を文字化けしないようにする
+    SetConsoleOutputCP(CP_UTF8);
+#endif
+#endif
+
 #else
 // Standard C/C++ main entry point
 int CATCH_INTERNAL_CDECL main(int argc, char* argv[])
@@ -70,7 +78,6 @@ int main(int argc, char* const argv[])
 
 // ハッシュのテストコード
 #include "EngineTest/Common/TestHash.hpp"
-
 // カスタム配列のテストコード
 #include "EngineTest/Common/TestArray.hpp"
 // カスタムVectorのテストコード
@@ -97,7 +104,6 @@ int main(int argc, char* const argv[])
 
 // 非同期タスク処理のテストコード
 #include "EngineTest/AsyncTask/TestAsyncTask.hpp"
-
 // エンジン本体のテストコード
 #include "EngineTest/TestEngine.hpp"
 
@@ -112,7 +118,6 @@ int main(int argc, char* const argv[])
 
 // Lambdaテストコード
 #include "EngineTest/Common/TestLambda.hpp"
-
 // ゲーム用アセットのテスト
 // ゲームプロジェクトはアプリプロジェクトでコードの実態を入れ込むためにcppファイルもインクルードしないといけない
 #include "TestCode/Asset/TestAsset.hpp"

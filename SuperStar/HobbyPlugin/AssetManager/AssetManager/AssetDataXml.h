@@ -23,7 +23,7 @@ namespace AssetManager
         AssetDataXml() : AssetDataBase() {}
         virtual ~AssetDataXml() = default;
 
-        virtual Bool _VLoad(Platform::FileInterface&) override;
+        virtual HE::Bool _VLoad(Platform::FileInterface&) override;
         virtual void _VUnload() override;
 
     protected:

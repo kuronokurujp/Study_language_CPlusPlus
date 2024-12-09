@@ -6,8 +6,9 @@
 #include <vector>
 
 #include "Engine/Common/CustomArray.h"
+#include "Engine/Common/CustomMap.h"
 #include "Engine/Common/CustomStack.h"
-#include "Engine/Common/CustomVector.h"
+// #include "Engine/Common/CustomVector.h"
 #include "Engine/Common/Handle.h"
 #include "Engine/Core.h"
 #include "Engine/Memory/Memory.h"
@@ -25,11 +26,13 @@ namespace Core::Common
     class RuntimePoolManager
     {
     public:
-        struct AllocData
-        {
-            T* _pItem = NULL;
-            Core::Common::Handle _handle;
-        };
+        /*
+            struct AllocData
+            {
+                T* _pItem = NULL;
+                Core::Common::Handle _handle;
+            };
+            */
 
     public:
         virtual ~RuntimePoolManager() { this->_ReleasePool(); }
@@ -37,22 +40,22 @@ namespace Core::Common
         /// <summary>
         /// データ使用個数
         /// </summary>
-        const Uint32 UseCount() const
+        const HE::Uint32 UseCount() const
         {
             if (this->_upUserSlot == NULL) return 0;
 
-            return static_cast<Uint32>(this->_upUserSlot->size());
+            return static_cast<HE::Uint32>(this->_upUserSlot->size());
         }
 
         /// <summary>
         /// データ最大数
         /// </summary>
-        const Uint32 Max() const { return static_cast<Uint32>(this->_upCacheDatas->capacity()); }
+        const HE::Uint32 Max() const { return static_cast<HE::Uint32>(this->_upCacheDatas->capacity()); }
 
         /// <summary>
         /// キャッシュしたデータが現在いくつか
         /// </summary>
-        const Uint32 CacheCount() const { return static_cast<Uint32>(this->_upCacheDatas->size()); }
+        const HE::Uint32 CacheCount() const { return static_cast<HE::Uint32>(this->_upCacheDatas->size()); }
 
         const bool Empty() const { return (this->UseCount() <= 0); }
 
@@ -67,7 +70,7 @@ namespace Core::Common
         /// <summary>
         /// ハンドルが存在するか
         /// </summary>
-        Bool Valid(const Core::Common::Handle& in_h)
+        HE::Bool Valid(const Core::Common::Handle& in_h)
         {
             if (this->_upUserSlot->at(in_h)) return TRUE;
 
@@ -80,7 +83,7 @@ namespace Core::Common
         /// プールするためのデータバッファ数を指定して確保
         /// 継承したクラスが必ず実行
         /// </summary>
-        void _ReservePool(const Uint32 in_uMax)
+        void _ReservePool(const HE::Uint32 in_uMax)
         {
             // TODO: 予約した数を変えたい場合にも対応できるようにしたほうがいい
 
@@ -128,26 +131,27 @@ namespace Core::Common
         /// 利用するデータとそのデータを紐づけたハンドルを返す
         /// </summary>
         template <class S, typename... TArgs>
-        AllocData _Alloc(TArgs&&... in_args)
+        std::tuple<Core::Common::Handle, T*> _Alloc(TArgs&&... in_args)
         {
+            // TODO: タプル使った方がいい？
             HE_STATIC_ASSERT(std::is_base_of<T, S>::value, "SクラスはTクラスを継承していない");
 
             HE_ASSERT(this->_upCacheDatas);
             HE_ASSERT(this->_upUserSlot);
 
-            AllocData allocData;
+            // AllocData allocData;
             HE_ASSERT(0 < this->_upCacheDatas->capacity());
 
             // 割り当てられなかったら空の枠を返す
             if (this->UseCount() >= this->_upCacheDatas->capacity())
             {
                 HE_ASSERT(FALSE && "オブジェクトを割り当てる数が足りない");
-                return allocData;
+                return std::tuple<Core::Common::Handle, T*>(NullHandle, NULL);
             }
 
             Handle handle;
 
-            Bool bNewSlot = FALSE;
+            HE::Bool bNewSlot = FALSE;
             S* pObject    = NULL;
 
             if (this->_upCacheDatas->empty())
@@ -156,11 +160,11 @@ namespace Core::Common
             }
             else
             {
-                Bool bFreeSlot = FALSE;
+                HE::Bool bFreeSlot = FALSE;
 
                 // フリー領域にあるのがSクラスかどうかチェックしてあればそれを使う,
                 // なければ新規作成する すでに生成したTクラスのインスタンスを再利用
-                Uint32 uChkIndex = 0;
+                HE::Uint32 uChkIndex = 0;
                 for (auto b = this->_upCacheDatas->begin(); b != this->_upCacheDatas->end(); ++b)
                 {
                     // 再利用可能なデータかチェック
@@ -172,7 +176,7 @@ namespace Core::Common
 
                         // キャッシュデータを利用したのでキャッシュリストから外す
                         this->_upCacheDatas->erase(b);
-                        handle.Set(uChkIndex);
+                        handle.SetIndex(uChkIndex);
 
                         // TODO: 再利用する場合はコンストラクターを呼ばなくてもいいのか？
 
@@ -191,26 +195,26 @@ namespace Core::Common
             if (bNewSlot)
             {
                 ++this->_uIndexCount;
-                handle.Set(this->_uIndexCount);
+                handle.SetIndex(this->_uIndexCount);
 
                 // Tを継承したSクラスのインスタンスを生成
                 // NEWは用意したマクロを使う
                 pObject = HE_NEW_MEM(S, 0)(std::forward<TArgs>(in_args)...);
             }
 
-            allocData._handle = handle;
-            allocData._pItem  = pObject;
+            // allocData._handle = handle;
+            // allocData._pItem  = pObject;
 
             // 利用リストに追加
             this->_upUserSlot->insert(std::make_pair(handle, pObject));
 
-            return allocData;
+            return std::tuple<Core::Common::Handle, T*>(handle, pObject);
         }
 
         /// <summary>
         /// 割り当てデータを解放
         /// </summary>
-        void _Free(const Handle& in_rHandle, const Bool in_bCache)
+        void _Free(const Handle& in_rHandle, const HE::Bool in_bCache)
         {
             HE_ASSERT(in_rHandle.Null() == FALSE && "解放するデータがないとだめ");
 
@@ -256,7 +260,7 @@ namespace Core::Common
 
         // 再利用するキャッシュデータリスト
         Core::Memory::UniquePtr<std::vector<T*>> _upCacheDatas = NULL;
-        Uint32 _uIndexCount                                    = 0;
+        HE::Uint32 _uIndexCount                                    = 0;
     };
 
     /// <summary>
@@ -266,80 +270,85 @@ namespace Core::Common
     /// データ最大数は固定
     /// データを使いまわすのでクラス型を利用するとクラスのプロパティ値が残るので注意
     /// </summary>
-    template <typename T, Uint32 TCapacity>
+    template <typename T, HE::Uint32 TCapacity>
     class FixedPoolManager final
     {
-    private:
-        struct Slot
-        {
-            T data;
-            Uint32 uIndex = uInvalidUint32;
-        };
+    public:
+        using UseDataMap = FixedMap<Core::Common::Handle, T*, TCapacity>;
 
     public:
         /// <summary>
         /// データ使用個数
         /// </summary>
-        inline Uint32 Size() const HE_NOEXCEPT { return this->_uUseCount; }
+        inline HE::Uint32 Size() const HE_NOEXCEPT { return this->_mUseData.Size(); }
 
         /// <summary>
         /// オブジェクトが空かどうか
         /// </summary>
-        inline Bool Empty() const HE_NOEXCEPT { return (this->_uUseCount <= 0); }
+        inline HE::Bool Empty() const HE_NOEXCEPT { return (this->_mUseData.Size() <= 0); }
+
+        /// <summary>
+        /// 利用中のデータマップ
+        /// </summary>
+        const UseDataMap& GetUseDataMap() const { return this->_mUseData; }
 
         /// <summary>
         /// プールしているデータの中で利用できるデータ枠を取得
         /// 利用するデータとそのデータを紐づけたハンドルを返す
         /// </summary>
-        T* Alloc(Handle* out)
+        std::tuple<Core::Common::Handle, T*> Alloc()
         {
-            HE_ASSERT(out != NULL);
-
-            Uint32 uUserSlotIndex = 0;
-            if (this->_sFreeSlotIndex.Empty())
+            HE::Uint32 uUseSlotIndex = 0;
+            if (this->_sFreeDataIndex.Empty())
             {
-                if (TCapacity <= this->_uFreeSlotMax) return NULL;
+                if (TCapacity <= this->_uFreeSlotMax)
+                    return std::tuple<Core::Common::Handle, T*>(NullHandle, NULL);
 
-                uUserSlotIndex = this->_uFreeSlotMax;
+                uUseSlotIndex = this->_uFreeSlotMax;
                 ++this->_uFreeSlotMax;
 
-                this->_sFreeSlotIndex.PushBack(uUserSlotIndex);
+                this->_sFreeDataIndex.PushBack(uUseSlotIndex);
             }
 
-            uUserSlotIndex = this->_sFreeSlotIndex.PopBack();
-            out->Set(uUserSlotIndex);
+            uUseSlotIndex = this->_sFreeDataIndex.PopBack();
+            Core::Common::Handle handle;
+            handle.SetIndex(uUseSlotIndex);
 
-            HE_ASSERT(uUserSlotIndex < this->_aUserSlot.Capacity() &&
+            HE_ASSERT(uUseSlotIndex < this->_aData.Capacity() &&
                       "プールオブジェクトのフリーインデックス値が確保数を超えている");
 
-            ++this->_uUseCount;
+            this->_mUseData.Add(handle, &this->_aData[uUseSlotIndex]);
 
-            // 空きのあるスロットを使用する
-            Slot* pSlot   = &this->_aUserSlot[uUserSlotIndex];
-            pSlot->uIndex = uUserSlotIndex;
-
-            return &pSlot->data;
+            return std::tuple<Core::Common::Handle, T*>(handle, &this->_aData[uUseSlotIndex]);
         }
 
         /// <summary>
         /// 割り当てデータを解放
         /// </summary>
-        Bool Free(const Handle& in_rHandle)
+        HE::Bool Free(const Handle& in_rHandle)
         {
             HE_ASSERT(in_rHandle.Null() == FALSE);
             if (in_rHandle.Null()) return FALSE;
 
-            --this->_uUseCount;
+            if (this->_mUseData.Contains(in_rHandle) == FALSE)
+            {
+                return FALSE;
+            }
 
-            const Uint32 uIndex = in_rHandle.Index();
-            HE_ASSERT(uIndex < this->_aUserSlot.Capacity());
+            const HE::Uint32 uIndex = in_rHandle.Index();
+            HE_ASSERT(uIndex < this->_aData.Capacity());
 
-            Slot* pSlot = &this->_aUserSlot[uIndex];
-            HE_ASSERT(pSlot->uIndex != uInvalidUint32);
+            T* pData = &this->_aData[uIndex];
 
-            pSlot->uIndex = uInvalidUint32;
+            // 共有ポインタであればresetをして解放する
+            if constexpr (IsShaderPtrByTemplateType<T>::value)
+            {
+                pData->reset();
+                pData = NULL;
+            }
 
-            this->_sFreeSlotIndex.PushBack(uIndex);
+            this->_mUseData.Erase(in_rHandle);
+            this->_sFreeDataIndex.PushBack(uIndex);
 
             return TRUE;
         }
@@ -349,27 +358,27 @@ namespace Core::Common
         {
             if (in_rHandle.Null()) return NULL;
 
-            Uint32 uIndex = in_rHandle.Index();
-            HE_ASSERT(uIndex < this->_aUserSlot.Capacity());
+            HE::Uint32 uIndex = in_rHandle.Index();
+            HE_ASSERT(uIndex < this->_aData.Capacity());
 
-            Slot* pSlot = &this->_aUserSlot[uIndex];
-            if (pSlot->uIndex == uInvalidUint32) return NULL;
-
-            return &pSlot->data;
+            return &this->_aData[uIndex];
         }
 
         // データの参照(const版)
         const T* Ref(const Handle& in_rHandle) const
         {
-            typedef RuntimePoolManager<T> ThisType;
+            typedef FixedPoolManager<T, TCapacity> ThisType;
             return (const_cast<ThisType*>(this)->_Ref(in_rHandle));
         }
 
     private:
-        FixedArray<Slot, TCapacity> _aUserSlot;
-        FixedStack<Uint32, TCapacity> _sFreeSlotIndex;
+        using ArrayData     = FixedArray<T, TCapacity>;
+        using FreeDataStack = FixedStack<HE::Uint32, TCapacity>;
 
-        Uint32 _uUseCount    = 0;
-        Uint32 _uFreeSlotMax = 0;
+        ArrayData _aData;
+        UseDataMap _mUseData;
+        FreeDataStack _sFreeDataIndex;
+
+        HE::Uint32 _uFreeSlotMax = 0;
     };
 }  // namespace Core::Common

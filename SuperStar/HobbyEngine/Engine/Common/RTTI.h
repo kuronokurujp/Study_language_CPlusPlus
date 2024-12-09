@@ -14,12 +14,12 @@ namespace Core::Common
         HE_CLASS_COPY_NG(RTTI);
 
     public:
-        RTTI(const Char* in_szClass) : _szClass(in_szClass), _pBaseRTTI(NULL)
+        RTTI(const HE::Char* in_szClass) : _szClass(in_szClass), _pBaseRTTI(NULL)
         {
             HE_LOG_LINE(HE_STR_TEXT("RTTI BaseClassName: %s"), in_szClass);
         }
 
-        RTTI(const Char* in_szClass, const RTTI& in_rBaseRTTI)
+        RTTI(const HE::Char* in_szClass, const RTTI& in_rBaseRTTI)
             : _szClass(in_szClass), _pBaseRTTI(&in_rBaseRTTI)
         {
             HE_LOG_LINE(HE_STR_TEXT("RTTI InheritClassName: %s BaseClassName: %s"), in_szClass,
@@ -27,12 +27,12 @@ namespace Core::Common
         }
 
         const FixedString128& GetName() const HE_NOEXCEPT { return this->_szClass; }
-        Bool IsExactly(const RTTI& in_rRtti) const HE_NOEXCEPT
+        HE::Bool IsExactly(const RTTI& in_rRtti) const HE_NOEXCEPT
         {
             return (this->_pBaseRTTI == &in_rRtti);
         }
 
-        Bool DerivesFrom(const RTTI*) const;
+        HE::Bool DerivesFrom(const RTTI*) const;
 
     private:
         const FixedString128 _szClass;

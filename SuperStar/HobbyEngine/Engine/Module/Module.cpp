@@ -4,20 +4,32 @@
 
 namespace Module
 {
-    ModuleBase::ModuleBase(const UTF8* in_szName, const ELayer in_eLayer, const Sint32 in_priority)
-        : _szName(in_szName), _eLayer(in_eLayer), _priority(in_priority)
+    ModuleBase::ModuleBase(const HE::UTF8* in_szName, const ELayer in_eLayer, const HE::Uint32 in_iPriority)
+        : _szName(in_szName), _eLayer(in_eLayer), _priority(in_iPriority)
     {
     }
 
-#ifdef HE_ENGINE_DEBUG
-    Bool ModuleBase::_ValidateDependenceModule()
+    ModuleBase* ModuleBase::_GetModule(Core::Common::StringBase& in_szName)
     {
-        for (Uint32 i = 0; i < this->_vDependenceModule.Size(); ++i)
+        auto pTargetModule = HE_ENGINE.ModuleManager().Get(in_szName.Str());
+        if (pTargetModule == NULL)
+        {
+            HE_PG_LOG_LINE(HE_STR_TEXT("指定したモジュール(%s)が存在しない"), in_szName.Str());
+            return NULL;
+        }
+
+        return pTargetModule;
+    }
+
+#ifdef HE_ENGINE_DEBUG
+    HE::Bool ModuleBase::_ValidateDependenceModule()
+    {
+        for (HE::Uint32 i = 0; i < this->_vDependenceModule.Size(); ++i)
         {
             // 依存モジュールに設定している依存モジュールが自身の場合はエラー
             // 依存の循環参照は認めない
             const auto& vCheckModule = this->_vDependenceModule[i]->_vDependenceModule;
-            for (Uint32 j = 0; j < vCheckModule.Size(); ++j)
+            for (HE::Uint32 j = 0; j < vCheckModule.Size(); ++j)
             {
                 if (this->_szName == vCheckModule[j]->Name())
                 {
@@ -33,7 +45,7 @@ namespace Module
     }
 #endif
 
-    ModuleBase* ModuleManager::Get(const Char* in_szName) const
+    ModuleBase* ModuleManager::Get(const HE::Char* in_szName) const
     {
         if (this->_mAppModule.Contains(in_szName))
         {
@@ -54,24 +66,24 @@ namespace Module
         return NULL;
     }
 
-    Bool ModuleManager::Release()
+    HE::Bool ModuleManager::Release()
     {
         // 全モジュール解放
         // TODO: 依存関係に応じてモジュールを破棄する順序を変える事はできないか？
         {
-            for (Uint32 i = 0; i < this->_vViewModule.Size(); ++i)
+            for (HE::Uint32 i = 0; i < this->_vViewModule.Size(); ++i)
             {
                 this->_vViewModule[i]->_VRelease();
             }
             this->_vViewModule.Clear();
 
-            for (Uint32 i = 0; i < this->_vLogicModule.Size(); ++i)
+            for (HE::Uint32 i = 0; i < this->_vLogicModule.Size(); ++i)
             {
                 this->_vLogicModule[i]->_VRelease();
             }
             this->_vLogicModule.Clear();
 
-            for (Uint32 i = 0; i < this->_vAppModule.Size(); ++i)
+            for (HE::Uint32 i = 0; i < this->_vAppModule.Size(); ++i)
             {
                 this->_vAppModule[i]->_VRelease();
             }
@@ -102,56 +114,56 @@ namespace Module
         return TRUE;
     }
 
-    void ModuleManager::BeforeUpdate(const Float32 in_fDeltaTime)
+    void ModuleManager::BeforeUpdate(const HE::Float32 in_fDeltaTime)
     {
-        for (Uint32 i = 0; i < this->_vAppModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vAppModule.Size(); ++i)
         {
             this->_vAppModule[i]->_VBeforeUpdate(in_fDeltaTime);
         }
 
-        for (Uint32 i = 0; i < this->_vLogicModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vLogicModule.Size(); ++i)
         {
             this->_vLogicModule[i]->_VBeforeUpdate(in_fDeltaTime);
         }
 
-        for (Uint32 i = 0; i < this->_vViewModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vViewModule.Size(); ++i)
         {
             this->_vViewModule[i]->_VBeforeUpdate(in_fDeltaTime);
         }
     }
 
-    void ModuleManager::Update(const Float32 in_fDeltaTime)
+    void ModuleManager::Update(const HE::Float32 in_fDeltaTime)
     {
-        for (Uint32 i = 0; i < this->_vLogicModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vLogicModule.Size(); ++i)
         {
             this->_vLogicModule[i]->_VUpdate(in_fDeltaTime);
         }
 
-        for (Uint32 i = 0; i < this->_vViewModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vViewModule.Size(); ++i)
         {
             this->_vViewModule[i]->_VUpdate(in_fDeltaTime);
         }
 
         // ロジックとビューのモジュール更新結果を元にアプリモジュールは更新される
-        for (Uint32 i = 0; i < this->_vAppModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vAppModule.Size(); ++i)
         {
             this->_vAppModule[i]->_VUpdate(in_fDeltaTime);
         }
     }
 
-    void ModuleManager::LateUpdate(const Float32 in_fDeltaTime)
+    void ModuleManager::LateUpdate(const HE::Float32 in_fDeltaTime)
     {
-        for (Uint32 i = 0; i < this->_vViewModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vViewModule.Size(); ++i)
         {
             this->_vViewModule[i]->_VLateUpdate(in_fDeltaTime);
         }
 
-        for (Uint32 i = 0; i < this->_vLogicModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vLogicModule.Size(); ++i)
         {
             this->_vLogicModule[i]->_VLateUpdate(in_fDeltaTime);
         }
 
-        for (Uint32 i = 0; i < this->_vAppModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vAppModule.Size(); ++i)
         {
             this->_vAppModule[i]->_VLateUpdate(in_fDeltaTime);
         }
@@ -160,7 +172,7 @@ namespace Module
     /// <summary>
     /// ヒープ作成したモジュールを登録
     /// </summary>
-    Bool ModuleManager::RegistHeapModule(ModuleBase* in_pModule)
+    HE::Bool ModuleManager::RegistHeapModule(ModuleBase* in_pModule)
     {
         HE_ASSERT(in_pModule);
         // モジュールレイヤーに応じたリストに登録
@@ -186,7 +198,7 @@ namespace Module
         return FALSE;
     }
 
-    Bool ModuleManager::Start(const ELayer in_eLayer)
+    HE::Bool ModuleManager::Start(const ELayer in_eLayer)
     {
         switch (in_eLayer)
         {
@@ -242,12 +254,12 @@ namespace Module
         if (out->Size() <= 1) return;
 
         // モジュール数が3桁もいかないので高速ソートは不要
-        for (Uint32 i = 0; i < out->Size() - 1; ++i)
+        for (HE::Uint32 i = 0; i < out->Size() - 1; ++i)
         {
-            Sint32 nowPriority = (*out)[i]->Priority();
-            for (Uint32 j = i; j < out->Size(); ++j)
+            HE::Uint32 nowPriority = (*out)[i]->Priority();
+            for (HE::Uint32 j = i; j < out->Size(); ++j)
             {
-                Sint32 cmpPriority = (*out)[j]->Priority();
+                HE::Uint32 cmpPriority = (*out)[j]->Priority();
                 if (cmpPriority < nowPriority)
                 {
                     auto tmp  = (*out)[i];
@@ -258,7 +270,7 @@ namespace Module
         }
     }
 
-    Bool ModuleManager::_StartModule(ModuleBase& in_rModule)
+    HE::Bool ModuleManager::_StartModule(ModuleBase& in_rModule)
     {
         HE_LOG_LINE(HE_STR_TEXT("Start Module(%s)"), in_rModule.Name());
         if (in_rModule._VStart() == FALSE)
@@ -271,7 +283,7 @@ namespace Module
         if (0 < vDependenceModuleNames.Size())
         {
             // 依存しているモジュールリストを作成
-            for (Uint32 i = 0; i < vDependenceModuleNames.Size(); ++i)
+            for (HE::Uint32 i = 0; i < vDependenceModuleNames.Size(); ++i)
             {
                 auto szName            = vDependenceModuleNames[i];
                 auto pDependenceModule = this->Get(szName.Str());

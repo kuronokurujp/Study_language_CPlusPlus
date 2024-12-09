@@ -3,14 +3,14 @@
 namespace Core::Math
 {
     // 2Dの矩形クラス
-    Rect2::Rect2(const Float32 in_fX, const Float32 in_fY, const Float32 in_fW, const Float32 in_fH,
+    Rect2::Rect2(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW, const HE::Float32 in_fH,
                  const EAnchor in_eAnchor)
     {
         this->Set(in_fX, in_fY, in_fW, in_fH, in_eAnchor);
     }
 
-    void Rect2::Set(const Float32 in_fX, const Float32 in_fY, const Float32 in_fW,
-                    const Float32 in_fH, const EAnchor in_eAnchor)
+    void Rect2::Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
+                    const HE::Float32 in_fH, const EAnchor in_eAnchor)
     {
         this->Clear();
 
@@ -27,8 +27,8 @@ namespace Core::Math
             }
             case EAnchor_Center:
             {
-                Float32 fHalfW = in_fW * 0.5f;
-                Float32 fHalfH = in_fH * 0.5f;
+                HE::Float32 fHalfW = in_fW * 0.5f;
+                HE::Float32 fHalfH = in_fH * 0.5f;
 
                 this->_fLeft   = in_fX - fHalfW;
                 this->_fRight  = in_fX + fHalfW;
@@ -46,7 +46,7 @@ namespace Core::Math
     /// </summary>
     const Vector2 Rect2::Pos() const
     {
-        Float32 fX = 0.0f, fY = 0.0f;
+        HE::Float32 fX = 0.0f, fY = 0.0f;
 
         switch (this->_eAnchor)
         {
@@ -71,13 +71,13 @@ namespace Core::Math
     /// <summary>
     /// Ins the side rect.
     /// </summary>
-    Bool Rect2::InSideRect(const Rect2& in_rOrderRect) const
+    HE::Bool Rect2::InSideRect(const Rect2& in_rOrderRect) const
     {
         const Vector2& rPos  = this->Pos();
         const Vector2& rLine = Vector2::Sub(rPos, in_rOrderRect.Pos());
 
-        const Float32 fW = this->WidthHalf() + in_rOrderRect.WidthHalf();
-        const Float32 fH = this->HeightHalf() + in_rOrderRect.HeightHalf();
+        const HE::Float32 fW = this->WidthHalf() + in_rOrderRect.WidthHalf();
+        const HE::Float32 fH = this->HeightHalf() + in_rOrderRect.HeightHalf();
 
         if (fW < fabs(rLine._fX)) return FALSE;
         if (fH < fabs(rLine._fY)) return FALSE;
@@ -88,7 +88,7 @@ namespace Core::Math
     /// <summary>
     /// 座標が矩形の中に入っているか
     /// </summary>
-    Bool Rect2::InSidePoint(const Vector2& in_rPos) const
+    HE::Bool Rect2::InSidePoint(const Vector2& in_rPos) const
     {
         if (this->_fRight < in_rPos._fX) return FALSE;
 
@@ -104,7 +104,7 @@ namespace Core::Math
     /// <summary>
     /// Sets the position.
     /// </summary>
-    void Rect2::_SetPos(const Float32 in_fX, const Float32 in_fY)
+    void Rect2::_SetPos(const HE::Float32 in_fX, const HE::Float32 in_fY)
     {
         switch (this->_eAnchor)
         {
@@ -118,8 +118,8 @@ namespace Core::Math
             }
             case EAnchor_Center:
             {
-                const Float32 halfW = this->WidthHalf();
-                const Float32 halfH = this->HeightHalf();
+                const HE::Float32 halfW = this->WidthHalf();
+                const HE::Float32 halfH = this->HeightHalf();
 
                 this->_fLeft   = in_fX - halfW;
                 this->_fRight  = in_fX + halfW;

@@ -1,5 +1,7 @@
 ﻿#include "LevelTitle.h"
 
+#include "Common.h"
+#include "Engine/Engine.h"
 #include "LevelInGame.h"
 #include "UIModule.h"
 
@@ -7,8 +9,8 @@ namespace Level
 {
     namespace Local
     {
-        static const Char* szInputActionNameByGameStart = HE_STR_TEXT("TitleLevel_GameStart");
-        static const Char* szInputActionNameByGameEnd   = HE_STR_TEXT("TitleLevel_GameEnd");
+        static const HE::Char* szInputActionNameByGameStart = HE_STR_TEXT("TitleLevel_GameStart");
+        static const HE::Char* szInputActionNameByGameEnd   = HE_STR_TEXT("TitleLevel_GameEnd");
 
         static const EnhancedInput::ActionMap mInputAction =
             {{szInputActionNameByGameStart,
@@ -17,16 +19,10 @@ namespace Level
               EnhancedInput::ActionData({Platform::EKeyboard::EKeyboard_A})}};
     };  // namespace Local
 
-    Bool LevelTitle::VBegin()
+    HE::Bool LevelTitle::VBegin()
     {
-        const Bool bRet = Level::Node::VBegin();
+        const HE::Bool bRet = Level::Node::VBegin();
         HE_ASSERT(bRet);
-
-        // レンダリングビュー作成
-        {
-            auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
-            this->_viewHandle  = pRenderModule->AddView();
-        }
 
         // ユーザー共通入力割り当て設定
         {
@@ -42,7 +38,7 @@ namespace Level
 
             auto handler =
                 HE_MAKE_CUSTOM_UNIQUE_PTR((Level::LevelUserInputMessage),
-                                          [this](const Char* in_pMsg) { HE_LOG_LINE(in_pMsg); });
+                                          [this](const HE::Char* in_pMsg) { HE_LOG_LINE(in_pMsg); });
             pComp->SetReceiver(std::move(handler));
         }
 
@@ -56,21 +52,15 @@ namespace Level
 
             // widgetを作成
             // レベルが切り替わると自動的にwidgetは破棄される
-            pUIModule->NewLayoutByLayotuAsset(this->_layoutAssetHandle, 0, this->_viewHandle,
+            pUIModule->NewLayoutByLayotuAsset(this->_layoutAssetHandle, 0, Game::g_sceneUIHandle,
                                               this->Handle());
         }
 
         return bRet;
     }
 
-    Bool LevelTitle::VEnd()
+    HE::Bool LevelTitle::VEnd()
     {
-        // ビューのハンドルを外す
-        {
-            auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
-            pRenderModule->RemoveView(this->_viewHandle);
-        }
-
         // 専用の入力アクションを外す
         {
             auto pInputModule = HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();
@@ -83,7 +73,7 @@ namespace Level
             pUIModule->UnloadAssetWithLayoutBuild(this->_layoutAssetHandle);
         }
 
-        const Bool bRet = Level::Node::VEnd();
+        const HE::Bool bRet = Level::Node::VEnd();
         HE_ASSERT(bRet);
 
         return bRet;

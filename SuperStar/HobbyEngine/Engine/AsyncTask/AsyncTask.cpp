@@ -15,7 +15,7 @@ namespace Core
     /// <summary>
     /// 非同期処理が終わるまで一定時間メインスレッド待機する
     /// </summary>
-    Bool AsyncTask::Contiune(const Uint32 in_uMsSec)
+    HE::Bool AsyncTask::Contiune(const HE::Uint32 in_uMsSec)
     {
         // タスクが終了しているかどうか
         auto result = this->_future.wait_for(std::chrono::milliseconds(in_uMsSec));
@@ -30,18 +30,18 @@ namespace Core
     /// <summary>
     /// タスクが成功しているか
     /// </summary>
-    Bool AsyncTask::IsSuccess() const
+    HE::Bool AsyncTask::IsSuccess() const
     {
         if (this->_bEnd) return this->_bSuccess;
         return FALSE;
     }
 
-    Bool AsyncTask::_VBeginWithThread()
+    HE::Bool AsyncTask::_VBeginWithThread()
     {
         return TRUE;
     }
 
-    Bool AsyncTask::_VEndWithThread()
+    HE::Bool AsyncTask::_VEndWithThread()
     {
         // 非同期タスク終了
         this->_bEnd = TRUE;

@@ -6,7 +6,7 @@ namespace Render
 {
     struct Color32
     {
-        Uint8 r, g, b, a;
+        HE::Uint8 r, g, b, a;
     };
 
     /// <summary>
@@ -14,7 +14,7 @@ namespace Render
     /// </summary>
     union Color
     {
-        Uint32 c;
+        HE::Uint32 c;
         Color32 c32;
     };
 

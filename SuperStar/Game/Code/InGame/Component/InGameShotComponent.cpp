@@ -4,14 +4,14 @@
 
 namespace InGame
 {
-    Bool InGameShotComponent::VEnd()
+    HE::Bool InGameShotComponent::VEnd()
     {
         this->_spStrategy = NULL;
 
         return Component::VEnd();
     }
 
-    void InGameShotComponent::VUpdate(const Float32 in_fDt)
+    void InGameShotComponent::VUpdate(const HE::Float32 in_fDt)
     {
         Actor::Component::VUpdate(in_fDt);
 
@@ -26,7 +26,7 @@ namespace InGame
 
     void InGameShotComponent::Shot(const Core::Math::Vector2& in_rPos,
                                    const Core::Math::Vector2& in_rDir,
-                                   const Uint32 in_uCollisionHashCode)
+                                   const HE::Uint32 in_uCollisionHashCode)
     {
         HE_ASSERT(this->_spStrategy);
 

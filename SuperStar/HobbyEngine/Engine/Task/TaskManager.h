@@ -27,7 +27,7 @@ namespace Core
     public:
         // タスクマネージャが使用するフラグ
         // 処理を停止するフラグ
-        static const Uint32 uFlagPause = 0x00000001;
+        static const HE::Uint32 uFlagPause = 0x00000001;
 
     public:
         TaskManager() = default;
@@ -37,24 +37,24 @@ namespace Core
         /// 初期化
         /// 利用前に必ず呼び出す
         /// </summary>
-        Bool Init(const Uint32 in_uTaskMax, const Sint32 in_sGroupNum);
+        HE::Bool Init(const HE::Uint32 in_uTaskMax, const HE::Sint32 in_iGroupNum);
 
         void End();
 
         /// <summary>
         /// 指定グループの全タスクのループ
         /// </summary>
-        void ForeachByGroup(const Sint32 in_sGroupId, std::function<void(Task*)>);
+        void ForeachByGroup(const HE::Sint32 in_sGroupId, std::function<void(Task*)>);
 
         /// <summary>
         /// 全タスク更新
         /// </summary>
-        void UpdateAll(const Float32);
+        void UpdateAll(const HE::Float32);
 
         /// <summary>
         /// 指定グループを更新
         /// </summary>
-        void UpdateByGroup(const Sint32 in_sGroupId, const Float32 in_fDt);
+        void UpdateByGroup(const HE::Sint32 in_sGroupId, const HE::Float32 in_fDt);
 
         /// <summary>
         /// 全タスクに流すイベント
@@ -64,14 +64,14 @@ namespace Core
         /// <summary>
         /// 指定グループのみイベントを流す
         /// </summary>
-        void EventByGroup(const Sint32 in_sGroupId, const TaskData&);
+        void EventByGroup(const HE::Sint32 in_sGroupId, const TaskData&);
 
         /// <summary>
         /// タスク作成して追加する
         /// 結果はハンドルで返す
         /// </summary>
         template <class T, typename... TArgs>
-        Common::Handle CreateAndAdd(const Sint32 in_sGroupId, const Bool in_bReleaseMem,
+        Common::Handle CreateAndAdd(const HE::Sint32 in_sGroupId, const HE::Bool in_bReleaseMem,
                                     TArgs&&... in_args)
         {
             HE_STATIC_ASSERT(std::is_base_of<Task, T>::value,
@@ -80,16 +80,14 @@ namespace Core
             HE_ASSERT(in_sGroupId < this->_iGroupNum);
 
             // 利用するタスクを割り当て
-            RuntimePoolManager::AllocData resAlloc =
-                this->_Alloc<T>(std::forward<TArgs>(in_args)...);
-            Task* pTask = resAlloc._pItem;
+            auto [handle, pTask] = this->_Alloc<T>(std::forward<TArgs>(in_args)...);
 
             pTask->VSetup(in_bReleaseMem);
-            pTask->_selfHandle = resAlloc._handle;
+            pTask->_selfHandle = handle;
 
             this->_Attach(pTask, in_sGroupId);
 
-            return resAlloc._handle;
+            return handle;  
         }
 
         /// <summary>
@@ -100,7 +98,7 @@ namespace Core
         /// <summary>
         /// グループ丸ごとタスクを削除
         /// </summary>
-        void RemoveGroup(const Sint32 in_sGroupId);
+        void RemoveGroup(const HE::Sint32 in_sGroupId);
 
         /// <summary>
         /// すべてのタスクを削除
@@ -110,12 +108,12 @@ namespace Core
         /// <summary>
         /// 指定グループの全タスクをターゲットグループへ移動
         /// </summary>
-        Bool MoveGroupAll(const Sint32 in_sOrgGroupId, const Sint32 in_sTargetGroupId);
+            HE::Bool MoveGroupAll(const HE::Sint32 in_sOrgGroupId, const HE::Sint32 in_sTargetGroupId);
 
         /// <summary>
         /// タスクを指定したグループ移動
         /// </summary>
-        Bool MoveGropuTask(const Common::Handle& in_rTask, const Sint32 in_sGroupId);
+        HE::Bool MoveGropuTask(const Common::Handle& in_rTask, const HE::Sint32 in_sGroupId);
 
         /// <summary>
         /// タスクアドレスをハンドルから取得
@@ -137,54 +135,54 @@ namespace Core
         /// <summary>
         /// 論理和を使ったフラグの設定
         /// </summary>
-        void EnableFlag(const Sint32 in_sGroupId, const Uint32 in_uFlags);
+        void EnableFlag(const HE::Sint32 in_sGroupId, const HE::Uint32 in_uFlags);
 
         /// <summary>
         /// 論理和を使ったフラグの消去
         /// </summary>
-        void DisableFlag(const Sint32 in_sGroupId, const Uint32 in_uFlags);
+        void DisableFlag(const HE::Sint32 in_sGroupId, const HE::Uint32 in_uFlags);
 
-        Uint32 Flag(const Sint32 in_sGroupId) const;
+        HE::Uint32 Flag(const HE::Sint32 in_sGroupId) const;
 
         /// <summary>
         /// グループに設定しているタスクの総数
         /// </summary>
-        Uint32 Count(const Sint32 in_sGroupId) const;
+        HE::Uint32 Count(const HE::Sint32 in_sGroupId) const;
 
         /// <summary>
         /// タスクグループの最大数
         /// </summary>
-        inline Uint32 GetMaxGroup() const { return this->_iGroupNum; }
+        inline HE::Sint32 GetMaxGroup() const { return this->_iGroupNum; }
 
     private:
         // タスクグループ管理
         struct TaskGroup
         {
             // グループの先頭タスクでダミーとなる
-            Task* _pRootTask = NULL;
+            Task* _pRootTask;
             // グループのタスク終端
-            Task* _pTailTask = NULL;
+            Task* _pTailTask;
             // グループのフラグ
-            Uint32 _uFlags = 0;
+            HE::Uint32 _uFlags;
 
             /// <summary>
             /// 設定しているタスク数
             /// </summary>
-            Uint32 _uCount = 0;
+            HE::Uint32 _uCount;
         };
 
         /// <summary>
         /// タスク追加する
         /// </summary>
-        Bool _Attach(Task* in_pTask, const Sint32 in_sGroupId);
+        HE::Bool _Attach(Task* in_pTask, const HE::Sint32 in_sGroupId);
 
         /// <summary>
         /// タスクをグループから外す
         /// </summary>
-        Sint32 _Dettach(Task* in_pTask);
+        HE::Sint32 _Dettach(Task* in_pTask);
 
     private:
         TaskGroup* _pTasks = NULL;
-        Sint32 _iGroupNum  = 0;
+        HE::Uint32 _iGroupNum  = 0;
     };
 };  // namespace Core

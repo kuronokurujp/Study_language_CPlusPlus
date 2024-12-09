@@ -19,12 +19,12 @@ namespace Event
         virtual ~EventListenerInterface() = default;
 
         // リスナー名をテキストで返す
-        virtual const Char* VName() = 0;
+        virtual const HE::Char* VName() = 0;
 
         /// <summary>
         /// リスナーがイベント受け取ったかどうか
         /// </summary>
-        virtual Bool VHandleEvent(EventDataInterfacePtr const&) = 0
+        virtual HE::Bool VHandleEvent(EventDataInterfacePtr const&) = 0
         {
             // 受け取ったイベント名を比較して
             // 処理したいイベント名なら処理するようにする。
@@ -49,7 +49,7 @@ namespace Event
     public:
         EventListenerWithRegistEventFunc(
             const Core::Common::FixedString128& in_szrName,
-            std::function<Bool(Event::EventDataInterfacePtr const&)> in_func)
+            std::function<HE::Bool(Event::EventDataInterfacePtr const&)> in_func)
         {
             this->_func   = in_func;
             this->_szName = in_szrName;
@@ -58,19 +58,19 @@ namespace Event
         virtual ~EventListenerWithRegistEventFunc() { this->_func = NULL; }
 
         // リスナー名
-        const Char* VName() { return this->_szName.Str(); }
+        const HE::Char* VName() { return this->_szName.Str(); }
 
         /// <summary>
         /// リスナーがイベント受け取ったかどうか
         /// </summary>
-        Bool VHandleEvent(Event::EventDataInterfacePtr const& in_spEventData) override final
+        HE::Bool VHandleEvent(Event::EventDataInterfacePtr const& in_spEventData) override final
         {
             HE_ASSERT(this->_func != NULL);
             return this->_func(in_spEventData);
         }
 
     private:
-        std::function<Bool(Event::EventDataInterfacePtr const&)> _func;
+        std::function<HE::Bool(Event::EventDataInterfacePtr const&)> _func;
         Core::Common::FixedString128 _szName;
     };
 

@@ -2,7 +2,7 @@
 
 namespace Game::Asset
 {
-    Bool ParamaterAssetData::_VLoad(Platform::FileInterface& in_rFileSystem)
+    HE::Bool ParamaterAssetData::_VLoad(Platform::FileInterface& in_rFileSystem)
     {
         if (AssetManager::AssetDataJson::_VLoad(in_rFileSystem) == FALSE) return FALSE;
 
@@ -17,29 +17,29 @@ namespace Game::Asset
         AssetDataJson::_VUnload();
     }
 
-    Uint32 ParamaterAssetData::GetUInt32ByIdData(const UTF8* in_pIdName, const UTF8* in_pFieldName)
+    HE::Uint32 ParamaterAssetData::GetUInt32ByIdData(const HE::UTF8* in_pIdName, const HE::UTF8* in_pFieldName)
     {
         return this->VGetUInt32({"data", in_pIdName, in_pFieldName});
     }
 
-    Sint32 ParamaterAssetData::GetSInt32ByIdData(const UTF8* in_pIdName, const UTF8* in_pFieldName)
+    HE::Sint32 ParamaterAssetData::GetSInt32ByIdData(const HE::UTF8* in_pIdName, const HE::UTF8* in_pFieldName)
     {
         return this->VGetSInt32({"data", in_pIdName, in_pFieldName});
     }
 
-    Float32 ParamaterAssetData::GetFloat32ByIdData(const UTF8* in_pIdName,
-                                                   const UTF8* in_pFieldName)
+    HE::Float32 ParamaterAssetData::GetFloat32ByIdData(const HE::UTF8* in_pIdName,
+                                                   const HE::UTF8* in_pFieldName)
     {
         return this->VGetFloat32({"data", in_pIdName, in_pFieldName});
     }
 
-    Core::Common::FixedString1024 ParamaterAssetData::GetCharByIdData(const UTF8* in_pIdName,
-                                                                      const UTF8* in_pFieldName)
+    Core::Common::FixedString1024 ParamaterAssetData::GetCharByIdData(const HE::UTF8* in_pIdName,
+                                                                      const HE::UTF8* in_pFieldName)
     {
         return this->VGetChar({"data", in_pIdName, in_pFieldName});
     }
 
-    Bool ParamaterAssetData::IsId(const UTF8* in_pIdName)
+    HE::Bool ParamaterAssetData::IsId(const HE::UTF8* in_pIdName)
     {
         return this->IsToken({"data", in_pIdName});
     }

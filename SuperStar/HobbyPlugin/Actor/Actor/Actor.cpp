@@ -37,19 +37,19 @@ namespace Actor
         return this->_pOwner->Get(in_rHandle);
     }
 
-    void Object::VSetup(const Bool in_bAutoDelete)
+    void Object::VSetup(const HE::Bool in_bAutoDelete)
     {
         TaskTree::VSetup(in_bAutoDelete);
 
         this->_Clear();
     }
 
-    Bool Object::VBegin()
+    HE::Bool Object::VBegin()
     {
         return TaskTree::VBegin();
     }
 
-    Bool Object::VEnd()
+    HE::Bool Object::VEnd()
     {
         // 設定しているコンポーネントを全て破棄
         this->RemoveAllComponent();
@@ -61,7 +61,7 @@ namespace Actor
         return TaskTree::VEnd();
     }
 
-    void Object::VBeginUpdate(const Float32 in_fDt)
+    void Object::VBeginUpdate(const HE::Float32 in_fDt)
     {
         if (this->_eState != EState_Active) return;
 
@@ -73,7 +73,7 @@ namespace Actor
             });
     }
 
-    void Object::VUpdate(const Float32 in_fDt)
+    void Object::VUpdate(const HE::Float32 in_fDt)
     {
         if (this->_eState != EState_Active) return;
 
@@ -84,7 +84,7 @@ namespace Actor
         Core::TaskTree::VUpdate(in_fDt);
     }
 
-    void Object::VLateUpdate(const Float32 in_fDt)
+    void Object::VLateUpdate(const HE::Float32 in_fDt)
     {
         if (this->_eState != EState_Active) return;
 
@@ -108,7 +108,7 @@ namespace Actor
         this->_RemoveAllComponent(&this->_lateComponents);
     }
 
-    Bool Object::RemoveComponent(Core::Common::Handle* in_pHandle)
+    HE::Bool Object::RemoveComponent(Core::Common::Handle* in_pHandle)
     {
         if (this->_RemoveComponent(in_pHandle, &this->_components))
         {
@@ -229,7 +229,7 @@ namespace Actor
     }
 
     void Object::ForeachComponents(
-        std::function<Bool(const Core::Common::Handle&, Component*)> in_func)
+        std::function<HE::Bool(const Core::Common::Handle&, Component*)> in_func)
     {
         auto list = this->_components.GetUserDataList();
         auto end  = list->end();
@@ -246,7 +246,7 @@ namespace Actor
         }
     }
 
-    Bool Object::_VSetupComponent(Component* in_pComp)
+    HE::Bool Object::_VSetupComponent(Component* in_pComp)
     {
         HE_ASSERT(in_pComp);
 
@@ -270,7 +270,7 @@ namespace Actor
         in_pComponents->RemoveAll();
     }
 
-    Bool Object::_RemoveComponent(Core::Common::Handle* in_pHandle,
+    HE::Bool Object::_RemoveComponent(Core::Common::Handle* in_pHandle,
                                   Core::TaskManager* in_pComponents)
     {
         HE_ASSERT(in_pHandle);

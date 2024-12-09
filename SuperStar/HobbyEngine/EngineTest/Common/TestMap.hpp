@@ -7,7 +7,7 @@
 #include "Engine/Memory/Memory.h"
 
 // 標準のメモリ確保を使用する<文字列, 整数>のマップ
-typedef Core::Common::FixedMap<Core::Common::FixedString16, Sint32, 2048> BASICMAP;
+typedef Core::Common::FixedMap<Core::Common::FixedString16, HE::Sint32, 2048> BASICMAP;
 std::ostream& operator<<(std::ostream& out, const BASICMAP::Iterator& r)
 {
     (void)r;
@@ -33,25 +33,26 @@ TEST_CASE("FixMap Test")
     Core::Common::FixedString16 strKey;
 
     // データ個数
-    const Sint32 ARRAY_NUM = 1024;
+    const HE::Sint32 ARRAY_NUM = 1024;
 
     // 乱数を時間で初期化
     srand((unsigned int)time(NULL));
 
     // データを用意しておく
-    Sint32* pDataArray = HE_NEW_MEM_ARRAY(Sint32, ARRAY_NUM, 0);
-    for (Sint32 ii = 0; ii < ARRAY_NUM; ii++)
+    HE::Sint32* pDataArray = reinterpret_cast<HE::Sint32*>(
+        HE_ALLOC_MEM(sizeof(HE::Sint32) * ARRAY_NUM, 0));  // HE_NEW_MEM_ARRAY(Sint32, ARRAY_NUM, 0);
+    for (HE::Sint32 ii = 0; ii < ARRAY_NUM; ii++)
     {
-        pDataArray[ii] = (Sint32)ii;
+        pDataArray[ii] = (HE::Sint32)ii;
     }
 
-    for (Sint32 shuffle = 0; shuffle < 100000; ++shuffle)
+    for (HE::Sint32 shuffle = 0; shuffle < 100000; ++shuffle)
     {
-        Sint32 a = rand() % ARRAY_NUM;
-        Sint32 b = rand() % ARRAY_NUM;
+        HE::Sint32 a = rand() % ARRAY_NUM;
+        HE::Sint32 b = rand() % ARRAY_NUM;
 
         // 適当に混ぜっ返す
-        Sint32 tmp    = pDataArray[a];
+        HE::Sint32 tmp    = pDataArray[a];
         pDataArray[a] = pDataArray[b];
         pDataArray[b] = tmp;
     }
@@ -63,7 +64,7 @@ TEST_CASE("FixMap Test")
     // データの追加
     {
         ctime = clock();
-        for (Sint32 ii = 0; ii < ARRAY_NUM; ii++)
+        for (HE::Sint32 ii = 0; ii < ARRAY_NUM; ii++)
         {
             // データの中身を16進数にしてキーにする
             strKey.Format(HE_STR_TEXT("0x%04x"), pDataArray[ii]);
@@ -80,7 +81,7 @@ TEST_CASE("FixMap Test")
     // ノードの正当性チェック
     {
         ctime        = clock();
-        Bool bResult = testmap.CheckValidByDebug(ARRAY_NUM);
+        HE::Bool bResult = testmap.CheckValidByDebug(ARRAY_NUM);
         CHECK(bResult);
         HE_LOG_LINE(HE_STR_TEXT("check ctime=%f sec"), (double)(clock() - ctime) / CLOCKS_PER_SEC);
     }
@@ -88,7 +89,7 @@ TEST_CASE("FixMap Test")
     // 検索
     {
         ctime = clock();
-        for (Sint32 ii = 0; ii < ARRAY_NUM; ii++)
+        for (HE::Sint32 ii = 0; ii < ARRAY_NUM; ii++)
         {
             // キーを作る
             strKey.Format(HE_STR_TEXT("0x%04x"), ii);
@@ -105,9 +106,10 @@ TEST_CASE("FixMap Test")
     // イテレータテスト
     {
         // イテレータ用のチェックリスト配列を作る
-        Bool* pCheckArray    = HE_NEW_MEM_ARRAY(Bool, ARRAY_NUM, 0);
-        Uint32 checked_count = 0;
-        for (Sint32 ii = 0; ii < ARRAY_NUM; ii++)
+        HE::Bool* pCheckArray = reinterpret_cast<HE::Bool*>(
+            HE_ALLOC_MEM(sizeof(HE::Bool) * ARRAY_NUM, 0));  // HE_NEW_MEM_ARRAY(Bool, ARRAY_NUM, 0);
+        HE::Uint32 checked_count = 0;
+        for (HE::Sint32 ii = 0; ii < ARRAY_NUM; ii++)
         {
             pCheckArray[ii] = FALSE;
         }
@@ -129,19 +131,19 @@ TEST_CASE("FixMap Test")
         HE_LOG_LINE(HE_STR_TEXT("iterator ctime=%f sec"),
                     (double)(clock() - ctime) / CLOCKS_PER_SEC);
 
-        HE_SAFE_DELETE_MEM_ARRAY(pCheckArray);
+        HE_SAFE_DELETE_MEM(pCheckArray);
     }
 
     // 削除
     {
         ctime = clock();
-        for (Sint32 ii = 0; ii < ARRAY_NUM; ii++)
+        for (HE::Sint32 ii = 0; ii < ARRAY_NUM; ii++)
         {
             // キーを作って
             strKey.Format(HE_STR_TEXT("0x%04x"), ii);
             // 探す
             BASICMAP::Iterator it = testmap.FindKey(strKey.Str());
-            Bool bResult;
+            HE::Bool bResult;
             // 削除する
             bResult = testmap.Erase(it);
             CHECK(bResult);
@@ -178,7 +180,7 @@ TEST_CASE("FixMap Test")
     CHECK(testmap.Empty());
 
     // データの削除
-    HE_SAFE_DELETE_MEM_ARRAY(pDataArray);
+    HE_SAFE_DELETE_MEM(pDataArray);
 
     CHECK(memoryManager.VRelease());
     memoryManager.Reset();
@@ -190,15 +192,15 @@ TEST_CASE("FixMap Copy")
 
     struct TEST_DATA
     {
-        const Char* pKey = 0;
-        Sint32 num       = 0;
+        const HE::Char* pKey = 0;
+        HE::Sint32 num       = 0;
     };
     static const TEST_DATA s_aArray[] = {
         {HE_STR_TEXT("test1"), 10}, {HE_STR_TEXT("test2"), 20}, {HE_STR_TEXT("test3"), 30},
         {HE_STR_TEXT("test4"), 40}, {HE_STR_TEXT("test5"), 50}, {HE_STR_TEXT("test6"), 60},
     };
 
-    for (Uint32 i = 0; i < HE_ARRAY_NUM(s_aArray); ++i)
+    for (HE::Uint32 i = 0; i < HE_ARRAY_NUM(s_aArray); ++i)
     {
         srcmap.Add(s_aArray[i].pKey, s_aArray[i].num);
     }
@@ -206,7 +208,7 @@ TEST_CASE("FixMap Copy")
     BASICMAP dstmap = srcmap;
     CHECK(dstmap.Size() == HE_ARRAY_NUM(s_aArray));
 
-    for (Uint32 i = 0; i < HE_ARRAY_NUM(s_aArray); ++i)
+    for (HE::Uint32 i = 0; i < HE_ARRAY_NUM(s_aArray); ++i)
     {
         auto iter = dstmap.FindKey(s_aArray[i].pKey);
         CHECK(iter.IsValid());
