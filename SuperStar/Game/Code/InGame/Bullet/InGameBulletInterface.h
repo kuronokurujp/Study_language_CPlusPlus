@@ -34,7 +34,7 @@ namespace InGame
     public:
         explicit InGameBulletFactoryInterface() = default;
 
-        virtual const HE::Char* VName() const                       = 0;
+        virtual const HE::Char* VName() const                   = 0;
         virtual void VConfiguration(InGameBulletWork* in_pWork) = 0;
     };
 
@@ -54,9 +54,11 @@ namespace InGame
 
         virtual HE::Bool VUpdate(InGameBulletWork*, Core::Common::Handle&) = 0;
 
-        virtual HE::Bool VIsScreenInSide(const InGameBulletWork* const, const Core::Math::Rect2&) = 0;
+        virtual HE::Bool VIsScreenInSide(const InGameBulletWork* const,
+                                         const Core::Math::Rect2&) = 0;
 
-        virtual HE::Bool VOutputCollisionData(CollisionData* out, const InGameBulletWork* const) = 0;
+        virtual HE::Bool VOutputCollisionData(CollisionData* out,
+                                              const InGameBulletWork* const) = 0;
 
 #if 0
         //	関数

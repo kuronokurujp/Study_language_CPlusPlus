@@ -81,7 +81,7 @@ namespace Render
     }
 
     HE::Bool RenderModule::RemoveViewPort(const Core::Common::Handle& in_rWindowHandle,
-                                      const Core::Common::Handle& in_rViewPortHandle)
+                                          const Core::Common::Handle& in_rViewPortHandle)
     {
         auto pWindow = this->_GetWindow(in_rWindowHandle);
         return pWindow->RemoveViewPort(in_rViewPortHandle);
@@ -123,7 +123,7 @@ namespace Render
     }
 
     HE::Bool RenderModule::PushSceneRenderCommand(const Core::Common::Handle& in_rHandle,
-                                              Command&& in_rrCommand)
+                                                  Command&& in_rrCommand)
     {
         auto pRenderingContext = this->_poolRenderingContext.Ref(in_rHandle);
 

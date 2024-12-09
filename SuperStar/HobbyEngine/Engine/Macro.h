@@ -26,7 +26,6 @@
 // リリース時には無効化
 #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
 
-
 #define HE_LOG_MSG_SIZE (2046)
 #define HE_FILE __FILEW__
 
@@ -36,14 +35,16 @@ void HE_LOG_UPDATE_FORMAT_STRING(std::wstring& in_szFormat, size_t& in_rPos, con
 {
     using DecayedT = std::decay_t<T>;  // 修飾子を除去した型
 
-    if constexpr (std::is_same_v<DecayedT, HE::WChar*> || std::is_same_v<DecayedT, const HE::WChar*>)
+    if constexpr (std::is_same_v<DecayedT, HE::WChar*> ||
+                  std::is_same_v<DecayedT, const HE::WChar*>)
     {
         if (in_rPos != std::wstring::npos)
         {
             in_szFormat.replace(in_rPos, 2, L"%ls");
         }
     }
-    else if constexpr (std::is_same_v<DecayedT, HE::UTF8*> || std::is_same_v<DecayedT, const HE::UTF8*>)
+    else if constexpr (std::is_same_v<DecayedT, HE::UTF8*> ||
+                       std::is_same_v<DecayedT, const HE::UTF8*>)
     {
         if (in_rPos != std::wstring::npos)
         {
@@ -58,7 +59,8 @@ void HE_LOG_UPDATE_FORMAT_STRING(std::wstring& in_szFormat, size_t& in_rPos, con
 // 共通処理を行う関数の作成
 // 文字列書式で%sが使える
 template <typename... TArgs>
-HE::Bool HE_LOG_CREATE_FORMATERD_STRING(HE::WChar* out, const HE::Char* in_szFormat, TArgs... in_args)
+HE::Bool HE_LOG_CREATE_FORMATERD_STRING(HE::WChar* out, const HE::Char* in_szFormat,
+                                        TArgs... in_args)
 {
     std::wstring szDynamicFormat = in_szFormat;
     size_t pos                   = szDynamicFormat.find(L"%");
@@ -150,9 +152,9 @@ void HE_LOG_LINE(const HE::Char* in_szFormat, TArgs... in_args)
 #define HE_PG_LOG_LINE(format, ...)                                                               \
     do                                                                                            \
     {                                                                                             \
-        static HE::WChar c[HE_LOG_MSG_SIZE] = {};                                                      \
+        static HE::WChar c[HE_LOG_MSG_SIZE] = {};                                                 \
         HE_LOG_CREATE_FORMATERD_STRING(c, format, __VA_ARGS__);                                   \
-        static HE::WChar c2[HE_LOG_MSG_SIZE * 2] = {};                                                 \
+        static HE::WChar c2[HE_LOG_MSG_SIZE * 2] = {};                                            \
         _snwprintf_s(c2, HE_LOG_MSG_SIZE * 2, HE_LOG_MSG_SIZE * 2, L"%ls:%d %ls", __FILEW__,      \
                      __LINE__, c);                                                                \
         OutputDebugString(c2);                                                                    \
@@ -184,9 +186,9 @@ void HE_LOG_LINE(const HE::Char* in_szFormat, TArgs... in_args)
 #define HE_PG_LOG_LINE(format, ...)                                                                \
     do                                                                                             \
     {                                                                                              \
-        static HE::Char c[HE_LOG_MSG_SIZE] = {};                                                       \
+        static HE::Char c[HE_LOG_MSG_SIZE] = {};                                                   \
         _snprintf_s(c, HE_LOG_MSG_SIZE, HE_LOG_MSG_SIZE, format, __VA_ARGS__);                     \
-        HE::Char c2[HE_LOG_MSG_SIZE * 2] = {};                                                         \
+        HE::Char c2[HE_LOG_MSG_SIZE * 2] = {};                                                     \
         _snprintf_s(c2, HE_LOG_MSG_SIZE * 2, HE_LOG_MSG_SIZE * 2, "%s:%d %s\n", HE_FILE, __LINE__, \
                     c);                                                                            \
         printf(c2);                                                                                \

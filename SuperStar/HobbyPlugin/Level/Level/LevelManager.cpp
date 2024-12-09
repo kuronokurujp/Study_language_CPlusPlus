@@ -24,7 +24,8 @@ namespace Level
         return TRUE;
     }
 
-    void Manager::ProcessInput(const HE::Float32 in_fDt, const EnhancedInput::InputMap& in_rInputMap)
+    void Manager::ProcessInput(const HE::Float32 in_fDt,
+                               const EnhancedInput::InputMap& in_rInputMap)
     {
         // 入力更新
         {

@@ -35,8 +35,8 @@
 
 // newのオーバーロード
 void* operator new(size_t in_size, HE::Uint8 in_page, HE::Uint8 in_alignSize,
-                   Core::Memory::Manager::EAllocateLocateType in_eLocateType, const HE::UTF8* in_pFile,
-                   HE::Uint32 in_line);
+                   Core::Memory::Manager::EAllocateLocateType in_eLocateType,
+                   const HE::UTF8* in_pFile, HE::Uint32 in_line);
 
 #else
 

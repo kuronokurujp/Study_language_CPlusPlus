@@ -4,7 +4,8 @@
 
 namespace Module
 {
-    ModuleBase::ModuleBase(const HE::UTF8* in_szName, const ELayer in_eLayer, const HE::Uint32 in_iPriority)
+    ModuleBase::ModuleBase(const HE::UTF8* in_szName, const ELayer in_eLayer,
+                           const HE::Uint32 in_iPriority)
         : _szName(in_szName), _eLayer(in_eLayer), _priority(in_iPriority)
     {
     }

@@ -111,7 +111,7 @@ namespace InGame
     }
 
     HE::Bool InGameBulletManagerComponent::VOnHit(const CollisionData& in_rSelfColData,
-                                              const CollisionData& in_rHitColData)
+                                                  const CollisionData& in_rHitColData)
     {
         // コリジョン成功か失敗か
         if (InGameCollisionComponent::VOnHit(in_rSelfColData, in_rHitColData) == FALSE)
@@ -156,7 +156,8 @@ namespace InGame
         return TRUE;
     }
 
-    HE::Bool InGameBulletManagerComponent::VOutputColData(CollisionData* out, const HE::Uint32 in_uColIndex)
+    HE::Bool InGameBulletManagerComponent::VOutputColData(CollisionData* out,
+                                                          const HE::Uint32 in_uColIndex)
     {
         auto pBullet = this->_vBullet.GetPtr(in_uColIndex);
 

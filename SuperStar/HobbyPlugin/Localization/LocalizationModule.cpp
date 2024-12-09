@@ -100,8 +100,8 @@ namespace Localization
     }
 
     const HE::Char* LocalizationModule::Text(const Core::Common::StringBase& in_szLocateName,
-                                         const Core::Common::StringBase& in_szGroupName,
-                                         const Core::Common::StringBase& in_szKey)
+                                             const Core::Common::StringBase& in_szGroupName,
+                                             const Core::Common::StringBase& in_szKey)
     {
         auto pLocalModule = this->GetDependenceModule<AssetManager::AssetManagerModule>();
         HE_ASSERT(pLocalModule);

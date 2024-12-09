@@ -176,7 +176,7 @@ namespace Core::Common
         return static_cast<HE::Uint32>(::wcslen((this->_szBuff)))
 #else
         HE::Uint32 uSize = this->Size();
-        HE::Uint32 uLen      = 0;
+        HE::Uint32 uLen  = 0;
 
         HE::Uint32 uOffset = 0;
         HE::Uint32 i       = 0;

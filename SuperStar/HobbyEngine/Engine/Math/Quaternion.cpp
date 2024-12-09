@@ -12,8 +12,8 @@ namespace Core::Math
         *this = Identity;
     }
 
-    Quaternion::Quaternion(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ,
-                           const HE::Float32 in_fW)
+    Quaternion::Quaternion(const HE::Float32 in_fX, const HE::Float32 in_fY,
+                           const HE::Float32 in_fZ, const HE::Float32 in_fW)
     {
         this->Set(in_fX, in_fY, in_fZ, in_fW);
     }
@@ -21,9 +21,9 @@ namespace Core::Math
     Quaternion::Quaternion(const Vector3& in_rAxis, const HE::Float32 in_fAngle)
     {
         const HE::Float32 scaler = Sin(in_fAngle * 0.5f);
-        this->_fX            = in_rAxis._fX * scaler;
-        this->_fY            = in_rAxis._fY * scaler;
-        this->_fZ            = in_rAxis._fZ * scaler;
+        this->_fX                = in_rAxis._fX * scaler;
+        this->_fY                = in_rAxis._fY * scaler;
+        this->_fZ                = in_rAxis._fZ * scaler;
 
         this->_fW = Cos(in_fAngle * 0.5f);
     }

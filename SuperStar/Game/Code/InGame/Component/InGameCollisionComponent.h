@@ -63,14 +63,14 @@ namespace InGame
         /// </summary>
         virtual HE::Bool VEnd() override;
 
-        virtual HE::Uint32 VColCount() const                                           = 0;
+        virtual HE::Uint32 VColCount() const                                               = 0;
         virtual HE::Bool VOutputColData(CollisionData* out, const HE::Uint32 in_uColIndex) = 0;
 
         /// <summary>
         /// 衝突発生
         /// </summary>
         virtual HE::Bool VOnHit(const CollisionData& in_rSelfColData,
-                            const CollisionData& in_rHitColData);
+                                const CollisionData& in_rHitColData);
 
         void SetCollisionHashCode(const HE::Char* in_szName);
         void SetCollisionHashCode(const HE::Uint32 in_uHashCode);
@@ -78,7 +78,8 @@ namespace InGame
 
         HE::Uint32 HashCode() const { return this->_uHashCode; }
 
-        void SetHitAction(std::function<HE::Bool(const CollisionData&, const CollisionData&)> in_func)
+        void SetHitAction(
+            std::function<HE::Bool(const CollisionData&, const CollisionData&)> in_func)
         {
             this->_hitAction = in_func;
         }

@@ -63,7 +63,7 @@ namespace Render
         const Core::Common::Handle AddViewPort(const Core::Common::Handle&,
                                                Core::Memory::UniquePtr<ViewPortConfig>);
         HE::Bool RemoveViewPort(const Core::Common::Handle& in_rWindowHandle,
-                            const Core::Common::Handle& in_rViewPortHandle);
+                                const Core::Common::Handle& in_rViewPortHandle);
 
         const ViewPortConfig* GetViewPortConfig(const Core::Common::Handle&);
 

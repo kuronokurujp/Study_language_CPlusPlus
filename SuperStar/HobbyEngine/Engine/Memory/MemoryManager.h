@@ -137,13 +137,13 @@ namespace Core::Memory
 
 #ifdef HE_ENGINE_DEBUG
         // メモリ確保
-        void* Allocate(const HE::Uint32 in_uAllocateSize, const HE::Uint8 in_page, const HE::Uint8 in_alignSize,
-                       const EAllocateLocateType in_eLocateType, const HE::UTF8* in_pFile,
-                       HE::Uint32 in_uLine);
+        void* Allocate(const HE::Uint32 in_uAllocateSize, const HE::Uint8 in_page,
+                       const HE::Uint8 in_alignSize, const EAllocateLocateType in_eLocateType,
+                       const HE::UTF8* in_pFile, HE::Uint32 in_uLine);
 #else
         // メモリ確保
-        void* Allocate(const Uint32 in_uAllocateSize, const HE::Uint8 in_page, const HE::Uint8 in_alignSize,
-                       const EAllocateLocateType in_eLocateType);
+        void* Allocate(const Uint32 in_uAllocateSize, const HE::Uint8 in_page,
+                       const HE::Uint8 in_alignSize, const EAllocateLocateType in_eLocateType);
 #endif
 
         // メモリ開放
@@ -213,7 +213,8 @@ namespace Core::Memory
         }
 
         // メモリページの初期化
-        HE::Bool _InitMemoryPage(const HE::Uint8 in_page, const HE::Uint32 in_uOffset, const HE::Uint32 in_uSize);
+        HE::Bool _InitMemoryPage(const HE::Uint8 in_page, const HE::Uint32 in_uOffset,
+                                 const HE::Uint32 in_uSize);
         // 指定のメモリブロックの前にメモリブロックを連結する
         void _AddListMemoryBlockPrev(BlockHeader* in_pMemoryBlock,
                                      BlockHeader* in_pTargetMemoryBlock);
@@ -279,7 +280,7 @@ namespace Core::Memory
 
             //  フッターの管理データをチェック
             HE::Sint8* pAddr = (reinterpret_cast<HE::Sint8*>(in_pMemoryBlock)) +
-                           (in_pMemoryBlock->_uSize - this->_GetMemoryBlockFooterSize());
+                               (in_pMemoryBlock->_uSize - this->_GetMemoryBlockFooterSize());
             if (reinterpret_cast<BlockFooter*>(pAddr)->_uMagicNumber != uMagicNumber)
             {
                 return FALSE;

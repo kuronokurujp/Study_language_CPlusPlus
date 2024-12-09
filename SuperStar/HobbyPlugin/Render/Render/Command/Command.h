@@ -72,7 +72,7 @@ namespace Render
     struct Cmd2DPointArrayDraw
     {
         const Point2D* aPoint = NULL;
-        HE::Uint32 uCount         = 0;
+        HE::Uint32 uCount     = 0;
     };
 
     /// <summary>

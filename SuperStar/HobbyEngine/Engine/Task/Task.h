@@ -17,8 +17,8 @@ namespace Core
     struct TaskData
     {
     public:
-        HE::Uint32 uId  = 0;
-        void* pData = NULL;
+        HE::Uint32 uId = 0;
+        void* pData    = NULL;
     };
 
     /// <summary>

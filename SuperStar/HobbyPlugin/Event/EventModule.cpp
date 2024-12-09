@@ -30,7 +30,7 @@ namespace Event
     }
 
     HE::Bool EventModule::AddListener(EventListenerPtr const& in_rListener,
-                                  EventTypeStr const& in_rType)
+                                      EventTypeStr const& in_rType)
     {
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
         {
@@ -42,7 +42,7 @@ namespace Event
     }
 
     HE::Bool EventModule::RemoveListener(EventListenerPtr const& in_rListener,
-                                     EventTypeStr const& in_rType)
+                                         EventTypeStr const& in_rType)
     {
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
         {

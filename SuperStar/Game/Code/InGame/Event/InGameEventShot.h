@@ -53,6 +53,6 @@ namespace InGame
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("ShotNormalBullet");
-        static inline HE::Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+        static inline HE::Uint32 s_uEventTypeHash       = s_szEventType.Hash();
     };
 }  // namespace InGame

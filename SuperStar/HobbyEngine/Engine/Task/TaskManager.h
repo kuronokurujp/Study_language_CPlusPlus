@@ -87,7 +87,7 @@ namespace Core
 
             this->_Attach(pTask, in_sGroupId);
 
-            return handle;  
+            return handle;
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Core
         /// <summary>
         /// 指定グループの全タスクをターゲットグループへ移動
         /// </summary>
-            HE::Bool MoveGroupAll(const HE::Sint32 in_sOrgGroupId, const HE::Sint32 in_sTargetGroupId);
+        HE::Bool MoveGroupAll(const HE::Sint32 in_sOrgGroupId, const HE::Sint32 in_sTargetGroupId);
 
         /// <summary>
         /// タスクを指定したグループ移動
@@ -182,7 +182,7 @@ namespace Core
         HE::Sint32 _Dettach(Task* in_pTask);
 
     private:
-        TaskGroup* _pTasks = NULL;
-        HE::Uint32 _iGroupNum  = 0;
+        TaskGroup* _pTasks    = NULL;
+        HE::Uint32 _iGroupNum = 0;
     };
 };  // namespace Core

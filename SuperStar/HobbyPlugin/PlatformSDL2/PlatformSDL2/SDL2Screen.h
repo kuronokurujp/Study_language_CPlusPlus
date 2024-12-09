@@ -7,8 +7,6 @@
 #include "Engine/MiniEngine.h"
 #include "Engine/Platform/PlatformScreen.h"
 
-
-
 namespace PlatformSDL2
 {
     class PlatformSDL2Module;
@@ -45,4 +43,4 @@ namespace PlatformSDL2
         PlatformSDL2::PlatformSDL2Module* _pSDL2Module = NULL;
     };
 
-}  // namespace Platform::SDL2
+}  // namespace PlatformSDL2

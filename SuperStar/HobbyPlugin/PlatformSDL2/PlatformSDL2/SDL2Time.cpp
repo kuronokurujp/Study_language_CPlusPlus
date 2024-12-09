@@ -19,4 +19,4 @@ namespace PlatformSDL2
     {
         // DxLib::SleepThread(static_cast<int>(in_uMs));
     }
-}  // namespace Platform::SDL2
+}  // namespace PlatformSDL2

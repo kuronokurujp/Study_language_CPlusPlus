@@ -208,8 +208,8 @@ namespace Core
             while (boot_time < end_time)
             {
                 HE::Sint64 beginTimeMSec = std::chrono::duration_cast<std::chrono::milliseconds>(
-                                           std::chrono::system_clock::now().time_since_epoch())
-                                           .count();
+                                               std::chrono::system_clock::now().time_since_epoch())
+                                               .count();
 
                 boot_time += delta_time;
 
@@ -221,9 +221,10 @@ namespace Core
                 // フレーム更新間隔まで待つ
                 do
                 {
-                    HE::Sint64 nowTimeMSec = std::chrono::duration_cast<std::chrono::milliseconds>(
-                                             std::chrono::system_clock::now().time_since_epoch())
-                                             .count();
+                    HE::Sint64 nowTimeMSec =
+                        std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now().time_since_epoch())
+                            .count();
 
                     delta_time = static_cast<HE::Float32>(nowTimeMSec - beginTimeMSec);
                 } while (delta_time < msec_one_frame);

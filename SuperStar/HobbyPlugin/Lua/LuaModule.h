@@ -53,7 +53,7 @@ namespace Lua
         struct LuaObject
         {
             HE::Char szName[128] = {NULL};
-            void* pLuaState  = NULL;
+            void* pLuaState      = NULL;
         };
 
     public:
@@ -160,7 +160,7 @@ namespace Lua
     /// </summary>
     template <typename... TArgs>
     HE::Bool LuaModule::CallScriptFunc(const Core::Common::Handle& in_rHandle,
-                                   const HE::Char* in_pActionName, TArgs... args)
+                                       const HE::Char* in_pActionName, TArgs... args)
     {
         auto* pLuaObject = this->_luaObjectPool.Ref(in_rHandle);
         if (this->_BeginLocalFunc(pLuaObject->pLuaState, in_pActionName) == FALSE) return FALSE;

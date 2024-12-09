@@ -59,7 +59,7 @@ namespace InGame
         /// 衝突発生
         /// </summary>
         HE::Bool VOnHit(const CollisionData& in_rSelfColData,
-                    const CollisionData& in_rHitColData) override final;
+                        const CollisionData& in_rHitColData) override final;
 
         /// <summary>
         /// 弾の生成
@@ -77,7 +77,7 @@ namespace InGame
 
     private:
         void _ForEachObject(std::function<HE::Bool(InGame::InGameBulletObject*,
-                                               InGame::InGameBulletStrategyInterface*)>);
+                                                   InGame::InGameBulletStrategyInterface*)>);
 
         HE::Bool _HandleEvent(Event::EventDataInterfacePtr const&);
 

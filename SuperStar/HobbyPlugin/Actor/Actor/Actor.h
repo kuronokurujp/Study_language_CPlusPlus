@@ -114,7 +114,8 @@ namespace Actor
         /// </summary>
         template <class T, typename... TArgs>
         std::tuple<Core::Common::Handle, T*> AddComponentByHandleAndComp(
-            const HE::Uint32 in_uUpdateOrder, const Component::EPriorty in_ePriorty, TArgs&&... in_args)
+            const HE::Uint32 in_uUpdateOrder, const Component::EPriorty in_ePriorty,
+            TArgs&&... in_args)
         {
             HE_STATIC_ASSERT(std::is_base_of<Component, T>::value,
                              "TクラスはComponentクラスを継承していない");

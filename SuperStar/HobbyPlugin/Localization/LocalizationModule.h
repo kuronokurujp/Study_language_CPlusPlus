@@ -93,8 +93,8 @@ namespace Localization
 
         // ローカライズテキストを取得
         const HE::Char* Text(const Core::Common::StringBase& in_szrLocateName,
-                         const Core::Common::StringBase& in_szrGroupName,
-                         const Core::Common::StringBase& in_szrKey);
+                             const Core::Common::StringBase& in_szrGroupName,
+                             const Core::Common::StringBase& in_szrKey);
 
     protected:
         /// <summary>

@@ -10,7 +10,8 @@ namespace Actor
     {
     }
 
-    HE::Bool ActorManager::Start(const HE::Uint32 in_uActorCapacity, const HE::Uint32 in_uActorGroupMax)
+    HE::Bool ActorManager::Start(const HE::Uint32 in_uActorCapacity,
+                                 const HE::Uint32 in_uActorGroupMax)
     {
         HE_ASSERT(1 < in_uActorGroupMax);
         if (this->_taskManager.Init(in_uActorCapacity, in_uActorGroupMax) == FALSE) return FALSE;
@@ -142,7 +143,8 @@ namespace Actor
         for (auto b = this->_pendingDataMap.Begin(); b != this->_pendingDataMap.End(); ++b)
         {
             const auto pData = &b->data;
-            const HE::Bool bRet  = this->_taskManager.MoveGropuTask(pData->handle, pData->sMoveGroupId);
+            const HE::Bool bRet =
+                this->_taskManager.MoveGropuTask(pData->handle, pData->sMoveGroupId);
             HE_ASSERT(bRet && "保留中のタスクを稼働中に切り替え失敗した");
         }
         this->_pendingDataMap.Clear();

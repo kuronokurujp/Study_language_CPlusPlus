@@ -83,7 +83,7 @@ namespace Core::Math
     /// 値が直近0かどうか.
     /// </summary>
     static inline HE::Bool NearZero(const HE::Float32 in_fValue,
-                                const HE::Float32 in_fEpsilon = 0.001f) HE_NOEXCEPT
+                                    const HE::Float32 in_fEpsilon = 0.001f) HE_NOEXCEPT
     {
         if (fabsf(in_fValue) <= in_fEpsilon)
         {

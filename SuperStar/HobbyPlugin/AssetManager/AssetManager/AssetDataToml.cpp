@@ -52,7 +52,7 @@ namespace AssetManager
     }
 
     HE::Bool AssetDataToml::Node::_OutputNodeMap(ToolNodeMapType* out, const HE::Char* in_szaName[],
-                                             const HE::Uint32 in_uCount)
+                                                 const HE::Uint32 in_uCount)
     {
         HE_ASSERT(out && "出力するポインターがNULL");
         HE_ASSERT(0 < in_uCount);

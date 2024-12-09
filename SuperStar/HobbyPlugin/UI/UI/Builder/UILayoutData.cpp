@@ -216,7 +216,8 @@ namespace UI::Builder
         return TRUE;
     }
 
-    HE::Bool UILayoutData::OutputNode(Node* out, const Node& in_rParentNode, const HE::UTF8* in_szName)
+    HE::Bool UILayoutData::OutputNode(Node* out, const Node& in_rParentNode,
+                                      const HE::UTF8* in_szName)
     {
         HE_ASSERT(out);
         HE_ASSERT(in_rParentNode.pNode);

@@ -6,8 +6,8 @@
 namespace AssetManager
 {
     static HE::Bool _OutputValueBySimdJson(simdjson::fallback::ondemand::value* out,
-                                       simdjson::ondemand::document& in_rDoc,
-                                       const std::initializer_list<const HE::UTF8*>& in_rTokens)
+                                           simdjson::ondemand::document& in_rDoc,
+                                           const std::initializer_list<const HE::UTF8*>& in_rTokens)
     {
         HE_ASSERT(out);
         HE_ASSERT(0 < in_rTokens.size());
@@ -122,9 +122,8 @@ namespace AssetManager
                 HE::Sint32 iSize    = in_rFileSystem.VFileSize(this->_fileHandle);
                 HE::Sint32 iMemSize = iSize + 1;
                 // TODO: メモリページを外部から指定できるようにする
-                pReadTmpBuff = reinterpret_cast<HE::UTF8*>(
-                    HE_ALLOC_MEM(sizeof(HE::UTF8) * iMemSize,
-                                 0));  
+                pReadTmpBuff =
+                    reinterpret_cast<HE::UTF8*>(HE_ALLOC_MEM(sizeof(HE::UTF8) * iMemSize, 0));
                 ::memset(pReadTmpBuff, '\0', iMemSize);
 
                 // ファイルの読み込み

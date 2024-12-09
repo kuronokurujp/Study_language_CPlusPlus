@@ -21,7 +21,7 @@ namespace Render
 
     protected:
         virtual HE::Bool _VBegin() = 0;
-        virtual void _VEnd()   = 0;
+        virtual void _VEnd()       = 0;
 
         virtual void _VUpdate(const HE::Float32) = 0;
 

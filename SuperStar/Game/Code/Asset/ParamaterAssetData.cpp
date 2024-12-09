@@ -17,18 +17,20 @@ namespace Game::Asset
         AssetDataJson::_VUnload();
     }
 
-    HE::Uint32 ParamaterAssetData::GetUInt32ByIdData(const HE::UTF8* in_pIdName, const HE::UTF8* in_pFieldName)
+    HE::Uint32 ParamaterAssetData::GetUInt32ByIdData(const HE::UTF8* in_pIdName,
+                                                     const HE::UTF8* in_pFieldName)
     {
         return this->VGetUInt32({"data", in_pIdName, in_pFieldName});
     }
 
-    HE::Sint32 ParamaterAssetData::GetSInt32ByIdData(const HE::UTF8* in_pIdName, const HE::UTF8* in_pFieldName)
+    HE::Sint32 ParamaterAssetData::GetSInt32ByIdData(const HE::UTF8* in_pIdName,
+                                                     const HE::UTF8* in_pFieldName)
     {
         return this->VGetSInt32({"data", in_pIdName, in_pFieldName});
     }
 
     HE::Float32 ParamaterAssetData::GetFloat32ByIdData(const HE::UTF8* in_pIdName,
-                                                   const HE::UTF8* in_pFieldName)
+                                                       const HE::UTF8* in_pFieldName)
     {
         return this->VGetFloat32({"data", in_pIdName, in_pFieldName});
     }

@@ -179,7 +179,7 @@ namespace Module
 
     private:
         Core::Common::FixedString128 _szName;
-        ELayer _eLayer   = ELayer_Logic;
+        ELayer _eLayer       = ELayer_Logic;
         HE::Uint32 _priority = 0;
 
 #ifdef HE_ENGINE_DEBUG
@@ -197,7 +197,7 @@ namespace Module
 // _type_にクラス型を記述
 #define HE_MODULE_GENRATE_DECLARATION(_type_) \
 public:                                       \
-    static const HE::UTF8* ModuleName()           \
+    static const HE::UTF8* ModuleName()       \
     {                                         \
         return #_type_;                       \
     }

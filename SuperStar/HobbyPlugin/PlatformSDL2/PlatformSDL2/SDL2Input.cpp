@@ -106,4 +106,4 @@ namespace PlatformSDL2
                 */
         }
     }
-}  // namespace Platform::SDL2
+}  // namespace PlatformSDL2

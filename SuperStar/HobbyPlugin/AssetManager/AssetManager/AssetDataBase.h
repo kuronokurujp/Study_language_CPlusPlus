@@ -31,7 +31,7 @@ namespace AssetManager
     protected:
         virtual void _VInit(const HE::Char* in_szName, const Core::File::Path& in_rPath);
         virtual HE::Bool _VLoad(Platform::FileInterface&) = 0;
-        virtual void _VUnload()                       = 0;
+        virtual void _VUnload()                           = 0;
 
     protected:
         Core::Common::FixedString128 _szName;

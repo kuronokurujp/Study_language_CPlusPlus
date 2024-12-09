@@ -122,12 +122,18 @@ namespace Actor
         void VOnActorUnRegistComponent(Component*);
 
     protected:
-        inline HE::Sint32 _GetPendingGroupId() const { return this->_taskManager.GetMaxGroup() - 1; }
+        inline HE::Sint32 _GetPendingGroupId() const
+        {
+            return this->_taskManager.GetMaxGroup() - 1;
+        }
 
         /// <summary>
         /// 最後のグループが保留グループなので更新グループ数は最大グループ数-1になる
         /// </summary>
-        inline HE::Sint32 _GetUpdateGroupMax() const { return this->_taskManager.GetMaxGroup() - 1; }
+        inline HE::Sint32 _GetUpdateGroupMax() const
+        {
+            return this->_taskManager.GetMaxGroup() - 1;
+        }
 
     private:
         /// <summary>

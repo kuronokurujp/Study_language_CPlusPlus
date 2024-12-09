@@ -43,7 +43,7 @@ namespace UI::Builder
         /// </summary>
         struct Data
         {
-            HE::Char szId[64]       = {0};
+            HE::Char szId[64]   = {0};
             EWidget eWidgetType = EWidget::EWidget_None;
 
             union ExData

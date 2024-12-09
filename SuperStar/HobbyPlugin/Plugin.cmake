@@ -79,7 +79,7 @@ if(EXISTS ${vcpkg_manifest_root_path}/.vcpkg.json)
 endif()
 
 execute_process(
-     COMMAND cmd /c "${vcpkg_dir_path}/vcpkg.exe" "--vcpkg-root=${vcpkg_dir_path}" install --clean-after-build "--x-manifest-root=${vcpkg_manifest_root_path}" "--x-install-root=${vcpkg_install_dir_path}" "--triplet=${vcpkg_triplet}"
+     COMMAND cmd /c "${vcpkg_dir_path}/vcpkg.exe" "--vcpkg-root=${vcpkg_dir_path}" install --clean-after-build "--x-manifest-root=${vcpkg_manifest_root_path}" "--x-install-root=${vcpkg_install_dir_path}/ThirdParty/VcPkg" "--triplet=${vcpkg_triplet}"
      WORKING_DIRECTORY ${vcpkg_manifest_root_path}
      OUTPUT_VARIABLE CMD_OUTPUT
      ERROR_VARIABLE CMD_ERROR

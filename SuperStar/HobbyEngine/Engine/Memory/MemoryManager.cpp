@@ -293,7 +293,7 @@ namespace Core::Memory
     /// <param
     /// name="in_uUseHeepSize">メモリページのサイズ（MINIMUM_ALIGN_SIZEの倍数であること）</param>
     HE::Bool Manager::_InitMemoryPage(const HE::Uint8 in_page, const HE::Uint32 in_uHeepOffset,
-                                  const HE::Uint32 in_uUseHeepSize)
+                                      const HE::Uint32 in_uUseHeepSize)
     {
         HE_ASSERT((in_page < HE_ARRAY_NUM(this->_aMemoryPageInfoArray)) &&
                   "指定ページが存在しない");
@@ -447,7 +447,7 @@ namespace Core::Memory
                     // 前からとるとき
                     // アラインを考えて実際に置けるかどうか
                     HE::Sint8* pStartAddr = reinterpret_cast<HE::Sint8*>(pFreeMemoryBlock) +
-                                        this->_GetMemoryBlockHeaderSize();
+                                            this->_GetMemoryBlockHeaderSize();
 
                     // 開始位置のオフセットを割り出す
                     uOffsetSize = reinterpret_cast<HE::Ptr>(pStartAddr) % in_alignSize;
@@ -597,7 +597,7 @@ namespace Core::Memory
 
         // 返すのは使用できる領域の先頭
         const HE::Uint32 headerSize = this->_GetMemoryBlockHeaderSize();
-        HE::Sint8* pAddr            = reinterpret_cast<HE::Sint8*>(pAllocateMemoryBlock) + headerSize;
+        HE::Sint8* pAddr = reinterpret_cast<HE::Sint8*>(pAllocateMemoryBlock) + headerSize;
         return (reinterpret_cast<void*>(pAddr));
     }
 
@@ -607,8 +607,8 @@ namespace Core::Memory
     void Manager::Free(void* in_pAllocatedMemory)
     {
         // 受け取ったのは使用できるメモリの先頭
-        const HE::Uint32 headerSize   = this->_GetMemoryBlockHeaderSize();
-        HE::Sint8* pAddr              = reinterpret_cast<HE::Sint8*>(in_pAllocatedMemory) - headerSize;
+        const HE::Uint32 headerSize = this->_GetMemoryBlockHeaderSize();
+        HE::Sint8* pAddr          = reinterpret_cast<HE::Sint8*>(in_pAllocatedMemory) - headerSize;
         BlockHeader* pMemoryBlock = reinterpret_cast<BlockHeader*>(pAddr);
 
         HE_ASSERT(this->_IsValidMemoryBlock(pMemoryBlock) &&
@@ -886,10 +886,10 @@ namespace Core::Memory
     /// <param name="in_page">ページ</param>
     void Manager::PrintMemoryPageInfo(HE::Uint8 in_page)
     {
-        HE::Uint32 uUsedTotal              = 0;
-        HE::Uint32 uFreeTotal              = 0;
-        HE::Uint32 uUsedCount              = 0;
-        HE::Uint32 uFreeCount              = 0;
+        HE::Uint32 uUsedTotal          = 0;
+        HE::Uint32 uFreeTotal          = 0;
+        HE::Uint32 uUsedCount          = 0;
+        HE::Uint32 uFreeCount          = 0;
         BlockHeader* pLargestUsedBlock = NULL;
         BlockHeader* pLargestFreeBlock = NULL;
 

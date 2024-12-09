@@ -40,7 +40,7 @@ namespace InGame
     }
 
     HE::Bool InGameBulletNormalStrategy::VUpdate(InGameBulletWork* in_pWork,
-                                             Core::Common::Handle& in_rViewHandle)
+                                                 Core::Common::Handle& in_rViewHandle)
     {
         InGameBulletNormalWork* pWork = reinterpret_cast<InGameBulletNormalWork*>(in_pWork->aWork);
 
@@ -57,7 +57,7 @@ namespace InGame
     }
 
     HE::Bool InGameBulletNormalStrategy::VIsScreenInSide(const InGameBulletWork* const in_pWork,
-                                                     const Core::Math::Rect2& in_rScreenInSide)
+                                                         const Core::Math::Rect2& in_rScreenInSide)
     {
         const InGameBulletNormalWork* const pWork =
             reinterpret_cast<const InGameBulletNormalWork* const>(in_pWork->aWork);
@@ -71,7 +71,7 @@ namespace InGame
     }
 
     HE::Bool InGameBulletNormalStrategy::VOutputCollisionData(CollisionData* out,
-                                                          const InGameBulletWork* const in_pObj)
+                                                              const InGameBulletWork* const in_pObj)
     {
         const InGameBulletNormalWork* const pWork =
             reinterpret_cast<const InGameBulletNormalWork* const>(in_pObj->aWork);

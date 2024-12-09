@@ -90,7 +90,8 @@ namespace Core::Math
         /// <summary>
         /// 行と列を指定した3x3の余因子行列を出力.
         /// </summary>
-        void OutputYoinshi3x3(Matrix3* out_pMat, const HE::Uint32 in_iRow, const HE::Uint32 in_iCol);
+        void OutputYoinshi3x3(Matrix3* out_pMat, const HE::Uint32 in_iRow,
+                              const HE::Uint32 in_iCol);
 
         /// <summary>
         /// 転置行列に変換.
@@ -105,7 +106,8 @@ namespace Core::Math
         /// <summary>
         /// Creates the scale matrix4.
         /// </summary>
-        static Matrix4 CreateScale(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ)
+        static Matrix4 CreateScale(const HE::Float32 in_fX, const HE::Float32 in_fY,
+                                   const HE::Float32 in_fZ)
         {
             const HE::Float32 faTemp[4][4] = {
                 {in_fX, 0.0f, 0.0f, 0.0f},
@@ -148,7 +150,8 @@ namespace Core::Math
         static Matrix4 CreateTranslation(const Vector3& in_rPos);
 
         // 縦横のサイズを元に単位正方形の座標系に行列変換する行列作成
-        static Matrix4 CreateSimpleViewProj(const HE::Float32 in_fWidth, const HE::Float32 in_fHeight);
+        static Matrix4 CreateSimpleViewProj(const HE::Float32 in_fWidth,
+                                            const HE::Float32 in_fHeight);
 
         // カメラ情報からビュー行列生成
         static Matrix4 CreateLookAt(const Vector3& in_rEye, const Vector3& in_rTarget,
@@ -160,8 +163,8 @@ namespace Core::Math
 
         // 透視射影行列作成
         static Matrix4 CreatePerspectiveFOV(const HE::Float32 in_fFov, const HE::Float32 in_fWidth,
-                                            const HE::Float32 in_fHeight, const HE::Float32 in_fNear,
-                                            const HE::Float32 in_fFar);
+                                            const HE::Float32 in_fHeight,
+                                            const HE::Float32 in_fNear, const HE::Float32 in_fFar);
 
     public:
         // 単位行列定義

@@ -16,7 +16,7 @@ namespace Core::Time
     }
 
     HE::Bool FPS::UpdateWait(Core::Memory::WeakPtr<Platform::TimeInterface> in_wpTimeInterface,
-                         const HE::Uint32 in_uWaitMSec)
+                             const HE::Uint32 in_uWaitMSec)
     {
         // ミリ秒単位で扱っている
         auto pTime = in_wpTimeInterface.lock();
@@ -27,7 +27,8 @@ namespace Core::Time
         const HE::Uint64 uFrameTimeMSec = uNowMSec - this->_uaPreviousTimeMSec[0];
 
         // Waitタイムより早い場合は待機フラグを返す
-        HE::Bool bWait = (uNowMSec - this->_uaPreviousTimeMSec[FPS::_uTimeAvgCount - 1]) < in_uWaitMSec;
+        HE::Bool bWait =
+            (uNowMSec - this->_uaPreviousTimeMSec[FPS::_uTimeAvgCount - 1]) < in_uWaitMSec;
 
         // 更新時間より早い
         if (bWait) return TRUE;
@@ -43,7 +44,8 @@ namespace Core::Time
             if (0 < uFrameTimeMSec)
             {
                 // 1秒 / フレーム更新したミリ秒時間 = フレーム更新したレート値
-                this->_uFrameRate = FPS::_fFrameAvgTimeMSec / static_cast<HE::Float32>(uFrameTimeMSec);
+                this->_uFrameRate =
+                    FPS::_fFrameAvgTimeMSec / static_cast<HE::Float32>(uFrameTimeMSec);
             }
             else
             {

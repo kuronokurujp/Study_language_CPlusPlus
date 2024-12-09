@@ -31,7 +31,7 @@ namespace Level
         void VUpdate(const HE::Float32 in_fDt) override final;
 
     private:
-        Render::Point2D* _aPoint  = NULL;
+        Render::Point2D* _aPoint      = NULL;
         const HE::Uint32 _uPointCount = 64;
     };
 }  // namespace Level

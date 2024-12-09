@@ -184,7 +184,7 @@ namespace Core::Common
         HE::Uint32 _uSize = 0;
 
     private:
-        TType* _pBuff     = NULL;
+        TType* _pBuff         = NULL;
         HE::Uint32 _uCapacity = 0;
     };
 

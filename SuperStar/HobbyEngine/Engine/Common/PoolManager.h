@@ -50,12 +50,18 @@ namespace Core::Common
         /// <summary>
         /// データ最大数
         /// </summary>
-        const HE::Uint32 Max() const { return static_cast<HE::Uint32>(this->_upCacheDatas->capacity()); }
+        const HE::Uint32 Max() const
+        {
+            return static_cast<HE::Uint32>(this->_upCacheDatas->capacity());
+        }
 
         /// <summary>
         /// キャッシュしたデータが現在いくつか
         /// </summary>
-        const HE::Uint32 CacheCount() const { return static_cast<HE::Uint32>(this->_upCacheDatas->size()); }
+        const HE::Uint32 CacheCount() const
+        {
+            return static_cast<HE::Uint32>(this->_upCacheDatas->size());
+        }
 
         const bool Empty() const { return (this->UseCount() <= 0); }
 
@@ -152,7 +158,7 @@ namespace Core::Common
             Handle handle;
 
             HE::Bool bNewSlot = FALSE;
-            S* pObject    = NULL;
+            S* pObject        = NULL;
 
             if (this->_upCacheDatas->empty())
             {
@@ -260,7 +266,7 @@ namespace Core::Common
 
         // 再利用するキャッシュデータリスト
         Core::Memory::UniquePtr<std::vector<T*>> _upCacheDatas = NULL;
-        HE::Uint32 _uIndexCount                                    = 0;
+        HE::Uint32 _uIndexCount                                = 0;
     };
 
     /// <summary>

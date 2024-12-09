@@ -12,7 +12,9 @@ namespace Core::Math
         explicit Vector2() { this->Zero(); }
 
         // コントラクト
-        explicit Vector2(const HE::Float32 in_fX, const HE::Float32 in_fY) : _fX(in_fX), _fY(in_fY) {}
+        explicit Vector2(const HE::Float32 in_fX, const HE::Float32 in_fY) : _fX(in_fX), _fY(in_fY)
+        {
+        }
 
         // コピーは代入文でできるようにするのがわかりやすいのでexplicitはつけない
         Vector2(const Vector2& in_v) { this->_fX = in_v._fX, this->_fY = in_v._fY; }
@@ -84,7 +86,10 @@ namespace Core::Math
         /// <summary>
         /// Sets the specified in value.
         /// </summary>
-        inline void Set(const HE::Float32 in_fValue) HE_NOEXCEPT { this->_fX = this->_fY = in_fValue; }
+        inline void Set(const HE::Float32 in_fValue) HE_NOEXCEPT
+        {
+            this->_fX = this->_fY = in_fValue;
+        }
         inline void Set(const HE::Float32 in_fX, const HE::Float32 in_fY) HE_NOEXCEPT
         {
             this->_fX = in_fX;
@@ -197,7 +202,7 @@ namespace Core::Math
         /// <param name="in_v2">The in v2.</param>
         /// <returns></returns>
         static inline HE::Float32 DistanceSquared(const Vector2& in_rRight,
-                                              const Vector2& in_rLeft) HE_NOEXCEPT
+                                                  const Vector2& in_rLeft) HE_NOEXCEPT
         {
             Vector2 size;
             size.SetSub(in_rLeft, in_rRight);
@@ -210,7 +215,7 @@ namespace Core::Math
 
         //	2つのベクトルの距離取得
         static inline HE::Float32 Distance(const Vector2& in_rRight,
-                                       const Vector2& in_rLeft) HE_NOEXCEPT
+                                           const Vector2& in_rLeft) HE_NOEXCEPT
         {
             Vector2 size;
             size.SetSub(in_rLeft, in_rRight);

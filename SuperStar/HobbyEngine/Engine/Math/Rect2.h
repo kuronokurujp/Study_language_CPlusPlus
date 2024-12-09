@@ -20,11 +20,11 @@ namespace Core::Math
 
         Rect2() { this->Clear(); }
 
-        Rect2(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW, const HE::Float32 in_fH,
-              const EAnchor in_eAnchor);
+        Rect2(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
+              const HE::Float32 in_fH, const EAnchor in_eAnchor);
 
-        void Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW, const HE::Float32 in_fH,
-                 const EAnchor in_eAnchor);
+        void Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
+                 const HE::Float32 in_fH, const EAnchor in_eAnchor);
 
         /// <summary>
         /// Gets the position.
@@ -44,7 +44,10 @@ namespace Core::Math
         /// <summary>
         /// Heights this instance.
         /// </summary>
-        inline HE::Float32 Height() const HE_NOEXCEPT { return fabsf(this->_fBottom - this->_fTop); }
+        inline HE::Float32 Height() const HE_NOEXCEPT
+        {
+            return fabsf(this->_fBottom - this->_fTop);
+        }
 
         /// <summary>
         /// Heights the half.
@@ -94,7 +97,7 @@ namespace Core::Math
         HE::Float32 _fTop    = 0.0f;
         HE::Float32 _fRight  = 0.0f;
         HE::Float32 _fBottom = 0.0f;
-        EAnchor _eAnchor = EAnchor_Left;
+        EAnchor _eAnchor     = EAnchor_Left;
 
     private:
         /// <summary>

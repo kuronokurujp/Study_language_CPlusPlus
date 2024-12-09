@@ -49,11 +49,11 @@ namespace InGame
     public:
         Core::Math::Vector2 _move;
         EObjectTag _eTag = EObjectTag::EObjectTag_None;
-        HE::Uint32 _uId      = 0;
+        HE::Uint32 _uId  = 0;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterMove");
-        static inline HE::Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+        static inline HE::Uint32 s_uEventTypeHash       = s_szEventType.Hash();
     };
 
     /// <summary>
@@ -69,11 +69,11 @@ namespace InGame
 
     public:
         EObjectTag _eTag = EObjectTag::EObjectTag_None;
-        HE::Uint32 _uId      = 0;
+        HE::Uint32 _uId  = 0;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterAttack");
-        static inline HE::Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+        static inline HE::Uint32 s_uEventTypeHash       = s_szEventType.Hash();
     };
 
     /// <summary>
@@ -91,12 +91,12 @@ namespace InGame
     public:
         Core::Math::Vector2 _pos;
         EEnemyTag _eEnemyTag = EEnemyTag::EEnemyTag_None;
-        HE::Uint32 _uId          = 0;
+        HE::Uint32 _uId      = 0;
         Core::Common::FixedString32 _szIdName;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterPutEnemy");
-        static inline HE::Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+        static inline HE::Uint32 s_uEventTypeHash       = s_szEventType.Hash();
     };
 
     /// <summary>
@@ -105,7 +105,8 @@ namespace InGame
     class EventCharacterPutPlayer final : public Event::BaseEventData
     {
     public:
-        EventCharacterPutPlayer(const HE::Float32 in_fTimeStamp, const Core::Math::Vector2& in_rPos);
+        EventCharacterPutPlayer(const HE::Float32 in_fTimeStamp,
+                                const Core::Math::Vector2& in_rPos);
 
         static inline HE::Uint32 EventTypeHash() { return s_uEventTypeHash; }
 
@@ -114,7 +115,7 @@ namespace InGame
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterPutPlayer");
-        static inline HE::Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+        static inline HE::Uint32 s_uEventTypeHash       = s_szEventType.Hash();
     };
 
     /// <summary>
@@ -129,12 +130,12 @@ namespace InGame
         static inline HE::Uint32 EventTypeHash() { return s_uEventTypeHash; }
 
     public:
-        HE::Uint32 _sDamage        = 0;
+        HE::Uint32 _sDamage    = 0;
         EObjectTag _eObjectTag = EObjectTag::EObjectTag_None;
-        HE::Uint64 _ulHandle       = 0;
+        HE::Uint64 _ulHandle   = 0;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterDamage");
-        static inline HE::Uint32 s_uEventTypeHash           = s_szEventType.Hash();
+        static inline HE::Uint32 s_uEventTypeHash       = s_szEventType.Hash();
     };
 }  // namespace InGame

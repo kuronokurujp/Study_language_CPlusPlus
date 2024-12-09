@@ -43,7 +43,7 @@ namespace Platform
         virtual ~ScreenInterface() = default;
 
         virtual const Core::Common::Handle VCreateWindow() = 0;
-        virtual HE::Bool VReleaseAllWindows()                  = 0;
+        virtual HE::Bool VReleaseAllWindows()              = 0;
 
         // TODO: ウィンドウ描画
         virtual void VShowWindow(const Core::Common::Handle&) = 0;

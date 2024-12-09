@@ -271,7 +271,7 @@ namespace Actor
     }
 
     HE::Bool Object::_RemoveComponent(Core::Common::Handle* in_pHandle,
-                                  Core::TaskManager* in_pComponents)
+                                      Core::TaskManager* in_pComponents)
     {
         HE_ASSERT(in_pHandle);
         HE_ASSERT(in_pHandle->Null() == FALSE);

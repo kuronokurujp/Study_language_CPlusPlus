@@ -48,7 +48,7 @@ namespace Core::Common
     private:
         LinkedListNode* _pPrev = NULL;
         LinkedListNode* _pNext = NULL;
-        HE::Uint32 _uFlag          = 0;
+        HE::Uint32 _uFlag      = 0;
     };
 
     /// <summary>

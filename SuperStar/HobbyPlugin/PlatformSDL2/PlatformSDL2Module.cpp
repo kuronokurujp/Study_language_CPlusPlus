@@ -6,7 +6,6 @@
 #include "PlatformSDL2/SDL2Screen.h"
 #include "PlatformSDL2/SDL2System.h"
 #include "PlatformSDL2/SDL2Time.h"
-
 #include "SDL2/SDL.h"
 
 // 依存モジュール

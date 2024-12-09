@@ -114,7 +114,7 @@ namespace Level
         /// アクター同士の関連付け設定
         /// </summary>
         HE::Bool ChainActor(const Core::Common::Handle& in_rActor,
-                        const Core::Common::Handle& in_rParentActor);
+                            const Core::Common::Handle& in_rParentActor);
 
     protected:
         virtual void _VProcessInput(const EnhancedInput::InputMap* in_pInputMap);

@@ -57,7 +57,7 @@ namespace Event
     }
 
     HE::Bool EventManager::AddListener(EventListenerPtr const& in_rListener,
-                                   EventTypeStr const& in_rType)
+                                       EventTypeStr const& in_rType)
     {
         if (this->ValidateType(in_rType) == FALSE) return FALSE;
 
@@ -95,7 +95,7 @@ namespace Event
     }
 
     HE::Bool EventManager::RemoveListener(EventListenerPtr const& in_rListener,
-                                      EventTypeStr const& in_rType)
+                                          EventTypeStr const& in_rType)
     {
         if (this->ValidateType(in_rType) == FALSE) return FALSE;
         HE::Bool bErase = FALSE;
@@ -280,7 +280,7 @@ namespace Event
                 if (itListeners == this->_mRegistry.End()) continue;
 
                 // イベントタイプに対応したリスナーを呼ぶ
-                const HE::Uint32 uEventId            = itListeners->key;
+                const HE::Uint32 uEventId        = itListeners->key;
                 EventListenerTable const& lTable = itListeners->data;
 
                 for (EventListenerTable::const_iterator listener = lTable.begin(),
@@ -342,7 +342,7 @@ namespace Event
 
     // 特定のイベント型に関連づけられたリスナーのリストを取得
     HE::Bool EventManager::OutputListenerList(EventListenerList* out,
-                                          EventTypeStr const& in_rEventType) const
+                                              EventTypeStr const& in_rEventType) const
     {
         HE_ASSERT(out);
 

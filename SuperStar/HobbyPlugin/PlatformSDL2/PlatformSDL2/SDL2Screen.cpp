@@ -72,7 +72,7 @@ namespace PlatformSDL2
         }
 
     private:
-        SDL_Window* _pWindow    = NULL;
+        SDL_Window* _pWindow = NULL;
         SDL_GLContext _glContext;
     };
 

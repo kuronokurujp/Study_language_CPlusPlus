@@ -54,7 +54,10 @@ namespace UI
         /// ローカライズグループ名を設定
         /// 文字列がある == ローカライズテキスト
         /// </summary>
-        inline void SetLogGroup(const HE::Char* in_szGroupName) { this->_szLocGroup = in_szGroupName; }
+        inline void SetLogGroup(const HE::Char* in_szGroupName)
+        {
+            this->_szLocGroup = in_szGroupName;
+        }
 
         inline void SetAnchor(const Core::Math::Rect2::EAnchor in_eAnchor)
         {
@@ -81,6 +84,6 @@ namespace UI
         Core::Common::FixedString128 _szLocGroup;
         Core::Math::Rect2 _rect;
         Core::Math::Rect2::EAnchor _eAnchor = Core::Math::Rect2::EAnchor_Left;
-        HE::Uint32 _uFontSize                    = 32;
+        HE::Uint32 _uFontSize               = 32;
     };
 }  // namespace UI

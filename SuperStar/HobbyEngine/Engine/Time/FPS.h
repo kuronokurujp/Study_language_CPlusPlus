@@ -25,7 +25,7 @@ namespace Core::Time
         /// 指定時間待機(ミリ秒)
         /// </summary>
         HE::Bool UpdateWait(Core::Memory::WeakPtr<Platform::TimeInterface> in_wpTimeInterface,
-                        const HE::Uint32 in_uWaitMSec);
+                            const HE::Uint32 in_uWaitMSec);
 
         /// <summary>
         /// 更新時間取得(秒)

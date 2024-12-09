@@ -51,7 +51,8 @@ namespace Core
         this->_ReservePool(in_uTaskMax);
 
         // タスクグループを確保
-        this->_pTasks = reinterpret_cast<TaskGroup*>( HE_ALLOC_MEM(sizeof(TaskGroup) * in_iGroupNum, 0));
+        this->_pTasks =
+            reinterpret_cast<TaskGroup*>(HE_ALLOC_MEM(sizeof(TaskGroup) * in_iGroupNum, 0));
         for (HE::Uint32 i = 0; i < in_iGroupNum; ++i)
         {
             // 先頭と終端タスクを作成して設定
@@ -86,7 +87,8 @@ namespace Core
         this->_ReleasePool();
     }
 
-    void TaskManager::ForeachByGroup(const HE::Sint32 in_iGroupId, std::function<void(Task*)> in_func)
+    void TaskManager::ForeachByGroup(const HE::Sint32 in_iGroupId,
+                                     std::function<void(Task*)> in_func)
     {
         HE_ASSERT(in_iGroupId < this->_iGroupNum);
 
@@ -246,7 +248,8 @@ namespace Core
         for (HE::Sint32 i = 0; i < this->_iGroupNum; ++i) this->RemoveGroup(i);
     }
 
-    HE::Bool TaskManager::MoveGroupAll(const HE::Sint32 in_iGrgGroupId, const HE::Sint32 in_iTargetGroupId)
+    HE::Bool TaskManager::MoveGroupAll(const HE::Sint32 in_iGrgGroupId,
+                                       const HE::Sint32 in_iTargetGroupId)
     {
         HE_ASSERT(in_iGrgGroupId < this->_iGroupNum && "グループ元のグループID値が間違っている");
         HE_ASSERT(in_iTargetGroupId < this->_iGroupNum &&
@@ -279,7 +282,8 @@ namespace Core
         return TRUE;
     }
 
-    HE::Bool TaskManager::MoveGropuTask(const Common::Handle& in_hTask, const HE::Sint32 in_iGroupId)
+    HE::Bool TaskManager::MoveGropuTask(const Common::Handle& in_hTask,
+                                        const HE::Sint32 in_iGroupId)
     {
         HE_ASSERT(in_hTask.Null() == FALSE);
 

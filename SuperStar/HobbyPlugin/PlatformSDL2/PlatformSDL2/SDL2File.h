@@ -18,7 +18,7 @@ namespace PlatformSDL2
         HE::Bool VFileClose(const Core::Common::Handle&) override final;
 
         HE::Bool VFileRead(void* out_pBuff, const Core::Common::Handle& in_rHandle,
-                       const HE::Uint32 in_size) override final;
+                           const HE::Uint32 in_size) override final;
         HE::Sint32 VFileSize(const Core::Common::Handle&) override final;
 
     private:
@@ -27,4 +27,4 @@ namespace PlatformSDL2
         /// </summary>
         Core::Common::FixedMap<Core::Common::Handle, struct FileInfo*, 2048> _mFileHandle;
     };
-}  // namespace Platform::SDL2
+}  // namespace PlatformSDL2

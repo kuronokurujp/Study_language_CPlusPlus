@@ -308,7 +308,7 @@ namespace Platform
     public:
         virtual ~InputInterface() = default;
 
-        virtual void VInit()                              = 0;
+        virtual void VInit()                                  = 0;
         virtual void VUpdate(const HE::Float32 in_fDeltaTime) = 0;
         virtual HE::Bool VIsQuit() const                      = 0;
 

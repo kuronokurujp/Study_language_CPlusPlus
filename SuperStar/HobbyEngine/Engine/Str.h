@@ -46,14 +46,14 @@
     {                                         \
         for (HE::Uint32 i = 0; i < size; ++i) \
         {                                     \
-            s[i] = ::tolower(s[i]);              \
+            s[i] = ::tolower(s[i]);           \
         }                                     \
     }
 #define HE_STR_UPPER(s, size)                 \
     {                                         \
         for (HE::Uint32 i = 0; i < size; ++i) \
         {                                     \
-            s[i] = ::toupper(s[i]);              \
+            s[i] = ::toupper(s[i]);           \
         }                                     \
     }
 

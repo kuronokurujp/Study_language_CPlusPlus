@@ -8,8 +8,8 @@ namespace Core::Math
     {
     public:
         explicit Quaternion();
-        explicit Quaternion(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ,
-                            const HE::Float32 in_fW);
+        explicit Quaternion(const HE::Float32 in_fX, const HE::Float32 in_fY,
+                            const HE::Float32 in_fZ, const HE::Float32 in_fW);
         explicit Quaternion(const Vector3& in_rAxis, const HE::Float32 in_fAngle);
 
         /// <summary>

@@ -62,11 +62,12 @@ namespace InGame
         const HE::Char* VName() const override final;
 
         HE::Bool VUpdate(InGameBulletWork* in_pWork,
-                     Core::Common::Handle& in_rViewHandle) override final;
+                         Core::Common::Handle& in_rViewHandle) override final;
 
         HE::Bool VIsScreenInSide(const InGameBulletWork* const,
-                             const Core::Math::Rect2&) override final;
+                                 const Core::Math::Rect2&) override final;
 
-        HE::Bool VOutputCollisionData(CollisionData* out, const InGameBulletWork* const) override final;
+        HE::Bool VOutputCollisionData(CollisionData* out,
+                                      const InGameBulletWork* const) override final;
     };
 }  // namespace InGame

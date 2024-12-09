@@ -39,8 +39,9 @@ TEST_CASE("FixMap Test")
     srand((unsigned int)time(NULL));
 
     // データを用意しておく
-    HE::Sint32* pDataArray = reinterpret_cast<HE::Sint32*>(
-        HE_ALLOC_MEM(sizeof(HE::Sint32) * ARRAY_NUM, 0));  // HE_NEW_MEM_ARRAY(Sint32, ARRAY_NUM, 0);
+    HE::Sint32* pDataArray =
+        reinterpret_cast<HE::Sint32*>(HE_ALLOC_MEM(sizeof(HE::Sint32) * ARRAY_NUM,
+                                                   0));  // HE_NEW_MEM_ARRAY(Sint32, ARRAY_NUM, 0);
     for (HE::Sint32 ii = 0; ii < ARRAY_NUM; ii++)
     {
         pDataArray[ii] = (HE::Sint32)ii;
@@ -52,9 +53,9 @@ TEST_CASE("FixMap Test")
         HE::Sint32 b = rand() % ARRAY_NUM;
 
         // 適当に混ぜっ返す
-        HE::Sint32 tmp    = pDataArray[a];
-        pDataArray[a] = pDataArray[b];
-        pDataArray[b] = tmp;
+        HE::Sint32 tmp = pDataArray[a];
+        pDataArray[a]  = pDataArray[b];
+        pDataArray[b]  = tmp;
     }
 
     // マップの生成と空かどうかのテスト
@@ -80,7 +81,7 @@ TEST_CASE("FixMap Test")
 
     // ノードの正当性チェック
     {
-        ctime        = clock();
+        ctime            = clock();
         HE::Bool bResult = testmap.CheckValidByDebug(ARRAY_NUM);
         CHECK(bResult);
         HE_LOG_LINE(HE_STR_TEXT("check ctime=%f sec"), (double)(clock() - ctime) / CLOCKS_PER_SEC);
@@ -106,8 +107,9 @@ TEST_CASE("FixMap Test")
     // イテレータテスト
     {
         // イテレータ用のチェックリスト配列を作る
-        HE::Bool* pCheckArray = reinterpret_cast<HE::Bool*>(
-            HE_ALLOC_MEM(sizeof(HE::Bool) * ARRAY_NUM, 0));  // HE_NEW_MEM_ARRAY(Bool, ARRAY_NUM, 0);
+        HE::Bool* pCheckArray =
+            reinterpret_cast<HE::Bool*>(HE_ALLOC_MEM(sizeof(HE::Bool) * ARRAY_NUM,
+                                                     0));  // HE_NEW_MEM_ARRAY(Bool, ARRAY_NUM, 0);
         HE::Uint32 checked_count = 0;
         for (HE::Sint32 ii = 0; ii < ARRAY_NUM; ii++)
         {

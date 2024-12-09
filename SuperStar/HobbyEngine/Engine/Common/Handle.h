@@ -28,7 +28,10 @@ namespace Core::Common
         inline void Clear() HE_NOEXCEPT { this->_ulHandle = HE::ulInvalidUint64; }
         inline HE::Uint32 Index() const HE_NOEXCEPT { return this->_handleField._uIndex; }
         inline HE::Uint32 Magic() const HE_NOEXCEPT { return this->_handleField._uMagic; }
-        inline HE::Bool Null() const HE_NOEXCEPT { return (this->_ulHandle == HE::ulInvalidUint64); }
+        inline HE::Bool Null() const HE_NOEXCEPT
+        {
+            return (this->_ulHandle == HE::ulInvalidUint64);
+        }
 
         operator HE::Uint64() const HE_NOEXCEPT { return this->_ulHandle; }
 

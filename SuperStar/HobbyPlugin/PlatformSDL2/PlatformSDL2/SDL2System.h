@@ -13,4 +13,4 @@ namespace PlatformSDL2
         HE::Uint32 VGetRand(const HE::Uint32) override final;
         HE::Bool VSetSeedRand(const HE::Uint32) override final;
     };
-}  // namespace Platform::SDL2
+}  // namespace PlatformSDL2

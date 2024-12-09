@@ -38,7 +38,8 @@ namespace AssetManager
             const Core::Common::FixedString512 GetString() const;
 
             template <typename... TArgs>
-            typename std::enable_if<(std::is_same<TArgs, const HE::Char*>::value && ...), Node>::type
+            typename std::enable_if<(std::is_same<TArgs, const HE::Char*>::value && ...),
+                                    Node>::type
             GetNode(TArgs... args)
             {
                 // 引数の個数を取得
@@ -67,7 +68,7 @@ namespace AssetManager
 
         private:
             HE::Bool _OutputNodeMap(ToolNodeMapType* out, const HE::Char* in_szaName[],
-                                const HE::Uint32 in_uCount);
+                                    const HE::Uint32 in_uCount);
             Node _GetNode(const HE::Char* in_szaName[], HE::Uint32 in_uCount);
 
         private:

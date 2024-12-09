@@ -38,7 +38,8 @@ namespace UI
 
     public:
         UIButtonMessageHandlerDefault() = default;
-        UIButtonMessageHandlerDefault(const HE::Char* in_szMsg, UIButtonMessageHandlerImpOnPush in_func)
+        UIButtonMessageHandlerDefault(const HE::Char* in_szMsg,
+                                      UIButtonMessageHandlerImpOnPush in_func)
             : _onPush(in_func), _szMsg(in_szMsg)
         {
         }
@@ -79,7 +80,7 @@ namespace UI
         /// コンポーネントの更新
         /// 必ず処理を記述
         /// </summary>
-        void VUpdate(const HE::Float32 ) override;
+        void VUpdate(const HE::Float32) override;
 
         /// <summary>
         /// プッシュ通知のハンドラーを設定
@@ -112,8 +113,8 @@ namespace UI
 
     private:
         Core::Memory::UniquePtr<UIButtonMessageHandler> _pushHandler;
-        HE::Float32 _fWidth                     = 0.0f;
-        HE::Float32 _fHeight                    = 0.0f;
+        HE::Float32 _fWidth                 = 0.0f;
+        HE::Float32 _fHeight                = 0.0f;
         Core::Math::Rect2::EAnchor _eAnchor = Core::Math::Rect2::EAnchor_Left;
     };
 }  // namespace UI

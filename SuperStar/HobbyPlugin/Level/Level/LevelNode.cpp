@@ -138,7 +138,7 @@ namespace Level
     }
 
     HE::Bool Node::ChainActor(const Core::Common::Handle& in_rChildActor,
-                          const Core::Common::Handle& in_rParentActor)
+                              const Core::Common::Handle& in_rParentActor)
     {
         HE_ASSERT(in_rChildActor.Null() == FALSE);
         HE_ASSERT(in_rParentActor.Null() == FALSE);

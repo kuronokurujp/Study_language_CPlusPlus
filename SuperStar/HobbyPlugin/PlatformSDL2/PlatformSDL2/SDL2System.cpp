@@ -11,4 +11,4 @@ namespace PlatformSDL2
     {
         return FALSE;
     }
-}  // namespace Platform::SDL2
+}  // namespace PlatformSDL2

@@ -25,6 +25,19 @@ if exist %VCPKG_CONFIG_FILE_PATH% (
     del %VCPKG_CONFIG_FILE_PATH%
 )
 
+REM 追加した環境変数を削除
+if defined CLANG_FORMAT_PATH (
+    setx CLANG_FORMAT_PATH ""
+    reg delete "HKEY_CURRENT_USER\Environment" /v CLANG_FORMAT_PATH /f
+    echo "delete env CLANG_FORMAT_PATH"
+)
+
+if defined CLANG_TIDY_PATH (
+    setx CLANG_TIDY_PATH "" 
+    reg delete "HKEY_CURRENT_USER\Environment" /v CLANG_TIDY_PATH /f
+    echo "delete env CLANG_TIDY_PATH"
+)
+
 exit /b 0
 
 endlocal

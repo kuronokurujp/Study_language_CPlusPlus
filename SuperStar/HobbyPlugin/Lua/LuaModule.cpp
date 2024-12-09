@@ -35,7 +35,7 @@ namespace Lua
     /// Luaスクリプトで実行する関数を追加
     /// </summary>
     static HE::Bool _LuaRegistFuncByState(lua_State* in_pState, const HE::Char* in_szFuncName,
-                                      lua_CFunction in_funcAddr)
+                                          lua_CFunction in_funcAddr)
     {
         Core::Common::g_szTempFixedString256 = in_szFuncName;
 
@@ -90,15 +90,15 @@ namespace Lua
                 {
                     pArgData->eValType = ELuaFuncArgType_Float32;
 
-                    const HE::Float32 fVal  = lua_tonumber(in_pLuaState, i);
-                    pArgData->data.fVal = fVal;
+                    const HE::Float32 fVal = lua_tonumber(in_pLuaState, i);
+                    pArgData->data.fVal    = fVal;
                     break;
                 }
                 case LUA_TSTRING:
                 {
                     pArgData->eValType = ELuaFuncArgType_Str;
 
-                    const HE::UTF8* pStr                     = lua_tostring(in_pLuaState, i);
+                    const HE::UTF8* pStr                 = lua_tostring(in_pLuaState, i);
                     Core::Common::g_szTempFixedString128 = pStr;
 
                     HE_STR_CPY_S(pArgData->data.szText, HE_ARRAY_NUM(pArgData->data.szText),
@@ -263,7 +263,8 @@ namespace Lua
         return this->_luaObjectPool.Free(in_rHandle);
     }
 
-    HE::Bool LuaModule::LoadScriptText(const Core::Common::Handle& in_rHandle, const HE::Char* in_pText)
+    HE::Bool LuaModule::LoadScriptText(const Core::Common::Handle& in_rHandle,
+                                       const HE::Char* in_pText)
     {
         HE_ASSERT(in_rHandle.Null() == FALSE);
 
@@ -320,7 +321,7 @@ namespace Lua
 
     // c++側がキャッチできる関数を登録
     HE::Bool LuaModule::RegistScriptFunc(const Core::Common::Handle& in_rHandle,
-                                     const HE::Char* in_pFuncName)
+                                         const HE::Char* in_pFuncName)
     {
         HE_ASSERT(in_rHandle.Null() == FALSE);
 

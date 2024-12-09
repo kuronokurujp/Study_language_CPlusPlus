@@ -18,8 +18,8 @@ namespace Event
     class EventManagerStrategyInterface
     {
     public:
-        EventManagerStrategyInterface()             = default;
-        virtual ~EventManagerStrategyInterface()    = default;
+        EventManagerStrategyInterface()                     = default;
+        virtual ~EventManagerStrategyInterface()            = default;
         virtual HE::Bool VIsEventTypeHash(const HE::Uint64) = 0;
     };
 

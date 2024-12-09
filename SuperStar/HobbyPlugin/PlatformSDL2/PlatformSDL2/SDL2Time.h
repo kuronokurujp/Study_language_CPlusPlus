@@ -13,4 +13,4 @@ namespace PlatformSDL2
         HE::Uint64 VNowMSec() override final;
         void VSleepMSec(const HE::Uint64 in_uMs) override final;
     };
-}  // namespace Platform::SDL2
+}  // namespace PlatformSDL2

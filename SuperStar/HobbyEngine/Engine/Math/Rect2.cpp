@@ -3,8 +3,8 @@
 namespace Core::Math
 {
     // 2Dの矩形クラス
-    Rect2::Rect2(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW, const HE::Float32 in_fH,
-                 const EAnchor in_eAnchor)
+    Rect2::Rect2(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
+                 const HE::Float32 in_fH, const EAnchor in_eAnchor)
     {
         this->Set(in_fX, in_fY, in_fW, in_fH, in_eAnchor);
     }

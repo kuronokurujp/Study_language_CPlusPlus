@@ -20,4 +20,4 @@ namespace PlatformSDL2
         HE::Uint32 _uPrevButton = 0;
         HE::Bool _bQuit         = FALSE;
     };
-}  // namespace Platform::SDL2
+}  // namespace PlatformSDL2

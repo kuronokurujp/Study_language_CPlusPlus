@@ -20,7 +20,8 @@ namespace AssetManager
                 HE::Sint32 iMemSize = iSize + 1;
 
                 // HE_NEW_MEM_ARRAY(UTF8, iMemSize, 0);
-                pReadTmpBuff = reinterpret_cast<HE::UTF8*>(HE_ALLOC_MEM(sizeof(HE::UTF8) * iMemSize, 0));
+                pReadTmpBuff =
+                    reinterpret_cast<HE::UTF8*>(HE_ALLOC_MEM(sizeof(HE::UTF8) * iMemSize, 0));
                 ::memset(pReadTmpBuff, '\0', iMemSize);
 
                 // ファイルの読み込み

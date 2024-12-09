@@ -15,7 +15,7 @@ namespace InGame
         /// ２次元の円同士の衝突ヒット
         /// </summary>
         static HE::Bool IsHitWithCircle2D(const CollisionData& in_rSelfColData,
-                                      const CollisionData& in_rTargetColData)
+                                          const CollisionData& in_rTargetColData)
         {
             auto len = Core::Math::Vector2::Distance(in_rSelfColData.data.circle2D.pos,
                                                      in_rTargetColData.data.circle2D.pos);
@@ -39,7 +39,8 @@ namespace InGame
                 if (in_rSelf.VOutputColData(&selfColData, selfColIndex) == FALSE) continue;
 
                 auto uTargetColCount = in_rTarget.VColCount();
-                for (HE::Uint32 targetColIndex = 0; targetColIndex < uTargetColCount; ++targetColIndex)
+                for (HE::Uint32 targetColIndex = 0; targetColIndex < uTargetColCount;
+                     ++targetColIndex)
                 {
                     if (in_rTarget.VOutputColData(&targetColData, targetColIndex) == FALSE)
                         continue;
@@ -115,7 +116,7 @@ namespace InGame
     }
 
     HE::Bool InGameCollisionComponent::VOnHit(const CollisionData& in_rSelfColData,
-                                          const CollisionData& in_rHitColData)
+                                              const CollisionData& in_rHitColData)
     {
         if (this->_hitAction == NULL) return TRUE;
 
@@ -144,7 +145,7 @@ namespace InGame
     }
 
     HE::Bool InGameCircleCollision2DComponent::VOutputColData(CollisionData* out,
-                                                          const HE::Uint32 in_uColIndex)
+                                                              const HE::Uint32 in_uColIndex)
     {
         auto pTrans = this->_pOwner->GetComponent<Actor::TransformComponent>();
         HE_ASSERT(pTrans);

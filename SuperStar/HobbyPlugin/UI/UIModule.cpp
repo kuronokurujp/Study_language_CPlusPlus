@@ -171,8 +171,8 @@ namespace UI
 
                         auto h =
                             this->NewLabelWidget(Core::Common::FixedString64(pNodeData->szId), sort,
-                                                 pLabel->szLoc, pLabel->szText, rect, pStyle->uColor,
-                                                 in_rViewHandle, in_rLevelHandle);
+                                                 pLabel->szLoc, pLabel->szText, rect,
+                                                 pStyle->uColor, in_rViewHandle, in_rLevelHandle);
 
                         this->AddChildWidget(hParentWidget, h);
                         hParentWidget = h;
@@ -254,9 +254,9 @@ namespace UI
 
     const UIWidgetHandlePack UIModule::NewLabelWidget(
         const Core::Common::StringBase& in_szrName, const HE::Uint32 in_uSort,
-        const HE::Char* in_szLocGroupName, const HE::Char* in_szText, const Core::Math::Rect2& in_rTextRect,
-        const HE::Uint32 in_uTextColor, const Core::Common::Handle& in_rViewHandle,
-        const Core::Common::Handle& in_rLevelHandle)
+        const HE::Char* in_szLocGroupName, const HE::Char* in_szText,
+        const Core::Math::Rect2& in_rTextRect, const HE::Uint32 in_uTextColor,
+        const Core::Common::Handle& in_rViewHandle, const Core::Common::Handle& in_rLevelHandle)
     {
         auto handlePack = this->NewWidget(in_szrName, in_uSort, in_rLevelHandle);
 
@@ -331,7 +331,8 @@ namespace UI
         return UIWidgetHandlePack(handle, in_rLevelHandle);
     }
 
-    HE::Bool UIModule::AddChildWidget(UIWidgetHandlePack& in_rParent, UIWidgetHandlePack& in_rWidget)
+    HE::Bool UIModule::AddChildWidget(UIWidgetHandlePack& in_rParent,
+                                      UIWidgetHandlePack& in_rWidget)
     {
         HE_ASSERT(in_rParent._levelHandle == in_rWidget._levelHandle);
         auto pLevelModule = this->GetDependenceModule<Level::LevelModule>();

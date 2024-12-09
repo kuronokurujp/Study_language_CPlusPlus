@@ -2,8 +2,9 @@
 
 namespace InGame
 {
-    EventCharacterMove::EventCharacterMove(const HE::Float32 in_fTimeStamp, const EObjectTag in_eTag,
-                                           const HE::Uint32 in_uId, const Core::Math::Vector2& in_rMove)
+    EventCharacterMove::EventCharacterMove(const HE::Float32 in_fTimeStamp,
+                                           const EObjectTag in_eTag, const HE::Uint32 in_uId,
+                                           const Core::Math::Vector2& in_rMove)
         : Event::BaseEventData(INGAME_CHARACTER_EVENT_TYPE_NAME, s_szEventType, in_fTimeStamp),
           _move(in_rMove),
           _eTag(in_eTag),
@@ -40,7 +41,8 @@ namespace InGame
     }
 
     EventCharacterDamage::EventCharacterDamage(const HE::Float32 in_fTimeStamp,
-                                               EObjectTag in_eObjectTag, const HE::Uint64 in_ulHandle,
+                                               EObjectTag in_eObjectTag,
+                                               const HE::Uint64 in_ulHandle,
                                                const HE::Uint32 in_sDamage)
         : Event::BaseEventData(INGAME_CHARACTER_EVENT_TYPE_NAME, s_szEventType, in_fTimeStamp),
           _ulHandle(in_ulHandle),
