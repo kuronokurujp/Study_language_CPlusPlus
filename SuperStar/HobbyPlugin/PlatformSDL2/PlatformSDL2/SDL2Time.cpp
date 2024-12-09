@@ -1,15 +1,15 @@
 ﻿#include "SDL2Time.h"
 
+#include "SDL2/SDL.h"
+
 namespace PlatformSDL2
 {
     /// <summary>
     /// 現在の経過時間を取得(ミリセコンド)
     /// </summary>
-    /// <returns></returns>
     HE::Uint64 Time::VNowMSec()
     {
-        return 0;
-        // return static_cast<Uint64>(GetNowCount());
+        return ::SDL_GetTicks();
     }
 
     /// <summary>
@@ -17,6 +17,6 @@ namespace PlatformSDL2
     /// </summary>
     void Time::VSleepMSec(const HE::Uint64 in_uMs)
     {
-        // DxLib::SleepThread(static_cast<int>(in_uMs));
+        ::SDL_Delay(in_uMs);
     }
 }  // namespace PlatformSDL2
