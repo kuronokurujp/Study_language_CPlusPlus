@@ -252,10 +252,8 @@ namespace Core::Common
         WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, this->Str(), -1, out, uOutputTextMaxLen,
                             NULL, NULL);
 #else
-        auto bSuccess =
-            HE_STR_SUCCESS(HE_STR_CPY_S(out, in_uOutBuffLen, this->_szBuff, this->Size()));
-        HE_ASSERT(bSuccess && "文字列コピーに失敗");
-
+        ::memcpy_s(out, in_uOutBuffLen * sizeof(out[0]), this->_szBuff,
+                   this->Size() * sizeof(this->_szBuff[0]));
 #endif
     }
 
