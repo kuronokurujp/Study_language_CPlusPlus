@@ -15,7 +15,7 @@ install_vcpkg_package($CACHE{CHACHE_VCPKG_ROOT} ${CMAKE_CURRENT_SOURCE_DIR} "${C
 # インストールしたパッケージのディレクトリパス
 set(VCPKG_DIR_PATH ThirdParty/VcPkg/$CACHE{CACHE_PROJECT_VCPKG_STATIC_LIB_TYPE})
 
-if(EXISTS ${VCPKG_DIR_PATH})
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH})
     # vcpkgの取り扱い設定処理
     # 使う場合はコメントを外して書き換えてください
 

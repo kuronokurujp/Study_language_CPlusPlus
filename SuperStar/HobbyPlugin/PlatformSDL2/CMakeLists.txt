@@ -12,8 +12,7 @@ install_vcpkg_package($CACHE{CHACHE_VCPKG_ROOT} ${CMAKE_CURRENT_SOURCE_DIR} "${C
 
 # インストールしたパッケージのディレクトリパス
 set(VCPKG_DIR_PATH ThirdParty/VcPkg/$CACHE{CACHE_PROJECT_VCPKG_STATIC_LIB_TYPE})
-#  
-if(EXISTS ${VCPKG_DIR_PATH})
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH})
     # プラグイン用のパッケージディレクトリ
     list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH}/share/sdl2")
     # SDL2をvcpkgでインストール
@@ -36,5 +35,7 @@ if(EXISTS ${VCPKG_DIR_PATH})
             # 相対パスだと自動で${CMAKE_CURRENT_SOURCE_DIR}が追加される
             ../Render/
     )
+else()
+    message(STATUS "Non VcpkgDir ${VCPKG_DIR_PATH}")
 endif()
 
