@@ -418,4 +418,5 @@ Build/*
 Bin/*
 VcPkg/
 vcpkg-configuration.json
+vcpkg.json
 
