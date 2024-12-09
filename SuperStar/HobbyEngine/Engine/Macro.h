@@ -13,6 +13,41 @@
 
 #include <cassert>
 
+// アサートマクロ
+#define HE_ASSERT(...) assert(__VA_ARGS__)
+#define HE_ASSERT_RETURN(...) \
+    {                         \
+        assert(__VA_ARGS__);  \
+        if (__VA_ARGS__)      \
+        {                     \
+        }                     \
+        else                  \
+        {                     \
+            return;           \
+        }                     \
+    }
+
+#define HE_ASSERT_RETURN_VALUE(_x_, ...) \
+    {                                    \
+        assert(__VA_ARGS__);             \
+        if (__VA_ARGS__)                 \
+        {                                \
+        }                                \
+        else                             \
+        {                                \
+            return (_x_);                \
+        }                                \
+    }
+
+#else
+
+#define HE_PG_LOG_LINE(format, ...) ((void)0)
+
+#define HE_LOG(...) ((void)0)
+#define HE_LOG_LINE(format, ...) ((void)0)
+
+#define HE_ASSERT(...) ((void)0)
+
 #endif
 
 #ifdef HE_ENGINE_DEBUG
@@ -24,7 +59,8 @@
 // ログ表示
 // TODO: ログはプラットフォーム毎に用意するのがいいかも
 // リリース時には無効化
-#if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
+// #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
+#if defined(HE_WIN)
 
 #define HE_LOG_MSG_SIZE (2046)
 #define HE_FILE __FILEW__
@@ -62,8 +98,24 @@ template <typename... TArgs>
 HE::Bool HE_LOG_CREATE_FORMATERD_STRING(HE::WChar* out, const HE::Char* in_szFormat,
                                         TArgs... in_args)
 {
+#ifdef HE_CHARACTER_CODE_UTF8
+    static HE::WChar szFormat[HE_LOG_MSG_SIZE] = {};
+    {
+        // 利用する文字数を取得
+        HE::Sint32 iUseSize =
+            MultiByteToWideChar(CP_UTF8, 0, in_szFormat, HE_LOG_MSG_SIZE, NULL, 0);
+        // 利用する文字数が制限を超えていないかチェック
+        HE_ASSERT_RETURN_VALUE(FALSE, iUseSize <= HE_LOG_MSG_SIZE);
+
+        // HE::UTF8文字列からUTF16の文字列に変える
+        MultiByteToWideChar(CP_UTF8, 0, in_szFormat, HE_LOG_MSG_SIZE, &szFormat[0], iUseSize);
+    }
+    std::wstring szDynamicFormat = szFormat;
+#else
     std::wstring szDynamicFormat = in_szFormat;
-    size_t pos                   = szDynamicFormat.find(L"%");
+#endif
+
+    size_t pos = szDynamicFormat.find(L"%");
 
     // 各引数に応じてフォーマット文字列を変更する
     // フォーマット置換データが文字列のwchar_t型とchart型と両方使える
@@ -109,7 +161,7 @@ void HE_LOG(const HE::Char* in_szFormat, TArgs... in_args)
         if (hConsole != INVALID_HANDLE_VALUE)
         {
             DWORD written = 0;
-            ::WriteConsoleW(hConsole, szText, static_cast<DWORD>(HE_STR_LEN(szText)), &written,
+            ::WriteConsoleW(hConsole, szText, static_cast<DWORD>(::wcslen(szText)), &written,
                             nullptr);
         }
     }
@@ -132,16 +184,16 @@ void HE_LOG_LINE(const HE::Char* in_szFormat, TArgs... in_args)
     // コンソールなどデバッグ画面で出力
     {
         ::OutputDebugString(szText);
-        ::OutputDebugString(HE_STR_TEXT("\n"));
+        ::OutputDebugString(L"\n");
 
         // WriteConsoleWを使ってワイド文字列を直接出力する
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         if (hConsole != INVALID_HANDLE_VALUE)
         {
             DWORD written = 0;
-            ::WriteConsoleW(hConsole, szText, static_cast<DWORD>(HE_STR_LEN(szText)), &written,
+            ::WriteConsoleW(hConsole, szText, static_cast<DWORD>(::wcslen(szText)), &written,
                             nullptr);
-            ::WriteConsoleW(hConsole, HE_STR_TEXT("\n"), 1, &written, nullptr);
+            ::WriteConsoleW(hConsole, L"\n", 1, &written, nullptr);
         }
     }
 }
@@ -149,23 +201,23 @@ void HE_LOG_LINE(const HE::Char* in_szFormat, TArgs... in_args)
 // プログラムが把握する情報を付与したログ出力
 // ファイルパスが長く長文になる可能性があるのでログサイズ2倍の文字列サイズを確保
 // コンソールにも出力
-#define HE_PG_LOG_LINE(format, ...)                                                               \
-    do                                                                                            \
-    {                                                                                             \
-        static HE::WChar c[HE_LOG_MSG_SIZE] = {};                                                 \
-        HE_LOG_CREATE_FORMATERD_STRING(c, format, __VA_ARGS__);                                   \
-        static HE::WChar c2[HE_LOG_MSG_SIZE * 2] = {};                                            \
-        _snwprintf_s(c2, HE_LOG_MSG_SIZE * 2, HE_LOG_MSG_SIZE * 2, L"%ls:%d %ls", __FILEW__,      \
-                     __LINE__, c);                                                                \
-        OutputDebugString(c2);                                                                    \
-        OutputDebugString(L"\n");                                                                 \
-        static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);                                 \
-        if (hConsole != INVALID_HANDLE_VALUE)                                                     \
-        {                                                                                         \
-            DWORD written = 0;                                                                    \
-            ::WriteConsoleW(hConsole, c2, static_cast<DWORD>(HE_STR_LEN(c2)), &written, nullptr); \
-            ::WriteConsoleW(hConsole, HE_STR_TEXT("\n"), 1, &written, nullptr);                   \
-        }                                                                                         \
+#define HE_PG_LOG_LINE(format, ...)                                                             \
+    do                                                                                          \
+    {                                                                                           \
+        static HE::WChar c[HE_LOG_MSG_SIZE] = {};                                               \
+        HE_LOG_CREATE_FORMATERD_STRING(c, format, __VA_ARGS__);                                 \
+        static HE::WChar c2[HE_LOG_MSG_SIZE * 2] = {};                                          \
+        _snwprintf_s(c2, HE_LOG_MSG_SIZE * 2, HE_LOG_MSG_SIZE * 2, L"%ls:%d %ls", __FILEW__,    \
+                     __LINE__, c);                                                              \
+        OutputDebugString(c2);                                                                  \
+        OutputDebugString(L"\n");                                                               \
+        static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);                               \
+        if (hConsole != INVALID_HANDLE_VALUE)                                                   \
+        {                                                                                       \
+            DWORD written = 0;                                                                  \
+            ::WriteConsoleW(hConsole, c2, static_cast<DWORD>(::wcslen(c2)), &written, nullptr); \
+            ::WriteConsoleW(hConsole, HE_STR_TEXT("\n"), 1, &written, nullptr);                 \
+        }                                                                                       \
     } while (0)
 
 #else
@@ -196,40 +248,7 @@ void HE_LOG_LINE(const HE::Char* in_szFormat, TArgs... in_args)
 
 #endif
 
-// アサートマクロ
-#define HE_ASSERT(...) assert(__VA_ARGS__)
-#define HE_ASSERT_RETURN(...) \
-    {                         \
-        assert(__VA_ARGS__);  \
-        if (__VA_ARGS__)      \
-        {                     \
-        }                     \
-        else                  \
-        {                     \
-            return;           \
-        }                     \
-    }
-
-#define HE_ASSERT_RETURN_VALUE(_x_, ...) \
-    {                                    \
-        assert(__VA_ARGS__);             \
-        if (__VA_ARGS__)                 \
-        {                                \
-        }                                \
-        else                             \
-        {                                \
-            return (_x_);                \
-        }                                \
-    }
-
 #else
-
-#define HE_PG_LOG_LINE(format, ...) ((void)0)
-
-#define HE_LOG(...) ((void)0)
-#define HE_LOG_LINE(format, ...) ((void)0)
-
-#define HE_ASSERT(...) ((void)0)
 
 #endif
 

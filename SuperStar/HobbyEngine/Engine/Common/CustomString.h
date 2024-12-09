@@ -257,7 +257,6 @@ namespace Core::Common
 #else
         FixedString(const std::string_view& in_szName) : StringBase(this->_szBuff, TCapacity)
         {
-            // TODO: 対応が必要
             this->_Copy(in_szName.data(), in_szName.length());
         }
 #endif
@@ -292,7 +291,7 @@ namespace Core::Common
             HE_ASSERT(in_szNameUTF8);
             HE_ASSERT(in_uLen <= TCapacity);
 
-            static HE::Char w[TCapacity] = {};
+            static HE::WChar w[TCapacity] = {};
             ::memset(w, 0, HE_ARRAY_SIZE(w));
 
             // 利用する文字数を取得
