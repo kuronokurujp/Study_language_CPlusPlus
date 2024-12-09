@@ -64,30 +64,35 @@ if(EXISTS ${vcpkg_manifest_root_path}/vcpkg.json)
     file(REMOVE ${vcpkg_manifest_root_path}/vcpkg.json)
 endif()
 
-# vcpkgの環境を構築
-execute_process(
-    COMMAND cmd /c "${vcpkg_dir_path}/vcpkg.exe" "--vcpkg-root=${vcpkg_dir_path}" new --application
-    WORKING_DIRECTORY ${vcpkg_manifest_root_path}
-    OUTPUT_VARIABLE CMD_OUTPUT
-    ERROR_VARIABLE CMD_ERROR
-    RESULT_VARIABLE CMD_RESULT
-)
-
-# プラグインが用意した.vcpkg.jsonをvcpkg.jsonにコピー
+# プラグインが用意した.vcpkg.jsonがあればvcpkg管理のライブラリをインストールする
 if(EXISTS ${vcpkg_manifest_root_path}/.vcpkg.json)
-    configure_file(${vcpkg_manifest_root_path}/.vcpkg.json ${vcpkg_manifest_root_path}/vcpkg.json COPYONLY)
+    file(SIZE ${vcpkg_manifest_root_path}/.vcpkg.json VCPKG_FILE_SIZE)
+    if (VCPKG_FILE_SIZE GREATER 0)
+        # vcpkgの環境を構築
+        execute_process(
+            COMMAND cmd /c "${vcpkg_dir_path}/vcpkg.exe" "--vcpkg-root=${vcpkg_dir_path}" new --application
+            WORKING_DIRECTORY ${vcpkg_manifest_root_path}
+            OUTPUT_VARIABLE CMD_OUTPUT
+            ERROR_VARIABLE CMD_ERROR
+            RESULT_VARIABLE CMD_RESULT
+        )
+
+        # プラグインが用意した.vcpkg.jsonをvcpkg.jsonにコピー
+        configure_file(${vcpkg_manifest_root_path}/.vcpkg.json ${vcpkg_manifest_root_path}/vcpkg.json COPYONLY)
+
+        execute_process(
+             COMMAND cmd /c "${vcpkg_dir_path}/vcpkg.exe" "--vcpkg-root=${vcpkg_dir_path}" install --clean-after-build "--x-manifest-root=${vcpkg_manifest_root_path}" "--x-install-root=${vcpkg_install_dir_path}/ThirdParty/VcPkg" "--triplet=${vcpkg_triplet}"
+             WORKING_DIRECTORY ${vcpkg_manifest_root_path}
+             OUTPUT_VARIABLE CMD_OUTPUT
+             ERROR_VARIABLE CMD_ERROR
+             RESULT_VARIABLE CMD_RESULT
+         )
+
+        message(STATUS "Command Output: ${CMD_OUTPUT}")
+        message(STATUS "Command Error: ${CMD_ERROR}")
+        message(STATUS "Command Result: ${CMD_RESULT}")
+
+    endif()
 endif()
-
-execute_process(
-     COMMAND cmd /c "${vcpkg_dir_path}/vcpkg.exe" "--vcpkg-root=${vcpkg_dir_path}" install --clean-after-build "--x-manifest-root=${vcpkg_manifest_root_path}" "--x-install-root=${vcpkg_install_dir_path}/ThirdParty/VcPkg" "--triplet=${vcpkg_triplet}"
-     WORKING_DIRECTORY ${vcpkg_manifest_root_path}
-     OUTPUT_VARIABLE CMD_OUTPUT
-     ERROR_VARIABLE CMD_ERROR
-     RESULT_VARIABLE CMD_RESULT
- )
-
-message(STATUS "Command Output: ${CMD_OUTPUT}")
-message(STATUS "Command Error: ${CMD_ERROR}")
-message(STATUS "Command Result: ${CMD_RESULT}")
 
 endfunction()

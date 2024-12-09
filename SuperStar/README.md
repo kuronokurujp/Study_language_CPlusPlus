@@ -23,21 +23,21 @@
 | ---- | ---------- |
 | C++  | 17         |
 
-| ツール                                                               | バージョン | 説明                                               |
-| -------------------------------------------------------------------- | ---------- | -------------------------------------------------- |
-| [CMake](https://cmake.org/)                                          | 3.30.0     | プロジェクト構築に利用                             |
-| [vcpk](https://learn.microsoft.com/ja-jp/vcpkg/get_started/overview) | ---        | プロジェクトで利用する C/C++ライブラリの管理に利用 |
+| ツール                                                                | バージョン | 説明                                               |
+| --------------------------------------------------------------------- | ---------- | -------------------------------------------------- |
+| [CMake](https://cmake.org/)                                           | 3.30.0     | プロジェクト構築に利用                             |
+| [vcpkg](https://learn.microsoft.com/ja-jp/vcpkg/get_started/overview) | ---        | プロジェクトで利用する C/C++ライブラリの管理に利用 |
 
 ## 利用ライブラリ一覧
 
-| Name                                                                      | Version   | 用途               |
-| ------------------------------------------------------------------------- | --------- | ------------------ |
-| [Catch2](https://github.com/catchorg/Catch2)                              | v2.13.10  | コードの単体テスト |
-| [DxLib](https://dxlib.xsrv.jp/)                                           | Ver 3.24d | 描画ライブラリ     |
-| [tomlplusplus](https://github.com/marzer/tomlplusplus?tab=readme-ov-file) | V3.4.0    | toml ファイル制御  |
-| [simdjson](https://github.com/simdjson/simdjson)                          | v3.9.4    | json ファイル制御  |
-| [pugixml](https://github.com/simdjson/simdjson)                           | v1.14     | xml ファイル制御   |
-| [Lua](https://www.lua.org/lua-l.html)                                     | v5.4.7    | lua スクリプト活用 |
+| Name                                                                      | Version | 用途                       |
+| ------------------------------------------------------------------------- | ------- | -------------------------- |
+| [Catch2](https://github.com/catchorg/Catch2)                              | 2.13.10 | コードの単体テスト         |
+| [SDL2](https://www.libsdl.org/index.php)                                  | 2.30.9  | プラットフォームライブラリ |
+| [tomlplusplus](https://github.com/marzer/tomlplusplus?tab=readme-ov-file) | 3.4.0   | toml ファイル制御          |
+| [simdjson](https://github.com/simdjson/simdjson)                          | 3.9.4   | json ファイル制御          |
+| [pugixml](https://github.com/simdjson/simdjson)                           | 1.14    | xml ファイル制御           |
+| [Lua](https://www.lua.org/lua-l.html)                                     | 5.4.7   | lua スクリプト活用         |
 
 ## 自作ツール一覧
 
@@ -51,7 +51,7 @@
 -   エンジン開発経験を詰むため
 -   最新技術を試す環境づくり
 
-## 環境構築手順(作成中)
+## 開発環境構築手順
 
 1. window パッケージ管理ソフト[chocolate](https://chocolatey.org/)をインストール
 
@@ -60,6 +60,8 @@
         - [Chocolatey とは、Windows 用のパッケージ管理システムの概要と特徴](https://www.issoh.co.jp/tech/details/3520/)
 
 1. EnvBuild.bat を実行
+
+    - chocolate を使用して開発に必要なアプリをインストールする
 
     - 注意点
 
@@ -70,7 +72,7 @@
         - Visual Studio 2022 Community
         - Git
 
-## 構築した環境削除
+## 構築した開発環境削除
 
 1. EnvClean.bat を実行
 
@@ -106,15 +108,6 @@
         - [インストール先](https://cmake.org/download/)
         - 項目 **Windows x64 Installer:** のインストーラーをダウンロード
         - [参考となるインストール方法](https://qiita.com/matskeng/items/c466c4751e1352f97ce6)
-
-1. 環境変数 CLANG_FORMAT_PATH を追加
-
-    - バッチファイルの一括整形する場合に使う
-    - 環境変数には clang-format.exe のパスを絶対パスで設定
-
-1. 環境変数 CLANG_TIDY_PATH を追加
-    - バッチファイルの一括整形で利用
-    - 環境変数には clang-tidy.exe のパスを絶対パスで設定
 
 #### コード整形内容をファイルに記述
 
@@ -176,6 +169,20 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
 
 2. 自動整形することでコンパイルが通らない可能性をつぶすため
 
+## モジュール追加手順
+1. Engine/Script/Generater/CreateModule/CreateModule.batを実行
+    - バッチファイル実行すると作成するモジュール名とモジュールをどこに作成するかのパス入力があります。<br>
+     モジュールを作成する箇所はHobbyPluginディレクトリにしてください。
+        
+2. vcpkgを使う場合
+    1. モジュールでvcpkgが管理しているライブラリを使う場合は.vcpkg.jsonにインストールするライブラリを記述してください。
+        - [vcpkgが取り扱っているライブラリの検索サイト](https://vcpkg.link/)
+        - [vcpkg.jsonの書き方](https://learn.microsoft.com/ja-jp/vcpkg/reference/vcpkg-json)
+        - 注意点
+            - "builtin-baseline"項目は記述しないでください。
+    1. CMakeLists.txtにvcpkgでインストールしたパッケージを使えるように記述
+        - CMakeLists.txtにはスケルトンコードがあるでそれを書き換える
+
 ## コーディング規約
 
 ### 目的
@@ -187,24 +194,26 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
 変数名を見るだけで変数型を素早く理解するために<br>
 ハンガリアン記法を採用<br>
 型の記号はわかりやすくかつ変数名を読むのを邪魔にならない程度<br>
+独自定義した型名に HE::をつけるようにした<br>
+これは SDL2 との型名との重複を避けるための対応<br>
 
 -   変数名の先頭につける記号一覧
     |データ型|プレフィックス|説明|
     |----|----|----|
-    |Sint8|なし|使う機会がほとんどないから|
-    |UInt8|なし|使う機会がほとんどないから|
-    |Int|なし|使う機会がほとんどないから|
-    |Sint16|is||
-    |Uint16|us||
-    |Sint32|i||
-    |Uint32|u||
-    |Sint64|il||
-    |Uint64|ul||
-    |Float32|f||
-    |Float64|d||
-    |Bool|b||
-    |Char|c||
-    |Char[] or Char\* or std::string などの文字列|sz||
+    |HE::Sint8|なし|使う機会がほとんどないから|
+    |HE::UInt8|なし|使う機会がほとんどないから|
+    |HE::Int|なし|使う機会がほとんどないから|
+    |HE::Sint16|is||
+    |HE::Uint16|us||
+    |HE::Sint32|i||
+    |HE::Uint32|u||
+    |HE::Sint64|il||
+    |HE::Uint64|ul||
+    |HE::Float32|f||
+    |HE::Float64|d||
+    |HE::Bool|b||
+    |HE::Char|c||
+    |HE::Char[] or Char\* or std::string などの文字列|sz||
     |ポインタ|p|p の前後に型記号はいれない|
     |参照|r||
     |std::shared*ptr|sp||
@@ -232,7 +241,7 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
         // *でポインターだからp
         // なのでupの記号をつける
         // しかしポインタなのでpのみにする
-        Uint32* pCount;
+        HE::Uint32* pCount;
         ```
     -   例 2)
         ```
@@ -241,7 +250,7 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
             public:
                 // メンバー変数なので_
                 // Uint32型なのでuをつける
-                Uint32 _uCount = 0;
+                HE::Uint32 _uCount = 0;
             };
         ```
     -   例 3)
@@ -268,7 +277,7 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
     class Object
     {
     private:
-        Uint32 _GetIndex() { return 0; }
+        HE::Uint32 _GetIndex() { return 0; }
     };
 ```
 
@@ -329,9 +338,9 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
     class Object
     {
     public:
-        Uint32 Count() const { this->_uCount; }
+        HE::Uint32 Count() const { this->_uCount; }
     private:
-        Uint32 _uCount;
+        HE::Uint32 _uCount;
     }
     ```
 
@@ -345,9 +354,9 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
     class Object
     {
     public:
-        Uint32 Count() const { this->_uCount; }
+        HE::Uint32 Count() const { this->_uCount; }
     private:
-        Uint32 _uCount;
+        HE::Uint32 _uCount;
     }
 
     Object obj;
@@ -413,6 +422,16 @@ TaskManager.hpp
 -   git の無視ファイルに Debug ディレクトリを指定しているのでディレクトリ名に Debug を使ってはいけない
 
 # 参考サイト
+
+## chocolate(windows のパッケージ管理ツール)
+
+-   [【絶対わかる】Windows へ Chocolatey のインストール方法と使い方](https://www.geeklibrary.jp/counter-attack/chocolatey/)
+-   [Chocolatey とは、Windows 用のパッケージ管理システムの概要と特徴](https://www.issoh.co.jp/tech/details/3520/)
+
+## vcpkg
+- [vcpkg公式ドキュメント](https://learn.microsoft.com/ja-jp/vcpkg/)
+- [vcpkgが取り扱っているライブラリの検索サイト](https://vcpkg.link/)
+- [vcpkg.jsonの書き方](https://learn.microsoft.com/ja-jp/vcpkg/reference/vcpkg-json)
 
 ## Git
 
