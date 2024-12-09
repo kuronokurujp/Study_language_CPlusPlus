@@ -25,15 +25,15 @@ namespace PlatformSDL2
         void VRemoveViewPort(const Core::Common::Handle& in_rWindowHandle,
                              const Core::Common::Handle& in_rViewPortHandle) override final;
 
-        // TODO: UI用シーン追加
+        // UI用シーン追加
         const Core::Common::Handle& VAddSceneViewUI(
             const Platform::ScreenSceneViewUIConfig&) override final;
 
-        // TODO: 2D用シーン追加
+        // 2D用シーン追加
         const Core::Common::Handle& VAddSceneView2D(
             const Platform::ScreenSceneView2DConfig&) override final;
 
-        // TODO: 2D環境取得
+        // 2D環境取得
         const Platform::ScreenSceneView2DEnvironment&& GetEnvBySceneView2D(
             const Core::Common::Handle&) override final;
 

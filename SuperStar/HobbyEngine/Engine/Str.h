@@ -41,7 +41,6 @@
 #define HE_STR_STR(t01, t02) ::strstr(t01, t02)
 #define HE_STR_VSNPRINTF(dst, len, count, fmt, arg) ::vsnprintf_s(dst, len, count, fmt, arg)
 
-// TODO: 未対応
 #define HE_STR_LOWER(s, size)                 \
     {                                         \
         for (HE::Uint32 i = 0; i < size; ++i) \
@@ -61,7 +60,6 @@
 #define HE_STR_TEXT(t) u8##t
 #define HE_STR_EMPTY u8""
 
-// TODO: 未対応
 // 1文字を小文字に変える
 #define HE_CHAR_LOWWER(c) ::tolower(c)
 

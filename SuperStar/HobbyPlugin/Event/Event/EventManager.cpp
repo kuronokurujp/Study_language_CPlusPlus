@@ -38,7 +38,6 @@ namespace Event
 
         // 登録したリスナーを解放
         {
-            // TODO: 名前は後で変える
             for (auto itr = this->_mRegistry.Begin(); itr != this->_mRegistry.End(); ++itr)
             {
                 for (auto itr2 = itr->data.begin(); itr2 != itr->data.end(); ++itr2)

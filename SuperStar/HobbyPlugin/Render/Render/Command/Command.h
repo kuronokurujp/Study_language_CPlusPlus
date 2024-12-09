@@ -25,7 +25,7 @@ namespace Render
         ECmdType_2DRectDraw,
         // 点描画
         ECmdType_2DPointDraw,
-        // TODO: 点群描画
+        // 点群描画
         ECmdType_2DPointArrayDraw,
         // 円の描画
         ECmdType_2DCircleDraw

@@ -31,8 +31,19 @@ namespace PlatformSDL2
         {
             // windowを作成
             // openglを扱うようにする
+            SDL_DisplayMode dm;
+
+            // ディスプレイ0の情報を取得
+            int x = 0;
+            int y = 0;
+            if (SDL_GetCurrentDisplayMode(0, &dm) == 0)
+            {
+                x = (dm.w - this->_uWidht) >> 1;
+                y = (dm.h - this->_uHeight) >> 1;
+            }
+
             this->_pWindow =
-                SDL_CreateWindow("", 0, 0, this->_uWidht, this->_uHeight, SDL_WINDOW_OPENGL);
+                SDL_CreateWindow("", x, y, this->_uWidht, this->_uHeight, SDL_WINDOW_OPENGL);
 
             // Windowに紐づいているOpenGLのコンテキストを生成
             // これを利用してOpenGLの機能を使う
@@ -76,7 +87,6 @@ namespace PlatformSDL2
         SDL_GLContext _glContext;
     };
 
-    // TODO: 2D用のシーン
     class DXLibSceneView2D : public Render::SceneViewBase
     {
     protected:
@@ -199,7 +209,6 @@ namespace PlatformSDL2
         // static inline ::POINTDATA s_a2DPoint[s_u2DPointCount];
     };
 
-    // TODO: UI用のシーン
     class DXLibSceneViewUI final : public DXLibSceneView2D
     {
     };
@@ -259,7 +268,7 @@ namespace PlatformSDL2
     const Core::Common::Handle& Screen::VAddSceneViewUI(
         const Platform::ScreenSceneViewUIConfig& in_rConfig)
     {
-        // TODO: プラットフォーム専用のUIシーンを追加
+        // プラットフォーム専用のUIシーンを追加
         auto pRenderModule = this->_pSDL2Module->GetDependenceModule<Render::RenderModule>();
         HE_ASSERT_RETURN_VALUE(NullHandle, pRenderModule);
 
@@ -272,7 +281,7 @@ namespace PlatformSDL2
     const Core::Common::Handle& Screen::VAddSceneView2D(
         const Platform::ScreenSceneView2DConfig& in_rConfig)
     {
-        // TODO: プラットフォーム専用の2Dシーンを追加
+        // プラットフォーム専用の2Dシーンを追加
         auto pRenderModule = this->_pSDL2Module->GetDependenceModule<Render::RenderModule>();
         HE_ASSERT_RETURN_VALUE(NullHandle, pRenderModule);
 
@@ -285,11 +294,11 @@ namespace PlatformSDL2
     {
         auto env = Platform::ScreenSceneView2DEnvironment();
 
-        // TODO: プラットフォーム専用の2Dシーンを追加
+        // プラットフォーム専用の2Dシーンを追加
         auto pRenderModule = this->_pSDL2Module->GetDependenceModule<Render::RenderModule>();
         HE_ASSERT_RETURN_VALUE(std::move(env), pRenderModule);
 
-        // TODO: ビューポートの設定情報取得
+        // ビューポートの設定情報取得
         // 設定情報から環境情報を構築
         auto pViewPortConfig = pRenderModule->GetViewPortConfig(in_rHandle);
 

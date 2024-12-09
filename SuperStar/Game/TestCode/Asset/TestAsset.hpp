@@ -5,16 +5,14 @@
 #include "Code/Asset/ParamaterAssetData.h"
 
 #define HE_UNIT_TEST_MODE
-// #include "../DxLib/DXLibModule.h"
 #include "../PlatformSDL2/PlatformSDL2Module.h"
 #include "Engine/Common/Function.h"
 #include "Engine/Engine.h"
 
 TEST_CASE("Test Paramater Asset Load")
 {
-    // TODO: プラットフォームSDL2対応がまだ
     UnitTestRunnerByModuleOnly<AssetManager::AssetManagerModule,
-                               PlatformSDL2::PlatformSDL2Module /*DXLib::DXLibModule*/>(
+                               PlatformSDL2::PlatformSDL2Module>(
         []()
         {
             auto pAssetManagerModule =

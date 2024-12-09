@@ -126,51 +126,6 @@ HE::Bool Engine::VRelease()
     return TRUE;
 }
 
-#if 0
-/// <summary>
-/// ゲームウィンドウ生成.
-/// </summary>
-Core::Common::Handle Engine::CreateGameWindow()
-{
-    HE_ASSERT(this->_bStart);
-
-    auto pPlatform = this->PlatformModule();
-    if (pPlatform == NULL) return NullHandle;
-
-    // TODO: ウィンドウを作成
-    // ゲームウィンドウとして扱う
-    auto pScreen = pPlatform->VScreen();
-    if (pScreen == NULL) return NullHandle;
-
-    auto [handle] = pScreen->VCreateWindow();
-
-    return handle;
-}
-
-/// <summary>
-/// ゲームウィンドウを解放.
-/// </summary>
-void Engine::ReleseAllWindows()
-{
-    auto pPlatform = this->PlatformModule();
-    if (pPlatform == NULL) return;
-
-    auto pScreen = pPlatform->VScreen();
-    if (pScreen == NULL) return NullHandle;
-
-
-    pPlatform->VReleaseAllWindows();
-}
-
-void Engine::ShowWindow(Core::Common::Handle& in_rHandle)
-{
-    auto pPlatform = this->PlatformModule();
-    if (pPlatform == NULL) return;
-
-    pPlatform->VShowWindow(in_rHandle);
-}
-#endif
-
 HE::Bool Engine::BeforeUpdateLoop(const HE::Float32 in_fDt)
 {
     this->_upModuleManager->BeforeUpdate(in_fDt);

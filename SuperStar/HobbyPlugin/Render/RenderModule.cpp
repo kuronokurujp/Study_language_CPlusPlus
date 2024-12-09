@@ -27,7 +27,7 @@ namespace Render
         auto [handle, pWindow] = this->_poolWindow.Alloc();
         if (handle.Null()) return NullHandle;
 
-        // TODO: 作成したウィンドウのセットアップ
+        // 作成したウィンドウのセットアップ
         if (pWindow->_Setup(std::move(in_upStrategy)) == FALSE)
         {
             this->_poolWindow.Free(handle);
@@ -64,7 +64,6 @@ namespace Render
         }
     }
 
-    // TODO: ウィンドウ表示
     void RenderModule::ShowWindow(const Core::Common::Handle& in_rHandle)
     {
         auto pWindow = this->_GetWindow(in_rHandle);
@@ -160,7 +159,7 @@ namespace Render
 
     HE::Bool RenderModule::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
     {
-        // TODO 作成したウィンドウの立ち上げ
+        // 作成したウィンドウの立ち上げ
         while (this->_sStandupWindow.Empty() == FALSE)
         {
             auto handle  = this->_sStandupWindow.PopBack();
@@ -176,7 +175,7 @@ namespace Render
 
     HE::Bool RenderModule::_VUpdate(const HE::Float32 in_fDeltaTime)
     {
-        // TODO: ウィンドウを更新
+        // ウィンドウを更新
         auto mWindow = this->_poolWindow.GetUseDataMap();
         for (auto itr = mWindow.Begin(); itr != mWindow.End(); ++itr)
         {
@@ -188,7 +187,7 @@ namespace Render
 
     HE::Bool RenderModule::_VLateUpdate(const HE::Float32)
     {
-        // TODO: ウィンドウの描画
+        // ウィンドウの描画
         auto mWindow = this->_poolWindow.GetUseDataMap();
         for (auto itr = mWindow.Begin(); itr != mWindow.End(); ++itr)
         {

@@ -80,7 +80,7 @@ namespace Render
     void Command2DPointArrayDraw(const Core::Common::Handle& in_rViewHandle,
                                  const Point2D* in_aPoint, const HE::Uint32 in_uCount)
     {
-        // TODO: 点群描画コマンドを作る
+        // 点群描画コマンドを作る
         HE_ASSERT(in_rViewHandle.Null() == FALSE);
         // 必要なコマンド情報を作る
         Command cmd;
@@ -115,7 +115,7 @@ namespace Render
                              const Core::Math::Vector2& in_rPos, const HE::Float32 in_fSize,
                              const Color& in_rColor)
     {
-        // TODO: 2D円の描画コマンドを作る
+        // 2D円の描画コマンドを作る
         HE_ASSERT(in_rViewHandle.Null() == FALSE);
 
         // 必要なコマンド情報を作る

@@ -45,22 +45,30 @@ namespace Platform
         virtual const Core::Common::Handle VCreateWindow() = 0;
         virtual HE::Bool VReleaseAllWindows()              = 0;
 
-        // TODO: ウィンドウ描画
+        /// <summary>
+        /// ウィンドウ描画
+        /// </summary>
         virtual void VShowWindow(const Core::Common::Handle&) = 0;
 
         virtual Core::Common::Handle VAddViewPort(const Core::Common::Handle&)       = 0;
         virtual void VRemoveViewPort(const Core::Common::Handle& in_rWindowHandle,
                                      const Core::Common::Handle& in_rViewPortHandle) = 0;
 
-        // TODO: UI用シーン追加
+        /// <summary>
+        /// UI用シーン追加
+        /// </summary>
         virtual const Core::Common::Handle& VAddSceneViewUI(
             const ScreenSceneViewUIConfig& in_rConfig) = 0;
 
-        // TODO: 2D用シーン追加
+        /// <summary>
+        /// 2D用シーン追加
+        /// </summary>
         virtual const Core::Common::Handle& VAddSceneView2D(
             const ScreenSceneView2DConfig& in_rConfig) = 0;
 
-        // TODO: 2D環境取得
+        /// <summary>
+        /// 2D環境取得
+        /// </summary>
         virtual const ScreenSceneView2DEnvironment&& GetEnvBySceneView2D(
             const Core::Common::Handle&) = 0;
     };

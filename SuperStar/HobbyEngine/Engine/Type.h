@@ -41,8 +41,8 @@ namespace HE
     using Uint16 = unsigned short;
     using Sint8  = signed char;
     using Uint8  = unsigned char;
+
 // WindowsではUnicode前提実装なのでwchar型にしている
-// TODO: UTF8型を利用する場合は
 #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
     using Char  = wchar_t;
     using WChar = wchar_t;

@@ -18,7 +18,7 @@ namespace Event
 
     HE::Bool EventModule::RemoveEventManager(const Core::Common::Handle& in_rHandle)
     {
-        // TODO: 確保した管理インスタンスを破棄
+        // 確保した管理インスタンスを破棄
         if (this->_mEventMng.Contains(in_rHandle) == FALSE) return FALSE;
 
         auto pEventMng = this->_mEventMng.FindKey(in_rHandle);
@@ -87,7 +87,7 @@ namespace Event
     /// </summary>
     HE::Bool EventModule::_VRelease()
     {
-        // TODO: 全ての管理インスタンスを破棄
+        // 全ての管理インスタンスを破棄
         auto itr = this->_mEventMng.Begin();
         while (itr != this->_mEventMng.End())
         {
@@ -100,7 +100,7 @@ namespace Event
 
     HE::Bool EventModule::_VLateUpdate(const HE::Float32 in_fDeltaTime)
     {
-        // TODO: 全ての管理インスタンスを実行
+        // 全ての管理インスタンスを実行
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
         {
             // TODO: 指定時間でイベント処理を途中終了しないようにする

@@ -14,7 +14,7 @@ HE::Bool ApplicationEngineFramework::VStart(const HE::Bool in_bDebug)
     const HE::Bool bPreInitRet = HE_ENGINE.Init();
     HE_ASSERT(bPreInitRet && "事前初期化に失敗");
 
-    // TODO: モジュール登録
+    // モジュール登録
     if (this->_VRegistEngineModule() == FALSE) return FALSE;
 
     const HE::Bool bInitRet = HE_ENGINE.Start();

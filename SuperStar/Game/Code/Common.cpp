@@ -2,7 +2,7 @@
 // ゲーム全体で参照できるグローバルデータを置く
 namespace Game
 {
-    // TODO: シーン描画するUI/2Dのハンドル
+    // シーン描画するUI/2Dのハンドル
     Core::Common::Handle g_sceneUIHandle;
     Core::Common::Handle g_scene2DHandle;
 

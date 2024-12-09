@@ -13,7 +13,9 @@
 
 namespace Render
 {
-    // TODO: レンダリングのコンテキスト
+    /// <summary>
+    /// レンダリングのコンテキスト
+    /// </summary>
     struct RenderingContext
     {
     public:
@@ -25,7 +27,7 @@ namespace Render
         inline Core::Common::Handle GetViewPortHandle() const { return this->ulViewPortHandle; }
         inline Core::Common::Handle GetSceneHandle() const { return this->ulSceneHandle; }
 
-        // TODO: コンテキストが有効かどうか
+        // コンテキストが有効かどうか
         HE::Bool IsValid() const;
 
     private:
@@ -50,24 +52,38 @@ namespace Render
     public:
         RenderModule() : ModuleBase(ModuleName(), Module::ELayer_View, 10) {}
 
-        // TODO: ウィンドウの生成と破棄
+        /// <summary>
+        /// ウィンドウ生成
+        /// </summary>
         const Core::Common::Handle NewWindow(Core::Memory::UniquePtr<Render::WindowStrategy>);
 
+        /// <summary>
+        /// ウィンドウ破棄
+        /// </summary>
         HE::Bool DeleteWindow(const Core::Common::Handle&);
         void DeleteAllWindow();
 
-        // TODO: ウィンドウ表示
+        /// <summary>
+        /// ウィンドウ表示
+        /// </summary>
         void ShowWindow(const Core::Common::Handle&);
 
-        // TODO: ビューポート追加と解除
+        /// <summary>
+        /// ビューポート追加
+        /// </summary>
         const Core::Common::Handle AddViewPort(const Core::Common::Handle&,
                                                Core::Memory::UniquePtr<ViewPortConfig>);
+        /// <summary>
+        /// ビューポート外す
+        /// </summary>
         HE::Bool RemoveViewPort(const Core::Common::Handle& in_rWindowHandle,
                                 const Core::Common::Handle& in_rViewPortHandle);
 
         const ViewPortConfig* GetViewPortConfig(const Core::Common::Handle&);
 
-        // TODO: UI用シーン追加
+        /// <summary>
+        /// UI用シーン追加
+        /// </summary>
         template <typename TScene>
         const Core::Common::Handle& AddSceneViewUI(const Core::Common::Handle& in_rWindowsHandle,
                                                    const Core::Common::Handle& in_rViewPortHash)
@@ -86,7 +102,9 @@ namespace Render
             return handle;
         }
 
-        // TODO: 2D用シーン追加
+        /// <summary>
+        /// 2D用シーン追加
+        /// </summary>
         template <typename TScene>
         const Core::Common::Handle& AddSceneView2D(const Core::Common::Handle& in_rWindowsHandle,
                                                    const Core::Common::Handle& in_rViewPortHash)
@@ -108,7 +126,9 @@ namespace Render
             return handle;
         }
 
-        // TODO: シーンにレンダリングするコマンド追加
+        /// <summary>
+        /// シーンにレンダリングするコマンド追加
+        /// </summary>
         HE::Bool PushSceneRenderCommand(const Core::Common::Handle&, Command&&);
 
     protected:

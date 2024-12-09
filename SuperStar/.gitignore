@@ -412,7 +412,9 @@ Log.txt
 
 # Project Only Setting
 HobbyPlugin/DxLib/DxLib/ThirdParty/DxLib_VC/*
+HobbyPlugin/PlatformDxLib/*
 !HobbyPlugin/DxLib/DxLib/ThirdParty/DxLib_VC/lib/
+
 User/*
 Build/*
 Bin/*
