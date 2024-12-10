@@ -152,17 +152,17 @@ namespace Module
         /// <summary>
         /// モジュール前更新
         /// </summary>
-        virtual HE::Bool _VBeforeUpdate(const HE::Float32 in_fDeltaTime) { return TRUE; }
+        virtual void _VBeforeUpdate(const HE::Float32 in_fDeltaTime) {}
 
         /// <summary>
         /// モジュール更新
         /// </summary>
-        virtual HE::Bool _VUpdate(const HE::Float32 in_fDeltaTime) { return TRUE; }
+        virtual void _VUpdate(const HE::Float32 in_fDeltaTime) {}
 
         /// <summary>
         /// モジュール後更新
         /// </summary>
-        virtual HE::Bool _VLateUpdate(const HE::Float32 in_fDeltaTime) { return TRUE; }
+        virtual void _VLateUpdate(const HE::Float32 in_fDeltaTime) {}
 
         template <class T>
         void _AppendDependenceModule()

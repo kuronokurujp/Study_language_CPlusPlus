@@ -83,8 +83,6 @@ namespace AssetManager
         /// </summary>
         HE::Bool _VRelease() override final;
 
-        HE::Bool _VUpdate(const HE::Float32 in_fDeltaTime) override final;
-
     private:
         HE::Bool _Load(AssetDataBase* out_pAssetData);
 

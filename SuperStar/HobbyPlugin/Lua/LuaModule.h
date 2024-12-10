@@ -105,7 +105,7 @@ namespace Lua
         /// <summary>
         /// モジュール後更新
         /// </summary>
-        HE::Bool _VLateUpdate(const HE::Float32 in_fDeltaTime) override final;
+        void _VLateUpdate(const HE::Float32 in_fDeltaTime) override final;
 
     private:
         template <typename... TArgs>

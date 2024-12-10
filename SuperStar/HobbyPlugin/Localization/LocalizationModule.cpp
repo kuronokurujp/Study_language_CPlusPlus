@@ -28,11 +28,6 @@ namespace Localization
         return TRUE;
     }
 
-    HE::Bool LocalizationModule::_VUpdate(const HE::Float32 in_fDeltaTime)
-    {
-        return TRUE;
-    }
-
     HE::Bool LocalizationModule::LoadSystemFile(const Core::Common::StringBase& in_szrFilePath)
     {
         auto pLocalModule = this->GetDependenceModule<AssetManager::AssetManagerModule>();

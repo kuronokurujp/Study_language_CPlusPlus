@@ -19,11 +19,6 @@ namespace AssetManager
         return TRUE;
     }
 
-    HE::Bool AssetManagerModule::_VUpdate(const HE::Float32 in_fDeltaTime)
-    {
-        return TRUE;
-    }
-
     void AssetManagerModule::Unload(const Core::Common::Handle& in_rHandle)
     {
         if (in_rHandle.Null()) return;

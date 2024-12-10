@@ -89,6 +89,8 @@ HE::Bool Engine::Start()
     if (pPlatformModule)
     {
         this->_spFPS = HE_MAKE_CUSTOM_SHARED_PTR((Core::Time::FPS), pPlatformModule->VTime());
+        // TODO: FPSは固定にして60にいったんしている
+        this->_spFPS->EnableFixedMode(60);
     }
 
     this->_bStart = TRUE;
@@ -129,29 +131,46 @@ HE::Bool Engine::VRelease()
 HE::Bool Engine::BeforeUpdateLoop(const HE::Float32 in_fDt)
 {
     this->_upModuleManager->BeforeUpdate(in_fDt);
-    return TRUE;
+
+    return (this->IsAppQuit() == FALSE);
 }
 
 HE::Bool Engine::WaitFrameLoop()
 {
     auto pPlatform = this->PlatformModule();
-    if (pPlatform == NULL) return FALSE;
+    if (pPlatform == NULL) return TRUE;
 
-    // 1 / 60 秒経過しないと更新しない
-    // 更新が1/60秒より早い場合に一定間隔で更新するための対応
-    // TODO: FPS設定できるようにした方がいい
     if (this->_spFPS != NULL)
     {
-        while (this->_spFPS->UpdateWait(pPlatform->VTime(), 16))
+        HE::Uint64 ulBeginTimeMSec = this->_spFPS->GetLastTimeMSec();
+
+        // 固定フレームモード
+        if (this->_spFPS->IsFixedMode())
         {
-            // TODO: 待機する時間を正確に計算した方がいい
-            pPlatform->VTime()->VSleepMSec(1);
+            // 指定したFPSまで待機
+            do
+            {
+                if (this->_spFPS->IsWaitFrameFixedMode(pPlatform->VTime()))
+                {
+                    // TODO: 待機中は何か処理をした方がいい?
+                    pPlatform->VTime()->VSleepMSec(1);
+                }
+                else
+                {
+                    this->_spFPS->UpdateTime(pPlatform->VTime());
+                    break;
+                }
+            } while (TRUE);
+        }
+        else
+        {
+            this->_spFPS->UpdateTime(pPlatform->VTime());
         }
 
-        // HE_LOG_LINE(HE_STR_TEXT("%d"), this->_spFPS->GetFrameRate());
+        HE::Uint64 ulEndMSec = this->_spFPS->GetLastTimeMSec();
     }
 
-    return TRUE;
+    return (pPlatform->VIsQuit() == FALSE);
 }
 
 HE::Bool Engine::MainUpdateLoop(const HE::Float32 in_fDt)
@@ -161,7 +180,7 @@ HE::Bool Engine::MainUpdateLoop(const HE::Float32 in_fDt)
 
     this->_upModuleManager->Update(in_fDt);
 
-    return TRUE;
+    return (this->IsAppQuit() == FALSE);
 }
 
 HE::Bool Engine::LateUpdateLoop(const HE::Float32 in_fDt)
@@ -170,7 +189,7 @@ HE::Bool Engine::LateUpdateLoop(const HE::Float32 in_fDt)
 
     this->_upModuleManager->LateUpdate(in_fDt);
 
-    return TRUE;
+    return (this->IsAppQuit() == FALSE);
 }
 
 HE::Float32 Engine::GetDeltaTimeSec()

@@ -393,7 +393,7 @@ namespace Lua
         return TRUE;
     }
 
-    HE::Bool LuaModule::_VLateUpdate(const HE::Float32 in_fDeltaTime)
+    void LuaModule::_VLateUpdate(const HE::Float32 in_fDeltaTime)
     {
         // TODO: Luaスクリプトから呼び出した関数結果を出力
 
@@ -433,8 +433,6 @@ namespace Lua
                 }
             }
         }
-
-        return TRUE;
     }
 
     // HE::Int型をプッシュ

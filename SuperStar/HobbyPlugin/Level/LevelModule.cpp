@@ -39,15 +39,13 @@ namespace Level
         return TRUE;
     }
 
-    HE::Bool LevelModule::_VBeforeUpdate(const HE::Float32 in_fDt)
+    void LevelModule::_VBeforeUpdate(const HE::Float32 in_fDt)
     {
         // 前更新でメインレベルの切り替えなどしている
         this->_spLevelManager->BeforeUpdate(in_fDt);
-
-        return TRUE;
     }
 
-    HE::Bool LevelModule::_VUpdate(const HE::Float32 in_fDt)
+    void LevelModule::_VUpdate(const HE::Float32 in_fDt)
     {
         // インプット入力対象に入力結果を送信
         auto pEnhancedInputModule = this->GetDependenceModule<EnhancedInput::EnhancedInputModule>();
@@ -57,13 +55,10 @@ namespace Level
 
         // マウスやキーボードなどの各入力を渡す
         this->_spLevelManager->Update(in_fDt);
-
-        return TRUE;
     }
 
-    HE::Bool LevelModule::_VLateUpdate(const HE::Float32 in_fDt)
+    void LevelModule::_VLateUpdate(const HE::Float32 in_fDt)
     {
         this->_spLevelManager->LateUpdate(in_fDt);
-        return TRUE;
     }
 }  // namespace Level

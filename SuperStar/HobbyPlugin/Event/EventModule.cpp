@@ -98,7 +98,7 @@ namespace Event
         return TRUE;
     }
 
-    HE::Bool EventModule::_VLateUpdate(const HE::Float32 in_fDeltaTime)
+    void EventModule::_VLateUpdate(const HE::Float32 in_fDeltaTime)
     {
         // 全ての管理インスタンスを実行
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
@@ -107,8 +107,6 @@ namespace Event
             // TODO: マルチコアかマルチスレッドを使うかも
             itr->data->Tick(EventManager::EConstancs_Infinite);
         }
-
-        return TRUE;
     }
 
 }  // namespace Event

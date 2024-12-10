@@ -108,8 +108,6 @@ namespace Localization
         /// </summary>
         HE::Bool _VRelease() override final;
 
-        HE::Bool _VUpdate(const HE::Float32 in_fDeltaTime) override final;
-
     private:
         using LocateTextMap =
             Core::Common::FixedMap<Core::Common::FixedString128, Core::Common::Handle, 64>;

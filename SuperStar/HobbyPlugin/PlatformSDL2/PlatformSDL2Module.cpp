@@ -6,6 +6,8 @@
 #include "PlatformSDL2/SDL2Screen.h"
 #include "PlatformSDL2/SDL2System.h"
 #include "PlatformSDL2/SDL2Time.h"
+
+// パッケージ
 #include "SDL2/SDL.h"
 
 // 依存モジュール
@@ -65,7 +67,7 @@ namespace PlatformSDL2
         }
 
         HE::Bool bRet = TRUE;
-        return TRUE;
+        return bRet;
     }
 
     /// <summary>
@@ -84,12 +86,14 @@ namespace PlatformSDL2
         return TRUE;
     }
 
-    HE::Bool PlatformSDL2Module::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
+    void PlatformSDL2Module::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
     {
         // 入力更新
         this->_spInput->VUpdate(in_fDeltaTime);
-
-        return (this->_bQuit == FALSE);
+        if (this->_bQuit == FALSE)
+        {
+            this->_bQuit = this->_spInput->VIsQuit();
+        }
     }
 
 }  // namespace PlatformSDL2

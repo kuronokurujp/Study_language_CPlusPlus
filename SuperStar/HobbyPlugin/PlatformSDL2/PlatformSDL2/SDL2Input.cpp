@@ -1,5 +1,7 @@
 ﻿#include "SDL2Input.h"
 
+#include "SDL2/SDL.h"
+
 // DxLib用の入力システムの実装
 
 namespace PlatformSDL2
@@ -65,6 +67,34 @@ namespace PlatformSDL2
 
     void Input::VUpdate(const HE::Float32 in_fDeltaTime)
     {
+        SDL_Event eventData;
+        SDL_zero(eventData);
+
+        // SDLシステム内で発生したイベントはすべてキューに積まれている
+        // キューに積まれたイベントを取得して分岐処理している
+        while (SDL_PollEvent(&eventData))
+        {
+            switch (eventData.type)
+            {
+                    // ウィンドウのxマークをクリックすると呼ばれる
+                case SDL_QUIT:
+                {
+                    this->_bQuit = TRUE;
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        // キーボードのescキーを押したら終了
+        const ::Uint8* pKeyboardState = SDL_GetKeyboardState(nullptr);
+        if (pKeyboardState[SDL_SCANCODE_ESCAPE])
+        {
+            this->_bQuit = TRUE;
+            return;
+        }
+
         // キー入力の処理
         {
             for (HE::Uint32 i = 0; i < Platform::EKeyboard::EKeyboard_MAX; ++i)

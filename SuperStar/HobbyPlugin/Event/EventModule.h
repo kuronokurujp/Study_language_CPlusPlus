@@ -51,7 +51,7 @@ namespace Event
         /// <summary>
         /// モジュール後更新
         /// </summary>
-        HE::Bool _VLateUpdate(const HE::Float32 in_fDeltaTime) override final;
+        void _VLateUpdate(const HE::Float32 in_fDeltaTime) override final;
 
     private:
         HE::Uint32 _uAddEventMngCount = 0;

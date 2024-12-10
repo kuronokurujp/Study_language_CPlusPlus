@@ -15,8 +15,22 @@ namespace Core::Time
             this->_uaPreviousTimeMSec[i] = uCurrentTime;
     }
 
-    HE::Bool FPS::UpdateWait(Core::Memory::WeakPtr<Platform::TimeInterface> in_wpTimeInterface,
-                             const HE::Uint32 in_uWaitMSec)
+    HE::Bool FPS::IsWaitFrameFixedMode(
+        Core::Memory::WeakPtr<Platform::TimeInterface> in_wpTimeInterface)
+    {
+        auto pTime = in_wpTimeInterface.lock();
+        if (pTime == NULL) return FALSE;
+
+        const HE::Uint64 uNowMSec = pTime->VNowMSec();
+        // Waitタイムより早い場合は待機フラグを返す
+        HE::Bool bWait = (uNowMSec - this->_uaPreviousTimeMSec[FPS::_uTimeAvgCount - 1]) <
+                         this->GetFrameMSecByFixedMode();
+
+        // 更新時間より早い
+        return bWait;
+    }
+
+    HE::Bool FPS::UpdateTime(Core::Memory::WeakPtr<Platform::TimeInterface> in_wpTimeInterface)
     {
         // ミリ秒単位で扱っている
         auto pTime = in_wpTimeInterface.lock();
@@ -25,13 +39,6 @@ namespace Core::Time
         const HE::Uint64 uNowMSec = pTime->VNowMSec();
         // 最新の時間と前フレーム前の時間との差
         const HE::Uint64 uFrameTimeMSec = uNowMSec - this->_uaPreviousTimeMSec[0];
-
-        // Waitタイムより早い場合は待機フラグを返す
-        HE::Bool bWait =
-            (uNowMSec - this->_uaPreviousTimeMSec[FPS::_uTimeAvgCount - 1]) < in_uWaitMSec;
-
-        // 更新時間より早い
-        if (bWait) return TRUE;
 
         // 格納した時間をずらす
         HE::Uint32 uSize =

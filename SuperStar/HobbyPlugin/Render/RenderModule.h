@@ -145,17 +145,17 @@ namespace Render
         /// <summary>
         /// 前更新
         /// </summary>
-        HE::Bool _VBeforeUpdate(const HE::Float32) override final;
+        void _VBeforeUpdate(const HE::Float32) override final;
 
         /// <summary>
         /// モジュール更新
         /// </summary>
-        HE::Bool _VUpdate(const HE::Float32) override final;
+        void _VUpdate(const HE::Float32) override final;
 
         /// <summary>
         /// モジュール後更新
         /// </summary>
-        HE::Bool _VLateUpdate(const HE::Float32) override final;
+        void _VLateUpdate(const HE::Float32) override final;
 
     private:
         Window* _GetWindow(const Core::Common::Handle&);

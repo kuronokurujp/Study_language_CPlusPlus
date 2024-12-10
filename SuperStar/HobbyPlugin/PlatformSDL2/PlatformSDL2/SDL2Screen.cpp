@@ -42,18 +42,18 @@ namespace PlatformSDL2
                 y = (dm.h - this->_uHeight) >> 1;
             }
 
-            this->_pWindow =
-                SDL_CreateWindow("", x, y, this->_uWidht, this->_uHeight, SDL_WINDOW_OPENGL);
-
+            // ウィンドウは最初は非表示にしておく
+            this->_pWindow = SDL_CreateWindow("", x, y, this->_uWidht, this->_uHeight,
+                                              SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
             // Windowに紐づいているOpenGLのコンテキストを生成
             // これを利用してOpenGLの機能を使う
-            this->_glContext = SDL_GL_CreateContext(this->_pWindow);
-            HE_ASSERT(this->_glContext);
+            this->_context = SDL_GL_CreateContext(this->_pWindow);
+            HE_ASSERT(this->_context);
         }
 
         void _VEnd() override final
         {
-            SDL_GL_DeleteContext(this->_glContext);
+            SDL_GL_DeleteContext(this->_context);
 
             if (this->_pWindow)
             {
@@ -62,7 +62,7 @@ namespace PlatformSDL2
             }
         }
 
-        void _VShow() override final {}
+        void _VShow() override final { SDL_ShowWindow(this->_pWindow); }
 
         void _VBeginRender() override final
         {
@@ -84,7 +84,7 @@ namespace PlatformSDL2
 
     private:
         SDL_Window* _pWindow = NULL;
-        SDL_GLContext _glContext;
+        SDL_GLContext _context;
     };
 
     class DXLibSceneView2D : public Render::SceneViewBase

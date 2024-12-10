@@ -157,7 +157,7 @@ namespace Render
         return TRUE;
     }
 
-    HE::Bool RenderModule::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
+    void RenderModule::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
     {
         // 作成したウィンドウの立ち上げ
         while (this->_sStandupWindow.Empty() == FALSE)
@@ -169,11 +169,9 @@ namespace Render
                 pWindow->_Begin();
             }
         }
-
-        return TRUE;
     }
 
-    HE::Bool RenderModule::_VUpdate(const HE::Float32 in_fDeltaTime)
+    void RenderModule::_VUpdate(const HE::Float32 in_fDeltaTime)
     {
         // ウィンドウを更新
         auto mWindow = this->_poolWindow.GetUseDataMap();
@@ -181,11 +179,9 @@ namespace Render
         {
             itr->data->_Update(in_fDeltaTime);
         }
-
-        return TRUE;
     }
 
-    HE::Bool RenderModule::_VLateUpdate(const HE::Float32)
+    void RenderModule::_VLateUpdate(const HE::Float32)
     {
         // ウィンドウの描画
         auto mWindow = this->_poolWindow.GetUseDataMap();
@@ -193,8 +189,6 @@ namespace Render
         {
             itr->data->_Render();
         }
-
-        return TRUE;
     }
 
 }  // namespace Render

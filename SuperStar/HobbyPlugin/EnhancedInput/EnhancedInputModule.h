@@ -126,8 +126,8 @@ namespace EnhancedInput
         /// </summary>
         HE::Bool _VRelease() override final;
 
-        HE::Bool _VBeforeUpdate(const HE::Float32 in_fDeltaTime) override final;
-        HE::Bool _VUpdate(const HE::Float32 in_fDeltaTime) override final;
+        void _VBeforeUpdate(const HE::Float32) override final;
+        void _VUpdate(const HE::Float32) override final;
 
     private:
         /// <summary>

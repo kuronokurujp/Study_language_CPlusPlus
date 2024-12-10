@@ -59,7 +59,7 @@ namespace PlatformSDL2
         /// <summary>
         /// 前更新
         /// </summary>
-        HE::Bool _VBeforeUpdate(const HE::Float32 in_fDeltaTime) override final;
+        void _VBeforeUpdate(const HE::Float32 in_fDeltaTime) override final;
 
     private:
         Core::Memory::SharedPtr<Platform::TimeInterface> _spTime;

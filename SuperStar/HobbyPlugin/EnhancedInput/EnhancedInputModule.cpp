@@ -56,13 +56,12 @@ namespace EnhancedInput
         return TRUE;
     }
 
-    HE::Bool EnhancedInputModule::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
+    void EnhancedInputModule::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
     {
         this->_mInputAction.Clear();
-        return TRUE;
     }
 
-    HE::Bool EnhancedInputModule::_VUpdate(const HE::Float32 in_fDeltaTime)
+    void EnhancedInputModule::_VUpdate(const HE::Float32 in_fDeltaTime)
     {
         auto pPlatformModule = this->GetDependenceModule<Platform::PlatformModule>();
         HE_ASSERT(pPlatformModule);
@@ -71,7 +70,7 @@ namespace EnhancedInput
         HE_ASSERT(pInput);
 
         // 入力処理をする
-        if (this->_mMappingAction.Empty()) return TRUE;
+        if (this->_mMappingAction.Empty()) return;
 
         auto& inputState = pInput->GetState();
 
@@ -111,8 +110,6 @@ namespace EnhancedInput
                 }
             }
         }
-
-        return TRUE;
     }
 
 }  // namespace EnhancedInput

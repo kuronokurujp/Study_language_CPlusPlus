@@ -71,11 +71,11 @@ namespace Platform
         /// <summary>
         /// 前更新
         /// </summary>
-        virtual HE::Bool _VBeforeUpdate(const HE::Float32 in_fDeltaTime) override = 0;
+        virtual void _VBeforeUpdate(const HE::Float32 in_fDeltaTime) override = 0;
 
         /// <summary>
         /// 更新
         /// </summary>
-        virtual HE::Bool _VUpdate(const HE::Float32 in_fDeltaTime) override { return TRUE; }
+        virtual void _VUpdate(const HE::Float32 in_fDeltaTime) override {}
     };
 }  // namespace Platform
