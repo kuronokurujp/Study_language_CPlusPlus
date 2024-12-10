@@ -117,6 +117,11 @@ namespace Level
                             const Core::Common::Handle& in_rParentActor);
 
     protected:
+        /// <summary>
+        /// タスク破棄
+        /// </summary>
+        void _VDestory() override final;
+
         virtual void _VProcessInput(const EnhancedInput::InputMap* in_pInputMap);
 
         /// <summary>

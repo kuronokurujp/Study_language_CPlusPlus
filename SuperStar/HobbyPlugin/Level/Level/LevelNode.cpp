@@ -148,6 +148,12 @@ namespace Level
         return pParentActor->AddChildTask(in_rChildActor);
     }
 
+    void Node::_VDestory()
+    {
+        this->_actorManager.Release();
+        Actor::Object::_VDestory();
+    }
+
     void Node::_VProcessInput(const EnhancedInput::InputMap* in_pInputMap)
     {
         ActorManagerDecorater* pDecotrater =

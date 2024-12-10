@@ -60,6 +60,13 @@ namespace Render
         return TRUE;
     }
 
+    void Window::_Release()
+    {
+        this->_ReleasePool();
+
+        HE_SAFE_DELETE_UNIQUE_PTR(this->_upStrategy);
+    }
+
     void Window::_Begin()
     {
         this->_upStrategy->_VBegin();
@@ -76,31 +83,34 @@ namespace Render
 
         {
             auto m = this->GetUserDataList();
+            HE_ASSERT_RETURN(m);
+
             for (auto itr = m->begin(); itr != m->end(); ++itr)
             {
                 itr->second->_End();
             }
         }
-
-        this->_ReleasePool();
-
-        HE_SAFE_DELETE_UNIQUE_PTR(this->_upStrategy);
     }
 
     void Window::_Update(const HE::Float32 in_fDt)
     {
         // ビューポート処理
         auto m = this->GetUserDataList();
-        for (auto itrViewPort = m->begin(); itrViewPort != m->end(); ++itrViewPort)
+        if (m)
         {
-            auto pViewPort = itrViewPort->second;
-
-            // シーン更新
-            // シーンの実際の更新はストラテジークラス側で行う
-            auto m = pViewPort->GetUserDataList();
-            for (auto itrScene = m->begin(); itrScene != m->end(); ++itrScene)
+            for (auto itrViewPort = m->begin(); itrViewPort != m->end(); ++itrViewPort)
             {
-                itrScene->second->_VUpdate(in_fDt);
+                auto pViewPort = itrViewPort->second;
+
+                // シーン更新
+                // シーンの実際の更新はストラテジークラス側で行う
+                auto m = pViewPort->GetUserDataList();
+                if (m == NULL) continue;
+
+                for (auto itrScene = m->begin(); itrScene != m->end(); ++itrScene)
+                {
+                    itrScene->second->_VUpdate(in_fDt);
+                }
             }
         }
     }
@@ -111,15 +121,20 @@ namespace Render
 
         // ビューポート処理
         auto m = this->GetUserDataList();
-        for (auto itrViewPort = m->begin(); itrViewPort != m->end(); ++itrViewPort)
+        if (m)
         {
-            // シーン描画
-            auto pViewPort = itrViewPort->second;
-            auto m         = pViewPort->GetUserDataList();
-            for (auto itrScene = m->begin(); itrScene != m->end(); ++itrScene)
+            for (auto itrViewPort = m->begin(); itrViewPort != m->end(); ++itrViewPort)
             {
                 // シーン描画
-                itrScene->second->_VRender(pViewPort);
+                auto pViewPort = itrViewPort->second;
+                auto m         = pViewPort->GetUserDataList();
+                if (m) continue;
+
+                for (auto itrScene = m->begin(); itrScene != m->end(); ++itrScene)
+                {
+                    // シーン描画
+                    itrScene->second->_VRender(pViewPort);
+                }
             }
         }
 
@@ -163,9 +178,12 @@ namespace Render
     {
         {
             auto m = this->GetUserDataList();
-            for (auto itr = m->begin(); itr != m->end(); ++itr)
+            if (m)
             {
-                itr->second->_VEnd();
+                for (auto itr = m->begin(); itr != m->end(); ++itr)
+                {
+                    itr->second->_VEnd();
+                }
             }
         }
         this->_ReleasePool();

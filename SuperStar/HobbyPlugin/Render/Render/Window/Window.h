@@ -138,6 +138,8 @@ namespace Render
 
     private:
         HE::Bool _Setup(Core::Memory::UniquePtr<WindowStrategy>);
+        void _Release();
+
         void _Begin();
         void _End();
 

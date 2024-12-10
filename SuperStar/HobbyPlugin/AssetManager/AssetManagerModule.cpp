@@ -50,9 +50,13 @@ namespace AssetManager
         // アセットハンドルがあれば解放する
         {
             auto assetList = this->GetUserDataList();
-            for (auto it = assetList->begin(); it != assetList->end(); ++it)
+            HE_ASSERT(assetList);
+
             {
-                this->Unload(it->first);
+                for (auto it = assetList->begin(); it != assetList->end(); ++it)
+                {
+                    this->Unload(it->first);
+                }
             }
         }
 

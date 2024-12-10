@@ -321,6 +321,11 @@ namespace Actor
 #endif
     protected:
         /// <summary>
+        /// タスク破棄
+        /// </summary>
+        virtual void _VDestory() override;
+
+        /// <summary>
         /// 追加したコンポーネントのセットアップ
         /// </summary>
         virtual HE::Bool _VSetupComponent(Component* in_pComp);

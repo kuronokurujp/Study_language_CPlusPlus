@@ -38,6 +38,12 @@ namespace Actor
         ActorManager(Core::Memory::UniquePtr<ActorManagerDecoraterlnterface>);
 
         /// <summary>
+        /// 解放処理
+        /// これを実行するとインスタンスが残っていても利用できない
+        /// </summary>
+        void Release();
+
+        /// <summary>
         /// 起動する
         /// 必ず最初に呼び出す
         /// グループ最大数は2以上にする
@@ -46,8 +52,8 @@ namespace Actor
         HE::Bool Start(const HE::Uint32 in_uActorCapacity, const HE::Uint32 in_uActorGroupMax);
 
         /// <summary>
-        /// 終了
-        /// これを呼び出した後は使えない
+        /// 起動終了
+        /// これを読んだ後にStartメソッドを再度実行すれば使える
         /// </summary>
         HE::Bool End();
 

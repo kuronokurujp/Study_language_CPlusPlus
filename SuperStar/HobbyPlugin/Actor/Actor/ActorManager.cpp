@@ -10,6 +10,11 @@ namespace Actor
     {
     }
 
+    void ActorManager::Release()
+    {
+        HE_SAFE_DELETE_UNIQUE_PTR(this->_upDecorator);
+    }
+
     HE::Bool ActorManager::Start(const HE::Uint32 in_uActorCapacity,
                                  const HE::Uint32 in_uActorGroupMax)
     {
@@ -26,7 +31,6 @@ namespace Actor
 
     HE::Bool ActorManager::End()
     {
-        HE_SAFE_DELETE_UNIQUE_PTR(this->_upDecorator);
         this->_taskManager.End();
 
         return TRUE;

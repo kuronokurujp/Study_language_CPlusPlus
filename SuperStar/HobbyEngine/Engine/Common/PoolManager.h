@@ -69,7 +69,7 @@ namespace Core::Common
         // 参照にするとデータをコピーして遅くなるので注意
         inline const std::unordered_map<Core::Common::Handle, T*>* GetUserDataList() const
         {
-            HE_ASSERT(this->_upUserSlot);
+            if (this->_upUserSlot == NULL) return NULL;
             return this->_upUserSlot.get();
         }
 

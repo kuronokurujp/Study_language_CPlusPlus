@@ -19,6 +19,8 @@ namespace Level
     HE::Bool Manager::Release()
     {
         if (this->_upNodeManager->End() == FALSE) return FALSE;
+        this->_upNodeManager->Release();
+
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upNodeManager);
 
         return TRUE;

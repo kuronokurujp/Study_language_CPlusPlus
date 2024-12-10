@@ -7,15 +7,6 @@ namespace Actor
 {
     Object::Object() : TaskTree()
     {
-        if (this->_components.Init(32, 32) == FALSE)
-        {
-            HE_ASSERT(FALSE && "コンポーネントのタスク管理の初期化失敗");
-        }
-
-        if (this->_lateComponents.Init(32, 32) == FALSE)
-        {
-            HE_ASSERT(FALSE && "コンポーネントのタスク管理の初期化失敗");
-        }
     }
 
     Object::~Object()
@@ -42,6 +33,16 @@ namespace Actor
         TaskTree::VSetup(in_bAutoDelete);
 
         this->_Clear();
+
+        if (this->_components.Init(32, 32) == FALSE)
+        {
+            HE_ASSERT(FALSE && "コンポーネントのタスク管理の初期化失敗");
+        }
+
+        if (this->_lateComponents.Init(32, 32) == FALSE)
+        {
+            HE_ASSERT(FALSE && "コンポーネントのタスク管理の初期化失敗");
+        }
     }
 
     HE::Bool Object::VBegin()
@@ -232,18 +233,34 @@ namespace Actor
         std::function<HE::Bool(const Core::Common::Handle&, Component*)> in_func)
     {
         auto list = this->_components.GetUserDataList();
-        auto end  = list->end();
+        HE_ASSERT_RETURN(list);
+
+        auto end = list->end();
         for (auto itr = list->begin(); itr != end; ++itr)
         {
             if (in_func(itr->first, reinterpret_cast<Component*>(itr->second)) == FALSE) break;
         }
 
         list = this->_lateComponents.GetUserDataList();
-        end  = list->end();
+        HE_ASSERT_RETURN(list);
+
+        end = list->end();
         for (auto itr = list->begin(); itr != end; ++itr)
         {
             if (in_func(itr->first, reinterpret_cast<Component*>(itr->second)) == FALSE) break;
         }
+    }
+
+    void Object::_VDestory()
+    {
+        // 設定しているコンポーネントを全て破棄
+        this->RemoveAllComponent();
+
+        // コンポーネント終了
+        this->_components.End();
+        this->_lateComponents.End();
+
+        TaskTree::_VDestory();
     }
 
     HE::Bool Object::_VSetupComponent(Component* in_pComp)
@@ -261,10 +278,13 @@ namespace Actor
     {
         // コンポーネント解除をオーナーに通知
         auto components = in_pComponents->GetUserDataList();
-        for (auto itr = components->begin(); itr != components->end(); ++itr)
+        if (components)
         {
-            auto pComponent = reinterpret_cast<Component*>(itr->second);
-            this->_pOwner->VOnActorUnRegistComponent(pComponent);
+            for (auto itr = components->begin(); itr != components->end(); ++itr)
+            {
+                auto pComponent = reinterpret_cast<Component*>(itr->second);
+                this->_pOwner->VOnActorUnRegistComponent(pComponent);
+            }
         }
 
         in_pComponents->RemoveAll();

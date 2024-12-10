@@ -49,6 +49,7 @@ namespace Render
         HE_ASSERT(pWindow &&
                   "ウィンドウがないということは別の箇所でRemoveされいるので意図していない");
         pWindow->_End();
+        pWindow->_Release();
 
         // 解放が終わったらプールしているデータを解放
         return this->_poolWindow.Free(in_rHandle);

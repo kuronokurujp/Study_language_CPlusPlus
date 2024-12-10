@@ -225,7 +225,7 @@ namespace Core
         HE_ASSERT(in_iGroupId < this->_iGroupNum);
 
         // 登録されているタスクを全て更新
-        TaskGroup* pGroup = &_pTasks[in_iGroupId];
+        TaskGroup* pGroup = &this->_pTasks[in_iGroupId];
         Task* pTask       = pGroup->_pRootTask;
         pTask             = pGroup->_pRootTask->_pNext;
         while (pTask)
@@ -242,7 +242,7 @@ namespace Core
 
     void TaskManager::RemoveAll()
     {
-        HE_ASSERT(this->_pTasks);
+        if (this->_pTasks == NULL) return;
 
         // タスクを全て削除
         for (HE::Sint32 i = 0; i < this->_iGroupNum; ++i) this->RemoveGroup(i);
@@ -259,7 +259,7 @@ namespace Core
         if (in_iGrgGroupId == in_iTargetGroupId) return FALSE;
 
         // 登録されているグループタスクを全て更新
-        TaskGroup* pGroup = &_pTasks[in_iGrgGroupId];
+        TaskGroup* pGroup = &this->_pTasks[in_iGrgGroupId];
         Task* pTask       = pGroup->_pRootTask;
         pTask             = pGroup->_pRootTask->_pNext;
         while (pTask)
