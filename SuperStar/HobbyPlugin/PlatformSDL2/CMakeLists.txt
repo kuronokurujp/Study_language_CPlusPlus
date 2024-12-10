@@ -15,14 +15,20 @@ set(VCPKG_DIR_PATH ThirdParty/VcPkg/$CACHE{CACHE_PROJECT_VCPKG_STATIC_LIB_TYPE})
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH})
     # プラグイン用のパッケージディレクトリ
     list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH}/share/sdl2")
+    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH}/share/glew")
+
     # SDL2をvcpkgでインストール
     find_package(SDL2 REQUIRED CONFIG)
+    # GLEWをvcpkeでインストール
+    find_package(GLEW REQUIRED CONFIG)
 
     target_link_libraries(${PLATFORMSDL2_PLUGIN_NAME} 
         PRIVATE
         # SDL2関連のライブラリを設定
         $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+        # GLEWを設定
+        GLEW::GLEW
     )
 
     target_include_directories(${PLATFORMSDL2_PLUGIN_NAME} 

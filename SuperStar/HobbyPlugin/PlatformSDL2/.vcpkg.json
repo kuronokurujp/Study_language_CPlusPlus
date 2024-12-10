@@ -2,12 +2,17 @@
     "name": "plugin-platform-sdl2",
     "version": "1.0.0",
     "dependencies": [
-        "sdl2"
+        "sdl2",
+        "glew"
     ],
     "overrides": [
         {
             "name": "sdl2",
             "version": "2.30.9"
+        },
+        {
+            "name": "glew",
+            "version": "2.2.0"
         }
     ]
 }
