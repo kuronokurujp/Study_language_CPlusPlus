@@ -16,9 +16,10 @@ set(RENDER_PLUGIN_TARGET_FILES
     Render/Command/Command.h
     Render/Command/Command.cpp
 
-    Render/View/View.cpp
-    Render/View/View.h
-    
     Render/Window/Window.cpp
     Render/Window/Window.h
+    Render/Window/ViewPort.h
+    Render/Window/ViewPort.cpp
+    Render/Window/Scene.h
+    Render/Window/Scene.cpp
 )

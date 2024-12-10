@@ -9,6 +9,8 @@
 // モジュールのヘッダーファイルは全てインクルードする
 #include "Render/Color.h"
 #include "Render/Command/Command.h"
+#include "Render/Window/Scene.h"
+#include "Render/Window/ViewPort.h"
 #include "Render/Window/Window.h"
 
 namespace Render

@@ -1,5 +1,8 @@
 ﻿#include "Window.h"
 
+#include "Scene.h"
+#include "ViewPort.h"
+
 namespace Render
 {
     Core::Common::Handle Window::AddViewPort(Core::Memory::UniquePtr<ViewPortConfig> in_upConfig)
@@ -140,66 +143,4 @@ namespace Render
 
         this->_upStrategy->_VEndRender();
     }
-
-    void ViewPort::RemoveScene(Core::Common::Handle& in_rHandle)
-    {
-        this->_Free(in_rHandle, FALSE);
-    }
-
-    SceneViewBase* ViewPort::GetScene(const Core::Common::Handle& in_rHandle)
-    {
-        HE_ASSERT_RETURN_VALUE(NULL, in_rHandle.Null() == FALSE);
-
-        auto pScene = this->_Ref(in_rHandle);
-        HE_ASSERT_RETURN_VALUE(NULL, pScene);
-
-        return pScene;
-    }
-
-    const ViewPortConfig* ViewPort::GetConfig()
-    {
-        return this->_upConfig.get();
-    }
-
-    HE::Bool ViewPort::_Setup(Core::Memory::UniquePtr<ViewPortConfig> in_upConfig)
-    {
-        this->_upConfig = std::move(in_upConfig);
-        this->_ReleasePool();
-        this->_ReservePool(this->_upConfig->uSceneCount);
-
-        return TRUE;
-    }
-
-    void ViewPort::_Begin()
-    {
-    }
-
-    void ViewPort::_End()
-    {
-        {
-            auto m = this->GetUserDataList();
-            if (m)
-            {
-                for (auto itr = m->begin(); itr != m->end(); ++itr)
-                {
-                    itr->second->_VEnd();
-                }
-            }
-        }
-        this->_ReleasePool();
-
-        HE_SAFE_DELETE_UNIQUE_PTR(this->_upConfig);
-    }
-
-    HE::Bool SceneViewBase::_PushCommand(Command&& in_rrCmd)
-    {
-        // コマンドをコピー
-        // 要素を先頭に追加
-        // 最後に追加したコマンドは配列先頭に
-        // 最初に追加したコマンドは配列末尾に
-        this->_commandBuff.PushFront(in_rrCmd);
-
-        return TRUE;
-    }
-
 }  // namespace Render
