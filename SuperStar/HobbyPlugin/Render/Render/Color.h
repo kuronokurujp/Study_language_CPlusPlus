@@ -7,6 +7,11 @@ namespace Render
     struct Color32
     {
         HE::Uint8 r, g, b, a;
+
+        inline HE::Float32 RedRate() const { return static_cast<HE::Float32>(this->r) * 0.004; }
+        inline HE::Float32 BlueRate() const { return static_cast<HE::Float32>(this->b) * 0.004; }
+        inline HE::Float32 GreenRate() const { return static_cast<HE::Float32>(this->g) * 0.004; }
+        inline HE::Float32 AlphaRate() const { return static_cast<HE::Float32>(this->a) * 0.004; }
     };
 
     /// <summary>
