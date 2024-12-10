@@ -22,4 +22,11 @@ set(PLATFORMSDL2_PLUGIN_TARGET_FILES
     PlatformSDL2/SDL2Screen.cpp
     PlatformSDL2/SDL2System.h
     PlatformSDL2/SDL2System.cpp
+    
+    PlatformSDL2/Screen/Window.cpp
+    PlatformSDL2/Screen/Window.h
+    PlatformSDL2/Screen/ViewPort.h
+    PlatformSDL2/Screen/ViewPort.cpp
+    PlatformSDL2/Screen/Scene.h
+    PlatformSDL2/Screen/Scene.cpp
 )

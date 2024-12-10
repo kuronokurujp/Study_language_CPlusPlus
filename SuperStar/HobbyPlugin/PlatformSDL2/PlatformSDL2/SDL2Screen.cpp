@@ -5,6 +5,8 @@
 #include <algorithm>
 
 #include "SDL2/SDL.h"
+#include "Screen/Scene.h"
+#include "Screen/Window.h"
 
 // 依存モジュール一覧
 #include "PlatformSDL2Module.h"
@@ -12,207 +14,6 @@
 
 namespace PlatformSDL2
 {
-    /// <summary>
-    /// DXLibのウィンドウロジック
-    /// </summary>
-    class DXLibWindowStrategy final : public Render::WindowStrategy
-    {
-    public:
-        DXLibWindowStrategy()
-        {
-            // TODO: 設定は仮
-            this->_uViewPortCount = 1;
-            this->_uHeight        = 480;
-            this->_uWidht         = 640;
-        }
-
-    protected:
-        void _VBegin() override final
-        {
-            // windowを作成
-            // openglを扱うようにする
-            SDL_DisplayMode dm;
-
-            // ディスプレイ0の情報を取得
-            int x = 0;
-            int y = 0;
-            if (SDL_GetCurrentDisplayMode(0, &dm) == 0)
-            {
-                x = (dm.w - this->_uWidht) >> 1;
-                y = (dm.h - this->_uHeight) >> 1;
-            }
-
-            // ウィンドウは最初は非表示にしておく
-            this->_pWindow = SDL_CreateWindow("", x, y, this->_uWidht, this->_uHeight,
-                                              SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
-            // Windowに紐づいているOpenGLのコンテキストを生成
-            // これを利用してOpenGLの機能を使う
-            this->_context = SDL_GL_CreateContext(this->_pWindow);
-            HE_ASSERT(this->_context);
-        }
-
-        void _VEnd() override final
-        {
-            SDL_GL_DeleteContext(this->_context);
-
-            if (this->_pWindow)
-            {
-                SDL_DestroyWindow(this->_pWindow);
-                this->_pWindow = NULL;
-            }
-        }
-
-        void _VShow() override final { SDL_ShowWindow(this->_pWindow); }
-
-        void _VBeginRender() override final
-        {
-            /*
-                // カラーバッファをクリアする
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-                // 3D描画開始
-                glEnable(GL_DEPTH_TEST);
-                glDisable(GL_BLEND);
-                */
-        }
-
-        void _VEndRender() override final
-        {
-            // ウィンドウの描画バッファを切り替える
-            SDL_GL_SwapWindow(this->_pWindow);
-        }
-
-    private:
-        SDL_Window* _pWindow = NULL;
-        SDL_GLContext _context;
-    };
-
-    class DXLibSceneView2D : public Render::SceneViewBase
-    {
-    protected:
-        HE::Bool _VBegin() override final { return TRUE; }
-        void _VEnd() override final {}
-
-        void _VUpdate(const HE::Float32) override final {}
-
-        void _VRender(Render::ViewPort* in_pViewPort) override final
-        {
-            // ビュー毎に描画コマンド処理
-            const Render::Command* pCommand = this->_commandBuff.PopBack();
-            while (pCommand != NULL)
-            {
-                // コマンドに応じた描画処理をする
-                switch (pCommand->uType)
-                {
-                    // 画面クリア
-                    case Render::ECmdType_ClsScreen:
-                    {
-                        const Render::CmdClsScreen* pClsScreen = &pCommand->data.clsScree;
-                        const auto& rColor                     = pClsScreen->color;
-
-                        break;
-                    }
-
-                    // 矩形を描画
-                    case Render::ECmdType_2DRectDraw:
-                    {
-                        const Render::Cmd2DRectDraw* pRect2D = &pCommand->data.rect2DDraw;
-
-                        break;
-                    }
-
-                    // 2Dテキストを描画
-                    case Render::ECmdType_2DTextDraw:
-                    {
-                        const Render::Cmd2DTextDraw* pText2D = &pCommand->data.text2DDraw;
-
-                        break;
-                    }
-
-                    // 点群描画
-                    case Render::ECmdType_2DPointArrayDraw:
-                    {
-                        // データ置換
-                        const Render::Cmd2DPointArrayDraw* pCmdPoint2DCloud =
-                            &pCommand->data.pointCloud2DDraw;
-                        HE_ASSERT(0 < pCmdPoint2DCloud->uCount && "点群の点が一つもないのはだめ");
-
-                        if (0 < pCmdPoint2DCloud->uCount)
-                        {
-                            const Uint32 num = HE_MIN(pCmdPoint2DCloud->uCount, s_u2DPointCount);
-                            /*
-                            std::transform(pCmdPoint2DCloud->aPoint, pCmdPoint2DCloud->aPoint + num,
-                                           s_a2DPoint,
-                                           [](const Render::Point2D& src)
-                                           {
-                                               const auto& rColor = src.color;
-                                               const auto uColor =
-                                                   ::GetColor(rColor.c32.r, rColor.c32.g,
-                                                              rColor.c32.b);
-                                               return ::POINTDATA{static_cast<int>(src.fX),
-                                                                  static_cast<int>(src.fY), uColor,
-                                                                  0};
-
-                                           });
-
-                            // 点の集合を描画する
-                            ::DrawPixelSet(s_a2DPoint, num);
-                                           */
-                        }
-                        break;
-                    }
-
-                    // 点描画
-                    case Render::ECmdType_2DPointDraw:
-                    {
-                        const Render::Cmd2DPointDraw* pCmdPoint2D = &pCommand->data.point2DDraw;
-
-                        const Render::Point2D* pPoint2D = &pCmdPoint2D->point;
-                        const auto& rColor              = pPoint2D->color;
-                        /*
-                        const auto uColor = ::GetColor(rColor.c32.r, rColor.c32.g, rColor.c32.b);
-                        ::DrawPixel(static_cast<int>(pPoint2D->fX), static_cast<int>(pPoint2D->fY),
-                                    uColor);
-                                    */
-
-                        break;
-                    }
-
-                    // 2次元の円描画
-                    case Render::ECmdType_2DCircleDraw:
-                    {
-                        const Render::Cmd2DCircleDraw* pCmdCircle = &pCommand->data.circle2DDraw;
-                        const Render::Color* pColor               = &pCmdCircle->color;
-                        /*
-                        const Uint32 uColor =
-                            ::GetColor(pColor->c32.r, pColor->c32.g, pColor->c32.b);
-
-                        // 円を描画
-                        ::DrawCircleAA(pCmdCircle->point.fX, pCmdCircle->point.fY,
-                                       pCmdCircle->fSize, 32, uColor, TRUE);
-
-*/
-                        break;
-                    }
-
-                    default:
-                        HE_ASSERT(0 && "存在しないコマンド");
-                }
-
-                pCommand = this->_commandBuff.PopBack();
-            }
-        }
-
-    private:
-        // 2Dの点群を表示するために必要
-        static constexpr Uint32 s_u2DPointCount = 500;
-        // static inline ::POINTDATA s_a2DPoint[s_u2DPointCount];
-    };
-
-    class DXLibSceneViewUI final : public DXLibSceneView2D
-    {
-    };
-
     Screen::Screen(PlatformSDL2::PlatformSDL2Module* in_pSDL2Module)
     {
         HE_ASSERT(in_pSDL2Module);
@@ -273,8 +74,8 @@ namespace PlatformSDL2
         HE_ASSERT_RETURN_VALUE(NullHandle, pRenderModule);
 
         const Core::Common::Handle& handle =
-            pRenderModule->AddSceneViewUI<DXLibSceneViewUI>(in_rConfig._windowHandle,
-                                                            in_rConfig._viewPortHandle);
+            pRenderModule->AddSceneViewUI<SceneViewUI>(in_rConfig._windowHandle,
+                                                       in_rConfig._viewPortHandle);
         return handle;
     }
 
@@ -285,8 +86,8 @@ namespace PlatformSDL2
         auto pRenderModule = this->_pSDL2Module->GetDependenceModule<Render::RenderModule>();
         HE_ASSERT_RETURN_VALUE(NullHandle, pRenderModule);
 
-        return pRenderModule->AddSceneView2D<DXLibSceneView2D>(in_rConfig._windowHandle,
-                                                               in_rConfig._viewPortHandle);
+        return pRenderModule->AddSceneView2D<SceneView2D>(in_rConfig._windowHandle,
+                                                          in_rConfig._viewPortHandle);
     }
 
     const Platform::ScreenSceneView2DEnvironment&& Screen::GetEnvBySceneView2D(

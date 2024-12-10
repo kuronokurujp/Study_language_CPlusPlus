@@ -8,6 +8,7 @@
 #include "PlatformSDL2/SDL2Time.h"
 
 // パッケージ
+#include "GL/glew.h"
 #include "SDL2/SDL.h"
 
 // 依存モジュール
@@ -57,6 +58,9 @@ namespace PlatformSDL2
             SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
         }
 
+        // OpenGLの拡張を有効に
+        glewExperimental = GL_TRUE;
+
         // プラットフォームの各機能を生成
         {
             this->_spTime   = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Time));
@@ -66,8 +70,7 @@ namespace PlatformSDL2
             this->_spSysmte = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::System));
         }
 
-        HE::Bool bRet = TRUE;
-        return bRet;
+        return TRUE;
     }
 
     /// <summary>
