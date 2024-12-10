@@ -34,13 +34,15 @@ namespace Render
     /// <summary>
     /// 描画するウィンドウ
     /// </summary>
-    class Window final : Core::Common::RuntimePoolManager<ViewPort>
+    class Window final
     {
         friend class RenderModule;
 
     public:
         Core::Common::Handle AddViewPort(Core::Memory::UniquePtr<ViewPortConfig>);
         HE::Bool RemoveViewPort(const Core::Common::Handle&);
+
+        Core::Memory::SharedPtr<ViewPort> GetViewPort(const Core::Common::Handle&);
 
         /// <summary>
         /// ウィンドウ表示
@@ -60,6 +62,8 @@ namespace Render
 
     private:
         Core::Memory::UniquePtr<WindowStrategy> _upStrategy;
+        Core::Common::RuntimePoolManager<ViewPort> _poolViewPortManager;
+
         HE::Bool _bShow  = FALSE;
         HE::Bool _bReady = FALSE;
     };

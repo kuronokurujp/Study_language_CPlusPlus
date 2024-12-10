@@ -14,7 +14,7 @@ namespace AssetManager
     HE::Bool AssetManagerModule::_VStart()
     {
         // 利用するアセット数を設定
-        this->_ReservePool(1024);
+        this->_poolAssetDataManager.ReservePool(1024);
 
         return TRUE;
     }
@@ -23,9 +23,9 @@ namespace AssetManager
     {
         if (in_rHandle.Null()) return;
 
-        if (this->Empty()) return;
+        if (this->_poolAssetDataManager.Empty()) return;
 
-        AssetDataBase* p = this->_Ref(in_rHandle);
+        AssetDataBase* p = this->_poolAssetDataManager.Ref(in_rHandle);
         if (p == NULL) return;
 
         p->_VUnload();
@@ -49,7 +49,7 @@ namespace AssetManager
     {
         // アセットハンドルがあれば解放する
         {
-            auto assetList = this->GetUserDataList();
+            auto assetList = this->_poolAssetDataManager.GetUserDataList();
             HE_ASSERT(assetList);
 
             {
@@ -60,7 +60,7 @@ namespace AssetManager
             }
         }
 
-        this->_ReleasePool();
+        this->_poolAssetDataManager.ReleasePool();
 
         return TRUE;
     }

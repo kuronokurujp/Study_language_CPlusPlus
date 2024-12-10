@@ -9,6 +9,8 @@
 // モジュールのヘッダーファイルは全てインクルードする
 #include "Render/Color.h"
 #include "Render/Command/Command.h"
+#include "Render/Draw/Material.h"
+#include "Render/Draw/Mesh.h"
 #include "Render/Window/Scene.h"
 #include "Render/Window/ViewPort.h"
 #include "Render/Window/Window.h"
@@ -91,7 +93,7 @@ namespace Render
                                                    const Core::Common::Handle& in_rViewPortHash)
         {
             auto pWindow   = this->_GetWindow(in_rWindowsHandle);
-            auto pViewPort = pWindow->_Ref(in_rViewPortHash);
+            auto pViewPort = pWindow->_poolViewPortManager.Ref(in_rViewPortHash);
 
             auto sceneHandle = pViewPort->AddSceneViewUI<TScene>();
             const Core::Common::Handle& handle =
@@ -113,7 +115,7 @@ namespace Render
 
         {
             auto pWindow   = this->_GetWindow(in_rWindowsHandle);
-            auto pViewPort = pWindow->_Ref(in_rViewPortHash);
+            auto pViewPort = pWindow->_poolViewPortManager.Ref(in_rViewPortHash);
 
             auto sceneHandle = pViewPort->AddSceneView2D<TScene>();
 
@@ -132,6 +134,9 @@ namespace Render
         /// シーンにレンダリングするコマンド追加
         /// </summary>
         HE::Bool PushSceneRenderCommand(const Core::Common::Handle&, Command&&);
+
+        // TODO: メッシュ作成
+        // TODO: マテリアル作成
 
     protected:
         /// <summary>

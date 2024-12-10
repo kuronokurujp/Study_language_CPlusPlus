@@ -19,7 +19,7 @@ namespace Render
     /// <summary>
     /// ウィンドウのビューポート
     /// </summary>
-    class ViewPort : Core::Common::RuntimePoolManager<SceneViewBase>
+    class ViewPort 
     {
         friend class Window;
 
@@ -27,14 +27,14 @@ namespace Render
         template <typename TScene>
         const Core::Common::Handle& AddSceneView2D()
         {
-            auto [handle, pScene] = this->_Alloc<TScene>();
+            auto [handle, pScene] = this->_poolSceneManager.Alloc<TScene>();
             return handle;
         }
 
         template <typename TScene>
         const Core::Common::Handle& AddSceneViewUI()
         {
-            auto [handle, pScene] = this->_Alloc<TScene>();
+            auto [handle, pScene] = this->_poolSceneManager.Alloc<TScene>();
             return handle;
         }
 
@@ -51,6 +51,7 @@ namespace Render
 
     private:
         Core::Memory::UniquePtr<ViewPortConfig> _upConfig;
+        Core::Common::RuntimePoolManager<SceneViewBase> _poolSceneManager;
     };
 
 }  // namespace Render

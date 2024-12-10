@@ -27,7 +27,7 @@ namespace Render
             in_upConfig->uWidth = this->_upStrategy->_uWidht;
         }
 
-        auto [handle, pData] = this->_Alloc<ViewPort>();
+        auto [handle, pData] = this->_poolViewPortManager.Alloc<ViewPort>();
 
         pData->_Setup(std::move(in_upConfig));
 
@@ -36,12 +36,12 @@ namespace Render
 
     HE::Bool Window::RemoveViewPort(const Core::Common::Handle& in_rHandle)
     {
-        auto pViewPort = this->_Ref(in_rHandle);
+        auto pViewPort = this->_poolViewPortManager.Ref(in_rHandle);
         HE_ASSERT(pViewPort);
 
         pViewPort->_End();
 
-        this->_Free(in_rHandle, FALSE);
+        this->_poolViewPortManager.Free(in_rHandle, FALSE);
 
         return TRUE;
     }
@@ -57,15 +57,15 @@ namespace Render
         this->_upStrategy = std::move(in_upConfig);
         HE_ASSERT(0 < this->_upStrategy->ViewPortCount());
 
-        this->_ReleasePool();
-        this->_ReservePool(this->_upStrategy->ViewPortCount());
+        this->_poolViewPortManager.ReleasePool();
+        this->_poolViewPortManager.ReservePool(this->_upStrategy->ViewPortCount());
 
         return TRUE;
     }
 
     void Window::_Release()
     {
-        this->_ReleasePool();
+        this->_poolViewPortManager.ReleasePool();
 
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upStrategy);
     }
@@ -85,7 +85,7 @@ namespace Render
         this->_upStrategy->_VEnd();
 
         {
-            auto m = this->GetUserDataList();
+            auto m = this->_poolViewPortManager.GetUserDataList();
             HE_ASSERT_RETURN(m);
 
             for (auto itr = m->begin(); itr != m->end(); ++itr)
@@ -98,7 +98,7 @@ namespace Render
     void Window::_Update(const HE::Float32 in_fDt)
     {
         // ビューポート処理
-        auto m = this->GetUserDataList();
+        auto m = this->_poolViewPortManager.GetUserDataList();
         if (m)
         {
             for (auto itrViewPort = m->begin(); itrViewPort != m->end(); ++itrViewPort)
@@ -107,7 +107,7 @@ namespace Render
 
                 // シーン更新
                 // シーンの実際の更新はストラテジークラス側で行う
-                auto m = pViewPort->GetUserDataList();
+                auto m = pViewPort->_poolSceneManager.GetUserDataList();
                 if (m == NULL) continue;
 
                 for (auto itrScene = m->begin(); itrScene != m->end(); ++itrScene)
@@ -123,15 +123,15 @@ namespace Render
         this->_upStrategy->_VBeginRender();
 
         // ビューポート処理
-        auto m = this->GetUserDataList();
+        auto m = this->_poolViewPortManager.GetUserDataList();
         if (m)
         {
             for (auto itrViewPort = m->begin(); itrViewPort != m->end(); ++itrViewPort)
             {
                 // シーン描画
                 auto pViewPort = itrViewPort->second;
-                auto m         = pViewPort->GetUserDataList();
-                if (m) continue;
+                auto m         = pViewPort->_poolSceneManager.GetUserDataList();
+                if (m == NULL) continue;
 
                 for (auto itrScene = m->begin(); itrScene != m->end(); ++itrScene)
                 {

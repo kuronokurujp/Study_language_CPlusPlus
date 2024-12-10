@@ -20,8 +20,7 @@ namespace AssetManager
     /// <summary>
     /// エンジンのアセット対応のモジュール
     /// </summary>
-    class AssetManagerModule final : public Module::ModuleBase,
-                                     public Core::Common::RuntimePoolManager<AssetDataBase>
+    class AssetManagerModule final : public Module::ModuleBase
     {
         HE_MODULE_GENRATE_DECLARATION(AssetManagerModule);
 
@@ -38,7 +37,7 @@ namespace AssetManager
             // TODO: 名前が重複した時はどうするかは考える
 
             // インスタンスを確保
-            auto [handle, p] = this->_Alloc<T>();
+            auto [handle, p] = this->_poolAssetDataManager.Alloc<T>();
 
             AssetDataBase* pAsset = p;
             pAsset->_VInit(in_pName,
@@ -50,7 +49,7 @@ namespace AssetManager
                 return handle;
             }
 
-            this->_Free(handle, TRUE);
+            this->_poolAssetDataManager.Free(handle, TRUE);
 
             return NullHandle;
         }
@@ -61,7 +60,7 @@ namespace AssetManager
         typename std::enable_if<std::is_base_of<AssetDataBase, T>::value, T&>::type GetAsset(
             const Core::Common::Handle& in_rHandle)
         {
-            T* p = reinterpret_cast<T*>(this->_Ref(in_rHandle));
+            T* p = reinterpret_cast<T*>(this->_poolAssetDataManager.Ref(in_rHandle));
             HE_ASSERT(p && "ロードしたアセットデータがない");
             return *p;
         }
@@ -88,5 +87,6 @@ namespace AssetManager
 
     private:
         Core::File::Path _mountDirPath;
+        Core::Common::RuntimePoolManager<AssetDataBase> _poolAssetDataManager;
     };
 }  // namespace AssetManager

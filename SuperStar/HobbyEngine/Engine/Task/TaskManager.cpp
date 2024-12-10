@@ -48,7 +48,7 @@ namespace Core
         if (in_iGroupNum <= 0) return FALSE;
 
         // プールのバッファ予約
-        this->_ReservePool(in_uTaskMax);
+        this->ReservePool(in_uTaskMax);
 
         // タスクグループを確保
         this->_pTasks =
@@ -84,7 +84,7 @@ namespace Core
         // グループを削除
         HE_SAFE_DELETE_MEM(this->_pTasks);
 
-        this->_ReleasePool();
+        this->ReleasePool();
     }
 
     void TaskManager::ForeachByGroup(const HE::Sint32 in_iGroupId,
@@ -215,7 +215,7 @@ namespace Core
 
         // ハンドルを返却する + メモリから削除するかしないか
         const HE::Bool bCache = pTask->_bReleaseMem == FALSE;
-        this->_Free(*in_pTask, bCache);
+        this->Free(*in_pTask, bCache);
 
         in_pTask->Clear();
     }
@@ -302,7 +302,7 @@ namespace Core
         if (in_hTask.Null()) return NULL;
 
         // ハンドルからタスクインスタンスを引き出す
-        Task* pTask = this->_Ref(in_hTask);
+        Task* pTask = this->Ref(in_hTask);
         if (pTask == NULL) return NULL;
 
         return pTask;

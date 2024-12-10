@@ -8,7 +8,6 @@
 #include "Engine/Common/CustomArray.h"
 #include "Engine/Common/CustomMap.h"
 #include "Engine/Common/CustomStack.h"
-// #include "Engine/Common/CustomVector.h"
 #include "Engine/Common/Handle.h"
 #include "Engine/Core.h"
 #include "Engine/Memory/Memory.h"
@@ -20,22 +19,12 @@ namespace Core::Common
     /// データを使いまわしてメモリ確保と解放の処理コストを減らせる
     /// プールデータ型をテンプレートで指定する
     /// データを使いまわすのでクラス型を利用するとクラスのプロパティ値が残るので注意
-    /// 継承利用版
     /// </summary>
     template <typename T>
     class RuntimePoolManager
     {
     public:
-        /*
-            struct AllocData
-            {
-                T* _pItem = NULL;
-                Core::Common::Handle _handle;
-            };
-            */
-
-    public:
-        virtual ~RuntimePoolManager() { this->_ReleasePool(); }
+        virtual ~RuntimePoolManager() { this->ReleasePool(); }
 
         /// <summary>
         /// データ使用個数
@@ -83,13 +72,12 @@ namespace Core::Common
             return FALSE;
         }
 
-    protected:
         /// <summary>
         /// プールのバッファ予約
         /// プールするためのデータバッファ数を指定して確保
         /// 継承したクラスが必ず実行
         /// </summary>
-        void _ReservePool(const HE::Uint32 in_uMax)
+        void ReservePool(const HE::Uint32 in_uMax)
         {
             // TODO: 予約した数を変えたい場合にも対応できるようにしたほうがいい
 
@@ -105,7 +93,7 @@ namespace Core::Common
             this->_upCacheDatas->reserve(in_uMax);
         }
 
-        void _ReleasePool()
+        void ReleasePool()
         {
             if (this->_upCacheDatas)
             {
@@ -135,17 +123,16 @@ namespace Core::Common
         /// <summary>
         /// プールしているデータの中で利用できるデータ枠を取得
         /// 利用するデータとそのデータを紐づけたハンドルを返す
+        /// T型を継承したクラスも扱える
         /// </summary>
         template <class S, typename... TArgs>
-        std::tuple<Core::Common::Handle, T*> _Alloc(TArgs&&... in_args)
+        std::tuple<Core::Common::Handle, T*> Alloc(TArgs&&... in_args)
         {
-            // TODO: タプル使った方がいい？
             HE_STATIC_ASSERT(std::is_base_of<T, S>::value, "SクラスはTクラスを継承していない");
 
             HE_ASSERT(this->_upCacheDatas);
             HE_ASSERT(this->_upUserSlot);
 
-            // AllocData allocData;
             HE_ASSERT(0 < this->_upCacheDatas->capacity());
 
             // 割り当てられなかったら空の枠を返す
@@ -208,9 +195,6 @@ namespace Core::Common
                 pObject = HE_NEW_MEM(S, 0)(std::forward<TArgs>(in_args)...);
             }
 
-            // allocData._handle = handle;
-            // allocData._pItem  = pObject;
-
             // 利用リストに追加
             this->_upUserSlot->insert(std::make_pair(handle, pObject));
 
@@ -220,7 +204,7 @@ namespace Core::Common
         /// <summary>
         /// 割り当てデータを解放
         /// </summary>
-        void _Free(const Handle& in_rHandle, const HE::Bool in_bCache)
+        void Free(const Handle& in_rHandle, const HE::Bool in_bCache)
         {
             HE_ASSERT(in_rHandle.Null() == FALSE && "解放するデータがないとだめ");
 
@@ -241,7 +225,7 @@ namespace Core::Common
         }
 
         // データの参照(非const版)
-        T* _Ref(const Handle& in_rHandle)
+        T* Ref(const Handle& in_rHandle)
         {
             if (in_rHandle.Null()) return NULL;
             // 要素があるかチェック
@@ -254,10 +238,10 @@ namespace Core::Common
         }
 
         // データの参照(const版)
-        const T* _Ref(const Handle& in_rHandle) const
+        const T* Ref(const Handle& in_rHandle) const
         {
             typedef RuntimePoolManager<T> ThisType;
-            return (const_cast<ThisType*>(this)->_Ref(in_rHandle));
+            return (const_cast<ThisType*>(this)->Ref(in_rHandle));
         }
 
     private:
@@ -374,7 +358,7 @@ namespace Core::Common
         const T* Ref(const Handle& in_rHandle) const
         {
             typedef FixedPoolManager<T, TCapacity> ThisType;
-            return (const_cast<ThisType*>(this)->_Ref(in_rHandle));
+            return (const_cast<ThisType*>(this)->Ref(in_rHandle));
         }
 
     private:

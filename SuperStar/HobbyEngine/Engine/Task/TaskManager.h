@@ -80,7 +80,7 @@ namespace Core
             HE_ASSERT(in_sGroupId < this->_iGroupNum);
 
             // 利用するタスクを割り当て
-            auto [handle, pTask] = this->_Alloc<T>(std::forward<TArgs>(in_args)...);
+            auto [handle, pTask] = this->Alloc<T>(std::forward<TArgs>(in_args)...);
 
             pTask->VSetup(in_bReleaseMem);
             pTask->_selfHandle = handle;

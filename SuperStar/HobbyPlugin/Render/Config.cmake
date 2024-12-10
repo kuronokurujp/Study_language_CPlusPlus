@@ -22,4 +22,9 @@ set(RENDER_PLUGIN_TARGET_FILES
     Render/Window/ViewPort.cpp
     Render/Window/Scene.h
     Render/Window/Scene.cpp
+    
+    Render/Draw/Mesh.h
+    Render/Draw/Mesh.cpp
+    Render/Draw/Material.h
+    Render/Draw/Material.cpp
 )

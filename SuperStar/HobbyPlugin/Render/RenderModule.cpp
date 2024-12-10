@@ -94,7 +94,7 @@ namespace Render
         auto pWindow = this->_GetWindow(pRenderingContext->GetWindowHandle());
         HE_ASSERT_RETURN_VALUE(NULL, pWindow);
 
-        auto pViewPort = pWindow->_Ref(pRenderingContext->GetViewPortHandle());
+        auto pViewPort = pWindow->_poolViewPortManager.Ref(pRenderingContext->GetViewPortHandle());
         HE_ASSERT_RETURN_VALUE(NULL, pViewPort);
 
         return pViewPort->GetConfig();
@@ -130,7 +130,7 @@ namespace Render
         auto pWindow = this->_GetWindow(pRenderingContext->GetWindowHandle());
         HE_ASSERT(pWindow);
 
-        auto pViewPort = pWindow->_Ref(pRenderingContext->GetViewPortHandle());
+        auto pViewPort = pWindow->_poolViewPortManager.Ref(pRenderingContext->GetViewPortHandle());
         HE_ASSERT(pViewPort);
 
         auto pScene = pViewPort->GetScene(pRenderingContext->GetSceneHandle());

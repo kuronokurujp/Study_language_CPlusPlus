@@ -4,14 +4,14 @@ namespace Render
 {
     void ViewPort::RemoveScene(Core::Common::Handle& in_rHandle)
     {
-        this->_Free(in_rHandle, FALSE);
+        this->_poolSceneManager.Free(in_rHandle, FALSE);
     }
 
     SceneViewBase* ViewPort::GetScene(const Core::Common::Handle& in_rHandle)
     {
         HE_ASSERT_RETURN_VALUE(NULL, in_rHandle.Null() == FALSE);
 
-        auto pScene = this->_Ref(in_rHandle);
+        auto pScene = this->_poolSceneManager.Ref(in_rHandle);
         HE_ASSERT_RETURN_VALUE(NULL, pScene);
 
         return pScene;
@@ -25,8 +25,8 @@ namespace Render
     HE::Bool ViewPort::_Setup(Core::Memory::UniquePtr<ViewPortConfig> in_upConfig)
     {
         this->_upConfig = std::move(in_upConfig);
-        this->_ReleasePool();
-        this->_ReservePool(this->_upConfig->uSceneCount);
+        this->_poolSceneManager.ReleasePool();
+        this->_poolSceneManager.ReservePool(this->_upConfig->uSceneCount);
 
         return TRUE;
     }
@@ -38,7 +38,7 @@ namespace Render
     void ViewPort::_End()
     {
         {
-            auto m = this->GetUserDataList();
+            auto m = this->_poolSceneManager.GetUserDataList();
             if (m)
             {
                 for (auto itr = m->begin(); itr != m->end(); ++itr)
@@ -47,7 +47,7 @@ namespace Render
                 }
             }
         }
-        this->_ReleasePool();
+        this->_poolSceneManager.ReleasePool();
 
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upConfig);
     }
