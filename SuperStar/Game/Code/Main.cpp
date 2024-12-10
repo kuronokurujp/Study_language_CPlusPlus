@@ -116,14 +116,14 @@ HE::Bool WinGameMain::VStart(const HE::Bool in_bDebug)
     pLocateModule->LoadSystemFile(Core::Common::FixedString256(HE_STR_TEXT("Locate/System.toml")));
     pLocateModule->LoadTextAll(Core::Common::FixedString16(HE_STR_TEXT("JP")));
 
-    // TODO: ゲーム画面表示準備
+    // ゲーム画面表示準備
     {
-        // TODO: 2Dのゲームシーンを追加
+        // 2Dのゲームシーンを追加
         Platform::ScreenSceneView2DConfig config2D(windowHandle, viewPortHandle);
         Game::g_scene2DHandle = upScreen->VAddSceneView2D(config2D);
         HE_ASSERT(Game::g_scene2DHandle.Null() == FALSE);
 
-        // TODO: UIのゲームシーンを追加
+        // UIのゲームシーンを追加
         Platform::ScreenSceneViewUIConfig configUI(windowHandle, viewPortHandle);
         Game::g_sceneUIHandle = upScreen->VAddSceneViewUI(configUI);
         HE_ASSERT(Game::g_sceneUIHandle.Null() == FALSE);
