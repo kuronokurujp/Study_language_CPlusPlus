@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-// DxLibのファイルシステム
+// SDL2のファイルシステム
 #include "Engine/Common/CustomMap.h"
 #include "Engine/File/Path.h"
 #include "Engine/MiniEngine.h"
@@ -9,7 +9,7 @@
 namespace PlatformSDL2
 {
     /// <summary>
-    ///  DxLibのファイルシステム
+    /// ファイルシステム
     /// </summary>
     class File final : public Platform::FileInterface
     {
