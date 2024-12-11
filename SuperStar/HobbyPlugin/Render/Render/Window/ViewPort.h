@@ -19,7 +19,7 @@ namespace Render
     /// <summary>
     /// ウィンドウのビューポート
     /// </summary>
-    class ViewPort 
+    class ViewPort
     {
         friend class Window;
 

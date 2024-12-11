@@ -25,7 +25,7 @@ namespace PlatformSDL2
         void _VEndRender() override final;
 
     private:
-        void* _pWindow = NULL;
+        void* _pWindow  = NULL;
         void* _pContext = NULL;
     };
 

@@ -27,7 +27,7 @@ namespace PlatformSDL2
         // アルファブレンド設定
         // srcFactor * srcAlpha + (1 - srcAlpha) * dstFactor
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
         // ビュー毎に描画コマンド処理
         const Render::Command* pCommand = this->_commandBuff.PopBack();
         while (pCommand != NULL)

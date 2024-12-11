@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-// DXLib用の入力システム
+// SDL2の入力システム
 #include "Engine/Platform/PlatformInput.h"
 
 namespace PlatformSDL2
 {
     /// <summary>
-    /// DxLib用の入力システム
+    /// 入力システム
     /// </summary>
     class Input final : public Platform::InputInterface
     {
