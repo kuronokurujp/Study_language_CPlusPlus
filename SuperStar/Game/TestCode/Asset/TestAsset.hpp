@@ -11,8 +11,7 @@
 
 TEST_CASE("Test Paramater Asset Load")
 {
-    UnitTestRunnerByModuleOnly<AssetManager::AssetManagerModule,
-                               PlatformSDL2::PlatformSDL2Module>(
+    UnitTestRunnerByModuleOnly<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module>(
         []()
         {
             auto pAssetManagerModule =
