@@ -12,17 +12,11 @@ if not exist %PROJ_PATH% (
 
 REM vcpkgでインストールしたのを全てアンインストール
 REM その後にvcpkgを破棄
-set VCPKG_PATH=%PROJ_PATH%\vcpkg
+set INSTALL_VCPKG_DIR_PATH=%PROJ_PATH%\ThirdParty
+set VCPKG_PATH=%INSTALL_VCPKG_DIR_PATH%\vcpkg
 if exist %VCPKG_PATH% (
     echo "uninstall vcpkg %VCPKG_PATH%"
     rmdir /s /q %VCPKG_PATH%
-)
-
-REM vcpkgの設定ファイルがあれば削除
-set VCPKG_CONFIG_FILE_PATH=%PROJ_PATH%\vcpkg-configuration.json
-if exist %VCPKG_CONFIG_FILE_PATH% (
-    echo "del %VCPKG_CONFIG_FILE_PATH%"
-    del %VCPKG_CONFIG_FILE_PATH%
 )
 
 REM 追加した環境変数を削除

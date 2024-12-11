@@ -40,10 +40,10 @@ option(
 # vcpkgから取得するパッケージのライブラリタイプ
 set(CACHE_PROJECT_VCPKG_STATIC_LIB_TYPE "x64-windows-static" CACHE STRING "" FORCE)
 # vcpkgのルートディレクトリ
-set(CHACHE_VCPKG_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg" CACHE STRING "Vcpkg toolchain file" FORCE)
+set(CHACHE_VCPKG_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/vcpkg" CACHE STRING "Vcpkg toolchain file" FORCE)
 
 # 環境変数からvcpkgのパスを取得してツールチェインを設定
-set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file" FORCE)
+set(CMAKE_TOOLCHAIN_FILE "$CACHE{CHACHE_VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file" FORCE)
 
 # ワークスペース名と使用言語C++をプロジェクトに設定.
 project(${WORKSPACE_NAME} VERSION 2.0 LANGUAGES C CXX)

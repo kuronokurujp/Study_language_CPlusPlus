@@ -36,11 +36,15 @@ call refreshenv
 REM ④使用するライブラリを簡単にインストールできるようにするためにvcpkgをインストール
 REM vcpkgをインストールするためにgitが必要なのでgitをインストールしてコマンド利用
 REM すでにvcpkgがインストールしているかチェック
-set VCPKG_PATH=%PROJ_PATH%\vcpkg
+set INSTALL_VCPKG_DIR_PATH=%PROJ_PATH%\ThirdParty
+set VCPKG_PATH=%INSTALL_VCPKG_DIR_PATH%\vcpkg
 if not exist %VCPKG_PATH% (
     REM インストール先へ移動
-    echo "install vcpkg to %PROJ_PATH%"
-    cd %PROJ_PATH%
+    echo "install vcpkg to %INSTALL_VCPKG_DIR_PATH%"
+    if not exist %INSTALL_VCPKG_DIR_PATH% (
+        mkdir %INSTALL_VCPKG_DIR_PATH%
+    )
+    cd %INSTALL_VCPKG_DIR_PATH%
     git clone https://github.com/microsoft/vcpkg.git
     if %errorlevel% neq 0 exit /b %errorlevel%
 ) else (
@@ -52,9 +56,6 @@ if exist %VCPKG_PATH% (
     cd %PROJ_PATH%
     call %VCPKG_PATH%\bootstrap-vcpkg.bat
     if %errorlevel% neq 0 exit /b %errorlevel%
-
-    REM vcpkgの環境構築
-    "%VCPKG_PATH%\vcpkg.exe" new --application
 
 ) else (
     echo "error not exist %VCPKG_PATH%"
