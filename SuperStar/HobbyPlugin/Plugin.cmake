@@ -88,9 +88,9 @@ if(EXISTS ${vcpkg_manifest_root_path}/.vcpkg.json)
              RESULT_VARIABLE CMD_RESULT
          )
 
-        message(STATUS "Command Output: ${CMD_OUTPUT}")
-        message(STATUS "Command Error: ${CMD_ERROR}")
-        message(STATUS "Command Result: ${CMD_RESULT}")
+        # message(STATUS "Command Output: ${CMD_OUTPUT}")
+        # message(STATUS "Command Error: ${CMD_ERROR}")
+        # message(STATUS "Command Result: ${CMD_RESULT}")
 
     endif()
 endif()
