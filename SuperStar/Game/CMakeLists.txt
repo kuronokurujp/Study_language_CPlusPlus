@@ -6,6 +6,13 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Gameアプリのプロジェクト登録.
 add_executable(${APP_NAME} WIN32)
 
+# VSのデバッグ用のプロパティを設定
+set_target_properties(${APP_NAME} PROPERTIES
+    VS_DEBUGGER_COMMAND "cmd.exe"
+    VS_DEBUGGER_COMMAND_ARGUMENTS "/c call ${CMAKE_CURRENT_SOURCE_DIR}/../UpdateAsset.bat && $(TargetPath)"
+    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+)
+
 # ファイル群をターゲット設定.
 target_sources(${APP_NAME}
   PRIVATE
