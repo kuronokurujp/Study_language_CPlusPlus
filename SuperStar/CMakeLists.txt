@@ -91,6 +91,12 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 # set(CMAKE_EXE_LINKER_FLAGS_UNITTEST "")
 # set(CMAKE_SHARED_LINKER_FLAGS_UNITTEST "")
 
+# ランタイムライブラリを /MT または /MD に統一
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+
 # アーキテクチャ指定.
 if(CMAKE_EXE_LINKER_FLAGS STREQUAL "/machine:x64")
   set(ARCH x86_64)
@@ -145,6 +151,12 @@ set_target_properties(${APP_NAME} PROPERTIES
     ${CMAKE_CURRENT_SOURCE_DIR}/Bin/${WORKSPACE_NAME}/${CMAKE_CFG_INTDIR}
 )
 
+# バッチファイルを実行するカスタムターゲットを作成
+add_custom_target(
+    RunBatch ALL  # 必ず実行されるように設定
+    COMMAND cmd /c "${CMAKE_CURRENT_SOURCE_DIR}/UpdateAsset.bat"
+    COMMENT "Running UpdateAsset.bat during build."
+)
 check_variable(LUA_PLUGIN_NAME)
 check_variable(EVENT_PLUGIN_NAME)
 check_variable(ENHANCED_INPUT_PLUGIN_NAME)
@@ -203,3 +215,8 @@ foreach(lib ${PLUGIN_LIBRARIES})
     $<$<CONFIG:UnitTest>:HE_USE_STD_UNIQUE_PTR>
   )
 endforeach()
+
+# アプリのビルド前にバッチファイルを実行させるターゲットに依存させて
+# アプリのビルド前にバッチファイルを実行させている
+add_dependencies(${TEST_APP_NAME} RunBatch)
+add_dependencies(${APP_NAME} RunBatch)

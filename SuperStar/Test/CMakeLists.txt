@@ -6,13 +6,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # 単体テストアプリのプロジェクト登録.
 add_executable(${TEST_APP_NAME})
 
-# VSのデバッグ用のプロパティを設定
-set_target_properties(${TEST_APP_NAME} PROPERTIES
-    VS_DEBUGGER_COMMAND "cmd.exe"
-    VS_DEBUGGER_COMMAND_ARGUMENTS "/c call ${CMAKE_CURRENT_SOURCE_DIR}/../UpdateAsset.bat && $(TargetPath)"
-    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-)
-
 set_property(TARGET ${TEST_APP_NAME} PROPERTY WIN32_EXECUTABLE false)
 
 # ファイル群をターゲット設定.
