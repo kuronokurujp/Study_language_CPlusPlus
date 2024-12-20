@@ -187,6 +187,14 @@ static void UnitTestRunnerByModuleOnly(std::function<HE::Bool()> in_func)
                 // モジュールのテスト
                 bEnd = in_func();
             }
+            else
+            {
+                bEnd = TRUE;
+            }
+        }
+        else
+        {
+            bEnd = TRUE;
         }
     }
 

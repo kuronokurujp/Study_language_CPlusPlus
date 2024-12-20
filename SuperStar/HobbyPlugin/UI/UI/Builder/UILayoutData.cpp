@@ -24,28 +24,28 @@ namespace UI::Builder
         struct StyleColor
         {
         public:
-            StyleColor(const HE::UTF8* in_szName, Render::Color in_rgba)
+            StyleColor(const HE::UTF8* in_szName, Core::Math::Color in_rgba)
             {
                 this->szName = in_szName;
                 this->rgba   = in_rgba;
             }
 
             const HE::UTF8* szName = NULL;
-            Render::Color rgba;
+            Core::Math::Color rgba;
         };
 
         /// <summary>
         /// UIデータの色名とカラーと対応したテーブル一覧
         /// </summary>
-        StyleColor s_aColorTable[] = {StyleColor("white", Render::RGB::White),
-                                      StyleColor("black", Render::RGB::Black),
-                                      StyleColor("red", Render::RGB::Red),
-                                      StyleColor("blue", Render::RGB::Blue),
-                                      StyleColor("green", Render::RGB::Green),
-                                      StyleColor("yellow", Render::RGB::Yellow),
-                                      StyleColor("cyan", Render::RGB::Cyan),
-                                      StyleColor("magenta", Render::RGB::Magenta),
-                                      StyleColor("ornage", Render::RGB::Orange)};
+        StyleColor s_aColorTable[] = {StyleColor("white", Core::Math::RGB::White),
+                                      StyleColor("black", Core::Math::RGB::Black),
+                                      StyleColor("red", Core::Math::RGB::Red),
+                                      StyleColor("blue", Core::Math::RGB::Blue),
+                                      StyleColor("green", Core::Math::RGB::Green),
+                                      StyleColor("yellow", Core::Math::RGB::Yellow),
+                                      StyleColor("cyan", Core::Math::RGB::Cyan),
+                                      StyleColor("magenta", Core::Math::RGB::Magenta),
+                                      StyleColor("ornage", Core::Math::RGB::Orange)};
 
         static const EAnchor _GetPosAnchor(const pugi::xml_node& in_rNode)
         {

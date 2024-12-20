@@ -22,11 +22,20 @@ set(PLATFORMSDL2_PLUGIN_TARGET_FILES
     PlatformSDL2/SDL2Screen.cpp
     PlatformSDL2/SDL2System.h
     PlatformSDL2/SDL2System.cpp
-    
+    PlatformSDL2/SDL2Font.cpp
+    PlatformSDL2/SDL2Font.h
+
     PlatformSDL2/Screen/Window.cpp
     PlatformSDL2/Screen/Window.h
     PlatformSDL2/Screen/ViewPort.h
     PlatformSDL2/Screen/ViewPort.cpp
     PlatformSDL2/Screen/Scene.h
     PlatformSDL2/Screen/Scene.cpp
+    
+    PlatformSDL2/Screen/Draw/Material.cpp
+    PlatformSDL2/Screen/Draw/Material.h
+    PlatformSDL2/Screen/Draw/Mesh.cpp
+    PlatformSDL2/Screen/Draw/Mesh.h
+    PlatformSDL2/Screen/Draw/Texture.cpp
+    PlatformSDL2/Screen/Draw/Texture.h
 )

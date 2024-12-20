@@ -1,28 +1,25 @@
 ﻿#pragma once
 
 #include "Engine/MiniEngine.h"
-
-// 依存モジュール一覧
-#include "RenderModule.h"
+#include "Engine/Platform/PlatformScreen.h"
 
 namespace PlatformSDL2
 {
     /// <summary>
-    /// DXLibのウィンドウロジック
+    /// ウィンドウロジック
     /// </summary>
-    class DXLibWindowStrategy final : public Render::WindowStrategy
+    class SDL2WindowStrategy final : public Platform::WindowStrategy
     {
     public:
-        DXLibWindowStrategy();
+        SDL2WindowStrategy(const Platform::WindowConfig& in_rConfig, void* in_pGLContext);
 
-    protected:
-        void _VBegin() override final;
-        void _VEnd() override final;
+        void VBegin() override final;
+        void VEnd() override final;
 
-        void _VShow() override final;
+        void VShow() override final;
 
-        void _VBeginRender() override final;
-        void _VEndRender() override final;
+        void VBeginRender() override final;
+        void VEndRender() override final;
 
     private:
         void* _pWindow  = NULL;

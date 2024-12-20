@@ -60,14 +60,19 @@ namespace Actor
     const Core::Math::Matrix4& TransformComponent::ComputeWorldTransform()
     {
         // 拡大・拡縮行列作成して初期行列として設定
-        this->_worldTransform =
-            Core::Math::Matrix4::CreateScale(this->_scale._fX, this->_scale._fY, this->_scale._fZ);
+
+        Core::Math::Matrix4::OutputScale(&this->_worldTransform, this->_scale._fX, this->_scale._fY,
+                                         this->_scale._fZ);
 
         // 回転行列作成して掛け算
-        this->_worldTransform.Mul(Core::Math::ConvQuaternionToMatrix4(this->_rotation));
+        Core::Math::Matrix4 rot;
+        Core::Math::OutputQuaternionToMatrix4(&rot, this->_rotation);
+        this->_worldTransform.Mul(rot);
 
         // 平行移動行列作成して掛け算
-        this->_worldTransform.Mul(Core::Math::Matrix4::CreateTranslation(this->_pos));
+        Core::Math::Matrix4 trans;
+        Core::Math::Matrix4::OutputTranslation(&trans, this->_pos);
+        this->_worldTransform.Mul(trans);
 
         return this->_worldTransform;
     }

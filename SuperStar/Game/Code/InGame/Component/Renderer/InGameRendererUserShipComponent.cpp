@@ -30,7 +30,7 @@ namespace InGame
 
         // 描画コマンド追加
         // TODO: 三角形の表示に切り替えられるか
-        Render::Command2DRectDraw(in_rViewHandle, rect, Render::RGB::White);
+        Render::Command2DRectDraw(in_rViewHandle, rect, Core::Math::RGB::White);
     }
 
 }  // namespace InGame

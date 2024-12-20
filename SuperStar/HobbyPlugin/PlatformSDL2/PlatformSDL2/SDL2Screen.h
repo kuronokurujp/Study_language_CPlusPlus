@@ -9,38 +9,43 @@
 
 namespace PlatformSDL2
 {
+    // 前方宣言
     class PlatformSDL2Module;
+
     class Screen final : public Platform::ScreenInterface
     {
     public:
-        // このクラスはDXLibModule下にあるのでこのクラスが生きている間はDXLibModuleは必ず存在しているのを保障している
+        // このクラスはModule下にあるのでこのクラスが生きている間はModuleは必ず存在しているのを保障している
         Screen(PlatformSDL2::PlatformSDL2Module*);
+        void VRelease() override final;
 
-        const Core::Common::Handle VCreateWindow() override final;
-        HE::Bool VReleaseAllWindows() override final;
+        Core::Memory::UniquePtr<Platform::WindowStrategy> VCreateWindowStrategy(
+            const Platform::WindowConfig&) override final;
 
-        void VShowWindow(const Core::Common::Handle&) override final;
+        Core::Memory::UniquePtr<Platform::ViewPortStrategy> VCreateViewPortStrategy(
+            const Platform::ViewPortConfig&) override final;
 
-        Core::Common::Handle VAddViewPort(const Core::Common::Handle&) override final;
-        void VRemoveViewPort(const Core::Common::Handle& in_rWindowHandle,
-                             const Core::Common::Handle& in_rViewPortHandle) override final;
+        Core::Memory::UniquePtr<Platform::SceneStrategyInterface> VCreateSceneUIStrategy()
+            override final;
+        Core::Memory::UniquePtr<Platform::SceneStrategyInterface> VCreateScene2DStrategy()
+            override final;
 
-        // UI用シーン追加
-        const Core::Common::Handle& VAddSceneViewUI(
-            const Platform::ScreenSceneViewUIConfig&) override final;
+        /// <summary>
+        /// TODO: 画面を色クリア
+        /// </summary>
+        void VCls(const HE::Uint32 in_uR, const HE::Uint32 in_uG,
+                  const HE::Uint32 in_uB) override final;
 
-        // 2D用シーン追加
-        const Core::Common::Handle& VAddSceneView2D(
-            const Platform::ScreenSceneView2DConfig&) override final;
-
-        // 2D環境取得
-        const Platform::ScreenSceneView2DEnvironment&& GetEnvBySceneView2D(
-            const Core::Common::Handle&) override final;
+        /// <summary>
+        /// TODO: 2Dテキスト描画
+        /// </summary>
+        void VDrawText2D(const Core::Math::Vector2& in_rPos, const HE::Char* in_szText,
+                         const Core::Math::Rect2::EAnchor in_eAnchor,
+                         const Core::Math::Color& in_rColor) override final;
 
     private:
-        Core::Common::FixedVector<Core::Common::Handle, 32> _vWindowHandle;
-
         PlatformSDL2::PlatformSDL2Module* _pSDL2Module = NULL;
+        void* _pFontMesh                               = NULL;
     };
 
 }  // namespace PlatformSDL2

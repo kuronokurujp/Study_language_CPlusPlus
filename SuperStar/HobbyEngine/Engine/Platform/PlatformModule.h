@@ -6,6 +6,7 @@
 
 // プラットフォームのインターフェイス
 #include "PlatformFile.h"
+#include "PlatformFont.h"
 #include "PlatformInput.h"
 #include "PlatformScreen.h"
 #include "PlatformSystem.h"
@@ -39,24 +40,29 @@ namespace Platform
         virtual Core::Memory::SharedPtr<Platform::TimeInterface> VTime() = 0;
 
         /// <summary>
-        /// 入力関連の処理
+        /// 入力関連
         /// </summary>
         virtual Core::Memory::SharedPtr<Platform::InputInterface> VInput() = 0;
 
         /// <summary>
-        /// ファイル関連の処理
+        /// ファイル関連
         /// </summary>
         virtual Core::Memory::SharedPtr<Platform::FileInterface> VFile() = 0;
 
         /// <summary>
-        /// スクリーン関連の処理
+        /// スクリーン関連
         /// </summary>
         virtual Core::Memory::SharedPtr<Platform::ScreenInterface> VScreen() = 0;
 
         /// <summary>
-        /// システム関連の処理
+        /// システム関連
         /// </summary>
         virtual Core::Memory::SharedPtr<Platform::SystemInterface> VSystem() = 0;
+
+        /// <summary>
+        /// フォント関連
+        /// </summary>
+        virtual Core::Memory::SharedPtr<Platform::FontInterface> VFont() = 0;
 
     protected:
         /// <summary>
@@ -76,6 +82,6 @@ namespace Platform
         /// <summary>
         /// 更新
         /// </summary>
-        virtual void _VUpdate(const HE::Float32 in_fDeltaTime) override {}
+        virtual void _Update(const HE::Float32 in_fDeltaTime) override {}
     };
 }  // namespace Platform

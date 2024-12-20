@@ -1,9 +1,7 @@
 ﻿#pragma once
 
-#include "Engine/Math/Rect2.h"
-#include "Engine/Math/Vector2.h"
+#include "Engine/Math/Math.h"
 #include "Engine/MiniEngine.h"
-#include "Render/Color.h"
 
 namespace Render
 {
@@ -11,7 +9,7 @@ namespace Render
     {
         HE::Float32 fX = 0.0f;
         HE::Float32 fY = 0.0f;
-        Color color;
+        Core::Math::Color color;
     };
 
     // コマンド一覧
@@ -38,7 +36,7 @@ namespace Render
     {
         HE::Float32 fX = 0.0f;
         HE::Float32 fY = 0.0f;
-        Color color;
+        Core::Math::Color color;
         Core::Math::Rect2::EAnchor anchor = Core::Math::Rect2::EAnchor_Left;
 
         HE::Char szChars[128] = {0};
@@ -55,7 +53,7 @@ namespace Render
         HE::Float32 fRightX = 0.0f;
         HE::Float32 fRightY = 0.0f;
 
-        Color color;
+        Core::Math::Color color;
     };
 
     /// <summary>
@@ -80,14 +78,14 @@ namespace Render
     /// </summary>
     struct CmdClsScreen
     {
-        Color color;
+        Core::Math::Color color;
     };
 
     struct Cmd2DCircleDraw
     {
         Point2D point;
         HE::Float32 fSize = 0.0f;
-        Color color;
+        Core::Math::Color color;
     };
 
     /// <summary>
@@ -119,20 +117,23 @@ namespace Render
     /// </summary>
     extern void Command2DTextDraw(const Core::Common::Handle& in_rViewHandle,
                                   const Core::Math::Vector2& in_rPos,
-                                  const Core::Common::StringBase& in_str, const Color& in_rColor,
+                                  const Core::Common::StringBase& in_str,
+                                  const Core::Math::Color& in_rColor,
                                   const Core::Math::Rect2::EAnchor in_eAnchor);
 
     /// <summary>
     /// 2D矩形描画
     /// </summary>
     extern void Command2DRectDraw(const Core::Common::Handle& in_rViewHandle,
-                                  const Core::Math::Rect2& in_rRect, const Color& in_rColor);
+                                  const Core::Math::Rect2& in_rRect,
+                                  const Core::Math::Color& in_rColor);
 
     /// <summary>
     /// 2D点描画
     /// </summary>
     extern void Command2DPointDraw(const Core::Common::Handle& in_rViewHandle,
-                                   const Core::Math::Vector2& in_rPos, const Color& in_rColor);
+                                   const Core::Math::Vector2& in_rPos,
+                                   const Core::Math::Color& in_rColor);
     /// <summary>
     /// 2D点群描画
     /// </summary>
@@ -143,13 +144,13 @@ namespace Render
     /// 画面クリア
     /// </summary>
     extern void CommandClsScreen(const Core::Common::Handle& in_rViewHandle,
-                                 const Color& in_rColor);
+                                 const Core::Math::Color& in_rColor);
 
     /// <summary>
     /// 2D円の描画
     /// </summary>
     extern void Command2DCircleDraw(const Core::Common::Handle& in_rViewHandle,
                                     const Core::Math::Vector2& in_rPos, const HE::Float32 in_fSize,
-                                    const Color& in_rColor);
+                                    const Core::Math::Color& in_rColor);
 
 }  // namespace Render

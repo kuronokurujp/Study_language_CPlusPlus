@@ -1,45 +1,135 @@
 ﻿#include "Window.h"
 
-#include "Scene.h"
-#include "ViewPort.h"
+#include "./Scene.h"
+#include "./ViewPort.h"
+#include "Engine/Engine.h"
+#include "Engine/Platform/PlatformModule.h"
 
 namespace Render
 {
-    Core::Common::Handle Window::AddViewPort(Core::Memory::UniquePtr<ViewPortConfig> in_upConfig)
+    static void _RenderCommand(const Render::Command* in_pCommand,
+                               Platform::ScreenInterface* in_pScreen)
     {
-        // ビューポートの縦横サイズを調整
-        // ウィンドウサイズを超えないようにする
-        if (in_upConfig->uHeight <= 0)
+        // TODO: コマンドに応じた描画処理をする
+        switch (in_pCommand->uType)
         {
-            in_upConfig->uHeight = this->_upStrategy->_uHeight;
-        }
-        else if (this->_upStrategy->_uHeight < in_upConfig->uHeight)
-        {
-            in_upConfig->uHeight = this->_upStrategy->_uHeight;
-        }
+            // 画面クリア
+            case Render::ECmdType_ClsScreen:
+            {
+                const Render::CmdClsScreen* pClsScreen = &in_pCommand->data.clsScree;
+                const auto& rColor                     = pClsScreen->color;
 
-        if (in_upConfig->uWidth <= 0)
-        {
-            in_upConfig->uWidth = this->_upStrategy->_uWidht;
-        }
-        else if (this->_upStrategy->_uHeight < in_upConfig->uHeight)
-        {
-            in_upConfig->uWidth = this->_upStrategy->_uWidht;
-        }
+                in_pScreen->VCls(rColor.c32.r, rColor.c32.b, rColor.c32.g);
+                break;
+            }
 
-        auto [handle, pData] = this->_poolViewPortManager.Alloc<ViewPort>();
+            // 矩形を描画
+            case Render::ECmdType_2DRectDraw:
+            {
+                const Render::Cmd2DRectDraw* pRect2D = &in_pCommand->data.rect2DDraw;
 
-        pData->_Setup(std::move(in_upConfig));
+                break;
+            }
+
+            // 点群描画
+            case Render::ECmdType_2DPointArrayDraw:
+            {
+                // データ置換
+                const Render::Cmd2DPointArrayDraw* pCmdPoint2DCloud =
+                    &in_pCommand->data.pointCloud2DDraw;
+                HE_ASSERT(0 < pCmdPoint2DCloud->uCount && "点群の点が一つもないのはだめ");
+
+                if (0 < pCmdPoint2DCloud->uCount)
+                {
+                    /*
+                        const HE::Uint32 num =
+                            HE_MIN(pCmdPoint2DCloud->uCount, s_u2DPointCount);
+                            */
+                    /*
+                    std::transform(pCmdPoint2DCloud->aPoint,
+                    pCmdPoint2DCloud->aPoint + num, s_a2DPoint,
+                                   [](const Render::Point2D& src)
+                                   {
+                                       const auto& rColor = src.color;
+                                       const auto uColor =
+                                           ::GetColor(rColor.c32.r, rColor.c32.g,
+                                                      rColor.c32.b);
+                                       return ::POINTDATA{static_cast<int>(src.fX),
+                                                          static_cast<int>(src.fY),
+                    uColor, 0};
+
+                                   });
+
+                    // 点の集合を描画する
+                    ::DrawPixelSet(s_a2DPoint, num);
+                                   */
+                }
+                break;
+            }
+
+            // 点描画
+            case Render::ECmdType_2DPointDraw:
+            {
+                const Render::Cmd2DPointDraw* pCmdPoint2D = &in_pCommand->data.point2DDraw;
+
+                const Render::Point2D* pPoint2D = &pCmdPoint2D->point;
+                const auto& rColor              = pPoint2D->color;
+                /*
+                const auto uColor = ::GetColor(rColor.c32.r, rColor.c32.g,
+                rColor.c32.b);
+                ::DrawPixel(static_cast<int>(pPoint2D->fX),
+                static_cast<int>(pPoint2D->fY), uColor);
+                            */
+
+                break;
+            }
+
+            // 2次元の円描画
+            case Render::ECmdType_2DCircleDraw:
+            {
+                const Render::Cmd2DCircleDraw* pCmdCircle = &in_pCommand->data.circle2DDraw;
+                const Core::Math::Color* pColor           = &pCmdCircle->color;
+                /*
+                const Uint32 uColor =
+                    ::GetColor(pColor->c32.r, pColor->c32.g, pColor->c32.b);
+
+                // 円を描画
+                ::DrawCircleAA(pCmdCircle->point.fX, pCmdCircle->point.fY,
+                               pCmdCircle->fSize, 32, uColor, TRUE);
+
+*/
+                break;
+            }
+            // 2Dテキストを描画
+            case Render::ECmdType_2DTextDraw:
+            {
+                const Render::Cmd2DTextDraw* pText2D = &in_pCommand->data.text2DDraw;
+
+                in_pScreen->VDrawText2D(Core::Math::Vector2(pText2D->fX, pText2D->fY),
+                                        pText2D->szChars, pText2D->anchor, pText2D->color);
+                break;
+            }
+        }
+    }
+
+    Core::Common::Handle Window::AddViewPort(
+        Core::Memory::UniquePtr<Platform::ViewPortStrategy> in_upStg)
+    {
+        auto [handle, pViewPort] = this->_poolViewPortManager.Alloc<ViewPort>();
+
+        // TODO: 用意できるシーン数は固定にしておく
+        pViewPort->Init(std::move(in_upStg), 3);
 
         return handle;
     }
 
-    HE::Bool Window::RemoveViewPort(const Core::Common::Handle& in_rHandle)
+    HE::Bool Window::RemoveViewPort(Core::Common::Handle& in_rHandle)
     {
         auto pViewPort = this->_poolViewPortManager.Ref(in_rHandle);
         HE_ASSERT(pViewPort);
 
         pViewPort->_End();
+        pViewPort->Release();
 
         this->_poolViewPortManager.Free(in_rHandle, FALSE);
 
@@ -48,41 +138,45 @@ namespace Render
 
     void Window::Show()
     {
-        if (this->_bReady) this->_upStrategy->_VShow();
+        if (this->_bReady) this->_upStrategy->VShow();
         this->_bShow = TRUE;
     }
 
-    HE::Bool Window::_Setup(Core::Memory::UniquePtr<WindowStrategy> in_upConfig)
+    HE::Bool Window::Init(Core::Memory::UniquePtr<Platform::WindowStrategy> in_upConfig)
     {
         this->_upStrategy = std::move(in_upConfig);
-        HE_ASSERT(0 < this->_upStrategy->ViewPortCount());
+
+        auto rWindowConfig = this->_upStrategy->GetConfig();
+        HE_ASSERT(0 < rWindowConfig.uViewPortCount);
 
         this->_poolViewPortManager.ReleasePool();
-        this->_poolViewPortManager.ReservePool(this->_upStrategy->ViewPortCount());
+        this->_poolViewPortManager.ReservePool(rWindowConfig.uViewPortCount);
 
         return TRUE;
     }
 
-    void Window::_Release()
+    void Window::Release()
     {
-        this->_poolViewPortManager.ReleasePool();
+        this->_upStrategy->VRelease();
+        this->_poolViewPortManager.ReleasePool([](ViewPort* in_pViewPort)
+                                               { in_pViewPort->Release(); });
 
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upStrategy);
     }
 
     void Window::_Begin()
     {
-        this->_upStrategy->_VBegin();
+        this->_upStrategy->VBegin();
         if (this->_bShow)
         {
-            this->_upStrategy->_VShow();
+            this->_upStrategy->VShow();
         }
         this->_bReady = TRUE;
     }
 
     void Window::_End()
     {
-        this->_upStrategy->_VEnd();
+        this->_upStrategy->VEnd();
 
         {
             auto m = this->_poolViewPortManager.GetUserDataList();
@@ -112,7 +206,7 @@ namespace Render
 
                 for (auto itrScene = m->begin(); itrScene != m->end(); ++itrScene)
                 {
-                    itrScene->second->_VUpdate(in_fDt);
+                    itrScene->second->_Update(in_fDt);
                 }
             }
         }
@@ -120,7 +214,12 @@ namespace Render
 
     void Window::_Render()
     {
-        this->_upStrategy->_VBeginRender();
+        auto pPlatformModule = HE_ENGINE.PlatformModule();
+        HE_ASSERT(pPlatformModule);
+
+        auto pPlatformScreen = pPlatformModule->VScreen();
+
+        this->_upStrategy->VBeginRender();
 
         // ビューポート処理
         auto m = this->_poolViewPortManager.GetUserDataList();
@@ -133,14 +232,28 @@ namespace Render
                 auto m         = pViewPort->_poolSceneManager.GetUserDataList();
                 if (m == NULL) continue;
 
+                pViewPort->_BeginRender();
+
                 for (auto itrScene = m->begin(); itrScene != m->end(); ++itrScene)
                 {
-                    // シーン描画
-                    itrScene->second->_VRender(pViewPort);
+                    itrScene->second->_BeginRender();
+
+                    // ビュー毎に描画コマンド処理
+                    const Render::Command* pCommand = itrScene->second->_commandBuff.PopBack();
+                    while (pCommand != NULL)
+                    {
+                        _RenderCommand(pCommand, pPlatformScreen.get());
+
+                        pCommand = itrScene->second->_commandBuff.PopBack();
+                    }
+
+                    itrScene->second->_EndRender();
                 }
+
+                pViewPort->_EndRender();
             }
         }
-
-        this->_upStrategy->_VEndRender();
+        this->_upStrategy->VEndRender();
     }
+
 }  // namespace Render

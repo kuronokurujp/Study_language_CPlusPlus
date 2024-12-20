@@ -1,36 +1,30 @@
 ﻿#pragma once
 
 #include "Engine/MiniEngine.h"
-
-// 依存モジュール一覧
-#include "RenderModule.h"
+#include "Engine/Platform/PlatformScreen.h"
 
 namespace PlatformSDL2
 {
     /// <summary>
     /// 2D用のシーン
     /// </summary>
-    class SceneView2D : public Render::SceneViewBase
+    class SDL2SceneStrategy2D : public Platform::SceneStrategyInterface
     {
-    protected:
-        HE::Bool _VBegin() override final;
-        void _VEnd() override final;
+    public:
+        HE::Bool VBegin() override;
 
-        void _VUpdate(const HE::Float32) override final;
+        void VEnd() override final;
 
-        void _VRender(Render::ViewPort* in_pViewPort) override final;
+        void VUpdate(const HE::Float32) override final;
 
-    private:
-        // 2Dの点群を表示するために必要
-        static constexpr HE::Uint32 s_u2DPointCount = 500;
-        // static inline ::POINTDATA s_a2DPoint[s_u2DPointCount];
+        void VBeginRender() override final;
+        void VEndRender() override final;
     };
 
     /// <summary>
     /// UI用のシーン
     /// </summary>
-    class SceneViewUI final : public SceneView2D
+    class SDL2SceneStrategyUI final : public SDL2SceneStrategy2D
     {
     };
-
 }  // namespace PlatformSDL2

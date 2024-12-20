@@ -76,23 +76,25 @@ HE::Bool WinGameMain::VStart(const HE::Bool in_bDebug)
 
     if (ApplicationEngineFramework::VStart(in_bDebug) == FALSE) return FALSE;
 
-    // ゲームウィンドウを作成
     auto pPlatformModule = HE_ENGINE.PlatformModule();
     HE_ASSERT(pPlatformModule);
 
-    auto upScreen = pPlatformModule->VScreen();
-    HE_ASSERT(upScreen);
+    // ゲームウィンドウを作成
+    auto spScreen = pPlatformModule->VScreen();
+    HE_ASSERT(spScreen);
+
+    auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
 
     Core::Common::Handle windowHandle;
     Core::Common::Handle viewPortHandle;
     {
         // TODO: 外部設定が必要かも
         // ゲームウィンドウを生成
-        windowHandle = upScreen->VCreateWindow();
+        windowHandle = pRenderModule->NewWindow(640, 320);
 
         // TODO: 画面に表示するビューポート
         // ゲームウィンドウで利用するビューポートを追加
-        viewPortHandle = upScreen->VAddViewPort(windowHandle);
+        viewPortHandle = pRenderModule->AddViewPort(windowHandle, 640, 320);
     }
 
     // ユーザー共通入力割り当て設定
@@ -110,26 +112,36 @@ HE::Bool WinGameMain::VStart(const HE::Bool in_bDebug)
 
     // リソースの起点ディレクトリを設定
     auto pAssetManagerModule = HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
-    pAssetManagerModule->SetMountDir(HE_STR_TEXT("Assets"));
+    pAssetManagerModule->SetCurrentDir(HE_STR_TEXT("Assets"));
 
     auto pLocateModule = HE_ENGINE.ModuleManager().Get<Localization::LocalizationModule>();
     pLocateModule->LoadSystemFile(Core::Common::FixedString256(HE_STR_TEXT("Locate/System.toml")));
     pLocateModule->LoadTextAll(Core::Common::FixedString16(HE_STR_TEXT("JP")));
 
+    // TODO: フォント用意
+    {
+        auto spFont = pPlatformModule->VFont();
+        // spFont->VLoad(HE_STR_TEXT("Font/PixelMplus12-Regular.ttf"));
+    }
+
     // ゲーム画面表示準備
     {
         // 2Dのゲームシーンを追加
-        Platform::ScreenSceneView2DConfig config2D(windowHandle, viewPortHandle);
-        Game::g_scene2DHandle = upScreen->VAddSceneView2D(config2D);
-        HE_ASSERT(Game::g_scene2DHandle.Null() == FALSE);
+        auto [scene2DHandle, p2DScene] =
+            pRenderModule->AddSceneView2D(windowHandle, viewPortHandle);
+        HE_ASSERT(scene2DHandle.Null() == FALSE);
+        Game::g_scene2DHandle = scene2DHandle;
 
         // UIのゲームシーンを追加
-        Platform::ScreenSceneViewUIConfig configUI(windowHandle, viewPortHandle);
-        Game::g_sceneUIHandle = upScreen->VAddSceneViewUI(configUI);
-        HE_ASSERT(Game::g_sceneUIHandle.Null() == FALSE);
+        auto [sceneUIHandle, pUIScene] =
+            pRenderModule->AddSceneViewUI(windowHandle, viewPortHandle);
+
+        HE_ASSERT(sceneUIHandle.Null() == FALSE);
+        Game::g_sceneUIHandle = sceneUIHandle;
 
         // ゲームウィンドウを表示
-        upScreen->VShowWindow(windowHandle);
+        // spScreen->VShowWindow(windowHandle);
+        pRenderModule->ShowWindow(windowHandle);
     }
 
     auto pLevelModule = HE_ENGINE.ModuleManager().Get<Level::LevelModule>();

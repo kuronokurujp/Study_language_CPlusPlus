@@ -247,7 +247,7 @@ namespace Lua
         return handle;
     }
 
-    HE::Bool LuaModule::ReleaseLuaObject(const Core::Common::Handle& in_rHandle)
+    HE::Bool LuaModule::ReleaseLuaObject(Core::Common::Handle& in_rHandle)
     {
         HE_ASSERT(in_rHandle.Null() == FALSE);
 
@@ -403,8 +403,8 @@ namespace Lua
             // TODO: 関数結果を受け取る
             // HE_LOG_LINE(HE_STR_TEXT("Lua関数は%s関数を呼んだ"), rData.szFuncName);
 
-            for (auto itr = this->_mScriptFuncAction.Begin(); itr != this->_mScriptFuncAction.End();
-                 ++itr)
+            for (auto itr = this->_mScriptFuncAction.Begin();
+                 itr != this->_mScriptFuncAction.End(); ++itr)
             {
                 if (1 < itr->data.use_count())
                 {

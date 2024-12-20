@@ -42,10 +42,10 @@ namespace Core::Common
 
         // カスタムマップのイテレーター
         // STL::Mapと同じように扱うために用意
-        class Iterator final
+        class IteratorChar final
         {
         public:
-            Iterator(Node* in_pNode) : _pNode(in_pNode) {}
+            IteratorChar(Node* in_pNode) : _pNode(in_pNode) {}
 
             inline const HE::Bool IsValid() const HE_NOEXCEPT { return (this->_pNode != NULL); }
 
@@ -56,46 +56,46 @@ namespace Core::Common
             const Pair* operator->() const { return &this->_pNode->_pair; }
 
             // インクリメント
-            Iterator& operator++()
+            IteratorChar& operator++()
             {
                 this->_pNode = this->_pNode->_pNext;
                 return *this;
             }
 
             // インクリメント
-            Iterator operator++(int)
+            IteratorChar operator++(int)
             {
-                Iterator iter = *this;
+                IteratorChar iter = *this;
                 ++(*this);
                 return iter;
             }
 
             // デクリメント
-            Iterator& operator--()
+            IteratorChar& operator--()
             {
                 this->_pNode = this->_pNode->_pPrev;
                 return *this;
             }
 
             // デクリメント
-            Iterator operator--(int)
+            IteratorChar operator--(int)
             {
-                Iterator iter = *this;
+                IteratorChar iter = *this;
                 --(*this);
                 return iter;
             }
 
             // 比較
-            bool operator==(const Iterator& in_rIter) const HE_NOEXCEPT
+            bool operator==(const IteratorChar& in_rIter) const HE_NOEXCEPT
             {
                 return (this->_pNode == in_rIter._pNode);
             }
 
             // 比較
-            bool operator!=(const Iterator& in_crIter) const { return !(*this == in_crIter); }
+            bool operator!=(const IteratorChar& in_crIter) const { return !(*this == in_crIter); }
 
             // 代入
-            const Iterator& operator=(const Iterator& in_rIter)
+            const IteratorChar& operator=(const IteratorChar& in_rIter)
             {
                 this->_pNode = in_rIter._pNode;
                 return *this;
@@ -109,12 +109,12 @@ namespace Core::Common
 
     public:
         // コンストラクタ
-        FixedMap() : _iteratorTail(&this->_tail) { this->_Init(); }
+        FixedMap() : _iteratorTail(&this->_tail) { this->Init(); }
 
         // コピーのコンストラクタ
         FixedMap(const FixedMap& in_mrOther) : _iteratorTail(&this->_tail)
         {
-            this->_Init();
+            this->Init();
             this->_DeepCopy(&in_mrOther);
         }
 
@@ -123,7 +123,7 @@ namespace Core::Common
         FixedMap(const std::initializer_list<std::pair<TKey, TData>>& in_rInitList)
             : _iteratorTail(&this->_tail)
         {
-            this->_Init();
+            this->Init();
             for (const auto& item : in_rInitList)
             {
                 this->Add(item.first, item.second);
@@ -165,7 +165,7 @@ namespace Core::Common
         /// <summary>
         /// キーとデータを追加
         /// </summary>
-        Iterator Add(const TKey& in_rKey, const TData& in_rData)
+        IteratorChar Add(const TKey& in_rKey, const TData& in_rData)
         {
             return this->_Add(in_rKey, &in_rData);
         }
@@ -174,7 +174,7 @@ namespace Core::Common
         /// キーとデータを追加
         /// DATAがムーブセマンティック用
         /// </summary>
-        Iterator AddByMoveData(const TKey& in_rKey, TData&& in_rData)
+        IteratorChar AddByMoveData(const TKey& in_rKey, TData&& in_rData)
         {
             // 赤ノードを作る
             Node* pNode = this->_NewNode();
@@ -199,13 +199,13 @@ namespace Core::Common
             // ルートは常に黒維持
             this->_pRoot->_uColor = Node::EColor::EColor_Black;
 
-            return Iterator(pNode);
+            return IteratorChar(pNode);
         }
 
         /// <summary>
         /// キーからデータ検索
         /// </summary>
-        Iterator FindKey(const TKey& in_trKey) const
+        IteratorChar FindKey(const TKey& in_trKey) const
         {
             // ツリーが空なら終端を返す
             if (this->Empty()) return this->End();
@@ -219,14 +219,14 @@ namespace Core::Common
             else
             {
                 // 見つかった
-                return Iterator(tpNode);
+                return IteratorChar(tpNode);
             }
         }
 
         /// <summary>
         /// データからキー検索
         /// </summary>
-        Iterator FindData(const TData& in_rData)
+        IteratorChar FindData(const TData& in_rData)
         {
             // ツリーが空なら終端を返す
             if (this->Empty()) return this->End();
@@ -240,7 +240,7 @@ namespace Core::Common
             else
             {
                 // 見つかった
-                return Iterator(tpNode);
+                return IteratorChar(tpNode);
             }
         }
 
@@ -277,7 +277,7 @@ namespace Core::Common
         /// <summary>
         /// データ削除(イテレータ版)
         /// </summary>
-        HE::Bool Erase(Iterator in_iter)
+        HE::Bool Erase(IteratorChar in_iter)
         {
             // 終端ノードは消させない
             if (in_iter == this->End()) return FALSE;
@@ -300,7 +300,7 @@ namespace Core::Common
 
             // ルートから辿って破棄
             this->_Clear(this->_pRoot);
-            this->_Init();
+            this->Init();
         }
 
         /// <summary>
@@ -317,12 +317,12 @@ namespace Core::Common
         /// 先頭イテレーターを取得
         /// データが空なら終端イテレーターを取得
         /// </summary>
-        Iterator Begin() const HE_NOEXCEPT { return Iterator(this->_head._pNext); }
+        IteratorChar Begin() const HE_NOEXCEPT { return IteratorChar(this->_head._pNext); }
 
         /// <summary>
         /// 終端イテレーター取得
         /// </summary>
-        Iterator End() const HE_NOEXCEPT { return this->_iteratorTail; }
+        IteratorChar End() const HE_NOEXCEPT { return this->_iteratorTail; }
 
         /// <summary>
         /// KEYを添え字にしてデータアクセス
@@ -360,7 +360,7 @@ namespace Core::Common
 
         inline TData& FindOrAddKey(const TKey& in_trKey)
         {
-            Iterator it = this->FindKey(in_trKey);
+            IteratorChar it = this->FindKey(in_trKey);
             if (it == this->End())
             {
                 // 無ければ追加する
@@ -495,7 +495,7 @@ namespace Core::Common
         }
 
         // ノードを追加する
-        Iterator _Add(const TKey& in_rKey, const TData* in_pData)
+        IteratorChar _Add(const TKey& in_rKey, const TData* in_pData)
         {
             // 赤ノードを作る
             Node* pNode = this->_NewNode();
@@ -521,7 +521,7 @@ namespace Core::Common
             // ルートは常に黒維持
             this->_pRoot->_uColor = Node::EColor::EColor_Black;
 
-            return Iterator(pNode);
+            return IteratorChar(pNode);
         }
 
         /// <summary>
@@ -898,7 +898,7 @@ namespace Core::Common
             return FALSE;
         }
 
-        void _Init() HE_NOEXCEPT
+        void Init() HE_NOEXCEPT
         {
             // 線形アクセス用のリストを初期化
             this->_pRoot       = NULL;
@@ -956,7 +956,7 @@ namespace Core::Common
         Node _head;
         Node _tail;
 
-        Iterator _iteratorTail;
+        IteratorChar _iteratorTail;
 
         HE::Uint32 _uNodeNum       = 0;
         HE::Uint32 _uFreeStackSize = 0;

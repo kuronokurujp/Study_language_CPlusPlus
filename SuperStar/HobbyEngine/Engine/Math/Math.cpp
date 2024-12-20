@@ -27,35 +27,32 @@ namespace Core::Math
     /// <summary>
     /// Matrix4s the form quaternion.
     /// </summary>
-    Matrix4 ConvQuaternionToMatrix4(const Quaternion& in_rQuaternion)
+    void OutputQuaternionToMatrix4(Matrix4* out, const Quaternion& in_rQuaternion)
     {
-        Matrix4 mat4;
         auto q = in_rQuaternion;
 
         // 1行n列
-        mat4._faMat[0][0] = 1.0f - 2.0f * q._fY * q._fY - 2.0f * q._fZ * q._fZ;
-        mat4._faMat[0][1] = 2.0f * q._fX * q._fY + 2.0f * q._fW * q._fZ;
-        mat4._faMat[0][2] = 2.0f * q._fX * q._fZ - 2.0f * q._fW * q._fY;
-        mat4._faMat[0][3] = 0.0f;
+        out->_faMat[0][0] = 1.0f - 2.0f * q._fY * q._fY - 2.0f * q._fZ * q._fZ;
+        out->_faMat[0][1] = 2.0f * q._fX * q._fY + 2.0f * q._fW * q._fZ;
+        out->_faMat[0][2] = 2.0f * q._fX * q._fZ - 2.0f * q._fW * q._fY;
+        out->_faMat[0][3] = 0.0f;
 
         // 2行n列
-        mat4._faMat[1][0] = 2.0f * q._fX * q._fY - 2.0f * q._fW * q._fZ;
-        mat4._faMat[1][1] = 1.0f - 2.0f * q._fX * q._fX - 2.0f * q._fZ * q._fZ;
-        mat4._faMat[1][2] = 2.0f * q._fY * q._fZ + 2.0f * q._fW * q._fX;
-        mat4._faMat[1][3] = 0.0f;
+        out->_faMat[1][0] = 2.0f * q._fX * q._fY - 2.0f * q._fW * q._fZ;
+        out->_faMat[1][1] = 1.0f - 2.0f * q._fX * q._fX - 2.0f * q._fZ * q._fZ;
+        out->_faMat[1][2] = 2.0f * q._fY * q._fZ + 2.0f * q._fW * q._fX;
+        out->_faMat[1][3] = 0.0f;
 
         // 3行n列
-        mat4._faMat[2][0] = 2.0f * q._fX * q._fZ + 2.0f * q._fW * q._fY;
-        mat4._faMat[2][1] = 2.0f * q._fY * q._fZ - 2.0f * q._fW * q._fX;
-        mat4._faMat[2][2] = 1.0f - 2.0f * q._fX * q._fX - 2.0f * q._fY * q._fY;
-        mat4._faMat[2][3] = 0.0f;
+        out->_faMat[2][0] = 2.0f * q._fX * q._fZ + 2.0f * q._fW * q._fY;
+        out->_faMat[2][1] = 2.0f * q._fY * q._fZ - 2.0f * q._fW * q._fX;
+        out->_faMat[2][2] = 1.0f - 2.0f * q._fX * q._fX - 2.0f * q._fY * q._fY;
+        out->_faMat[2][3] = 0.0f;
 
         // 4行n列
-        mat4._faMat[3][0] = 0;
-        mat4._faMat[3][1] = 0;
-        mat4._faMat[3][2] = 0;
-        mat4._faMat[3][3] = 1.0f;
-
-        return mat4;
+        out->_faMat[3][0] = 0;
+        out->_faMat[3][1] = 0;
+        out->_faMat[3][2] = 0;
+        out->_faMat[3][3] = 1.0f;
     }
 }  // namespace Core::Math

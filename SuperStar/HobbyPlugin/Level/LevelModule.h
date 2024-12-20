@@ -57,7 +57,7 @@ namespace Level
         /// <summary>
         /// 更新
         /// </summary>
-        void _VUpdate(const HE::Float32) override final;
+        void _Update(const HE::Float32) override final;
 
         /// <summary>
         /// 後更新

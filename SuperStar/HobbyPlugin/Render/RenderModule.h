@@ -1,16 +1,9 @@
 ﻿#pragma once
 
-#include "Engine/Common/CustomMap.h"
-#include "Engine/Common/CustomVector.h"
-#include "Engine/Common/Hash.h"
-#include "Engine/Common/PoolManager.h"
 #include "Engine/Module/Module.h"
 
 // モジュールのヘッダーファイルは全てインクルードする
-#include "Render/Color.h"
 #include "Render/Command/Command.h"
-#include "Render/Draw/Material.h"
-#include "Render/Draw/Mesh.h"
 #include "Render/Window/Scene.h"
 #include "Render/Window/ViewPort.h"
 #include "Render/Window/Window.h"
@@ -54,17 +47,17 @@ namespace Render
         using WindowHandleKeyMap = Core::Common::FixedMap<HE::Uint64, Core::Common::Handle, 32>;
 
     public:
-        RenderModule() : ModuleBase(ModuleName(), Module::ELayer_View, 10) {}
+        RenderModule();
 
         /// <summary>
         /// ウィンドウ生成
         /// </summary>
-        const Core::Common::Handle NewWindow(Core::Memory::UniquePtr<Render::WindowStrategy>);
+        const Core::Common::Handle NewWindow(const HE::Uint32 in_w, const HE::Uint32 in_h);
 
         /// <summary>
         /// ウィンドウ破棄
         /// </summary>
-        HE::Bool DeleteWindow(const Core::Common::Handle&);
+        HE::Bool DeleteWindow(Core::Common::Handle&);
         void DeleteAllWindow();
 
         /// <summary>
@@ -75,68 +68,35 @@ namespace Render
         /// <summary>
         /// ビューポート追加
         /// </summary>
-        const Core::Common::Handle AddViewPort(const Core::Common::Handle&,
-                                               Core::Memory::UniquePtr<ViewPortConfig>);
+        const Core::Common::Handle AddViewPort(const Core::Common::Handle&, const HE::Uint32 in_w,
+                                               const HE::Uint32 in_h);
+
         /// <summary>
         /// ビューポート外す
         /// </summary>
         HE::Bool RemoveViewPort(const Core::Common::Handle& in_rWindowHandle,
-                                const Core::Common::Handle& in_rViewPortHandle);
+                                Core::Common::Handle& in_rViewPortHandle);
 
-        const ViewPortConfig* GetViewPortConfig(const Core::Common::Handle&);
+        const ViewPort* GetViewPort(const Core::Common::Handle&);
 
         /// <summary>
         /// UI用シーン追加
         /// </summary>
-        template <typename TScene>
-        const Core::Common::Handle& AddSceneViewUI(const Core::Common::Handle& in_rWindowsHandle,
-                                                   const Core::Common::Handle& in_rViewPortHash)
-        {
-            auto pWindow   = this->_GetWindow(in_rWindowsHandle);
-            auto pViewPort = pWindow->_poolViewPortManager.Ref(in_rViewPortHash);
-
-            auto sceneHandle = pViewPort->AddSceneViewUI<TScene>();
-            const Core::Common::Handle& handle =
-                this->_AddScene(in_rWindowsHandle, in_rViewPortHash, sceneHandle);
-            if (handle == NullHandle)
-            {
-                pViewPort->RemoveScene(sceneHandle);
-            }
-
-            return handle;
-        }
+        std::tuple<Core::Common::Handle, SceneViewBase*> AddSceneViewUI(
+            const Core::Common::Handle& in_rWindowsHandle,
+            const Core::Common::Handle& in_rViewPortHash);
 
         /// <summary>
         /// 2D用シーン追加
         /// </summary>
-        template <typename TScene>
-        const Core::Common::Handle& AddSceneView2D(const Core::Common::Handle& in_rWindowsHandle,
-                                                   const Core::Common::Handle& in_rViewPortHash)
-
-        {
-            auto pWindow   = this->_GetWindow(in_rWindowsHandle);
-            auto pViewPort = pWindow->_poolViewPortManager.Ref(in_rViewPortHash);
-
-            auto sceneHandle = pViewPort->AddSceneView2D<TScene>();
-
-            const Core::Common::Handle& handle =
-                this->_AddScene(in_rWindowsHandle, in_rViewPortHash, sceneHandle);
-            if (handle == NullHandle)
-            {
-                pViewPort->RemoveScene(sceneHandle);
-                return NullHandle;
-            }
-
-            return handle;
-        }
+        std::tuple<Core::Common::Handle, SceneViewBase*> AddSceneView2D(
+            const Core::Common::Handle& in_rWindowsHandle,
+            const Core::Common::Handle& in_rViewPortHash);
 
         /// <summary>
         /// シーンにレンダリングするコマンド追加
         /// </summary>
         HE::Bool PushSceneRenderCommand(const Core::Common::Handle&, Command&&);
-
-        // TODO: メッシュ作成
-        // TODO: マテリアル作成
 
     protected:
         /// <summary>
@@ -157,7 +117,7 @@ namespace Render
         /// <summary>
         /// モジュール更新
         /// </summary>
-        void _VUpdate(const HE::Float32) override final;
+        void _Update(const HE::Float32) override final;
 
         /// <summary>
         /// モジュール後更新
@@ -167,13 +127,17 @@ namespace Render
     private:
         Window* _GetWindow(const Core::Common::Handle&);
 
-        const Core::Common::Handle& _AddScene(const Core::Common::Handle& in_rWindowHandle,
-                                              const Core::Common::Handle& in_rViewPortHandle,
-                                              const Core::Common::Handle& in_rSceneHandle);
+        Core::Common::Handle _AddScene(const Core::Common::Handle& in_rWindowHandle,
+                                       const Core::Common::Handle& in_rViewPortHandle,
+                                       const Core::Common::Handle& in_rSceneHandle);
 
     private:
         Core::Common::FixedPoolManager<Window, 32> _poolWindow;
         Core::Common::FixedPoolManager<RenderingContext, 32> _poolRenderingContext;
+
+        // Core::Memory::SharedPtr<MaterialPool> _spPoolMaterial;
+        //  Core::Memory::SharedPtr<MeshPool> _spPoolMesh;
+        //  Core::Memory::SharedPtr<TexturePool> _spPoolTexture;
 
         Core::Common::FixedStack<Core::Common::Handle, 32> _sStandupWindow;
     };

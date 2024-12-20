@@ -67,7 +67,7 @@ namespace Lua
         /// <summary>
         /// Luaオブジェクトを破棄
         /// </summary>
-        HE::Bool ReleaseLuaObject(const Core::Common::Handle&);
+        HE::Bool ReleaseLuaObject(Core::Common::Handle&);
 
         /// <summary>
         /// Luaスクリプトテキストをロード

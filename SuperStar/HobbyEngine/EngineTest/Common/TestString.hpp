@@ -51,3 +51,36 @@ TEST_CASE("FixString OutputUTF8")
     // 文字位置判定が意図通りか
     CHECK(szStr32.Find(HE_STR_TEXT("日")) == 0);
 }
+
+TEST_CASE("FixString Iterator")
+{
+    {
+        Core::Common::FixedString128 s(HE_STR_TEXT("test"));
+
+        auto itrEnd = s.End();
+        for (auto itr = s.Begin(); itr != itrEnd; ++itr)
+        {
+            HE_LOG(*itr);
+        }
+    }
+
+    {
+        Core::Common::FixedString128 s(HE_STR_TEXT("テストtestだ。"));
+
+        auto itrEnd = s.End();
+        for (auto itr = s.Begin(); itr != itrEnd; ++itr)
+        {
+            HE_LOG(*itr);
+        }
+    }
+
+    {
+        Core::Common::FixedString128 s(HE_STR_TEXT("日本語のtestだ。"));
+
+        auto itrEnd = s.End();
+        for (auto itr = s.Begin(); itr != itrEnd; ++itr)
+        {
+            HE_LOG(*itr);
+        }
+    }
+}

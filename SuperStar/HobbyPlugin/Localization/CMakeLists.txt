@@ -19,6 +19,6 @@ common_build_plugin(
 target_include_directories(${LOCALIZATION_PLUGIN_NAME} 
     PRIVATE
         # プラグインに依存しているプラグインコード
-        # ライブラリのリンクはcmakeで指定したCMakeLists.txtでやっている
+        # ライブラリのリンクはプロジェクトのCMakeLists.txtでやっている
         ${CMAKE_CURRENT_SOURCE_DIR}/../AssetManager/
 )

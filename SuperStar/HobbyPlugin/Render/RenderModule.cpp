@@ -1,7 +1,10 @@
 ﻿#include "RenderModule.h"
 
+#include "Engine/Platform/PlatformModule.h"
+
 namespace Render
 {
+
     void RenderingContext::Setup(const Core::Common::Handle& in_ulWindowHash,
                                  const Core::Common::Handle& in_ulViewPortHash,
                                  const Core::Common::Handle& in_ulSceneHash)
@@ -21,24 +24,42 @@ namespace Render
         return TRUE;
     }
 
-    const Core::Common::Handle RenderModule::NewWindow(
-        Core::Memory::UniquePtr<Render::WindowStrategy> in_upStrategy)
+    RenderModule::RenderModule() : ModuleBase(ModuleName(), Module::ELayer_View, 10)
+    {
+        // 依存モジュール
+        this->_AppendDependenceModule<Platform::PlatformModule>();
+    }
+
+    const Core::Common::Handle RenderModule::NewWindow(const HE::Uint32 in_w, const HE::Uint32 in_h)
     {
         auto [handle, pWindow] = this->_poolWindow.Alloc();
         if (handle.Null()) return NullHandle;
 
+        // TODO: プラットフォームからウィンドウストラテジーを生成して渡す
         // 作成したウィンドウのセットアップ
-        if (pWindow->_Setup(std::move(in_upStrategy)) == FALSE)
+
+        Platform::WindowConfig platformWindowConfig;
+        {
+            platformWindowConfig.uWidth         = in_w;
+            platformWindowConfig.uHeight        = in_h;
+            platformWindowConfig.uViewPortCount = 1;
+        }
+
+        auto pPlatform  = this->GetDependenceModule<Platform::PlatformModule>();
+        auto upStrategy = pPlatform->VScreen()->VCreateWindowStrategy(platformWindowConfig);
+
+        if (pWindow->Init(std::move(upStrategy)) == FALSE)
         {
             this->_poolWindow.Free(handle);
             return NullHandle;
         }
+
         this->_sStandupWindow.PushBack(handle);
 
         return handle;
     }
 
-    HE::Bool RenderModule::DeleteWindow(const Core::Common::Handle& in_rHandle)
+    HE::Bool RenderModule::DeleteWindow(Core::Common::Handle& in_rHandle)
     {
         if (in_rHandle.Null()) return FALSE;
         // すでに破棄されている
@@ -47,9 +68,9 @@ namespace Render
         // Viewの解放処理をする
         auto pWindow = this->_poolWindow.Ref(in_rHandle);
         HE_ASSERT(pWindow &&
-                  "ウィンドウがないということは別の箇所でRemoveされいるので意図していない");
+                  "ウィンドウがないということは別の箇所でRemoveされているので意図していない");
         pWindow->_End();
-        pWindow->_Release();
+        pWindow->Release();
 
         // 解放が終わったらプールしているデータを解放
         return this->_poolWindow.Free(in_rHandle);
@@ -72,22 +93,51 @@ namespace Render
     }
 
     const Core::Common::Handle RenderModule::AddViewPort(
-        const Core::Common::Handle& in_rWindowHandle,
-        Core::Memory::UniquePtr<ViewPortConfig> in_upConfig)
+        const Core::Common::Handle& in_rWindowHandle, const HE::Uint32 in_w, const HE::Uint32 in_h)
     {
         auto pWindow = this->_GetWindow(in_rWindowHandle);
 
-        return pWindow->AddViewPort(std::move(in_upConfig));
+        // ビューポートの縦横サイズを調整
+        // ウィンドウサイズを超えないようにする
+        auto rWindowConfig = pWindow->_upStrategy->GetConfig();
+        Platform::ViewPortConfig viewPortConfig;
+        {
+            viewPortConfig.uWidth  = in_w;
+            viewPortConfig.uHeight = in_h;
+        }
+
+        if (viewPortConfig.uHeight <= 0)
+        {
+            viewPortConfig.uHeight = rWindowConfig.uHeight;
+        }
+        else if (rWindowConfig.uHeight < viewPortConfig.uHeight)
+        {
+            viewPortConfig.uHeight = rWindowConfig.uHeight;
+        }
+
+        if (viewPortConfig.uWidth <= 0)
+        {
+            viewPortConfig.uWidth = rWindowConfig.uWidth;
+        }
+        else if (rWindowConfig.uWidth < viewPortConfig.uWidth)
+        {
+            viewPortConfig.uWidth = rWindowConfig.uWidth;
+        }
+
+        auto pPlatform  = this->GetDependenceModule<Platform::PlatformModule>();
+        auto upStrategy = pPlatform->VScreen()->VCreateViewPortStrategy(viewPortConfig);
+
+        return pWindow->AddViewPort(std::move(upStrategy));
     }
 
     HE::Bool RenderModule::RemoveViewPort(const Core::Common::Handle& in_rWindowHandle,
-                                          const Core::Common::Handle& in_rViewPortHandle)
+                                          Core::Common::Handle& in_rViewPortHandle)
     {
         auto pWindow = this->_GetWindow(in_rWindowHandle);
         return pWindow->RemoveViewPort(in_rViewPortHandle);
     }
 
-    const ViewPortConfig* RenderModule::GetViewPortConfig(const Core::Common::Handle& in_rHandle)
+    const ViewPort* RenderModule::GetViewPort(const Core::Common::Handle& in_rHandle)
     {
         auto pRenderingContext = this->_poolRenderingContext.Ref(in_rHandle);
 
@@ -97,7 +147,50 @@ namespace Render
         auto pViewPort = pWindow->_poolViewPortManager.Ref(pRenderingContext->GetViewPortHandle());
         HE_ASSERT_RETURN_VALUE(NULL, pViewPort);
 
-        return pViewPort->GetConfig();
+        return pViewPort;  //->GetConfig();
+    }
+
+    std::tuple<Core::Common::Handle, SceneViewBase*> RenderModule::AddSceneViewUI(
+        const Core::Common::Handle& in_rWindowsHandle, const Core::Common::Handle& in_rViewPortHash)
+    {
+        auto pWindow   = this->_GetWindow(in_rWindowsHandle);
+        auto pViewPort = pWindow->_poolViewPortManager.Ref(in_rViewPortHash);
+
+        // TODO: プラットフォームからシーンを取得して渡す
+        auto pPlatform  = this->GetDependenceModule<Platform::PlatformModule>();
+        auto upStrategy = pPlatform->VScreen()->VCreateSceneUIStrategy();
+
+        auto [sceneHandle, pScene] = pViewPort->AddSceneView(std::move(upStrategy));
+
+        Core::Common::Handle handle =
+            this->_AddScene(in_rWindowsHandle, in_rViewPortHash, sceneHandle);
+        if (handle == NullHandle)
+        {
+            pViewPort->RemoveScene(sceneHandle);
+        }
+
+        return std::tuple<Core::Common::Handle, SceneViewBase*>(handle, pScene);
+    }
+
+    std::tuple<Core::Common::Handle, SceneViewBase*> RenderModule::AddSceneView2D(
+        const Core::Common::Handle& in_rWindowsHandle, const Core::Common::Handle& in_rViewPortHash)
+    {
+        auto pWindow   = this->_GetWindow(in_rWindowsHandle);
+        auto pViewPort = pWindow->_poolViewPortManager.Ref(in_rViewPortHash);
+
+        auto pPlatform  = this->GetDependenceModule<Platform::PlatformModule>();
+        auto upStrategy = pPlatform->VScreen()->VCreateScene2DStrategy();
+
+        auto [sceneHandle, pScene] = pViewPort->AddSceneView(std::move(upStrategy));
+
+        const Core::Common::Handle& handle =
+            this->_AddScene(in_rWindowsHandle, in_rViewPortHash, sceneHandle);
+        if (handle == NullHandle)
+        {
+            pViewPort->RemoveScene(sceneHandle);
+        }
+
+        return std::tuple<Core::Common::Handle, SceneViewBase*>(handle, pScene);
     }
 
     Window* RenderModule::_GetWindow(const Core::Common::Handle& in_rHandle)
@@ -108,9 +201,9 @@ namespace Render
         return pWindow;
     }
 
-    const Core::Common::Handle& RenderModule::_AddScene(
-        const Core::Common::Handle& in_rWindowHandle,
-        const Core::Common::Handle& in_rViewPortHandle, const Core::Common::Handle& in_rSceneHandle)
+    Core::Common::Handle RenderModule::_AddScene(const Core::Common::Handle& in_rWindowHandle,
+                                                 const Core::Common::Handle& in_rViewPortHandle,
+                                                 const Core::Common::Handle& in_rSceneHandle)
     {
         auto [handle, pRenderingContext] = this->_poolRenderingContext.Alloc();
         pRenderingContext->Setup(in_rWindowHandle, in_rViewPortHandle, in_rSceneHandle);
@@ -172,7 +265,7 @@ namespace Render
         }
     }
 
-    void RenderModule::_VUpdate(const HE::Float32 in_fDeltaTime)
+    void RenderModule::_Update(const HE::Float32 in_fDeltaTime)
     {
         // ウィンドウを更新
         auto mWindow = this->_poolWindow.GetUseDataMap();

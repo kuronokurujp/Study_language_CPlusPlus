@@ -125,6 +125,8 @@ HE::Bool HE_LOG_CREATE_FORMATERD_STRING(HE::WChar* out, const HE::Char* in_szFor
     try
     {
         // 変換された引数を持つ動的なフォーマット文字列で出力する
+        // TODO: 置換文字列の文字数が万になると例外エラーになる
+        // TODO: 文字数が万など大きな数になった場合,例外エラーにならない対応が必要
         ::_snwprintf_s(out, HE_LOG_MSG_SIZE, HE_LOG_MSG_SIZE, szDynamicFormat.c_str(), in_args...);
     }
     catch (const std::exception& e)

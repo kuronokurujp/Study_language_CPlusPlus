@@ -8,15 +8,7 @@ namespace Core::Math
     // つまりDirectXで扱っている行列形式にしている
     // なのでシェーダーは左から右へ行列掛け算出来る
 
-    // 単位行列の値
-    static const HE::Float32 faIdent[4][4] = {
-        {1.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 1.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 1.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f, 1.0f},
-    };
-
-    const Matrix4 Matrix4::Identity = Matrix4(faIdent);
+    const Matrix4 Matrix4::Identity;  // = Matrix4(faIdent);
 
     // 平行移動ベクトル取得
     void Matrix4::OutputTranslation(Vector3* out)
@@ -152,7 +144,7 @@ namespace Core::Math
     /// なぜ?
     ///   2pi = 360度なのでこれを360分割すれば1ラジアンになるから
     /// </summary>
-    Matrix4 Matrix4::CreateRotationZ(const HE::Float32 in_fRadian)
+    void Matrix4::OutputRotationZ(Matrix4* out, const HE::Float32 in_fRadian)
     {
         // cos(a) * x - sin(a) * y
         // sin(a) * x + cos(a) * y
@@ -163,14 +155,14 @@ namespace Core::Math
             {0.0f, 0.0f, 0.0f, 1.0f},
         };
 
-        return Matrix4(faTtemp);
+        out->Set(faTtemp);
     }
 
     /// <summary>
     /// Creates the translation.
     /// </summary>
     /// <param name="in_rPos">The in r position.</param>
-    Matrix4 Matrix4::CreateTranslation(const Vector3& in_rPos)
+    void Matrix4::OutputTranslation(Matrix4* out, const Vector3& in_rPos)
     {
         const HE::Float32 faTemp[4][4] = {
             {1.0f, 0.0f, 0.0f, 0.0f},
@@ -179,11 +171,12 @@ namespace Core::Math
             {in_rPos._fX, in_rPos._fY, in_rPos._fZ, 1.0f},
         };
 
-        return Matrix4(faTemp);
+        out->Set(faTemp);
     }
 
     // 縦横のサイズを元に単位正方形の座標系に行列変換する行列作成
-    Matrix4 Matrix4::CreateSimpleViewProj(const HE::Float32 in_fWidth, const HE::Float32 in_fHeight)
+    void Matrix4::OutputSimpleViewProj(Matrix4* out, const HE::Float32 in_fWidth,
+                                       const HE::Float32 in_fHeight)
     {
         const HE::Float32 faTemp[4][4] = {
             {2.0f / in_fWidth, 0.0f, 0.0f, 0.0f},
@@ -192,12 +185,12 @@ namespace Core::Math
             {0.0f, 0.0f, 1.0f, 1.0f},
         };
 
-        return Matrix4(faTemp);
+        out->Set(faTemp);
     }
 
     // カメラ情報からビュー行列生成
-    Matrix4 Matrix4::CreateLookAt(const Vector3& in_rEye, const Vector3& in_rTarget,
-                                  const Vector3& in_rUp)
+    void Matrix4::OutputLookAt(Matrix4* out, const Vector3& in_rEye, const Vector3& in_rTarget,
+                               const Vector3& in_rUp)
     {
         Vector3 zAxis;
         zAxis.SetSub(in_rTarget, in_rEye);
@@ -221,12 +214,13 @@ namespace Core::Math
             {trans._fX, trans._fY, trans._fZ, 1.0f},
         };
 
-        return Matrix4(faTemp);
+        out->Set(faTemp);
     }
 
     // 正射影行列作成
-    Matrix4 Matrix4::CreateOrtho(const HE::Float32 in_fWidth, const HE::Float32 in_fHeight,
-                                 const HE::Float32 in_fNear, const HE::Float32 in_fFar)
+    void Matrix4::OutputOrtho(Matrix4* out, const HE::Float32 in_fWidth,
+                              const HE::Float32 in_fHeight, const HE::Float32 in_fNear,
+                              const HE::Float32 in_fFar)
     {
         const HE::Float32 faTemp[4][4] = {
             {2.0f / in_fWidth, 0.0f, 0.0f, 0.0f},
@@ -234,14 +228,13 @@ namespace Core::Math
             {0.0f, 0.0f, 1.0f / (in_fFar - in_fNear), 0.0f},
             {0.0f, 0.0f, in_fNear / (in_fNear - in_fFar), 1.0f},
         };
-
-        return Matrix4(faTemp);
+        out->Set(faTemp);
     }
 
     // 透視射影行列作成
-    Matrix4 Matrix4::CreatePerspectiveFOV(const HE::Float32 in_fFov, const HE::Float32 in_fWidth,
-                                          const HE::Float32 in_fHeight, const HE::Float32 in_fNear,
-                                          const HE::Float32 in_fFar)
+    void Matrix4::OutputPerspectiveFOV(Matrix4* out, const HE::Float32 in_fFov,
+                                       const HE::Float32 in_fWidth, const HE::Float32 in_fHeight,
+                                       const HE::Float32 in_fNear, const HE::Float32 in_fFar)
     {
         HE_ASSERT(in_fWidth != 0.0f);
         HE_ASSERT(in_fHeight != 0.0f);
@@ -256,7 +249,6 @@ namespace Core::Math
             {0.0f, 0.0f, in_fFar / (in_fFar - in_fNear), 1.0f},
             {0.0f, 0.0f, -in_fNear * in_fFar / (in_fFar - in_fNear), 0.0f},
         };
-
-        return Matrix4(faTemp);
+        out->Set(faTemp);
     }
 }  // namespace Core::Math

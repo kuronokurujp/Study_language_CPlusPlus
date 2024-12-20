@@ -4,18 +4,13 @@
 #include "Engine/Common/PoolManager.h"
 #include "Engine/MiniEngine.h"
 
+namespace Platform
+{
+    class ViewPortStrategy;
+};
+
 namespace Render
 {
-    /// <summary>
-    /// ビューポートを作る設定データ
-    /// </summary>
-    struct ViewPortConfig
-    {
-        HE::Uint32 uSceneCount = 0;
-        HE::Uint32 uWidth      = 0;
-        HE::Uint32 uHeight     = 0;
-    };
-
     /// <summary>
     /// ウィンドウのビューポート
     /// </summary>
@@ -24,34 +19,29 @@ namespace Render
         friend class Window;
 
     public:
-        template <typename TScene>
-        const Core::Common::Handle& AddSceneView2D()
-        {
-            auto [handle, pScene] = this->_poolSceneManager.Alloc<TScene>();
-            return handle;
-        }
+        HE::Bool Init(Core::Memory::UniquePtr<Platform::ViewPortStrategy>,
+                      const HE::Uint32 in_uSceneCount);
+        void Release();
 
-        template <typename TScene>
-        const Core::Common::Handle& AddSceneViewUI()
-        {
-            auto [handle, pScene] = this->_poolSceneManager.Alloc<TScene>();
-            return handle;
-        }
-
+        std::tuple<Core::Common::Handle, SceneViewBase*> AddSceneView(
+            Core::Memory::UniquePtr<class Platform::SceneStrategyInterface> in_upStorategy);
         void RemoveScene(Core::Common::Handle&);
 
         SceneViewBase* GetScene(const Core::Common::Handle&);
 
-        const ViewPortConfig* GetConfig();
+        const HE::Uint32 Width() const;
+        const HE::Uint32 Height() const;
 
     private:
-        HE::Bool _Setup(Core::Memory::UniquePtr<ViewPortConfig>);
         void _Begin();
         void _End();
 
+        void _BeginRender();
+        void _EndRender();
+
     private:
-        Core::Memory::UniquePtr<ViewPortConfig> _upConfig;
         Core::Common::RuntimePoolManager<SceneViewBase> _poolSceneManager;
+        Core::Memory::UniquePtr<Platform::ViewPortStrategy> _upStrategy;
     };
 
 }  // namespace Render

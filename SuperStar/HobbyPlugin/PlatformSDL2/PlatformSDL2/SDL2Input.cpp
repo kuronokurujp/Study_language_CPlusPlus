@@ -76,10 +76,17 @@ namespace PlatformSDL2
         {
             switch (eventData.type)
             {
-                    // ウィンドウのxマークをクリックすると呼ばれる
+                // アプリ全体の終了イベント
+                // ウィンドウが一つのみならウィンドウの×ボタンをクリックすると呼ばれる
+                // でもウィンドウが複数あるとよばれない
                 case SDL_QUIT:
                 {
                     this->_bQuit = TRUE;
+                    break;
+                }
+                case SDL_WINDOWEVENT:
+                {
+                    // TODO: ウィンドウが複数時の処理が必要
                     break;
                 }
                 default:

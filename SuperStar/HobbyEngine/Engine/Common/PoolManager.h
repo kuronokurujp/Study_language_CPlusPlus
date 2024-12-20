@@ -2,6 +2,7 @@
 
 // 要素の数が動的に変わるので以下のデータ構造クラスを使っている
 // TODO: 自前で動的対応したのを作るのでそれまでの利用
+#include <functional>
 #include <unordered_map>
 #include <vector>
 
@@ -93,13 +94,24 @@ namespace Core::Common
             this->_upCacheDatas->reserve(in_uMax);
         }
 
-        void ReleasePool()
+        /// <summary>
+        /// Allocで割り当てたメモリを解放している
+        /// Freeメソッド以外の方法でメモリ解放をするとエラーになる
+        /// </summary>
+        void ReleasePool(std::function<void(T*)> in_releleseObjFunc = NULL)
         {
             if (this->_upCacheDatas)
             {
                 for (auto itr = this->_upCacheDatas->begin(); itr != this->_upCacheDatas->end();
                      ++itr)
                 {
+                    // 解放対象を関数で渡す
+                    // 関数でメモリ解放する前の解放処理があれば行う
+                    if (in_releleseObjFunc)
+                    {
+                        in_releleseObjFunc(*itr);
+                    }
+
                     HE_SAFE_DELETE_MEM(*itr);
                 }
                 this->_upCacheDatas->clear();
@@ -111,6 +123,13 @@ namespace Core::Common
             {
                 for (auto itr = this->_upUserSlot->begin(); itr != this->_upUserSlot->end(); ++itr)
                 {
+                    // 解放対象を関数で渡す
+                    // 関数でメモリ解放する前の解放処理があれば行う
+                    if (in_releleseObjFunc)
+                    {
+                        in_releleseObjFunc(itr->second);
+                    }
+
                     HE_SAFE_DELETE_MEM(itr->second);
                 }
 
@@ -125,10 +144,11 @@ namespace Core::Common
         /// 利用するデータとそのデータを紐づけたハンドルを返す
         /// T型を継承したクラスも扱える
         /// </summary>
-        template <class S, typename... TArgs>
-        std::tuple<Core::Common::Handle, T*> Alloc(TArgs&&... in_args)
+        template <class TExObject, typename... TArgs>
+        std::tuple<Core::Common::Handle, TExObject*> Alloc(TArgs&&... in_args)
         {
-            HE_STATIC_ASSERT(std::is_base_of<T, S>::value, "SクラスはTクラスを継承していない");
+            HE_STATIC_ASSERT(std::is_base_of<T, TExObject>::value,
+                             "SクラスはTクラスを継承していない");
 
             HE_ASSERT(this->_upCacheDatas);
             HE_ASSERT(this->_upUserSlot);
@@ -139,13 +159,13 @@ namespace Core::Common
             if (this->UseCount() >= this->_upCacheDatas->capacity())
             {
                 HE_ASSERT(FALSE && "オブジェクトを割り当てる数が足りない");
-                return std::tuple<Core::Common::Handle, T*>(NullHandle, NULL);
+                return std::tuple<Core::Common::Handle, TExObject*>(NullHandle, NULL);
             }
 
             Handle handle;
 
-            HE::Bool bNewSlot = FALSE;
-            S* pObject        = NULL;
+            HE::Bool bNewSlot  = FALSE;
+            TExObject* pObject = NULL;
 
             if (this->_upCacheDatas->empty())
             {
@@ -161,7 +181,8 @@ namespace Core::Common
                 for (auto b = this->_upCacheDatas->begin(); b != this->_upCacheDatas->end(); ++b)
                 {
                     // 再利用可能なデータかチェック
-                    pObject = dynamic_cast<S*>(*b);
+                    // TODO: dynamic_cast以外はないかな?
+                    pObject = dynamic_cast<TExObject*>(*b);
                     if (pObject != NULL)
                     {
                         // 再利用可能なデータなので追加フラグを立てる
@@ -192,24 +213,31 @@ namespace Core::Common
 
                 // Tを継承したSクラスのインスタンスを生成
                 // NEWは用意したマクロを使う
-                pObject = HE_NEW_MEM(S, 0)(std::forward<TArgs>(in_args)...);
+                // TODO: 使用するメモリページを指定したい
+                pObject = HE_NEW_MEM(TExObject, 0)(std::forward<TArgs>(in_args)...);
             }
 
             // 利用リストに追加
             this->_upUserSlot->insert(std::make_pair(handle, pObject));
 
-            return std::tuple<Core::Common::Handle, T*>(handle, pObject);
+            return std::tuple<Core::Common::Handle, TExObject*>(handle, pObject);
         }
 
         /// <summary>
         /// 割り当てデータを解放
         /// </summary>
-        void Free(const Handle& in_rHandle, const HE::Bool in_bCache)
+        HE::Bool Free(Handle& in_rHandle, const HE::Bool in_bCache)
         {
-            HE_ASSERT(in_rHandle.Null() == FALSE && "解放するデータがないとだめ");
+            HE_ASSERT_RETURN_VALUE(FALSE,
+                                   in_rHandle.Null() == FALSE && "解放するデータがないとだめ");
 
             T* pRemoveObj = this->_upUserSlot->at(in_rHandle);
-            HE_ASSERT(pRemoveObj != NULL);
+            if (pRemoveObj != NULL)
+            {
+                in_rHandle.Clear();
+                return TRUE;
+            }
+
             this->_upUserSlot->erase(in_rHandle);
 
             if (in_bCache)
@@ -222,6 +250,10 @@ namespace Core::Common
                 // キャッシュしたのを破棄する
                 HE_SAFE_DELETE_MEM(pRemoveObj);
             }
+            // 割り当てを解除
+            in_rHandle.Clear();
+
+            return TRUE;
         }
 
         // データの参照(非const版)
@@ -315,18 +347,19 @@ namespace Core::Common
         /// <summary>
         /// 割り当てデータを解放
         /// </summary>
-        HE::Bool Free(const Handle& in_rHandle)
+        HE::Bool Free(Handle& in_rHandle)
         {
-            HE_ASSERT(in_rHandle.Null() == FALSE);
+            HE_ASSERT_RETURN_VALUE(FALSE, in_rHandle.Null() == FALSE);
             if (in_rHandle.Null()) return FALSE;
 
             if (this->_mUseData.Contains(in_rHandle) == FALSE)
             {
+                in_rHandle.Clear();
                 return FALSE;
             }
 
             const HE::Uint32 uIndex = in_rHandle.Index();
-            HE_ASSERT(uIndex < this->_aData.Capacity());
+            HE_ASSERT_RETURN_VALUE(FALSE, uIndex < this->_aData.Capacity());
 
             T* pData = &this->_aData[uIndex];
 
@@ -339,6 +372,8 @@ namespace Core::Common
 
             this->_mUseData.Erase(in_rHandle);
             this->_sFreeDataIndex.PushBack(uIndex);
+
+            in_rHandle.Clear();
 
             return TRUE;
         }

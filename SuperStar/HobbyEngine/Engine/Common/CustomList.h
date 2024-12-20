@@ -370,8 +370,8 @@ namespace Core::Common
     {
     public:
         // イテレータの型定義
-        using Iterator    = ListNodeIterator<T, LinkedListNode<T>>;
-        using RevIterator = ListNodeReverseIterator<T, LinkedListNode<T>>;
+        using IteratorChar = ListNodeIterator<T, LinkedListNode<T>>;
+        using RevIterator  = ListNodeReverseIterator<T, LinkedListNode<T>>;
 
     public:
         CustomList() { LinkedListBase::Insert(&this->_head, &this->_tail); }
@@ -403,7 +403,7 @@ namespace Core::Common
         /// <summary>
         /// 任意の位置の直前にノードを挿入
         /// </summary>
-        HE::Bool Insert(Iterator& in_rIt, LinkedListNode<T>& in_rNode)
+        HE::Bool Insert(IteratorChar& in_rIt, LinkedListNode<T>& in_rNode)
         {
             return LinkedListBase<T>::Insert(in_rIt.GetNode()->GetPrev(), &in_rNode);
         }
@@ -431,37 +431,37 @@ namespace Core::Common
         /// <summary>
         /// ノードの消去
         /// </summary>
-        Iterator Erase(LinkedListNode<T>* in_pNode)
+        IteratorChar Erase(LinkedListNode<T>* in_pNode)
         {
             HE_ASSERT(in_pNode);
 
             LinkedListNode<T>* pNext = in_pNode->GetNext();
             LinkedListBase<T>::Erase(in_pNode);
 
-            return Iterator(pNext);
+            return IteratorChar(pNext);
         }
 
         /// <summary>
         /// 設定したイテレータのノードを取る
         /// </summary>
-        Iterator Erase(const Iterator& in_rIt)
+        IteratorChar Erase(const IteratorChar& in_rIt)
         {
             LinkedListNode<T>* pNode = in_rIt.GetNode();
             LinkedListNode<T>* pNext = pNode->GetNext();
             LinkedListBase<T>::Erase(pNode);
 
-            return Iterator(pNext);
+            return IteratorChar(pNext);
         }
 
         /// <summary>
         /// 先頭のイテレータを取得
         /// </summary>
-        Iterator BeginItr() { return Iterator(this->_head.GetNext()); }
+        IteratorChar BeginItr() { return IteratorChar(this->_head.GetNext()); }
 
         /// <summary>
         /// 終端のイテレータを取得
         /// </summary>
-        Iterator EndItr() { return Iterator(&this->_tail); }
+        IteratorChar EndItr() { return IteratorChar(&this->_tail); }
 
         /// <summary>
         /// 先頭の逆イテレータを取得

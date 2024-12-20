@@ -23,15 +23,47 @@ namespace Core::Common
     FixedString512 g_szTempFixedString512;
     FixedString1024 g_szTempFixedString1024;
 
-    StringBase::StringBase(HE::Char* in_szBuff, const HE::Uint32 in_uCapacity)
+#if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
+#else
+    static HE::Uint32 _GetUTF8CharOffset(const HE::Uint8 in_char)
+    {
+        if (in_char == 0x00) return 0;
+
+        // UTF8のコード表を見ると1byteが1文字とか2byteが1文字とかある
+        // https://seiai.ed.jp/sys/text/java/utf8table.html
+        // 1byteが1文字
+        if (in_char < 0x80) return 1;
+        // 2byteが1文字
+        else if (in_char < 0xE0)
+            return 2;
+        // 3byteが1文字
+        else if (in_char < 0xF0)
+            return 3;
+        // 4byteが1文字
+        else if (in_char < 0xF8)
+            return 4;
+        // 5byteが1文字
+        else if (in_char < 0xFC)
+            return 5;
+
+        // 6byteが1文字
+        return 6;
+    }
+#endif
+
+    StringBase::StringBase(HE::Char* in_szBuff, const HE::Uint32 in_uCapacity,
+                           const HE::Bool in_bUseBuff)
     {
         HE_ASSERT(in_szBuff && "文字列を格納する文字列バッファがない");
         HE_ASSERT(0 < in_uCapacity && "格納する文字最大数が0になっている");
 
         this->_szBuff    = in_szBuff;
         this->_uCapacity = in_uCapacity;
-        ::memset(this->_szBuff, 0, sizeof(HE::Char) * in_uCapacity);
-        this->_szBuff[0] = HE_STR_TEXT('\0');
+        if (in_bUseBuff == FALSE)
+        {
+            ::memset(this->_szBuff, 0, sizeof(HE::Char) * in_uCapacity);
+            this->_szBuff[0] = HE_STR_TEXT('\0');
+        }
     }
 
     StringBase& StringBase::Replace(const HE::Char* in_szOld, const HE::Char* in_szNew)
@@ -186,25 +218,7 @@ namespace Core::Common
             // 終端があれば終了する
             if (c == 0x00) break;
 
-            // UTF8のコード表を見ると1byteが1文字とか2byteが1文字とかある
-            // https://seiai.ed.jp/sys/text/java/utf8table.html
-            // 1byteが1文字
-            if (c < 0x80) uOffset = 1;
-            // 2byteが1文字
-            else if (c < 0xE0)
-                uOffset = 2;
-            // 3byteが1文字
-            else if (c < 0xF0)
-                uOffset = 3;
-            // 4byteが1文字
-            else if (c < 0xF8)
-                uOffset = 4;
-            // 5byteが1文字
-            else if (c < 0xFC)
-                uOffset = 5;
-            // 6byteが1文字
-            else
-                uOffset = 6;
+            uOffset = _GetUTF8CharOffset(c);
 
             i += uOffset;
             uLen += 1;
@@ -316,5 +330,37 @@ namespace Core::Common
         }
 
         return *this;
+    }
+
+    StringBase::IteratorChar& StringBase::IteratorChar::operator++()
+    {
+        // TODO: return ステートメントをここに挿入します
+#if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
+        ++this->_sIndex;
+        *this;
+#else
+        // UTF8の場合、日本語などワイド文字だとオフセット値が異なる
+        HE::Uint32 uOffset = _GetUTF8CharOffset(this->_pStr[this->_sIndex]);
+        this->_sIndex += uOffset;
+
+        return *this;
+#endif
+    }
+
+    HE::Char* StringBase::IteratorChar::operator*()
+    {
+#if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
+        this->_aChar[0] = this->_pStr[this->_sIndex];
+        this->_aChar[1] = NULL;
+#else
+        HE::Uint32 uOffset = _GetUTF8CharOffset(this->_pStr[this->_sIndex]);
+        for (auto i = 0; i < uOffset; ++i)
+        {
+            this->_aChar[i] = this->_pStr[this->_sIndex + i];
+        }
+        this->_aChar[uOffset] = NULL;
+
+#endif
+        return this->_aChar;
     }
 }  // namespace Core::Common

@@ -3,7 +3,10 @@
     "version": "1.0.0",
     "dependencies": [
         "sdl2",
-        "glew"
+        "glew",
+        "freetype",
+        "sdl2-ttf",
+        "soil2"
     ],
     "overrides": [
         {
@@ -13,6 +16,18 @@
         {
             "name": "glew",
             "version": "2.2.0"
+        },
+        {
+            "name": "freetype",
+            "version": "2.13.3"
+        },
+        {
+            "name": "sdl2-ttf",
+            "version": "2.22.0"
+        },
+        {
+            "name": "sol2",
+            "version": "1.3.0"
         }
     ]
 }

@@ -1,7 +1,19 @@
 ﻿#include "ViewPort.h"
 
+#include "Engine/Platform/PlatformModule.h"
+
 namespace Render
 {
+    std::tuple<Core::Common::Handle, SceneViewBase*> ViewPort::AddSceneView(
+        Core::Memory::UniquePtr<Platform::SceneStrategyInterface> in_upStorategy)
+    {
+        auto [handle, pScene] = this->_poolSceneManager.Alloc<SceneViewBase>();
+
+        pScene->_Begin(std::move(in_upStorategy));
+
+        return std::tuple<Core::Common::Handle, SceneViewBase*>(handle, pScene);
+    }
+
     void ViewPort::RemoveScene(Core::Common::Handle& in_rHandle)
     {
         this->_poolSceneManager.Free(in_rHandle, FALSE);
@@ -17,18 +29,31 @@ namespace Render
         return pScene;
     }
 
-    const ViewPortConfig* ViewPort::GetConfig()
+    const HE::Uint32 ViewPort::Width() const
     {
-        return this->_upConfig.get();
+        return this->_upStrategy->GetConfig().uWidth;
     }
 
-    HE::Bool ViewPort::_Setup(Core::Memory::UniquePtr<ViewPortConfig> in_upConfig)
+    const HE::Uint32 ViewPort::Height() const
     {
-        this->_upConfig = std::move(in_upConfig);
+        return this->_upStrategy->GetConfig().uHeight;
+    }
+
+    HE::Bool ViewPort::Init(Core::Memory::UniquePtr<Platform::ViewPortStrategy> in_upStg,
+                            const HE::Uint32 in_uSceneCount)
+    {
+        this->_upStrategy = std::move(in_upStg);
+
         this->_poolSceneManager.ReleasePool();
-        this->_poolSceneManager.ReservePool(this->_upConfig->uSceneCount);
+        this->_poolSceneManager.ReservePool(in_uSceneCount);
 
         return TRUE;
+    }
+
+    void ViewPort::Release()
+    {
+        this->_poolSceneManager.ReleasePool([](SceneViewBase* in_pScene) { in_pScene->Release(); });
+        HE_SAFE_DELETE_UNIQUE_PTR(this->_upStrategy);
     }
 
     void ViewPort::_Begin()
@@ -43,13 +68,20 @@ namespace Render
             {
                 for (auto itr = m->begin(); itr != m->end(); ++itr)
                 {
-                    itr->second->_VEnd();
+                    itr->second->_End();
                 }
             }
         }
-        this->_poolSceneManager.ReleasePool();
+    }
 
-        HE_SAFE_DELETE_UNIQUE_PTR(this->_upConfig);
+    void ViewPort::_BeginRender()
+    {
+        this->_upStrategy->VBeginRender();
+    }
+
+    void ViewPort::_EndRender()
+    {
+        this->_upStrategy->VEndRender();
     }
 
 }  // namespace Render

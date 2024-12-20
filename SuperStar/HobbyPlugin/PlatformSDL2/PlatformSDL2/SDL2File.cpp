@@ -13,9 +13,16 @@ namespace PlatformSDL2
         HE::Sint32 _iFileSize    = 0;
     };
 
+    void File::SetCurrentDir(const Core::File::Path& in_rPath)
+    {
+        this->_currentDirPath = in_rPath;
+    }
+
     const Core::Common::Handle File::VFileOpen(const Core::File::Path& in_rPath)
     {
-        auto pFileRW = ::SDL_RWFromFile(in_rPath.Str(), "rb");
+        auto path = Core::File::Path(this->_currentDirPath.Str(), in_rPath.Str());
+
+        auto pFileRW = ::SDL_RWFromFile(path.Str(), "rb");
         HE_ASSERT_RETURN_VALUE(NullHandle, pFileRW);
 
         FileInfo* pFileInfo    = HE_NEW_MEM(FileInfo, 0);
@@ -23,7 +30,7 @@ namespace PlatformSDL2
         pFileInfo->_iFileSize  = pFileRW->size(pFileRW);
 
         // ファイルパスをハッシュ値にしてそれをハンドルにしている
-        Core::Common::Handle fileHandle(Core::Common::HashName(in_rPath.Str()));
+        Core::Common::Handle fileHandle(Core::Common::HashName(path.Str()));
 
         this->_mFileHandle.Add(fileHandle, pFileInfo);
 
@@ -67,4 +74,73 @@ namespace PlatformSDL2
 
         return TRUE;
     }
+
+    std::tuple<void*, HE::Uint32> File::VLoadBinary(const Core::File::Path& in_rPath)
+    {
+        // ファイルをバイナル形式でロード
+        auto handle = this->VFileOpen(in_rPath.Str());
+        HE_ASSERT_RETURN_VALUE((std::tuple<void*, HE::Uint32>(NULL, 0)), handle.Null() == FALSE);
+
+        auto uSize = this->VFileSize(handle);
+
+        // TODO: メモリページは指定したい
+        void* pData = HE_ALLOC_MEM(uSize, 0);
+        if (pData != NULL)
+        {
+            ::memset(pData, 0, uSize);
+
+            // ロード
+            HE::Bool bRet = FALSE;
+
+            if (this->VFileRead(pData, handle, uSize))
+            {
+                bRet = TRUE;
+            }
+            else
+            {
+                HE_SAFE_DELETE_MEM(pData);
+            }
+            HE_ASSERT(bRet && "ファイル読み込みに失敗");
+        }
+
+        this->VFileClose(handle);
+
+        return std::tuple<void*, HE::Uint32>(pData, uSize);
+    }
+
+    std::tuple<HE::Char*, HE::Uint32> File::VLoadText(const Core::File::Path& in_rPath)
+    {
+        // ファイルをバイナル形式でロード
+        auto handle = this->VFileOpen(in_rPath.Str());
+        HE_ASSERT_RETURN_VALUE((std::tuple<HE::Char*, HE::Uint32>(NULL, 0)),
+                               handle.Null() == FALSE);
+
+        auto uSize = this->VFileSize(handle);
+
+        // TODO: メモリページは指定したい
+        HE::Char* pData = reinterpret_cast<HE::Char*>(HE_ALLOC_MEM(uSize + 1, 0));
+        if (pData != NULL)
+        {
+            ::memset(pData, 0, uSize + 1);
+
+            // ロード
+            HE::Bool bRet = FALSE;
+
+            if (this->VFileRead(pData, handle, uSize))
+            {
+                bRet         = TRUE;
+                pData[uSize] = HE_STR_TEXT('\0');
+            }
+            else
+            {
+                HE_SAFE_DELETE_MEM(pData);
+            }
+            HE_ASSERT(bRet && "ファイル読み込みに失敗");
+        }
+
+        this->VFileClose(handle);
+
+        return std::tuple<HE::Char*, HE::Uint32>(pData, uSize);
+    }
+
 }  // namespace PlatformSDL2

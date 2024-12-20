@@ -44,6 +44,7 @@ set(ENGINE_TARGET_FILES
     Engine/File/Path.cpp
     Engine/File/Path.h
     
+    Engine/Math/Color.h
     Engine/Math/Math.cpp
     Engine/Math/Math.h
     Engine/Math/Matrix3.cpp
@@ -78,6 +79,7 @@ set(ENGINE_TARGET_FILES
     Engine/Module/Module.h
     
     Engine/Platform/PlatformFile.h
+    Engine/Platform/PlatformFont.h
     Engine/Platform/PlatformInput.cpp
     Engine/Platform/PlatformInput.h
     Engine/Platform/PlatformScreen.cpp

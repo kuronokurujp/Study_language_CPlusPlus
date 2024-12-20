@@ -9,7 +9,8 @@
 #include "InGame/Event/InGameEventShot.h"
 
 // 利用モジュール
-#include "Engine/Platform/PlatformModule.h"
+// #include "Engine/Platform/PlatformModule.h"
+#include "RenderModule.h"
 
 namespace InGame
 {
@@ -75,13 +76,17 @@ namespace InGame
         // 弾の生存範囲内のデータを作る
         Core::Math::Rect2 activeScreenInSide;
         {
-            auto pPlatform = HE_ENGINE.ModuleManager().Get<Platform::PlatformModule>();
-            auto pScreen   = pPlatform->VScreen();
-            const Platform::ScreenSceneView2DEnvironment&& rrSceneView2DEnv =
-                pScreen->GetEnvBySceneView2D(this->_viewHandle);
+            // auto pPlatform = HE_ENGINE.ModuleManager().Get<Render Platform::PlatformModule>();
+            // auto pScreen   = pPlatform->VScreen();
+            auto pRender   = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
+            auto pViewPort = pRender->GetViewPort(this->_viewHandle);
+            //            const Platform::ScreenSceneView2DEnvironment&& rrSceneView2DEnv =
+            //                pScreen->VGetEnvBySceneView2D(this->_viewHandle);
 
-            HE::Float32 fW = static_cast<HE::Float32>(rrSceneView2DEnv._uWidth);
-            HE::Float32 fH = static_cast<HE::Float32>(rrSceneView2DEnv._uHeight);
+            HE::Float32 fW =
+                static_cast<HE::Float32>(pViewPort->Width());  // rrSceneView2DEnv._uWidth);
+            HE::Float32 fH =
+                static_cast<HE::Float32>(pViewPort->Height());  // rrSceneView2DEnv._uHeight);
 
             const HE::Float32 fSideLength = 100.0f;
             activeScreenInSide.Set(-fSideLength, -fSideLength, 2 * fSideLength + fW,

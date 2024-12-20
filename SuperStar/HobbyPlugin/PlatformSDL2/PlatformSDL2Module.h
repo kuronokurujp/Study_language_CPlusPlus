@@ -46,6 +46,11 @@ namespace PlatformSDL2
             return this->_spSysmte;
         }
 
+        Core::Memory::SharedPtr<Platform::FontInterface> VFont() override final
+        {
+            return this->_spFont;
+        }
+
     protected:
         /// <summary>
         /// モジュール初期化
@@ -67,6 +72,7 @@ namespace PlatformSDL2
         Core::Memory::SharedPtr<Platform::FileInterface> _spFile;
         Core::Memory::SharedPtr<Platform::ScreenInterface> _spScreen;
         Core::Memory::SharedPtr<Platform::SystemInterface> _spSysmte;
+        Core::Memory::SharedPtr<Platform::FontInterface> _spFont;
 
         HE::Bool _bQuit = FALSE;
     };

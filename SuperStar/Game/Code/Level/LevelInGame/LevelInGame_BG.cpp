@@ -17,24 +17,26 @@ namespace Level
         //	点の位置を複数作成
         {
             // スクリーンサイズ取得
-            auto pPlatform = HE_ENGINE.ModuleManager().Get<Platform::PlatformModule>();
-            auto pScreen   = pPlatform->VScreen();
-            auto pSystem   = pPlatform->VSystem();
+            auto pPlatformModule = HE_ENGINE.ModuleManager().Get<Platform::PlatformModule>();
+            // auto pScreen   = pPlatform->VScreen();
+            auto pSystem = pPlatformModule->VSystem();
 
-            auto rScene2DEnv = pScreen->GetEnvBySceneView2D(Game::g_scene2DHandle);
+            auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
+            auto pViewPort     = pRenderModule->GetViewPort(Game::g_scene2DHandle);
+            // auto rScene2DEnv   = pScreen->VGetEnvBySceneView2D(Game::g_scene2DHandle);
 
             this->_aPoint = reinterpret_cast<Render::Point2D*>(
                 HE_ALLOC_MEM(sizeof(Render::Point2D) * this->_uPointCount, 0));
             for (HE::Uint32 i = 0; i < this->_uPointCount; ++i)
             {
-                const HE::Float32 fX =
-                    static_cast<HE::Float32>(pSystem->VGetRand(rScene2DEnv._uWidth));
-                const HE::Float32 fY =
-                    static_cast<HE::Float32>(pSystem->VGetRand(rScene2DEnv._uHeight));
+                const HE::Float32 fX = static_cast<HE::Float32>(
+                    pSystem->VGetRand(pViewPort->Width()));  // rScene2DEnv._uWidth));
+                const HE::Float32 fY = static_cast<HE::Float32>(
+                    pSystem->VGetRand(pViewPort->Height()));  // rScene2DEnv._uHeight));
                 Render::Point2D* p = &this->_aPoint[i];
                 p->fX              = fX;
                 p->fY              = fY;
-                p->color           = Render::RGB::White;
+                p->color           = Core::Math::RGB::White;
             }
         }
 
@@ -53,13 +55,16 @@ namespace Level
         Node::VUpdate(in_fDt);
 
         // スクリーン情報を取得
-        auto pPlatform = HE_ENGINE.ModuleManager().Get<Platform::PlatformModule>();
-        auto pScreen   = pPlatform->VScreen();
-        auto pSystem   = pPlatform->VSystem();
+        auto pPlatformModule = HE_ENGINE.PlatformModule();
+        auto pSystem         = pPlatformModule->VSystem();
 
-        auto rScene2DEnv = pScreen->GetEnvBySceneView2D(Game::g_scene2DHandle);
+        auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
+        auto pViewPort     = pRenderModule->GetViewPort(Game::g_scene2DHandle);
 
-        const HE::Float32 fMaxXPos = static_cast<HE::Float32>(rScene2DEnv._uWidth);
+        // auto rScene2DEnv = pScreen->VGetEnvBySceneView2D(Game::g_scene2DHandle);
+
+        const HE::Float32 fMaxXPos =
+            static_cast<HE::Float32>(pViewPort->Width());  // rScene2DEnv._uWidth);
         // 左から右へ動かす
         for (HE::Uint32 i = 0; i < this->_uPointCount; ++i)
         {
@@ -67,12 +72,13 @@ namespace Level
             if (this->_aPoint[i].fX < 0)
             {
                 this->_aPoint[i].fX = fMaxXPos;
-                this->_aPoint[i].fY = pSystem->VGetRand(rScene2DEnv._uHeight);
+                this->_aPoint[i].fY =
+                    pSystem->VGetRand(pViewPort->Height());  // rScene2DEnv._uHeight);
             }
         }
 
         // 背景を黒くする
-        Render::CommandClsScreen(Game::g_scene2DHandle, Render::RGB::Black);
+        Render::CommandClsScreen(Game::g_scene2DHandle, Core::Math::RGB::Black);
 
         // 点をまとめて設定して描画
         Render::Command2DPointArrayDraw(Game::g_scene2DHandle, this->_aPoint, this->_uPointCount);

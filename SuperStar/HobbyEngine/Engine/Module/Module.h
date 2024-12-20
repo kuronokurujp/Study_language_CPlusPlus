@@ -3,7 +3,6 @@
 #include "Engine/Common/CustomMap.h"
 #include "Engine/Common/CustomVector.h"
 #include "Engine/Common/Singleton.h"
-// #include "Engine/Engine.h"
 
 namespace Module
 {
@@ -101,7 +100,7 @@ namespace Module
         {
             Core::Common::FixedString64 szName(T::ModuleName());
             auto pTargetModule = reinterpret_cast<T*>(this->_GetModule(szName));
-            if (pTargetModule == NULL) return NULL;
+            HE_ASSERT_RETURN_VALUE(NULL, pTargetModule && "モジュールとして登録していないのでだめ");
 
             // 依存対象のモジュールかどうかチェック
             HE::Bool bHit = FALSE;
@@ -114,7 +113,8 @@ namespace Module
                 }
             }
 
-            if (bHit == FALSE) return NULL;
+            HE_ASSERT_RETURN_VALUE(NULL, bHit && "依存モジュールが存在しないのはまずい");
+            // if (bHit == FALSE) return NULL;
 
             return pTargetModule;
         }
@@ -157,7 +157,7 @@ namespace Module
         /// <summary>
         /// モジュール更新
         /// </summary>
-        virtual void _VUpdate(const HE::Float32 in_fDeltaTime) {}
+        virtual void _Update(const HE::Float32 in_fDeltaTime) {}
 
         /// <summary>
         /// モジュール後更新

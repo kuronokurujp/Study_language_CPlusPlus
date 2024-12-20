@@ -2,15 +2,14 @@
 
 namespace Platform
 {
-    ScreenSceneViewUIConfig::ScreenSceneViewUIConfig(const Core::Common::Handle& in_windowHandle,
-                                                     const Core::Common::Handle& in_viewPortHandle)
-        : _windowHandle(in_windowHandle), _viewPortHandle(in_viewPortHandle)
+    WindowStrategy::WindowStrategy(const WindowConfig& in_rConfig)
     {
+        this->_config = in_rConfig;
     }
 
-    ScreenSceneView2DConfig::ScreenSceneView2DConfig(const Core::Common::Handle& in_windowHandle,
-                                                     const Core::Common::Handle& in_viewPortHandle)
-        : _windowHandle(in_windowHandle), _viewPortHandle(in_viewPortHandle)
+    ViewPortStrategy::ViewPortStrategy(const ViewPortConfig& in_rConfig)
     {
+        this->_config = in_rConfig;
     }
+
 }  // namespace Platform

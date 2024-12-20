@@ -8,7 +8,9 @@
 
 // モジュールのヘッダーファイルは全てインクルードする
 #include "AssetManager/AssetDataBase.h"
+#include "AssetManager/AssetDataBinary.h"
 #include "AssetManager/AssetDataJson.h"
+#include "AssetManager/AssetDataText.h"
 #include "AssetManager/AssetDataToml.h"
 #include "AssetManager/AssetDataXml.h"
 
@@ -40,8 +42,7 @@ namespace AssetManager
             auto [handle, p] = this->_poolAssetDataManager.Alloc<T>();
 
             AssetDataBase* pAsset = p;
-            pAsset->_VInit(in_pName,
-                           Core::File::Path(this->_mountDirPath.Str(), in_rFilePath.Str()));
+            pAsset->_VInit(in_pName, in_rFilePath.Str());
 
             // アセットのロードをして失敗したら確保したインスタンスを解放
             if (this->_Load(pAsset))
@@ -68,7 +69,7 @@ namespace AssetManager
         /// <summary>
         /// アセット格納ディレクトリ設定
         /// </summary>
-        void SetMountDir(const HE::Char* in_szMountDir) { this->_mountDirPath = in_szMountDir; }
+        void SetCurrentDir(const HE::Char* in_szMountDir);
 
     protected:
         /// <summary>
@@ -86,7 +87,6 @@ namespace AssetManager
         HE::Bool _Load(AssetDataBase* out_pAssetData);
 
     private:
-        Core::File::Path _mountDirPath;
         Core::Common::RuntimePoolManager<AssetDataBase> _poolAssetDataManager;
     };
 }  // namespace AssetManager

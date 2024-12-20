@@ -56,7 +56,8 @@ namespace Core
             Core::Common::Handle _handle;
         };
 
-        using ChildTaskNodeIterator = Core::Common::CustomList<TaskTree::ChildTaskNode>::Iterator;
+        using ChildTaskNodeIterator =
+            Core::Common::CustomList<TaskTree::ChildTaskNode>::IteratorChar;
 
     public:
         TaskTree() : Task() { this->_Clear(); }

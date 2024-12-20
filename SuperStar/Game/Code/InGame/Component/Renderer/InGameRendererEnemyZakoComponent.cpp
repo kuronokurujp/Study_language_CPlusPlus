@@ -23,7 +23,7 @@ namespace InGame
 
         // 描画コマンド追加
         // TODO: 画像表示に切り替えるかも
-        Render::Command2DRectDraw(in_rViewHandle, rect, Render::RGB::White);
+        Render::Command2DRectDraw(in_rViewHandle, rect, Core::Math::RGB::White);
     }
 
 }  // namespace InGame

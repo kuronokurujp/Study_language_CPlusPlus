@@ -7,7 +7,8 @@ namespace Render
 {
     void Command2DTextDraw(const Core::Common::Handle& in_rViewHandle,
                            const Core::Math::Vector2& in_rPos,
-                           const Core::Common::StringBase& in_szrName, const Color& in_rColor,
+                           const Core::Common::StringBase& in_szrName,
+                           const Core::Math::Color& in_rColor,
                            const Core::Math::Rect2::EAnchor in_eAnchor)
     {
         HE_ASSERT(in_rViewHandle.Null() == FALSE);
@@ -34,7 +35,7 @@ namespace Render
     }
 
     void Command2DRectDraw(const Core::Common::Handle& in_rViewHandle,
-                           const Core::Math::Rect2& in_rRect, const Color& in_rColor)
+                           const Core::Math::Rect2& in_rRect, const Core::Math::Color& in_rColor)
     {
         HE_ASSERT(in_rViewHandle.Null() == FALSE);
 
@@ -57,7 +58,7 @@ namespace Render
     }
 
     void Command2DPointDraw(const Core::Common::Handle& in_rViewHandle,
-                            const Core::Math::Vector2& in_rPos, const Color& in_rColor)
+                            const Core::Math::Vector2& in_rPos, const Core::Math::Color& in_rColor)
     {
         HE_ASSERT(in_rViewHandle.Null() == FALSE);
         // 必要なコマンド情報を作る
@@ -96,7 +97,8 @@ namespace Render
         pModule->PushSceneRenderCommand(in_rViewHandle, std::move(cmd));
     }
 
-    void CommandClsScreen(const Core::Common::Handle& in_rViewHandle, const Color& in_rColor)
+    void CommandClsScreen(const Core::Common::Handle& in_rViewHandle,
+                          const Core::Math::Color& in_rColor)
     {
         HE_ASSERT(in_rViewHandle.Null() == FALSE);
 
@@ -113,7 +115,7 @@ namespace Render
 
     void Command2DCircleDraw(const Core::Common::Handle& in_rViewHandle,
                              const Core::Math::Vector2& in_rPos, const HE::Float32 in_fSize,
-                             const Color& in_rColor)
+                             const Core::Math::Color& in_rColor)
     {
         // 2D円の描画コマンドを作る
         HE_ASSERT(in_rViewHandle.Null() == FALSE);

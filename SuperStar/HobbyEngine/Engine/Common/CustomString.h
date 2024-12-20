@@ -20,9 +20,59 @@ namespace Core::Common
         HE_CLASS_MOVE_CONSTRUCT_NG(StringBase);
 
     public:
-        StringBase(HE::Char* in_szBuff, const HE::Uint32 in_uCapacity);
+        // 文字列の文字送りするイテレーター
+        class IteratorChar final
+        {
+        public:
+            IteratorChar(HE::Char* in_pStr, const HE::Sint32 in_sIndex)
+                : _pStr(in_pStr), _sIndex(in_sIndex)
+            {
+            }
 
-        virtual ~StringBase() { this->Clear(); }
+            // インクリメント
+            IteratorChar& operator++();
+
+            // インクリメント
+            IteratorChar operator++(int)
+            {
+                IteratorChar iter = *this;
+                ++(*this);
+                return iter;
+            }
+
+            // 比較
+            bool operator==(const IteratorChar& in_rIter) const HE_NOEXCEPT
+            {
+                if (this->_sIndex == in_rIter._sIndex) return TRUE;
+
+                return (in_rIter._sIndex <= this->_sIndex);
+            }
+
+            // 現在参照している文字
+            HE::Char* operator*();
+
+            // 比較
+            bool operator!=(const IteratorChar& in_crIter) const { return !(*this == in_crIter); }
+
+        private:
+#if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
+            HE::Char _aChar[1] = {0};
+#else
+
+            HE::Char _aChar[7] = {0};
+#endif
+            HE::Char* _pStr    = NULL;
+            HE::Sint32 _sIndex = 0;
+        };
+
+    public:
+        /// <summary>
+        /// in_bUseBuffがTRUNならバッファにはすでに文字がありそれを使いまわす
+        /// </summary>
+        StringBase(HE::Char* in_szBuff, const HE::Uint32 in_uCapacity,
+                   const HE::Bool in_bUseBuff = FALSE);
+
+        virtual ~StringBase() = default;
         StringBase& Replace(const HE::Char* in_szOld, const HE::Char* in_szNew);
         StringBase& Insert(const HE::Uint32 in_uIndex, const HE::Char* in_szInsert);
         StringBase& Remove(const HE::Uint32 in_uIndex, const HE::Uint32 in_uCount = 1);
@@ -30,7 +80,7 @@ namespace Core::Common
         StringBase& FormatV(const HE::Char* in_szFormat, va_list in_vlist);
         void Clear() HE_NOEXCEPT { this->_szBuff[0] = '\0'; }
 
-        // TODO: 文字列の先頭と末尾の文字を取得
+        // 文字列の先頭と末尾の文字を取得
         HE::Char FirstChar() const { return this->_szBuff[0]; }
         HE::Char LastChar() const
         {
@@ -49,7 +99,10 @@ namespace Core::Common
         HE::Uint32 Length() const;
 
         // 文字データの要素数(文字数ではない, UTF8だと要素数=文字数とはならない)
-        HE::Uint32 Size() const { return static_cast<HE::Uint32>(HE_STR_SIZE(this->_szBuff)); }
+        inline HE::Uint32 Size() const HE_NOEXCEPT
+        {
+            return static_cast<HE::Uint32>(HE_STR_SIZE(this->_szBuff));
+        }
 
         inline const HE::Char* Str() const HE_NOEXCEPT { return this->_szBuff; }
 
@@ -142,6 +195,16 @@ namespace Core::Common
             const HE::Char* carrValue[] = {args...};
             for (HE::Uint32 i = 0; i < uCount; ++i) this->_Add(carrValue[i]);
         }
+
+        /// <summary>
+        /// 文字列の文字を一つずつ扱う先頭イテレーターを取得
+        /// </summary>
+        IteratorChar Begin() const HE_NOEXCEPT { return IteratorChar(this->_szBuff, 0); }
+
+        /// <summary>
+        /// 文字列の文字を一つずつ扱う終端イテレーター取得
+        /// </summary>
+        IteratorChar End() const HE_NOEXCEPT { return IteratorChar(this->_szBuff, this->Size()); }
 
         HE::Bool operator==(const HE::Char* in_szName) const
         {

@@ -2,6 +2,7 @@
 
 #include "Engine/Memory/Memory.h"
 #include "PlatformSDL2/SDL2File.h"
+#include "PlatformSDL2/SDL2Font.h"
 #include "PlatformSDL2/SDL2Input.h"
 #include "PlatformSDL2/SDL2Screen.h"
 #include "PlatformSDL2/SDL2System.h"
@@ -10,15 +11,24 @@
 // パッケージ
 #include "GL/glew.h"
 #include "SDL2/SDL.h"
-
-// 依存モジュール
-#include "RenderModule.h"
+#include "SDL2/SDL_ttf.h"
 
 namespace PlatformSDL2
 {
+#ifdef HE_ENGINE_DEBUG
+    /// <summary>
+    /// OpenGLのバグが起きた時のメッセージ
+    /// </summary>
+    void GLAPIENTRY _ShowMessageFromGLError(GLenum in_source, GLenum in_type, GLuint in_id,
+                                            GLenum in_severity, GLsizei in_length,
+                                            const GLchar* in_pMessage, const void* in_pUserParam)
+    {
+        HE_LOG_LINE(HE_STR_TEXT("OpenGL Debug Message: %s"), in_pMessage);
+    }
+#endif
+
     PlatformSDL2Module::PlatformSDL2Module() : PlatformModule()
     {
-        this->_AppendDependenceModule<Render::RenderModule>();
     }
 
     /// <summary>
@@ -28,8 +38,20 @@ namespace PlatformSDL2
     {
         // SDLの初期化
         // 初期化にも色々な種類があるが、いったんVideoのみで
-        Uint32 ulSDLResult = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-        HE_ASSERT_RETURN_VALUE(FALSE, ulSDLResult == 0 && "SDLの初期化に失敗");
+        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
+        {
+            HE_LOG_LINE(HE_STR_TEXT("Error: SDL_Init Message= %s"), SDL_GetError());
+            HE_ASSERT_RETURN_VALUE(FALSE, FALSE && "SDLの初期化に失敗");
+        }
+
+        // SDLのフォント初期化
+        if (TTF_Init() == -1)
+        {
+            HE_LOG_LINE(HE_STR_TEXT("Error: TTF_Init Message= %s"), TTF_GetError());
+
+            SDL_Quit();
+            HE_ASSERT_RETURN_VALUE(FALSE, FALSE && "SDL2_TTFの初期化失敗");
+        }
 
         // openglの属性設定をする
         // windowを作成する前にしないといけない
@@ -68,6 +90,26 @@ namespace PlatformSDL2
             this->_spFile   = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::File));
             this->_spScreen = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Screen), this);
             this->_spSysmte = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::System));
+            this->_spFont   = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Font), this);
+        }
+
+        {
+#ifdef HE_ENGINE_DEBUG
+            const GLubyte* pVersion = ::glGetString(GL_VERSION);
+            HE_LOG_LINE(HE_STR_TEXT("OpenGL Version(%d)"), *pVersion);
+
+            GLint maxTextureSize;
+            ::glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+            HE_LOG_LINE(HE_STR_TEXT("Max texture size: %d"), maxTextureSize);
+#endif
+        }
+
+        {
+#ifdef HE_ENGINE_DEBUG
+            ::glEnable(GL_DEBUG_OUTPUT);
+            ::glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+            glDebugMessageCallback(_ShowMessageFromGLError, NULL);
+#endif
         }
 
         return TRUE;
@@ -78,13 +120,19 @@ namespace PlatformSDL2
     /// </summary>
     HE::Bool PlatformSDL2Module::_VRelease()
     {
+        // TODO: 各機能の解放
+        this->_spFont->VRelease();
+        this->_spScreen->VRelease();
+
         this->_spTime.reset();
         this->_spInput.reset();
         this->_spFile.reset();
         this->_spScreen.reset();
         this->_spSysmte.reset();
+        this->_spFont.reset();
 
-        SDL_Quit();
+        ::TTF_Quit();
+        ::SDL_Quit();
 
         return TRUE;
     }

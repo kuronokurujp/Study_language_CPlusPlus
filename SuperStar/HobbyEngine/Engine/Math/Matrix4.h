@@ -15,9 +15,35 @@ namespace Core::Math
     /// </summary>
     class Matrix4 final
     {
+        HE_CLASS_MOVE_NG(Matrix4);
+        HE_CLASS_COPY_NG(Matrix4);
+
     public:
-        explicit Matrix4() { *this = Matrix4::Identity; }
-        explicit Matrix4(const HE::Float32 in_faaMat[4][4])
+        explicit Matrix4()
+        {
+            // 単位行列の値
+            constexpr HE::Float32 faIdent[4][4] = {
+                {1.0f, 0.0f, 0.0f, 0.0f},
+                {0.0f, 1.0f, 0.0f, 0.0f},
+                {0.0f, 0.0f, 1.0f, 0.0f},
+                {0.0f, 0.0f, 0.0f, 1.0f},
+            };
+            this->Set(faIdent);
+        }
+
+        /*
+                explicit Matrix4(const HE::Float32 in_faaMat[4][4])
+                {
+                    ::memcpy(this->_faMat, in_faaMat, 4 * 4 * sizeof(HE::Float32));
+                }
+                */
+
+        inline void Set(Matrix4& in_rMat)
+        {
+            ::memcpy(this->_faMat, in_rMat._faMat, 4 * 4 * sizeof(HE::Float32));
+        }
+
+        inline void Set(const HE::Float32 in_faaMat[4][4])
         {
             ::memcpy(this->_faMat, in_faaMat, 4 * 4 * sizeof(HE::Float32));
         }
@@ -104,10 +130,10 @@ namespace Core::Math
         void Scale(const HE::Float32);
 
         /// <summary>
-        /// Creates the scale matrix4.
+        /// スケール設定した行列出力
         /// </summary>
-        static Matrix4 CreateScale(const HE::Float32 in_fX, const HE::Float32 in_fY,
-                                   const HE::Float32 in_fZ)
+        static void OutputScale(Matrix4* out, const HE::Float32 in_fX, const HE::Float32 in_fY,
+                                const HE::Float32 in_fZ)
         {
             const HE::Float32 faTemp[4][4] = {
                 {in_fX, 0.0f, 0.0f, 0.0f},
@@ -115,24 +141,25 @@ namespace Core::Math
                 {0.0f, 0.0f, in_fZ, 0.0f},
                 {0.0f, 0.0f, 0.0f, 1.0f},
             };
+            out->Set(faTemp);
 
-            return Matrix4(faTemp);
+            // return Matrix4(faTemp);
         }
 
         /// <summary>
         /// Creates the scale.
         /// </summary>
-        static Matrix4 CreateScale(const Math::Vector3& in_rScale)
+        static void OutputScale(Matrix4* out, const Math::Vector3& in_rScale)
         {
-            return CreateScale(in_rScale._fX, in_rScale._fY, in_rScale._fZ);
+            OutputScale(out, in_rScale._fX, in_rScale._fY, in_rScale._fZ);
         }
 
         /// <summary>
         /// Creates the scale.
         /// </summary>
-        static Matrix4 CreateScale(const HE::Float32 in_fScale)
+        static void OutputScale(Matrix4* out, const HE::Float32 in_fScale)
         {
-            return CreateScale(in_fScale, in_fScale, in_fScale);
+            OutputScale(out, in_fScale, in_fScale, in_fScale);
         }
 
         /// <summary>
@@ -142,29 +169,30 @@ namespace Core::Math
         /// なぜ?
         ///   2pi = 360度なのでこれを360分割すれば1ラジアンになるから
         /// </summary>
-        static Matrix4 CreateRotationZ(const HE::Float32 in_fRadian);
+        static void OutputRotationZ(Matrix4* out, const HE::Float32 in_fRadian);
 
         /// <summary>
         /// Creates the translation.
         /// </summary>
-        static Matrix4 CreateTranslation(const Vector3& in_rPos);
+        static void OutputTranslation(Matrix4* out, const Vector3& in_rPos);
 
         // 縦横のサイズを元に単位正方形の座標系に行列変換する行列作成
-        static Matrix4 CreateSimpleViewProj(const HE::Float32 in_fWidth,
-                                            const HE::Float32 in_fHeight);
+        static void OutputSimpleViewProj(Matrix4* out, const HE::Float32 in_fWidth,
+                                         const HE::Float32 in_fHeight);
 
         // カメラ情報からビュー行列生成
-        static Matrix4 CreateLookAt(const Vector3& in_rEye, const Vector3& in_rTarget,
-                                    const Vector3& in_rUp);
+        static void OutputLookAt(Matrix4* out, const Vector3& in_rEye, const Vector3& in_rTarget,
+                                 const Vector3& in_rUp);
 
         // 正射影行列作成
-        static Matrix4 CreateOrtho(const HE::Float32 in_fWidth, const HE::Float32 in_fHeight,
-                                   const HE::Float32 in_fNear, const HE::Float32 in_fFar);
+        static void OutputOrtho(Matrix4* out, const HE::Float32 in_fWidth,
+                                const HE::Float32 in_fHeight, const HE::Float32 in_fNear,
+                                const HE::Float32 in_fFar);
 
         // 透視射影行列作成
-        static Matrix4 CreatePerspectiveFOV(const HE::Float32 in_fFov, const HE::Float32 in_fWidth,
-                                            const HE::Float32 in_fHeight,
-                                            const HE::Float32 in_fNear, const HE::Float32 in_fFar);
+        static void OutputPerspectiveFOV(Matrix4* out, const HE::Float32 in_fFov,
+                                         const HE::Float32 in_fWidth, const HE::Float32 in_fHeight,
+                                         const HE::Float32 in_fNear, const HE::Float32 in_fFar);
 
     public:
         // 単位行列定義

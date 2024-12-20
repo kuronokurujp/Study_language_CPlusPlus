@@ -108,11 +108,7 @@ namespace Core::Math
         /// <summary>
         /// ベクトル要素をfloatポインタで返す.
         /// </summary>
-        /// <returns></returns>
-        const HE::Float32* GetAsFloatPtr() HE_NOEXCEPT
-        {
-            return reinterpret_cast<HE::Float32*>(&this->_fX);
-        }
+        const HE::Float32* GetAsFloatPtr() const HE_NOEXCEPT { return &this->_fX; }
 
         // 内積
         static HE::Float32 Dot(const Vector3& in_rV, const Vector3& in_rV2);

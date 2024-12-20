@@ -20,7 +20,8 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH})
     # 使う場合はコメントを外して書き換えてください
 
     # プラグイン用のパッケージディレクトリを設定
-    # list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH}/share/インストールしたパッケージ名のディレクトリ")
+    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH}")
+
     # SDL2のパッケージを探す
     # find_package(インストールしたパッケージ名 REQUIRED CONFIG)
     

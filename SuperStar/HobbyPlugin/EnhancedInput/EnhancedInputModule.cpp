@@ -61,7 +61,7 @@ namespace EnhancedInput
         this->_mInputAction.Clear();
     }
 
-    void EnhancedInputModule::_VUpdate(const HE::Float32 in_fDeltaTime)
+    void EnhancedInputModule::_Update(const HE::Float32 in_fDeltaTime)
     {
         auto pPlatformModule = this->GetDependenceModule<Platform::PlatformModule>();
         HE_ASSERT(pPlatformModule);
