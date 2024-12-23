@@ -13,147 +13,150 @@
 
 namespace PlatformSDL2
 {
-    struct FontBuildData
+    namespace Local
     {
-        HE::Char* szAllChar          = NULL;
-        FontMaterial::Glyph* pGlyphs = NULL;
-        HE::Uint32 uCharCount        = 0;
-        HE::Uint32 uGlyphCount       = 0;
-    };
-
-    /// <summary>
-    /// TODO: フォントの構築に必要なデータを生成
-    /// </summary>
-    static FontBuildData _CreateFontBuildData(void* in_pFontData, const HE::Uint32 in_uSize)
-    {
-        FT_Face face;
-        FT_Library library;
-
-        FontBuildData buildData;
-
-        // FreeType ライブラリを初期化
-        if (::FT_Init_FreeType(&library))
+        struct FontData
         {
-            HE_LOG_LINE(HE_STR_TEXT("FreeTypeのライブラリ初期化に失敗"));
-            return buildData;
-        }
+            FT_Library _ftLib   = NULL;
+            FT_Face _ftFace     = NULL;
+            SDL_RWops* _pRWops  = NULL;
+            TTF_Font* _pTTFFont = NULL;
+        };
 
-        // メモリ上のフォントデータを利用して Face を作成
-        if (::FT_New_Memory_Face(library, reinterpret_cast<FT_Byte*>(in_pFontData), in_uSize, 0,
-                                 &face))
+        constexpr HE::Uint32 aFontSize[] = {64};
+
+        static FontData OpenFont(void* in_pFontBinary, const HE::Uint32 in_uFontDataSize,
+                                 const HE::Uint32 in_uFontSize)
         {
-            HE_LOG_LINE(HE_STR_TEXT("FreeTypeのFace生成が失敗"));
-            ::FT_Done_FreeType(library);
+            FT_Face face;
+            FT_Library library;
 
-            return buildData;
-        }
-
-        // フォント内の文字を列挙
-        ::FT_UInt freeTypeGlyphIndex = 0;
-        ::FT_ULong unicode           = 0;
-        HE::Uint32 uCharCount        = 0;
-        HE::Uint32 uGlyphCount       = 0;
-        // まずどれくらい文字バッファサイズが必要かバッファ数を計算
-        {
-            ::FT_Get_First_Char(face, &freeTypeGlyphIndex);
-
-            while (freeTypeGlyphIndex != 0)
+            // FreeType ライブラリを初期化
+            if (::FT_Init_FreeType(&library))
             {
-                if (unicode <= 0x7F)
-                {
-                    // 1バイト文字
-                    uCharCount += 1;
-                }
-                else if (unicode <= 0x7FF)
-                {
-                    // 2バイト文字
-                    uCharCount += 2;
-                }
-                else if (unicode <= 0xFFFF)
-                {
-                    // 3バイト文字
-                    uCharCount += 3;
-                }
-                else if (unicode <= 0x10FFFF)
-                {
-                    // 4バイト文字
-                    uCharCount += 4;
-                }
-
-                unicode = ::FT_Get_Next_Char(face, unicode, &freeTypeGlyphIndex);
-                ++uGlyphCount;
+                HE_LOG_LINE(HE_STR_TEXT("FreeTypeのライブラリ初期化に失敗"));
+                return FontData{NULL, NULL, NULL, NULL};
             }
-            ++uCharCount;
-        }
 
-        // 文字バッファを作る
-        HE::Char* pHeapFontAllChar =
-            reinterpret_cast<HE::Char*>(HE_ALLOC_MEM_LAST(sizeof(HE::Char) * uCharCount, 0));
-        ::memset(pHeapFontAllChar, 0, sizeof(HE::Char) * uCharCount);
-
-        // グリフの数分データを生成
-        FontMaterial::Glyph* pGlyphs = reinterpret_cast<FontMaterial::Glyph*>(
-            HE_ALLOC_MEM_LAST(sizeof(FontMaterial::Glyph) * uGlyphCount, 0));
-
-        Core::Common::StringBase s(pHeapFontAllChar, uCharCount, TRUE);
-        {
-            auto unicode = ::FT_Get_First_Char(face, &freeTypeGlyphIndex);
-
-            HE::Uint32 uGlyphIndex = 0;
-            while (freeTypeGlyphIndex != 0)
+            // メモリ上のフォントデータを利用して Face を作成
+            if (::FT_New_Memory_Face(library, reinterpret_cast<FT_Byte*>(in_pFontBinary),
+                                     in_uFontDataSize, 0, &face))
             {
-                FontMaterial::Glyph* pGlyph = &pGlyphs[uGlyphIndex];
-                pGlyph->uUnicode            = unicode;
+                HE_LOG_LINE(HE_STR_TEXT("FreeTypeのFace生成が失敗"));
 
-                if (unicode <= 0x7F)
-                {
-                    // 1バイト文字
-                    s += (HE::Char)(unicode);
-                }
-                else if (unicode <= 0x7FF)
-                {
-                    // 2バイト文字
-                    s += (HE::Char)(0xC0 | ((unicode >> 6) & 0x1F));
-                    s += (HE::Char)(0x80 | (unicode & 0x3F));
-                }
-                else if (unicode <= 0xFFFF)
-                {
-                    // 3バイト文字
-                    s += (HE::Char)(0xE0 | ((unicode >> 12) & 0x0F));
-                    s += (HE::Char)(0x80 | ((unicode >> 6) & 0x3F));
-                    s += (HE::Char)(0x80 | (unicode & 0x3F));
-                }
-                else if (unicode <= 0x10FFFF)
-                {
-                    // 4バイト文字
-                    s += (HE::Char)(0xF0 | ((unicode >> 18) & 0x07));
-                    s += (HE::Char)(0x80 | ((unicode >> 12) & 0x3F));
-                    s += (HE::Char)(0x80 | ((unicode >> 6) & 0x3F));
-                    s += (HE::Char)(0x80 | (unicode & 0x3F));
-                }
-
-                unicode = ::FT_Get_Next_Char(face, unicode, &freeTypeGlyphIndex);
-                ++uGlyphIndex;
+                return FontData{library, NULL, NULL, NULL};
             }
-            s += HE_STR_TEXT('\0');
+
+            // TODO: SDL2_ttfのフォントデータを作成
+            SDL_RWops* pRWops = ::SDL_RWFromMem(in_pFontBinary, in_uFontDataSize);
+            if (pRWops == NULL)
+            {
+                return FontData{library, face, NULL, NULL};
+            }
+
+            pRWops->seek(pRWops, 0, RW_SEEK_SET);
+
+            auto pFont = ::TTF_OpenFontRW(pRWops, 0, in_uFontSize);
+            return FontData{library, face, pRWops, pFont};
         }
 
-        buildData.szAllChar   = pHeapFontAllChar;
-        buildData.pGlyphs     = pGlyphs;
-        buildData.uGlyphCount = uGlyphCount;
-        buildData.uCharCount  = uCharCount;
+        static void CloseFont(FontData* in_pData)
+        {
+            if (in_pData->_pTTFFont) ::TTF_CloseFont(in_pData->_pTTFFont);
 
-        ::FT_Done_Face(face);
-        ::FT_Done_FreeType(library);
+            if (in_pData->_pRWops) ::SDL_FreeRW(reinterpret_cast<SDL_RWops*>(in_pData->_pRWops));
 
-        return buildData;
-    }
+            if (in_pData->_ftFace) ::FT_Done_Face(in_pData->_ftFace);
 
-    static void _ReleaseFontBuildData(FontBuildData& in_rFontBuildData)
-    {
-        HE_SAFE_DELETE_MEM(in_rFontBuildData.pGlyphs);
-        HE_SAFE_DELETE_MEM(in_rFontBuildData.szAllChar);
-    }
+            if (in_pData->_ftLib) ::FT_Done_FreeType(in_pData->_ftLib);
+
+            in_pData->_pRWops   = NULL;
+            in_pData->_ftFace   = NULL;
+            in_pData->_pTTFFont = NULL;
+            in_pData->_ftLib    = NULL;
+        }
+
+        // テクスチャを構築し、グリフのUVを計算する
+        static HE::Bool OutputTextureAndUV(SDL_Surface** out_ppSurface,
+                                           FontMaterial::GlyphMap* out_pGlyphMap,
+                                           const FontData& in_rData, const HE::Uint32 in_uTexW,
+                                           const HE::Uint32 in_uTexH, const SDL_Color in_color)
+        {
+            // SDLサーフェイスを作成
+            *out_ppSurface = ::SDL_CreateRGBSurface(0, in_uTexW, in_uTexH, 32,
+                                                    0x00FF0000,   // Red mask
+                                                    0x0000FF00,   // Green mask
+                                                    0x000000FF,   // Blue mask
+                                                    0xFF000000);  // Alpha mask
+            if ((*out_ppSurface) == NULL)
+            {
+                HE_LOG_LINE(HE_STR_TEXT("Failed to create surface: %d"), ::SDL_GetError());
+                return FALSE;
+            }
+
+            // フォント内の文字を列挙
+            ::FT_UInt freeTypeGlyphIndex = 0;
+            ::FT_ULong unicode           = 0;
+            HE::Uint32 uCharCount        = 0;
+            HE::Uint32 uGlyphCount       = 0;
+
+            HE::Float32 fInvTexW = 1.0f / static_cast<HE::Float32>(in_uTexW);
+            HE::Float32 fInvTexH = 1.0f / static_cast<HE::Float32>(in_uTexH);
+            // まずどれくらい文字バッファサイズが必要かバッファ数を計算
+            {
+                unicode = ::FT_Get_First_Char(in_rData._ftFace, &freeTypeGlyphIndex);
+
+                // グリフを並べるための現在の描画位置
+                int x = 0, y = 0, rowHeight = 0;
+
+                SDL_Surface* pGlyphSurf = NULL;
+                while (freeTypeGlyphIndex != 0)
+                {
+                    pGlyphSurf = ::TTF_RenderGlyph_Blended(in_rData._pTTFFont, unicode, in_color);
+                    if (pGlyphSurf == NULL)
+                    {
+                        HE_LOG_LINE(HE_STR_TEXT("Failed to render glyph: %d %d"), unicode,
+                                    TTF_GetError());
+                        continue;
+                    }
+
+                    // グリフが横幅を超えた場合は次の行に移動
+                    if (in_uTexW <= (x + pGlyphSurf->w))
+                    {
+                        x = 0;
+                        y += rowHeight;
+                        HE_ASSERT(y < (*out_ppSurface)->h);
+
+                        rowHeight = 0;
+                    }
+
+                    // グリフをサーフェイスにコピー
+                    SDL_Rect destRect = {x, y, pGlyphSurf->w, pGlyphSurf->h};
+                    SDL_BlitSurface(pGlyphSurf, nullptr, *out_ppSurface, &destRect);
+
+                    // グリフのUVを計算して保存
+                    (*out_pGlyphMap)[unicode] =
+                        {static_cast<HE::Float32>(x) * fInvTexW,
+                         static_cast<HE::Float32>(x + pGlyphSurf->w) * fInvTexW,
+                         static_cast<HE::Float32>(y) * fInvTexH,
+                         static_cast<HE::Float32>(y + pGlyphSurf->h) * fInvTexH,
+                         static_cast<HE::Uint32>(pGlyphSurf->w),
+                         static_cast<HE::Uint32>(pGlyphSurf->h)};
+
+                    // X座標を更新
+                    x += pGlyphSurf->w;
+                    rowHeight = HE_MAX(rowHeight, pGlyphSurf->h);
+
+                    // サーフェイスを解放
+                    ::SDL_FreeSurface(pGlyphSurf);
+
+                    unicode = ::FT_Get_Next_Char(in_rData._ftFace, unicode, &freeTypeGlyphIndex);
+                }
+            }
+
+            return TRUE;
+        }
+    }  // namespace Local
 
     Font::Font(PlatformSDL2::PlatformSDL2Module* in_pModule) : _pModule(in_pModule)
     {
@@ -164,7 +167,7 @@ namespace PlatformSDL2
         this->VUnload();
     }
 
-    HE::Bool Font::VLoad(const HE::Uint32 in_uFontSize,
+    HE::Bool Font::VLoad(const Platform::EFontSize in_eSizeType,
                          std::initializer_list<Core::File::Path> in_aPath)
     {
         // ttf,vert,fragファイルのパスが入っている
@@ -196,74 +199,33 @@ namespace PlatformSDL2
             return FALSE;
         }
 
-        // TODO: 書き込む文字列を作る
-        // TODO:
-        // フォントの文字列を作るためにヒープ確報しているので使い終わったら解放しないとだめ
-        auto fontBuildData = _CreateFontBuildData(pFontBinary, uFontBinarySize);
-        Core::Common::StringBase s(fontBuildData.szAllChar, fontBuildData.uCharCount, TRUE);
+        HE::Uint32 uFontSize = Local::aFontSize[in_eSizeType];
+        Local::FontData fontData;
+        FontMaterial::GlyphMap mGlypMap;
+        SDL_Surface* pFontSurf = NULL;
 
-        if (s.Empty())
+        fontData = Local::OpenFont(pFontBinary, uFontBinarySize, uFontSize);
         {
-            _ReleaseFontBuildData(fontBuildData);
+            // TODO: フォントサイズが高くなるとテクスチャ内に文字が収まらない
+            // 動的にテクスチャサイズを変える必要がある
+            HE::Uint32 uTexW = 2048;
+            HE::Uint32 uTexH = 4096;
 
-            HE_SAFE_DELETE_MEM(pFontMatFragShaderText);
-            HE_SAFE_DELETE_MEM(pFontMatVertShaderText);
-            HE_SAFE_DELETE_MEM(pFontBinary);
+            Local::OutputTextureAndUV(&pFontSurf, &mGlypMap, fontData, uTexW, uTexH,
+                                      {255, 255, 255, 255});
 
-            return FALSE;
+            // 文字列をテクスチャーへ書き込む
+            this->_spTex = HE_MAKE_CUSTOM_SHARED_PTR((TextureSurface), GL_TEXTURE_2D, GL_TEXTURE0,
+                                                     pFontSurf->pixels, uTexW, uTexH);
+            // フォントマテリアルを作成
+            this->_spMat = HE_MAKE_CUSTOM_SHARED_PTR((FontMaterial));
+            this->_spMat->LoadShader(pFontMatVertShaderText, pFontMatFragShaderText);
+            this->_spMat->CopyGlyphs(std::move(mGlypMap));
+
+            Local::CloseFont(&fontData);
         }
 
-        // TODO: SDL2_ttfのフォントデータを作成
-        SDL_RWops* pRWops = ::SDL_RWFromMem(pFontBinary, uFontBinarySize);
-        if (pRWops == NULL)
-        {
-            ::SDL_FreeRW(reinterpret_cast<SDL_RWops*>(pRWops));
-            _ReleaseFontBuildData(fontBuildData);
-
-            HE_SAFE_DELETE_MEM(pFontMatFragShaderText);
-            HE_SAFE_DELETE_MEM(pFontMatVertShaderText);
-            HE_SAFE_DELETE_MEM(pFontBinary);
-
-            return FALSE;
-        }
-
-        // フォント色
-        constexpr SDL_Color sdlColor{255, 255, 255, 255};
-
-        // フォントのテクスチャと文字のUV情報を作成
-        {
-            // 再利用のためにポインタをリセット
-            pRWops->seek(pRWops, 0, RW_SEEK_SET);
-
-            Core::Common::Handle surfaceHandle;
-            HE::Uint32 uFontSize = in_uFontSize;
-            auto pFont           = ::TTF_OpenFontRW(pRWops, 0, uFontSize);
-            if (pFont)
-            {
-                // TODO: フォントのサーフェイス作成
-                SDL_Surface* pSurf = TTF_RenderUTF8_Blended(pFont, s.Str(), sdlColor);
-                if (pSurf)
-                {
-                    // TODO: 文字列をテクスチャーへ書き込む
-                    // TODO: テクスチャだけ差し替えはあるか？
-                    this->_spTex = HE_MAKE_CUSTOM_SHARED_PTR((TextureSurface), GL_TEXTURE_2D,
-                                                             pSurf->pixels, pSurf->w, pSurf->h);
-
-                    // TODO: フォントマテリアルを作成
-                    this->_spMat = HE_MAKE_CUSTOM_SHARED_PTR((FontMaterial));
-                    this->_spMat->LoadShader(pFontMatVertShaderText, pFontMatFragShaderText);
-
-                    // TODO: テクスチャを作ったので解放
-                    SDL_FreeSurface(pSurf);
-                }
-
-                ::TTF_CloseFont(pFont);
-            }
-        }
-
-        ::SDL_FreeRW(reinterpret_cast<SDL_RWops*>(pRWops));
-
-        _ReleaseFontBuildData(fontBuildData);
+        ::SDL_FreeSurface(pFontSurf);
 
         HE_SAFE_DELETE_MEM(pFontMatFragShaderText);
         HE_SAFE_DELETE_MEM(pFontMatVertShaderText);

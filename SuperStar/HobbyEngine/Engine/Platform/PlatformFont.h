@@ -7,6 +7,11 @@
 
 namespace Platform
 {
+    enum EFontSize
+    {
+        EFontSize_64 = 0,
+    };
+
     class FontInterface
     {
     public:
@@ -14,7 +19,7 @@ namespace Platform
 
         virtual void VRelease() = 0;
 
-        virtual HE::Bool VLoad(const HE::Uint32 in_uFontSize,
+        virtual HE::Bool VLoad(const EFontSize in_eSizeType,
                                std::initializer_list<Core::File::Path>) = 0;
         virtual void VUnload()                                          = 0;
     };

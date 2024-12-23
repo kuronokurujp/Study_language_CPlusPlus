@@ -76,12 +76,9 @@ namespace PlatformSDL2
             // これで描画くずれが防げる
             SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-            // 描画計算をGPU任せにする(0ならGPU任せになる)
+            // 描画計算をGPU任せにする(0ならCPU任せになる)
             SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
         }
-
-        // OpenGLの拡張を有効に
-        glewExperimental = GL_TRUE;
 
         // プラットフォームの各機能を生成
         {
@@ -101,6 +98,12 @@ namespace PlatformSDL2
             GLint maxTextureSize;
             ::glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
             HE_LOG_LINE(HE_STR_TEXT("Max texture size: %d"), maxTextureSize);
+
+            // テクスチャユニット数
+            GLint textureUnits = 0;
+            ::glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &textureUnits);
+            HE_LOG_LINE(HE_STR_TEXT("GPU TextureUnitNum %d"), textureUnits);
+
 #endif
         }
 

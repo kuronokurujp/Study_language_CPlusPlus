@@ -31,12 +31,12 @@ namespace Render
 
     const HE::Uint32 ViewPort::Width() const
     {
-        return this->_upStrategy->GetConfig().uWidth;
+        return this->_upStrategy->GetConfig()._uWidth;
     }
 
     const HE::Uint32 ViewPort::Height() const
     {
-        return this->_upStrategy->GetConfig().uHeight;
+        return this->_upStrategy->GetConfig()._uHeight;
     }
 
     HE::Bool ViewPort::Init(Core::Memory::UniquePtr<Platform::ViewPortStrategy> in_upStg,

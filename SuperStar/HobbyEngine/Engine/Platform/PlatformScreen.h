@@ -10,15 +10,15 @@ namespace Platform
 {
     struct WindowConfig
     {
-        HE::Uint32 uWidth         = 0;
-        HE::Uint32 uHeight        = 0;
+        HE::Uint32 _uWidth        = 0;
+        HE::Uint32 _uHeight       = 0;
         HE::Uint32 uViewPortCount = 0;
     };
 
     struct ViewPortConfig
     {
-        HE::Uint32 uWidth  = 0;
-        HE::Uint32 uHeight = 0;
+        HE::Uint32 _uWidth  = 0;
+        HE::Uint32 _uHeight = 0;
     };
 
     /// <summary>
@@ -101,7 +101,9 @@ namespace Platform
         /// <summary>
         /// 2Dテキスト描画
         /// </summary>
-        virtual void VDrawText2D(const Core::Math::Vector2& in_rPos, const HE::Char* in_szText,
+        virtual void VDrawText2D(const ViewPortConfig& in_rViewConfg,
+                                 const Core::Math::Vector2& in_rPos, const HE::Char* in_szText,
+                                 const HE::Uint32 in_uTextSize,
                                  const Core::Math::Rect2::EAnchor in_eAnchor,
                                  const Core::Math::Color& in_rColor) = 0;
     };

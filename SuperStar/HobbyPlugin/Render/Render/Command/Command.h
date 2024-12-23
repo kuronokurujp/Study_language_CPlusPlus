@@ -34,8 +34,9 @@ namespace Render
     /// </summary>
     struct Cmd2DTextDraw
     {
-        HE::Float32 fX = 0.0f;
-        HE::Float32 fY = 0.0f;
+        HE::Float32 fX   = 0.0f;
+        HE::Float32 fY   = 0.0f;
+        HE::Uint32 uSize = 0;
         Core::Math::Color color;
         Core::Math::Rect2::EAnchor anchor = Core::Math::Rect2::EAnchor_Left;
 
@@ -117,8 +118,8 @@ namespace Render
     /// </summary>
     extern void Command2DTextDraw(const Core::Common::Handle& in_rViewHandle,
                                   const Core::Math::Vector2& in_rPos,
-                                  const Core::Common::StringBase& in_str,
-                                  const Core::Math::Color& in_rColor,
+                                  const Core::Common::StringBase& in_str, const HE::Uint32 in_uSize,
+                                  const Core::Math::Color in_color,
                                   const Core::Math::Rect2::EAnchor in_eAnchor);
 
     /// <summary>

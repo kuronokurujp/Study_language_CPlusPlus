@@ -8,6 +8,7 @@
 namespace Render
 {
     static void _RenderCommand(const Render::Command* in_pCommand,
+                               const Platform::ViewPortConfig& in_rViewPortConfig,
                                Platform::ScreenInterface* in_pScreen)
     {
         // TODO: コマンドに応じた描画処理をする
@@ -105,8 +106,10 @@ namespace Render
             {
                 const Render::Cmd2DTextDraw* pText2D = &in_pCommand->data.text2DDraw;
 
-                in_pScreen->VDrawText2D(Core::Math::Vector2(pText2D->fX, pText2D->fY),
-                                        pText2D->szChars, pText2D->anchor, pText2D->color);
+                in_pScreen->VDrawText2D(in_rViewPortConfig,
+                                        Core::Math::Vector2(pText2D->fX, pText2D->fY),
+                                        pText2D->szChars, pText2D->uSize, pText2D->anchor,
+                                        pText2D->color);
                 break;
             }
         }
@@ -234,6 +237,12 @@ namespace Render
 
                 pViewPort->_BeginRender();
 
+                Platform::ViewPortConfig viewPortConfig;
+                {
+                    viewPortConfig._uWidth  = pViewPort->Width();
+                    viewPortConfig._uHeight = pViewPort->Height();
+                }
+
                 for (auto itrScene = m->begin(); itrScene != m->end(); ++itrScene)
                 {
                     itrScene->second->_BeginRender();
@@ -242,7 +251,7 @@ namespace Render
                     const Render::Command* pCommand = itrScene->second->_commandBuff.PopBack();
                     while (pCommand != NULL)
                     {
-                        _RenderCommand(pCommand, pPlatformScreen.get());
+                        _RenderCommand(pCommand, viewPortConfig, pPlatformScreen.get());
 
                         pCommand = itrScene->second->_commandBuff.PopBack();
                     }

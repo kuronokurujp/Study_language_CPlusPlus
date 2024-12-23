@@ -22,17 +22,17 @@ namespace PlatformSDL2
         /// </summary>
         virtual HE::Bool VRelease();
 
-        // TODO: シェーダーロード/アンロード
+        // シェーダーロード/アンロード
         HE::Bool LoadShader(const HE::Char* in_pVertexMem, const HE::Char* in_pPixelMem);
         void UnLoadShader();
 
         /// <summary>
-        /// TODO: マテリアル有効/無効
+        /// マテリアル有効/無効
         /// </summary>
         void Enable();
         void Disable();
 
-        // TODO: マテリアルに渡すプロパティ
+        // マテリアルに渡すプロパティ
         // シェーダーに行列を渡す
         void SetPropertyMatrix(const HE::UTF8* in_pName, const Core::Math::Matrix4&);
         // シェーダーにベクトルを渡す
@@ -54,17 +54,19 @@ namespace PlatformSDL2
     public:
         struct Glyph
         {
-            HE::Uint32 uUnicode = 0;
             //  テクスチャのUV値
-            HE::Float32 _fTexSU, _fTexSV;
-            HE::Float32 _fTexEU, _fTexEV;
+            HE::Float32 _fTexSU, _fTexEU;
+            HE::Float32 _fTexSV, _fTexEV;
+            HE::Uint32 _uW;
+            HE::Uint32 _uH;
         };
 
+        // TODO: 動的用のを作ったら差し替える
+        using GlyphMap = std::unordered_map<HE::Uint32, Glyph>;
+
     public:
-        /// <summary>
-        /// フォントのマテリアルを作る
-        /// </summary>
-        HE::Bool Create(void* in_pSDLTexSurf, Glyph* in_aGlyps, const HE::Uint32 in_uGlyphCount);
+        void CopyGlyphs(Glyph* in_aGlyphs, const HE::Uint32 in_uGlyphCount);
+        void CopyGlyphs(GlyphMap&& in_rrGlyphs);
 
         /// <summary>
         /// 解放
@@ -74,9 +76,7 @@ namespace PlatformSDL2
         const Glyph* GetGlyph(const HE::Uint32);
 
     private:
-        // TODO: グリフの数が不定なので固定にはできない
-        // TODO: 動的用のを作ったら差し替える
-        std::unordered_map<HE::Uint32, Glyph> _mGlyphs;
+        GlyphMap _mGlyphs;
     };
 
 }  // namespace PlatformSDL2

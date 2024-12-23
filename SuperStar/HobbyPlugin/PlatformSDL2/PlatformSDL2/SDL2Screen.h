@@ -3,7 +3,6 @@
 // プラットフォームのスクリーンインターフェイス
 // スクリーン情報取得や設定などができる
 
-#include "Engine/Common/CustomVector.h"
 #include "Engine/MiniEngine.h"
 #include "Engine/Platform/PlatformScreen.h"
 
@@ -39,8 +38,9 @@ namespace PlatformSDL2
         /// <summary>
         /// TODO: 2Dテキスト描画
         /// </summary>
-        void VDrawText2D(const Core::Math::Vector2& in_rPos, const HE::Char* in_szText,
-                         const Core::Math::Rect2::EAnchor in_eAnchor,
+        void VDrawText2D(const Platform::ViewPortConfig& in_rViewConfig,
+                         const Core::Math::Vector2& in_rPos, const HE::Char* in_szText,
+                         const HE::Uint32 in_uTextSize, const Core::Math::Rect2::EAnchor in_eAnchor,
                          const Core::Math::Color& in_rColor) override final;
 
     private:

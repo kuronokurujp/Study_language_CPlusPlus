@@ -13,20 +13,11 @@ namespace PlatformSDL2
     public:
         virtual ~VertexArray() = default;
 
-        void Bind(const Mesh::BindMeshVertexData& in_rMeshVertexData,
-                  const Mesh::BindMeshIndexData& in_rMeshIndexData)
+        void WriteVertexAndLayout(const Mesh::VertexData& in_rMeshVertexData)
         {
-            this->_uVertCount    = in_rMeshVertexData._uVerticesCount;
-            this->_uIndicesCount = in_rMeshIndexData._uIndicesCount;
+            this->_uVertCount = 0;
 
-            HE::Uint32 uVertSize = 0;
-            {
-                for (auto itr = in_rMeshVertexData._aBindLayout.begin();
-                     itr != in_rMeshVertexData._aBindLayout.end(); ++itr)
-                {
-                    uVertSize += itr->_uDataSize;
-                }
-            }
+            HE::Uint32 uVertSize = in_rMeshVertexData._uVertSize;
 
             // 頂点リストオブジェクトを作成して使用可能にする
             {
@@ -36,6 +27,8 @@ namespace PlatformSDL2
 
             // 頂点情報を作成
             {
+                this->_uVertCount = in_rMeshVertexData._uVerticesCount;
+
                 glGenBuffers(1, &this->vertexBuffer);
                 // 頂点情報を格納するバッファ生成
                 // GL_ARRAY_BUFFERで指定
@@ -48,6 +41,37 @@ namespace PlatformSDL2
                              GL_STATIC_DRAW);
             }
 
+            // データレイアウト作成
+            {
+                // xyzの頂点とuv頂点の5つの頂点
+                int layoutOffsetPointerSize = 0;
+
+                HE::Uint32 uGroupIdx = 0;
+                for (auto itr = in_rMeshVertexData._aBindLayout.begin();
+                     itr != in_rMeshVertexData._aBindLayout.end(); ++itr)
+                {
+                    // こうしないと警告でエラーになる
+                    void* pPointer = reinterpret_cast<void*>(
+                        static_cast<std::uintptr_t>(layoutOffsetPointerSize));
+
+                    // xyzの頂点データを関連付けする
+                    // グループ
+                    glEnableVertexAttribArray(uGroupIdx);
+                    glVertexAttribPointer(uGroupIdx, itr->_uItemCount, GL_FLOAT, GL_FALSE,
+                                          uVertSize, pPointer);
+
+                    // レイアウトのオフセット
+                    layoutOffsetPointerSize += itr->_uDataSize;
+
+                    ++uGroupIdx;
+                }
+            }
+        }
+
+        void WriteIndices(const Mesh::IndexData& in_rMeshIndexData)
+        {
+            this->_uIndicesCount = 0;
+
             // 頂点並びの添え字を作成
             {
                 glGenBuffers(1, &this->indexBuffer);
@@ -55,33 +79,12 @@ namespace PlatformSDL2
                 // GL_ELEMENT_ARRAY_BUFFERでインデックスバッファ専用のが作れる
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBuffer);
 
+                this->_uIndicesCount = in_rMeshIndexData._uIndicesCount;
                 // インデックス情報に書き込むデータサイズ計算
                 int indexSize = this->_uIndicesCount * sizeof(in_rMeshIndexData._pIndices[0]);
 
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexSize, in_rMeshIndexData._pIndices,
                              GL_STATIC_DRAW);
-            }
-
-            // データレイアウト作成
-            {
-                // xyzの頂点とuv頂点の5つの頂点
-                float strideSize = uVertSize;
-                // ItemMax;
-                int layoutOffsetPointerSize = 0;
-
-                HE::Uint32 uGroupIdx = 0;
-                for (auto itr = in_rMeshVertexData._aBindLayout.begin();
-                     itr != in_rMeshVertexData._aBindLayout.end(); ++itr)
-                {
-                    // xyzの頂点データを関連付けする
-                    // グループ
-                    glEnableVertexAttribArray(uGroupIdx);
-                    glVertexAttribPointer(uGroupIdx, itr->_uItemCount, GL_FLOAT, GL_FALSE,
-                                          static_cast<GLsizei>(strideSize), 0);
-                    // TODO: レイアウトのオフセットはどうするか
-                    layoutOffsetPointerSize += itr->_uDataSize;
-                    ++uGroupIdx;
-                }
             }
         }
 
@@ -92,13 +95,7 @@ namespace PlatformSDL2
             glDeleteVertexArrays(1, &this->vertexArray);
         }
 
-        void SetActive()
-        {
-            HE_ASSERT(glIsBuffer(this->vertexBuffer));
-            HE_ASSERT(glIsBuffer(this->indexBuffer));
-
-            glBindVertexArray(this->vertexArray);
-        }
+        void SetActive() { glBindVertexArray(this->vertexArray); }
 
         const HE::Uint32 GetIndicesCount() const { return this->_uIndicesCount; }
         const HE::Uint32 GetVertsCount() const { return this->_uVertCount; }
@@ -127,23 +124,49 @@ namespace PlatformSDL2
         HE_SAFE_DELETE_MEM(this->_pVertexArray);
     }
 
-    void Mesh::BindMeshData(const BindMeshVertexData& in_rMeshVertexData,
-                            const BindMeshIndexData& in_rMeshIndexData)
+    void Mesh::WriteDrawData(const VertexData& in_rMeshVertexData,
+                             const IndexData& in_rMeshIndexData)
     {
         auto pVertexArray = reinterpret_cast<VertexArray*>(this->_pVertexArray);
         HE_ASSERT_RETURN(pVertexArray);
 
-        pVertexArray->Bind(in_rMeshVertexData, in_rMeshIndexData);
+        // 頂点とそれに紐づいた頂点レイアウトの書き込み
+        pVertexArray->WriteVertexAndLayout(in_rMeshVertexData);
+
+        // 頂点と紐づいた頂点インデックスの書き込み
+        if ((in_rMeshIndexData._pIndices != NULL) && (0 < in_rMeshIndexData._uIndicesCount))
+        {
+            pVertexArray->WriteIndices(in_rMeshIndexData);
+        }
     }
 
-    void Mesh::Draw()
+    void Mesh::FreeDrawData()
+    {
+        auto pVertexArray = reinterpret_cast<VertexArray*>(this->_pVertexArray);
+        HE_ASSERT_RETURN(pVertexArray);
+
+        pVertexArray->Release();
+    }
+
+    void Mesh::DrawByVertexOnly(const HE::Uint32 in_uMode)
     {
         auto pVertexArray = reinterpret_cast<VertexArray*>(this->_pVertexArray);
         HE_ASSERT_RETURN(pVertexArray);
 
         pVertexArray->SetActive();
 
-        ::glDrawElements(GL_TRIANGLE_STRIP, pVertexArray->GetIndicesCount(), GL_UNSIGNED_INT,
-                         nullptr);
+        ::glDrawArrays(in_uMode, 0, pVertexArray->GetVertsCount());
     }
+
+    void Mesh::DrawByVertexAndIndex(const HE::Uint32 in_uMode)
+    {
+        auto pVertexArray = reinterpret_cast<VertexArray*>(this->_pVertexArray);
+        HE_ASSERT_RETURN(pVertexArray);
+        HE_ASSERT_RETURN(0 < pVertexArray->GetIndicesCount());
+
+        pVertexArray->SetActive();
+
+        ::glDrawElements(in_uMode, pVertexArray->GetIndicesCount(), GL_UNSIGNED_INT, nullptr);
+    }
+
 }  // namespace PlatformSDL2

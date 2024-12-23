@@ -8,6 +8,8 @@
 #include "Engine/Engine.h"
 
 // GUIテスト
+// ウィンドウが開く
+// TODO: ウィンドウで表示後に一定時間後に画像保存する仕組みがほしいな
 TEST_CASE("SDL2 Font Load GUITest")
 {
     HE::Uint32 uStep = 0;
@@ -21,7 +23,7 @@ TEST_CASE("SDL2 Font Load GUITest")
             auto pPlatformModule = HE_ENGINE.PlatformModule();
             auto pRenderModule   = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
 
-            if (uStep == 1)
+            if (uStep == 0)
             {
                 auto pAssetManagerModule =
                     HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
@@ -29,33 +31,27 @@ TEST_CASE("SDL2 Font Load GUITest")
 
                 // フォントデータのバイナリアセットを作成
                 {
-                    // TODO: ロードするフォントファイルパスを渡す
+                    // ロードするフォントファイルパスを渡す
                     // シェーダーファイルも渡す.(プラットフォームによっては使わない)
-                    auto bRet = pPlatformModule->VFont()->VLoad(32, {"Font/TestFont.ttf",
-                                                                     "Shader/Font.vert",
-                                                                     "Shader/Font.frag"});
+                    auto bRet =
+                        pPlatformModule->VFont()->VLoad(Platform::EFontSize_64,
+                                                        {"Font/TestFont.ttf", "Shader/Font.vert",
+                                                         "Shader/Font.frag"});
                     CHECK(bRet);
                 }
 
-                // TODO: プラットフォームを他のモジュールから絶対参照しないようにする
-                // 他のモジュールの事情に合わせる作りすると拡張と修正が困難だから
-                // プラットフォームはロウモジュールでロウモジュールは他のモジュールの参照をしてはいけない
-                // 依存していたらエラーにする仕組みを用意するべきかも
-
                 ++uStep;
-                // TODO: ここまで動くか
                 return FALSE;
             }
-            else if (uStep == 0)
+            else if (uStep == 1)
             {
                 Core::Common::Handle windowHandle;
                 Core::Common::Handle viewPortHandle;
                 {
-                    // TODO: 外部設定が必要かも
                     // ゲームウィンドウを生成
                     windowHandle = pRenderModule->NewWindow(640, 480);
 
-                    // TODO: 画面に表示するビューポート
+                    // 画面に表示するビューポート
                     // ゲームウィンドウで利用するビューポートを追加
                     viewPortHandle = pRenderModule->AddViewPort(windowHandle, 640, 480);
                 }
@@ -76,12 +72,26 @@ TEST_CASE("SDL2 Font Load GUITest")
             }
             else if (uStep == 2)
             {
-                // TODO: ウィンドウが閉じたら終了
-                // TODO: 作成したリソース解放される
-                Core::Common::FixedString1024 s(HE_STR_TEXT("T"));
-                Render::Command2DTextDraw(sceneHandle, Core::Math::Vector2(0.0f, 0.0f), s,
+                // ウィンドウが閉じたら終了
+
+                // TODO: UIテキストを表示
+                // 2改行チェック
+                Core::Common::FixedString1024 s(HE_STR_TEXT("カTestあ\n12\n34"));
+                Render::Command2DTextDraw(sceneHandle, Core::Math::Vector2(0.0f, 0.0f), s, 32,
                                           Core::Math::RGB::White,
-                                          Core::Math::Rect2::EAnchor::EAnchor_Center);
+                                          Core::Math::Rect2::EAnchor::EAnchor_Left);
+
+                // 1改行チェック
+                Core::Common::FixedString1024 s1(HE_STR_TEXT("T\nT"));
+                Render::Command2DTextDraw(sceneHandle, Core::Math::Vector2(0.0f, 32.0f * 3.f), s1,
+                                          32, Core::Math::RGB::White,
+                                          Core::Math::Rect2::EAnchor::EAnchor_Left);
+
+                //  改行なしチェック
+                Core::Common::FixedString1024 s2(HE_STR_TEXT("Ss"));
+                Render::Command2DTextDraw(sceneHandle, Core::Math::Vector2(0.0f, 32.0f * 5.f), s2,
+                                          32, Core::Math::RGB::White,
+                                          Core::Math::Rect2::EAnchor::EAnchor_Left);
 
                 return FALSE;
             }

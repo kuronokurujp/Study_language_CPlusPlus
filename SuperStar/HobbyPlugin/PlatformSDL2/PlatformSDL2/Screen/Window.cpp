@@ -25,12 +25,12 @@ namespace PlatformSDL2
         int y = 0;
         if (::SDL_GetCurrentDisplayMode(0, &dm) == 0)
         {
-            x = (dm.w - this->_config.uWidth) >> 1;
-            y = (dm.h - this->_config.uHeight) >> 1;
+            x = (dm.w - this->_config._uWidth) >> 1;
+            y = (dm.h - this->_config._uHeight) >> 1;
         }
 
         // ウィンドウは最初は非表示にしておく
-        this->_pWindow = ::SDL_CreateWindow("", x, y, this->_config.uWidth, this->_config.uHeight,
+        this->_pWindow = ::SDL_CreateWindow("", x, y, this->_config._uWidth, this->_config._uHeight,
                                             SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
 
         // Windowに紐づいているOpenGLのコンテキストを生成

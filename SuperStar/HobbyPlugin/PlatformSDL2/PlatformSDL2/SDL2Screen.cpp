@@ -53,12 +53,24 @@ namespace PlatformSDL2
         s_pDummyWindow  = SDL_CreateWindow("", 0, 0, 0, 0, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
         s_pShareContext = SDL_GL_CreateContext(reinterpret_cast<SDL_Window*>(s_pDummyWindow));
         {
+            // OpenGLの拡張を有効に
+            glewExperimental  = GL_TRUE;
             GLenum glewResult = glewInit();
             if (glewResult != GLEW_OK)
             {
                 HE_ASSERT(0);
                 HE_LOG_LINE(HE_STR_TEXT("Unable to initialize GLEW: %s"),
                             ::glewGetErrorString(glewResult));
+            }
+
+            // 拡張機能の確認
+            if (GLEW_ARB_texture_non_power_of_two)
+            {
+                HE_LOG_LINE(HE_STR_TEXT("GL_ARB_texture_non_power_of_two is supported!"));
+            }
+            else
+            {
+                HE_LOG_LINE(HE_STR_TEXT("GL_ARB_texture_non_power_of_two is NOT supported."));
             }
         }
 
@@ -137,53 +149,52 @@ namespace PlatformSDL2
         ::glClearColor(fR, fG, fB, 1.0f);
     }
 
-    void Screen::VDrawText2D(const Core::Math::Vector2& in_rPos, const HE::Char* in_szText,
+    void Screen::VDrawText2D(const Platform::ViewPortConfig& in_rViewConfig,
+                             const Core::Math::Vector2& in_rPos, const HE::Char* in_szText,
+                             const HE::Uint32 in_uTextSize,
                              const Core::Math::Rect2::EAnchor in_eAnchor,
                              const Core::Math::Color& in_rColor)
     {
+        // TODO: アンカー処理がまだ
+
         auto pFontInterface = this->_pSDL2Module->VFont();
         Font* pFont         = reinterpret_cast<Font*>(pFontInterface.get());
+        HE_ASSERT_RETURN(pFont);
 
-        // TODO: フォントのマテリアルを取得
+        // フォントのマテリアルを取得
         auto pFontMat = pFont->GetMaterial();
-        HE_ASSERT(pFontMat);
-        if (pFontMat == NULL) return;
+        HE_ASSERT_RETURN(pFontMat);
 
-        // TODO: フォントのテクスチャを取得
+        // フォントのテクスチャを取得
         auto pFontTex = pFont->GetTexture();
-        HE_ASSERT(pFontTex);
-        if (pFontTex == NULL) return;
+        HE_ASSERT_RETURN(pFontTex);
 
-        // TODO: 文字列に合わせて頂点配列を作り描画
+        // フォントの頂点データ構造体
+        struct Vertex
+        {
+            // 頂点の位置
+            Core::Math::Vector3 position;
+            // UV座標
+            Core::Math::Vector2 uv;
+        };
+
+        // TODO: 動的用を作ったら差し替える
+        static std::vector<Vertex> s_vertices;
+        s_vertices.clear();
+
+        // 文字列に合わせて頂点配列を作り描画
         Mesh* pMesh = reinterpret_cast<Mesh*>(this->_pFontMesh);
         {
-            // フォントの頂点データ構造体
-            struct Vertex
-            {
-                // 頂点の位置
-                Core::Math::Vector3 position;
-                // UV座標
-                Core::Math::Vector2 uv;
-            };
-
-            // TODO: 試す
-            // TODO: 頂点やインデックスは数を固定にできないの
-            // TODO: 動的用を作ったら差し替える
-            static std::vector<Vertex> s_vertices;
-            static std::vector<HE::Uint32> s_indices;
-            s_vertices.clear();
-            s_indices.clear();
-
             // インデックスオフセット
-            GLuint indexOffset = 0;
-            // TODO: 適当、後で整理
-            HE::Float32 charWidth  = 1.0f;
-            HE::Float32 charHeight = 1.0f;
+            HE::Uint32 uIndexOffset = 0;
+            // メッシュのサイズ
+            constexpr HE::Float32 fMeshWidth  = 1.0f;
+            constexpr HE::Float32 fMeshHeight = 1.0f;
 
-            HE::Float32 sx = -charWidth * 0.5f;
-            HE::Float32 x  = sx;
-            HE::Float32 sy = -charHeight * 0.5f;
-            HE::Float32 y  = sy;
+            HE::Float32 fSX = 0;
+            HE::Float32 fSY = 0;
+            HE::Float32 fX  = fSX;
+            HE::Float32 fY  = fSY;
 
             Core::Common::g_szTempFixedString1024 = in_szText;
             auto itrEnd                           = Core::Common::g_szTempFixedString1024.End();
@@ -192,144 +203,150 @@ namespace PlatformSDL2
                 if ((*itr)[0] == HE_STR_TEXT('\n'))
                 {
                     // 改行したら左端に戻す
-                    x = sx;
-
+                    fX = fSX;
                     // 1行分下にずらす
-                    // TODO: ずらす量はテスト
-                    y -= charHeight;
+                    fY -= fMeshHeight;
+
+                    // 改行時にダミー頂点を挿入してつながりをリセット
+                    // 前の行の最後の頂点をコピー
+                    s_vertices.push_back(s_vertices.back());
+                    // 新しい行の左下
+                    s_vertices.push_back({Core::Math::Vector3(fX, fY - fMeshHeight, 0.0f),
+                                          // UVは仮の値
+                                          Core::Math::Vector2(0.0f, 0.0f)});
                     continue;
                 }
 
-                // TODO: UTF8からunicodeに変える
-                HE::Uint32 uUnicode = 0;
-                // TODO: まとめた方がいい？
-                {
-                    HE::UTF8 c     = (*itr)[0];
-                    HE::UTF8* utf8 = &(*itr)[0];
-                    if ((c & 0x80) == 0x00)
-                    {  // 1バイト文字 (ASCII)
-                        uUnicode = c;
-                    }
-                    else if ((c & 0xE0) == 0xC0)
-                    {  // 2バイト文字
-                        uUnicode = ((c & 0x1F) << 6) | (utf8[1] & 0x3F);
-                    }
-                    else if ((c & 0xF0) == 0xE0)
-                    {  // 3バイト文字
-                        uUnicode = ((c & 0x0F) << 12) | ((utf8[1] & 0x3F) << 6) | (utf8[2] & 0x3F);
-                    }
-                    else if ((c & 0xF8) == 0xF0)
-                    {  // 4バイト文字
-                        uUnicode = ((c & 0x07) << 18) | ((utf8[1] & 0x3F) << 12) |
-                                   ((utf8[2] & 0x3F) << 6) | (utf8[3] & 0x3F);
-                    }
-                    else
-                    {
-                        // TODO: エラーにする？
-                    }
-                }
+                // UTF8からunicodeに変える
+                const HE::Uint32 uUnicode = Core::Common::GetUTF8CharToUnicode(*itr);
 
-                // TODO: グリフのUV値を元に設定
-                auto pGlpyh = pFontMat->GetGlyph(uUnicode);
+                // グリフのUV値を元に設定
+                auto pGlyph = pFontMat->GetGlyph(uUnicode);
 
-                // 頂点データ：四角形の2つの三角形として格納 (時計回り)
+                // 頂点データ：四角形をGL_TRIANGLE_STRIPに対応させる (時計回り)
                 // 左下
-                s_vertices.push_back({Core::Math::Vector3(x, y, 0.0f),
-                                      Core::Math::Vector2(pGlpyh->_fTexSU, pGlpyh->_fTexEV)});
-                // 右下
-                s_vertices.push_back({Core::Math::Vector3(x + charWidth, y, 0.0f),
-                                      Core::Math::Vector2(pGlpyh->_fTexEU, pGlpyh->_fTexEV)});
-                // 右上
-                s_vertices.push_back({Core::Math::Vector3(x + charWidth, y + charHeight, 0.0f),
-                                      Core::Math::Vector2(pGlpyh->_fTexEU, pGlpyh->_fTexSV)});
-                // 左上
-                s_vertices.push_back({Core::Math::Vector3(x, y + charHeight, 0.0f),
-                                      Core::Math::Vector2(pGlpyh->_fTexSU, pGlpyh->_fTexSV)});
+                s_vertices.push_back({Core::Math::Vector3(fX, fY - fMeshHeight, 0.0f),
+                                      Core::Math::Vector2(pGlyph->_fTexSU, pGlyph->_fTexEV)});
 
-                // インデックスデータ：2つの三角形 (0, 1, 2) と (2, 3, 0)
-                s_indices.push_back(indexOffset + 0);
-                s_indices.push_back(indexOffset + 1);
-                s_indices.push_back(indexOffset + 2);
-                s_indices.push_back(indexOffset + 2);
-                s_indices.push_back(indexOffset + 3);
-                s_indices.push_back(indexOffset + 0);
+                // 左上
+                s_vertices.push_back({Core::Math::Vector3(fX, fY, 0.0f),
+                                      Core::Math::Vector2(pGlyph->_fTexSU, pGlyph->_fTexSV)});
+                // 右下
+                s_vertices.push_back({Core::Math::Vector3(fX + fMeshWidth, fY - fMeshHeight, 0.0f),
+                                      Core::Math::Vector2(pGlyph->_fTexEU, pGlyph->_fTexEV)});
+                // 右上
+                s_vertices.push_back({Core::Math::Vector3(fX + fMeshWidth, fY, 0.0f),
+                                      Core::Math::Vector2(pGlyph->_fTexEU, pGlyph->_fTexSV)});
+
+                /*
+                                // 左下
+                                s_vertices.push_back(
+                                    {Core::Math::Vector3(-1.f, -1.f, 0.0f), Core::Math::Vector2(0,
+                   1)});
+                                // 右下
+                                s_vertices.push_back(
+                                    {Core::Math::Vector3(1.f, -1.f, 0.0f), Core::Math::Vector2(1,
+                   1)});
+                                // 右上
+                                s_vertices.push_back(
+                                    {Core::Math::Vector3(1.f, 1.f, 0.0f), Core::Math::Vector2(1,
+                   0)});
+                                // 左上
+                                s_vertices.push_back(
+                                    {Core::Math::Vector3(-1.f, 1.f, 0.0f), Core::Math::Vector2(0,
+                   0)});
+
+                                // インデックスデータ：2つの三角形 (0, 1, 2) と (2, 3, 0)
+                                s_indices.push_back(0);
+                                s_indices.push_back(1);
+                                s_indices.push_back(2);
+                                s_indices.push_back(2);
+                                s_indices.push_back(3);
+                                s_indices.push_back(0);
+                                */
 
                 // 次の文字の位置に移動
-                x += charWidth;
+                fX += fMeshWidth;
                 // 1文字あたり4つの頂点
-                indexOffset += 4;
+                uIndexOffset += 4;
             }
 
             //  頂点など描画に必要な情報をバインド
             {
-                Mesh::BindMeshIndexData bindMeshIndexData;
+                Mesh::IndexData bindMeshIndexData;
                 {
-                    bindMeshIndexData._pIndices      = s_indices.data();
-                    bindMeshIndexData._uIndicesCount = s_indices.size();
+                    bindMeshIndexData._pIndices      = NULL;
+                    bindMeshIndexData._uIndicesCount = 0;
                 }
 
-                Mesh::BindMeshVertexData bindMeshVertexData;
+                Mesh::VertexData bindMeshVertexData;
                 {
                     bindMeshVertexData._pVertices      = s_vertices.data();
                     bindMeshVertexData._uVerticesCount = s_vertices.size();
+                    bindMeshVertexData._uVertSize      = sizeof(Vertex);
                     bindMeshVertexData._aBindLayout    = {
-                        Mesh::BindMeshLayoutData(3, sizeof(Vertex::position)),
-                        Mesh::BindMeshLayoutData(2, sizeof(Vertex::uv)),
+                        Mesh::LayoutData(3, sizeof(Vertex::position)),
+                        Mesh::LayoutData(2, sizeof(Vertex::uv)),
                     };
                 }
 
-                pMesh->BindMeshData(bindMeshVertexData, bindMeshIndexData);
+                pMesh->WriteDrawData(bindMeshVertexData, bindMeshIndexData);
             }
         }
 
-        // TODO: 機能有効
+        // 機能有効
         {
-            // TODO: テクスチャを有効
-            // pFontTex->VEnable();
-            // TODO: マテリアルを有効
+            // テクスチャを有効
+            pFontTex->Enable();
+            // マテリアルを有効
             pFontMat->Enable();
         }
 
-#if 0
-        // TODO: 画面の縦横を設定
-        // プロパティ名固定は大丈夫なのか?
+        // 射影はシンプルなのを利用
         {
             Core::Math::Matrix4 viewProj;
             Core::Math::Matrix4::OutputSimpleViewProj(&viewProj,
                                                       static_cast<HE::Float32>(
-                                                          pViewPortConfig->uWidth),
+                                                          in_rViewConfig._uWidth),
                                                       static_cast<HE::Float32>(
-                                                          pViewPortConfig->uHeight));
+                                                          in_rViewConfig._uHeight));
             pFontMat->SetPropertyMatrix("uViewProj", viewProj);
         }
 
-        // TODO: 座標を設定
+        // 座標を設定
         {
             Core::Math::Matrix4 scaleMat;
-            Core::Math::Matrix4::OutputScale(&scaleMat, 32.0f, 32.0f, 1.0f);
+            Core::Math::Matrix4::OutputScale(&scaleMat, in_uTextSize, in_uTextSize, 1.0f);
 
             Core::Math::Matrix4 transMat;
-            Core::Math::Matrix4::OutputTranslation(&transMat,
-                                                   Core::Math::Vector3(in_rPos._fX, in_rPos._fY,
-                                                                       0.0f));
+            // 原点を画面の左上にする
+            Core::Math::Matrix4::OutputTranslation(
+                &transMat,
+                Core::Math::Vector3(in_rPos._fX - (in_rViewConfig._uWidth >> 1),
+                                    -in_rPos._fY + (in_rViewConfig._uHeight >> 1), 0.0f));
 
             Core::Math::Matrix4 world;
             world.Set(scaleMat);
 
             world.Mul(transMat);
-            // プロパティ名固定は大丈夫なのか?
             pFontMat->SetPropertyMatrix("uWorldTransform", world);
         }
-#endif
-        // TODO: バインドやプロパティ設定などすべての準備が整ったので描画
-        pMesh->Draw();
 
-        // TODO: 機能無効
+        // フォントテクスチャ設定
         {
-            // TODO: マテリアルを無効
-            pFontMat->Disable();
-            // TODO: テクスチャを無効
-            // pFontTex->VDisable();
+            pFontMat->SetPropertyTexture("uTexture", pFontTex.get());
         }
+
+        // すべての準備が整ったので描画
+        pMesh->DrawByVertexOnly(GL_TRIANGLE_STRIP);
+
+        // 機能無効
+        {
+            // マテリアルを無効
+            pFontMat->Disable();
+            // テクスチャを無効
+            pFontTex->Disable();
+        }
+        pMesh->FreeDrawData();
     }
 }  // namespace PlatformSDL2

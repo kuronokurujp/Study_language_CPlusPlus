@@ -72,8 +72,9 @@ namespace PlatformSDL2
         }
 
         // シェーダープログラム内のuniformをリストアップする関数
-        void ListShaderUniforms()
+        void LogUniformNames()
         {
+#ifdef HE_ENGINE_DEBUG
             GLint numUniforms = 0;
             auto program      = this->shaderProgram;
             glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUniforms);
@@ -97,11 +98,13 @@ namespace PlatformSDL2
                 HE_LOG_LINE(HE_STR_TEXT("Name %s. Type %d. Size %d. Location %d."),
                             uniformName.data(), type, size, location);
             }
+#endif
         }
 
         // シェーダープログラム内の属性をリストアップする関数
-        void ListShaderAttributes()
+        void LogAttributeNames()
         {
+#ifdef HE_ENGINE_DEBUG
             GLint numAttributes = 0;
             auto program        = this->shaderProgram;
 
@@ -126,6 +129,7 @@ namespace PlatformSDL2
                 HE_LOG_LINE(HE_STR_TEXT("Name: %s, Type: %d Location: %d"), attributeName.data(),
                             type, location);
             }
+#endif
         }
 
         // シェーダーを有効化
@@ -328,7 +332,7 @@ namespace PlatformSDL2
 
     void Material::Enable()
     {
-        // TODO: OpenGLのシェーダを有効
+        // OpenGLのシェーダを有効
         OpenGLShader* pShader = reinterpret_cast<OpenGLShader*>(this->_pShader);
         pShader->SetActive();
     }
@@ -367,34 +371,9 @@ namespace PlatformSDL2
         return TRUE;
     }
 
-    HE::Bool FontMaterial::Create(void* in_pSDLTexSurf, Glyph* in_aGlyphs,
-                                  const HE::Uint32 in_uGlyphCount)
+    void FontMaterial::CopyGlyphs(GlyphMap&& in_rrGlyphs)
     {
-        SDL_Surface* pSurf = reinterpret_cast<SDL_Surface*>(in_pSDLTexSurf);
-
-        // TODO: 文字テクスチャを指すUV値を計算
-        const HE::Float32 fGlyphW =
-            static_cast<HE::Float32>(pSurf->w) / static_cast<HE::Float32>(in_uGlyphCount);
-
-        const HE::Float32 fGlyphH = static_cast<HE::Float32>(pSurf->h);
-        const HE::Float32 fInvW   = 1.0f / static_cast<HE::Float32>(pSurf->w);
-        for (HE::Uint32 i = 0; i < in_uGlyphCount; ++i)
-        {
-            Glyph* pGlyph = &in_aGlyphs[i];
-
-            // UV座標を設定
-            const HE::Float32 fTextUOffset = static_cast<HE::Float32>(i) * fGlyphW;
-            pGlyph->_fTexSU                = fTextUOffset * fInvW;
-            pGlyph->_fTexSV                = 0.0f;
-
-            const HE::Float32 fTextUNextOffset = static_cast<HE::Float32>(i + 1) * fGlyphW;
-            pGlyph->_fTexEU                    = fTextUNextOffset * fInvW;
-            pGlyph->_fTexEV                    = fGlyphH;
-
-            this->_mGlyphs.insert(std::make_pair(pGlyph->uUnicode, *pGlyph));
-        }
-
-        return TRUE;
+        this->_mGlyphs = std::move(in_rrGlyphs);
     }
 
     HE::Bool FontMaterial::VRelease()

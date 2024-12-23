@@ -161,7 +161,6 @@ namespace Core::Math
     /// <summary>
     /// Creates the translation.
     /// </summary>
-    /// <param name="in_rPos">The in r position.</param>
     void Matrix4::OutputTranslation(Matrix4* out, const Vector3& in_rPos)
     {
         const HE::Float32 faTemp[4][4] = {

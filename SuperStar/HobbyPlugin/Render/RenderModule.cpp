@@ -40,8 +40,8 @@ namespace Render
 
         Platform::WindowConfig platformWindowConfig;
         {
-            platformWindowConfig.uWidth         = in_w;
-            platformWindowConfig.uHeight        = in_h;
+            platformWindowConfig._uWidth        = in_w;
+            platformWindowConfig._uHeight       = in_h;
             platformWindowConfig.uViewPortCount = 1;
         }
 
@@ -102,26 +102,26 @@ namespace Render
         auto rWindowConfig = pWindow->_upStrategy->GetConfig();
         Platform::ViewPortConfig viewPortConfig;
         {
-            viewPortConfig.uWidth  = in_w;
-            viewPortConfig.uHeight = in_h;
+            viewPortConfig._uWidth  = in_w;
+            viewPortConfig._uHeight = in_h;
         }
 
-        if (viewPortConfig.uHeight <= 0)
+        if (viewPortConfig._uHeight <= 0)
         {
-            viewPortConfig.uHeight = rWindowConfig.uHeight;
+            viewPortConfig._uHeight = rWindowConfig._uHeight;
         }
-        else if (rWindowConfig.uHeight < viewPortConfig.uHeight)
+        else if (rWindowConfig._uHeight < viewPortConfig._uHeight)
         {
-            viewPortConfig.uHeight = rWindowConfig.uHeight;
+            viewPortConfig._uHeight = rWindowConfig._uHeight;
         }
 
-        if (viewPortConfig.uWidth <= 0)
+        if (viewPortConfig._uWidth <= 0)
         {
-            viewPortConfig.uWidth = rWindowConfig.uWidth;
+            viewPortConfig._uWidth = rWindowConfig._uWidth;
         }
-        else if (rWindowConfig.uWidth < viewPortConfig.uWidth)
+        else if (rWindowConfig._uWidth < viewPortConfig._uWidth)
         {
-            viewPortConfig.uWidth = rWindowConfig.uWidth;
+            viewPortConfig._uWidth = rWindowConfig._uWidth;
         }
 
         auto pPlatform  = this->GetDependenceModule<Platform::PlatformModule>();

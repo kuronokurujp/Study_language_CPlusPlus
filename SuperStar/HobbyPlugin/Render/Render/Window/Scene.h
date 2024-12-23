@@ -27,7 +27,6 @@ namespace Render
         void Release();
 
     protected:
-
         HE::Bool _Begin(Core::Memory::UniquePtr<Platform::SceneStrategyInterface>);
         void _End();
         void _Update(const HE::Float32);

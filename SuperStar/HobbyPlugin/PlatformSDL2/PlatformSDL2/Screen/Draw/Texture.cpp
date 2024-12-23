@@ -7,11 +7,14 @@
 
 namespace PlatformSDL2
 {
-    TextureBase::TextureBase(const HE::Uint32 in_uType)
+
+    TextureBase::TextureBase(const HE::Uint32 in_uType, const HE::Uint32 in_uUnitID)
     {
         this->_Clear();
 
         this->_uTextureType = in_uType;
+        this->_uUnitID      = in_uUnitID;
+        this->_uUnitIdx     = this->_uUnitID - GL_TEXTURE0;
     }
 
     HE::Bool TextureBase::Release()
@@ -24,6 +27,7 @@ namespace PlatformSDL2
 
         glDeleteTextures(1, reinterpret_cast<GLuint*>(&this->_uTextureID));
         this->_uTextureID = 0;
+        this->_uUnitID    = 0;
 
         return TRUE;
     }
@@ -31,8 +35,13 @@ namespace PlatformSDL2
     void TextureBase::Enable()
     {
         // 画像を書き込むためにテクスチャを有効化
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(this->_uUnitID);
         ::glBindTexture(this->_uTextureType, this->_uTextureID);
+
+        // TODO: 使うテクスチャーの縦横
+        GLint width, height;
+        glGetTexLevelParameteriv(this->_uTextureType, 0, GL_TEXTURE_WIDTH, &width);
+        glGetTexLevelParameteriv(this->_uTextureType, 0, GL_TEXTURE_HEIGHT, &height);
     }
 
     void TextureBase::Disable()
@@ -40,8 +49,9 @@ namespace PlatformSDL2
         ::glBindTexture(this->_uTextureType, 0);
     }
 
-    TextureImage::TextureImage(const HE::Uint32 in_uType, void* in_pImg, const HE::Uint32 in_uSize)
-        : TextureBase(in_uType)
+    TextureImage::TextureImage(const HE::Uint32 in_uType, const HE::Uint32 in_uUnitID,
+                               void* in_pImg, const HE::Uint32 in_uSize)
+        : TextureBase(in_uType, in_uUnitID)
     {
         HE_ASSERT_RETURN(in_pImg);
         HE_ASSERT_RETURN(0 < in_uSize);
@@ -117,6 +127,8 @@ namespace PlatformSDL2
         // テクスチャのフィルタリングをバイリニアにする
         ::glTexParameteri(this->_uTextureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         ::glTexParameteri(this->_uTextureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        ::glTexParameteri(this->_uTextureType, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        ::glTexParameteri(this->_uTextureType, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         if (::glGetError() != GL_NO_ERROR)
         {
@@ -142,24 +154,19 @@ namespace PlatformSDL2
 #endif
     }
 
-    TextureSurface::TextureSurface(const HE::Uint32 in_uType, void* in_pPixel,
-                                   const HE::Uint32 in_uWidth, const HE::Uint32 in_uHeight)
-        : TextureBase(in_uType)
+    TextureSurface::TextureSurface(const HE::Uint32 in_uType, const HE::Uint32 in_uUnitID,
+                                   void* in_pPixel, const HE::Uint32 in_uWidth,
+                                   const HE::Uint32 in_uHeight)
+        : TextureBase(in_uType, in_uUnitID)
     {
         HE_ASSERT(in_pPixel);
-        // テクスチャユニット数
-        {
-            GLint textureUnits = 0;
-            ::glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &textureUnits);
-            HE_LOG_LINE(HE_STR_TEXT("GPU TextureUnitNum %d"), textureUnits);
-        }
 
         // テクスチャ生成
-        ::glGenTextures(1, reinterpret_cast<GLuint*>(&this->_uTextureID));
+        ::glGenTextures(1, &this->_uTextureID);
         ::glBindTexture(this->_uTextureType, this->_uTextureID);
 
         // 生成したテクスチャをピクセルに書き込む
-        ::glTexImage2D(this->_uTextureType, 0, GL_RGBA, in_uWidth, in_uHeight, 0, GL_BGRA,
+        ::glTexImage2D(this->_uTextureType, 0, GL_RGBA, in_uWidth, in_uHeight, 0, GL_RGBA,
                        GL_UNSIGNED_BYTE, in_pPixel);
         auto error = ::glGetError();
         if (error != GL_NO_ERROR)
@@ -168,10 +175,13 @@ namespace PlatformSDL2
             HE_ASSERT(FALSE);
             return;
         }
-
         // テクスチャのフィルタリングをバイリニアにする
         ::glTexParameteri(this->_uTextureType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         ::glTexParameteri(this->_uTextureType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        // ラップモードを設定
+        ::glTexParameteri(this->_uTextureType, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        ::glTexParameteri(this->_uTextureType, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         if (::glGetError() != GL_NO_ERROR)
         {
             HE_ASSERT(FALSE);

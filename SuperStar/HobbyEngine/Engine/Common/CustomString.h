@@ -419,6 +419,11 @@ namespace Core::Common
         }
     }
 
+    /// <summary>
+    /// UTF8の文字からユニコード値にして返す
+    /// </summary>
+    extern HE::Uint32 GetUTF8CharToUnicode(const HE::UTF8*);
+
     // テンプレートクラス FixedString の部分的な型特性
     template <typename T>
     struct IsFixedString : std::false_type

@@ -15,41 +15,36 @@
 
 namespace Core::Common
 {
-    FixedString16 g_szTempFixedString16;
-    FixedString32 g_szTempFixedString32;
-    FixedString64 g_szTempFixedString64;
-    FixedString128 g_szTempFixedString128;
-    FixedString256 g_szTempFixedString256;
-    FixedString512 g_szTempFixedString512;
-    FixedString1024 g_szTempFixedString1024;
-
+    namespace Local
+    {
 #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
 #else
-    static HE::Uint32 _GetUTF8CharOffset(const HE::Uint8 in_char)
-    {
-        if (in_char == 0x00) return 0;
+        static HE::Uint32 GetUTF8CharOffset(const HE::Uint8 in_char)
+        {
+            if (in_char == 0x00) return 0;
 
-        // UTF8のコード表を見ると1byteが1文字とか2byteが1文字とかある
-        // https://seiai.ed.jp/sys/text/java/utf8table.html
-        // 1byteが1文字
-        if (in_char < 0x80) return 1;
-        // 2byteが1文字
-        else if (in_char < 0xE0)
-            return 2;
-        // 3byteが1文字
-        else if (in_char < 0xF0)
-            return 3;
-        // 4byteが1文字
-        else if (in_char < 0xF8)
-            return 4;
-        // 5byteが1文字
-        else if (in_char < 0xFC)
-            return 5;
+            // UTF8のコード表を見ると1byteが1文字とか2byteが1文字とかある
+            // https://seiai.ed.jp/sys/text/java/utf8table.html
+            // 1byteが1文字
+            if (in_char < 0x80) return 1;
+            // 2byteが1文字
+            else if (in_char < 0xE0)
+                return 2;
+            // 3byteが1文字
+            else if (in_char < 0xF0)
+                return 3;
+            // 4byteが1文字
+            else if (in_char < 0xF8)
+                return 4;
+            // 5byteが1文字
+            else if (in_char < 0xFC)
+                return 5;
 
-        // 6byteが1文字
-        return 6;
-    }
+            // 6byteが1文字
+            return 6;
+        }
 #endif
+    }  // namespace Local
 
     StringBase::StringBase(HE::Char* in_szBuff, const HE::Uint32 in_uCapacity,
                            const HE::Bool in_bUseBuff)
@@ -218,7 +213,7 @@ namespace Core::Common
             // 終端があれば終了する
             if (c == 0x00) break;
 
-            uOffset = _GetUTF8CharOffset(c);
+            uOffset = Local::GetUTF8CharOffset(c);
 
             i += uOffset;
             uLen += 1;
@@ -337,14 +332,12 @@ namespace Core::Common
         // TODO: return ステートメントをここに挿入します
 #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
         ++this->_sIndex;
-        *this;
 #else
         // UTF8の場合、日本語などワイド文字だとオフセット値が異なる
-        HE::Uint32 uOffset = _GetUTF8CharOffset(this->_pStr[this->_sIndex]);
+        HE::Uint32 uOffset = Local::GetUTF8CharOffset(this->_pStr[this->_sIndex]);
         this->_sIndex += uOffset;
-
-        return *this;
 #endif
+        return *this;
     }
 
     HE::Char* StringBase::IteratorChar::operator*()
@@ -353,7 +346,7 @@ namespace Core::Common
         this->_aChar[0] = this->_pStr[this->_sIndex];
         this->_aChar[1] = NULL;
 #else
-        HE::Uint32 uOffset = _GetUTF8CharOffset(this->_pStr[this->_sIndex]);
+        HE::Uint32 uOffset = Local::GetUTF8CharOffset(this->_pStr[this->_sIndex]);
         for (auto i = 0; i < uOffset; ++i)
         {
             this->_aChar[i] = this->_pStr[this->_sIndex + i];
@@ -363,4 +356,47 @@ namespace Core::Common
 #endif
         return this->_aChar;
     }
+
+    FixedString16 g_szTempFixedString16;
+    FixedString32 g_szTempFixedString32;
+    FixedString64 g_szTempFixedString64;
+    FixedString128 g_szTempFixedString128;
+    FixedString256 g_szTempFixedString256;
+    FixedString512 g_szTempFixedString512;
+    FixedString1024 g_szTempFixedString1024;
+
+    /// <summary>
+    /// UTF8の文字からユニコード値にして返す
+    /// </summary>
+    HE::Uint32 GetUTF8CharToUnicode(const HE::UTF8* in_pUTF8Char)
+    {
+        HE::UTF8 c = in_pUTF8Char[0];
+        // 1バイト文字 (ASCII)
+        if ((c & 0x80) == 0x00)
+        {
+            return c;
+        }
+
+        // 2バイト文字
+        if ((c & 0xE0) == 0xC0)
+        {
+            return ((c & 0x1F) << 6) | (in_pUTF8Char[1] & 0x3F);
+        }
+
+        // 3バイト文字
+        if ((c & 0xF0) == 0xE0)
+        {
+            return ((c & 0x0F) << 12) | ((in_pUTF8Char[1] & 0x3F) << 6) | (in_pUTF8Char[2] & 0x3F);
+        }
+
+        // 4バイト文字
+        if ((c & 0xF8) == 0xF0)
+        {
+            return ((c & 0x07) << 18) | ((in_pUTF8Char[1] & 0x3F) << 12) |
+                   ((in_pUTF8Char[2] & 0x3F) << 6) | (in_pUTF8Char[3] & 0x3F);
+        }
+
+        return 0;
+    }
+
 }  // namespace Core::Common

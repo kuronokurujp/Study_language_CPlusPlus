@@ -7,8 +7,8 @@ namespace Render
 {
     void Command2DTextDraw(const Core::Common::Handle& in_rViewHandle,
                            const Core::Math::Vector2& in_rPos,
-                           const Core::Common::StringBase& in_szrName,
-                           const Core::Math::Color& in_rColor,
+                           const Core::Common::StringBase& in_szrName, const HE::Uint32 in_uSize,
+                           const Core::Math::Color in_color,
                            const Core::Math::Rect2::EAnchor in_eAnchor)
     {
         HE_ASSERT(in_rViewHandle.Null() == FALSE);
@@ -23,8 +23,9 @@ namespace Render
 
             pText2D->fX     = in_rPos._fX;
             pText2D->fY     = in_rPos._fY;
-            pText2D->color  = in_rColor;
+            pText2D->color  = in_color;
             pText2D->anchor = in_eAnchor;
+            pText2D->uSize  = in_uSize;
             HE_STR_ERRNO e  = HE_STR_CPY_S(pText2D->szChars, HE_ARRAY_NUM(pText2D->szChars),
                                            in_szrName.Str(), in_szrName.Capacity());
             HE_ASSERT(HE_STR_SUCCESS(e) && "文字列コピーに失敗");

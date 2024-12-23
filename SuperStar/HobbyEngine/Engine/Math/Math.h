@@ -19,6 +19,21 @@ namespace Core::Math
     static const HE::Float32 fRadiansUnit       = fPI / 180.0f;
     static const HE::Float32 fInvertRadiansUnit = 180.0f / fPI;
 
+    // 2乗の値に整形する関数
+    // 負数は未対応
+    static HE::Uint32 PowerOfTwo(const HE::Uint32 value)
+    {
+        if (value == 0) return 0;
+
+        HE::Uint32 a = 2;
+        while (a < value)
+        {
+            a *= 2;
+        }
+
+        return a;
+    }
+
     /// <summary>
     /// Radianses to degrees.
     /// </summary>
