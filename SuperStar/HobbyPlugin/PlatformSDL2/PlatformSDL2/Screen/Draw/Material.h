@@ -65,7 +65,6 @@ namespace PlatformSDL2
         using GlyphMap = std::unordered_map<HE::Uint32, Glyph>;
 
     public:
-        void CopyGlyphs(Glyph* in_aGlyphs, const HE::Uint32 in_uGlyphCount);
         void CopyGlyphs(GlyphMap&& in_rrGlyphs);
 
         /// <summary>
