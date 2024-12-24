@@ -13,17 +13,22 @@ class WinGameMain final : public ApplicationEngineFramework
 public:
     WinGameMain(HINSTANCE in_instance, HE::Int in_cmdShow);
 
+protected:
+    /// <summary>
+    /// ゲーム開始前のロード
+    /// </summary>
+    HE::Bool _VLoad() override final;
+
     /// <summary>
     /// ゲーム開始
     /// </summary>
-    HE::Bool VStart(const HE::Bool in_bDebug) override final;
+    HE::Bool _VStart() override final;
 
     /// <summary>
     /// ゲーム終了
     /// </summary>
-    HE::Bool VEnd() override final;
+    HE::Bool _VEnd() override final;
 
-protected:
     /// <summary>
     /// エンジンのモジュールを登録・解除
     /// </summary>

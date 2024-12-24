@@ -98,8 +98,8 @@ TEST_CASE("FixMap Test")
             // 検索
             BASICMAP::Iterator it = testmap.FindKey(strKey.Str());
             CHECK(it != testmap.End());
-            CHECK(it->key == strKey);
-            CHECK(it->data == ii);
+            CHECK(it->_key == strKey);
+            CHECK(it->_data == ii);
         }
         HE_LOG_LINE(HE_STR_TEXT("find ctime=%f sec"), (double)(clock() - ctime) / CLOCKS_PER_SEC);
     }
@@ -119,11 +119,11 @@ TEST_CASE("FixMap Test")
         ctime = clock();
         for (BASICMAP::Iterator it = testmap.Begin(); it != testmap.End(); ++it)
         {
-            CHECK((0 <= it->data && it->data < ARRAY_NUM));
-            CHECK((pCheckArray[it->data] == FALSE));
+            CHECK((0 <= it->_data && it->_data < ARRAY_NUM));
+            CHECK((pCheckArray[it->_data] == FALSE));
 
             // チェック済み
-            pCheckArray[it->data] = TRUE;
+            pCheckArray[it->_data] = TRUE;
             // チェック済みカウント
             checked_count++;
         }
@@ -214,9 +214,9 @@ TEST_CASE("FixMap Copy")
     {
         auto iter = dstmap.FindKey(s_aArray[i].pKey);
         CHECK(iter.IsValid());
-        CHECK(iter->data == s_aArray[i].num);
+        CHECK(iter->_data == s_aArray[i].num);
 
-        HE_LOG_LINE(HE_STR_TEXT("key(%s) / data(%d)"), iter->key.Str(), iter->data);
+        HE_LOG_LINE(HE_STR_TEXT("key(%s) / data(%d)"), iter->_key.Str(), iter->_data);
     }
 }
 
@@ -233,9 +233,9 @@ TEST_CASE("FixMap Erase")
     // ループ中に要素削除しても大丈夫か
     for (auto itr = srcmap.Begin(); itr != srcmap.End(); ++itr)
     {
-        HE_LOG_LINE(HE_STR_TEXT("key(%s), data(%d)"), itr->key.Str(), itr->data);
+        HE_LOG_LINE(HE_STR_TEXT("key(%s), data(%d)"), itr->_key.Str(), itr->_data);
 
-        if (itr->data == 2)
+        if (itr->_data == 2)
         {
             HE_LOG_LINE(HE_STR_TEXT("Delete data 2"));
             srcmap.Erase(itr);
@@ -244,6 +244,6 @@ TEST_CASE("FixMap Erase")
 
     for (auto itr = srcmap.Begin(); itr != srcmap.End(); ++itr)
     {
-        HE_LOG_LINE(HE_STR_TEXT("key(%s), data(%d)"), itr->key.Str(), itr->data);
+        HE_LOG_LINE(HE_STR_TEXT("key(%s), data(%d)"), itr->_key.Str(), itr->_data);
     }
 }

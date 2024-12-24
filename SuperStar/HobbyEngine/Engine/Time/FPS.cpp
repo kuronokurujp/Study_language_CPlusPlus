@@ -41,9 +41,9 @@ namespace Core::Time
         const HE::Uint64 uFrameTimeMSec = uNowMSec - this->_uaPreviousTimeMSec[0];
 
         // 格納した時間をずらす
-        HE::Uint32 uSize =
+        HE::Uint32 _uSize =
             HE_ARRAY_SIZE(this->_uaPreviousTimeMSec) - sizeof(this->_uaPreviousTimeMSec[0]);
-        ::memmove(this->_uaPreviousTimeMSec, &this->_uaPreviousTimeMSec[1], uSize);
+        ::memmove(this->_uaPreviousTimeMSec, &this->_uaPreviousTimeMSec[1], _uSize);
 
         // フレームレートを計算
         {

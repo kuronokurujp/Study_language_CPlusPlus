@@ -28,22 +28,15 @@ namespace Core::Math
                 {0.0f, 0.0f, 1.0f, 0.0f},
                 {0.0f, 0.0f, 0.0f, 1.0f},
             };
-            this->SetPosition(faIdent);
+            this->Set(faIdent);
         }
 
-        /*
-                explicit Matrix4(const HE::Float32 in_faaMat[4][4])
-                {
-                    ::memcpy(this->_faMat, in_faaMat, 4 * 4 * sizeof(HE::Float32));
-                }
-                */
-
-        inline void SetPosition(Matrix4& in_rMat)
+        inline void Set(Matrix4& in_rMat)
         {
             ::memcpy(this->_faMat, in_rMat._faMat, 4 * 4 * sizeof(HE::Float32));
         }
 
-        inline void SetPosition(const HE::Float32 in_faaMat[4][4])
+        inline void Set(const HE::Float32 in_faaMat[4][4])
         {
             ::memcpy(this->_faMat, in_faaMat, 4 * 4 * sizeof(HE::Float32));
         }
@@ -141,9 +134,7 @@ namespace Core::Math
                 {0.0f, 0.0f, in_fZ, 0.0f},
                 {0.0f, 0.0f, 0.0f, 1.0f},
             };
-            out->SetPosition(faTemp);
-
-            // return Matrix4(faTemp);
+            out->Set(faTemp);
         }
 
         /// <summary>

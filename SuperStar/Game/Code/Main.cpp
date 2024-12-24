@@ -46,15 +46,15 @@ int main()
 {
 #endif
     ApplicationEngineFramework* pAppEngineFramework = &appFramework;
+#ifdef HE_ENGINE_DEBUG
+    pAppEngineFramework->Init(TRUE);
+#else
+    pAppEngineFramework->Init(FALSE);
+#endif
 
-    // アプリ開始
-    if (pAppEngineFramework->VStart(TRUE) == FALSE) return 0;
+    pAppEngineFramework->Running();
 
-    // ゲームループ
-    pAppEngineFramework->VGameLoop();
-
-    // アプリ終了
-    pAppEngineFramework->VEnd();
+    pAppEngineFramework->Release();
 
     return 0;
 }
@@ -67,33 +67,27 @@ WinGameMain::WinGameMain(HINSTANCE in_instance, HE::Int in_cmdShow)
     this->_cmdShow = in_cmdShow;
 }
 
-HE::Bool WinGameMain::VStart(const HE::Bool in_bDebug)
+HE::Bool WinGameMain::_VLoad()
 {
     // アプリに関連する情報を取得
     LoadStringW(this->_inst, IDS_APP_TITLE, _szTitle, uMaxLoadStringLength);
     LoadStringW(this->_inst, IDC_SUPERSTAR, _szWindowClass, uMaxLoadStringLength);
 
-    if (ApplicationEngineFramework::VStart(in_bDebug) == FALSE) return FALSE;
-
     auto pPlatformModule = HE_ENGINE.PlatformModule();
-    HE_ASSERT(pPlatformModule);
+    HE_ASSERT_RETURN_VALUE(FALSE, pPlatformModule);
 
-    // ゲームウィンドウを作成
-    auto spScreen = pPlatformModule->VScreen();
-    HE_ASSERT(spScreen);
+    // リソースの起点ディレクトリを設定
+    auto pAssetManagerModule = HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
+    pAssetManagerModule->SetCurrentDir(HE_STR_TEXT("Assets"));
 
-    auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
+    auto pLocateModule = HE_ENGINE.ModuleManager().Get<Localization::LocalizationModule>();
+    pLocateModule->LoadSystemFile(Core::Common::FixedString256(HE_STR_TEXT("Locate/System.toml")));
+    pLocateModule->LoadTextAll(Core::Common::FixedString16(HE_STR_TEXT("JP")));
 
-    Core::Common::Handle windowHandle;
-    Core::Common::Handle viewPortHandle;
+    // フォント用意
     {
-        // TODO: 外部設定が必要かも
-        // ゲームウィンドウを生成
-        windowHandle = pRenderModule->NewWindow(640, 320);
-
-        // TODO: 画面に表示するビューポート
-        // ゲームウィンドウで利用するビューポートを追加
-        viewPortHandle = pRenderModule->AddViewPort(windowHandle, 640, 320);
+        auto spFont = pPlatformModule->VFont();
+        spFont->VLoad(Platform::EFontSize::EFontSize_64, HE_STR_TEXT("Font/Font.ttf"));
     }
 
     // ユーザー共通入力割り当て設定
@@ -109,18 +103,23 @@ HE::Bool WinGameMain::VStart(const HE::Bool in_bDebug)
         pInputModule->SetCommonMappingAction(mInputAction);
     }
 
-    // リソースの起点ディレクトリを設定
-    auto pAssetManagerModule = HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
-    pAssetManagerModule->SetCurrentDir(HE_STR_TEXT("Assets"));
+    return TRUE;
+}
 
-    auto pLocateModule = HE_ENGINE.ModuleManager().Get<Localization::LocalizationModule>();
-    pLocateModule->LoadSystemFile(Core::Common::FixedString256(HE_STR_TEXT("Locate/System.toml")));
-    pLocateModule->LoadTextAll(Core::Common::FixedString16(HE_STR_TEXT("JP")));
-
-    // フォント用意
+HE::Bool WinGameMain::_VStart()
+{
+    // ゲームウィンドウを作成
+    auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
+    Core::Common::Handle windowHandle;
+    Core::Common::Handle viewPortHandle;
     {
-        auto spFont = pPlatformModule->VFont();
-        spFont->VLoad(Platform::EFontSize::EFontSize_64, HE_STR_TEXT("Font/Font.ttf"));
+        // TODO: 外部設定が必要かも
+        // ゲームウィンドウを生成
+        windowHandle = pRenderModule->NewWindow(640, 480);
+
+        // TODO: 画面に表示するビューポート
+        // ゲームウィンドウで利用するビューポートを追加
+        viewPortHandle = pRenderModule->AddViewPort(windowHandle, 640, 480);
     }
 
     // ゲーム画面表示準備
@@ -153,9 +152,9 @@ HE::Bool WinGameMain::VStart(const HE::Bool in_bDebug)
     return TRUE;
 }
 
-HE::Bool WinGameMain::VEnd()
+HE::Bool WinGameMain::_VEnd()
 {
-    return ApplicationEngineFramework::VEnd();
+    return TRUE;
 }
 
 HE::Bool WinGameMain::_VRegistEngineModule()

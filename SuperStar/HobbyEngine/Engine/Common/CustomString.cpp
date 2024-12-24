@@ -188,8 +188,8 @@ namespace Core::Common
 
     HE::Sint32 StringBase::Find(const HE::Char* in_szName, const HE::Uint32 in_uStart) const
     {
-        const HE::Uint32 uCount = this->Size();
-        if (uCount <= in_uStart) return -1;
+        const HE::Uint32 _uCount = this->Size();
+        if (_uCount <= in_uStart) return -1;
 
         const HE::Char* szFind = HE_STR_STR(this->_szBuff + in_uStart, in_szName);
         if (szFind == NULL) return -1;
@@ -202,12 +202,12 @@ namespace Core::Common
 #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
         return static_cast<HE::Uint32>(::wcslen((this->_szBuff)))
 #else
-        HE::Uint32 uSize = this->Size();
+        HE::Uint32 _uSize = this->Size();
         HE::Uint32 uLen  = 0;
 
         HE::Uint32 uOffset = 0;
         HE::Uint32 i       = 0;
-        while (i < uSize)
+        while (i < _uSize)
         {
             HE::Uint8 c = static_cast<HE::Uint8>(this->_szBuff[i]);
             // 終端があれば終了する
@@ -288,16 +288,16 @@ namespace Core::Common
     {
         if (in_szName && this->_uCapacity > 0)
         {
-            HE::Uint32 uCount    = this->Size();
-            HE::Sint32 iCatCount = static_cast<HE::Sint32>(this->_uCapacity - uCount - 1);
+            HE::Uint32 _uCount    = this->Size();
+            HE::Sint32 iCatCount = static_cast<HE::Sint32>(this->_uCapacity - _uCount - 1);
             HE_ASSERT(0 < iCatCount &&
                       "文字列の長さがバッファサイズを超えて文字列の追加ができない");
 
             if (iCatCount > 0)
             {
                 auto bSuccess =
-                    HE_STR_SUCCESS(HE_STR_CPY_S(this->_szBuff + uCount,
-                                                static_cast<HE::Sint32>(this->_uCapacity - uCount),
+                    HE_STR_SUCCESS(HE_STR_CPY_S(this->_szBuff + _uCount,
+                                                static_cast<HE::Sint32>(this->_uCapacity - _uCount),
                                                 in_szName, iCatCount));
                 HE_ASSERT(bSuccess && "文字列コピーに失敗");
 
@@ -314,14 +314,14 @@ namespace Core::Common
 
     StringBase& StringBase::_Add(const HE::Char c)
     {
-        HE::Uint32 uCount = this->Size();
-        HE_ASSERT(uCount + 1 < this->_uCapacity &&
+        HE::Uint32 _uCount = this->Size();
+        HE_ASSERT(_uCount + 1 < this->_uCapacity &&
                   "文字列の長さがバッファサイズを超えて文字の追加ができない");
 
-        if (uCount + 1 < this->_uCapacity)
+        if (_uCount + 1 < this->_uCapacity)
         {
-            this->_szBuff[uCount]     = c;
-            this->_szBuff[uCount + 1] = '\0';
+            this->_szBuff[_uCount]     = c;
+            this->_szBuff[_uCount + 1] = '\0';
         }
 
         return *this;

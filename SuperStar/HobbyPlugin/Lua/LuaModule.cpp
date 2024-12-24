@@ -91,7 +91,7 @@ namespace Lua
                     pArgData->eValType = ELuaFuncArgType_Float32;
 
                     const HE::Float32 fVal = lua_tonumber(in_pLuaState, i);
-                    pArgData->data.fVal    = fVal;
+                    pArgData->_data.fVal    = fVal;
                     break;
                 }
                 case LUA_TSTRING:
@@ -101,7 +101,7 @@ namespace Lua
                     const HE::UTF8* pStr                 = lua_tostring(in_pLuaState, i);
                     Core::Common::g_szTempFixedString128 = pStr;
 
-                    HE_STR_CPY_S(pArgData->data.szText, HE_ARRAY_NUM(pArgData->data.szText),
+                    HE_STR_CPY_S(pArgData->_data.szText, HE_ARRAY_NUM(pArgData->_data.szText),
                                  Core::Common::g_szTempFixedString128.Str(),
                                  Core::Common::g_szTempFixedString128.Size());
 
@@ -376,7 +376,7 @@ namespace Lua
         while (this->_mUseLuaObject.Empty() == FALSE)
         {
             auto itr = this->_mUseLuaObject.Begin();
-            this->ReleaseLuaObject(itr->data);
+            this->ReleaseLuaObject(itr->_data);
         }
         HE_ASSERT(this->_mUseLuaObject.Empty());
 
@@ -384,7 +384,7 @@ namespace Lua
         for (auto itr = this->_mScriptFuncAction.Begin(); itr != this->_mScriptFuncAction.End();
              ++itr)
         {
-            itr->data = NULL;
+            itr->_data = NULL;
         }
         this->_mScriptFuncAction.Clear();
 
@@ -406,13 +406,13 @@ namespace Lua
             for (auto itr = this->_mScriptFuncAction.Begin(); itr != this->_mScriptFuncAction.End();
                  ++itr)
             {
-                if (1 < itr->data.use_count())
+                if (1 < itr->_data.use_count())
                 {
-                    itr->data->Call(rData);
+                    itr->_data->Call(rData);
                 }
                 else
                 {
-                    DeleterFreeMemory* pDeleter = std::get_deleter<DeleterFreeMemory>(itr->data);
+                    DeleterFreeMemory* pDeleter = std::get_deleter<DeleterFreeMemory>(itr->_data);
                     if (pDeleter)
                     {
 #ifdef HE_ENGINE_DEBUG
@@ -429,7 +429,7 @@ namespace Lua
                     }
 
                     this->_mScriptFuncAction.Erase(itr);
-                    itr->data = NULL;
+                    itr->_data = NULL;
                 }
             }
         }

@@ -22,9 +22,9 @@ namespace Event
         if (this->_mEventMng.Contains(in_rHandle) == FALSE) return FALSE;
 
         auto pEventMng = this->_mEventMng.FindKey(in_rHandle);
-        pEventMng->data->Release();
+        pEventMng->_data->Release();
 
-        HE_SAFE_DELETE_MEM(pEventMng->data);
+        HE_SAFE_DELETE_MEM(pEventMng->_data);
 
         return this->_mEventMng.Erase(in_rHandle);
     }
@@ -35,7 +35,7 @@ namespace Event
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
         {
             // in_rTypeのリスナー管理データに登録
-            itr->data->AddListener(in_rListener, in_rType);
+            itr->_data->AddListener(in_rListener, in_rType);
         }
 
         return TRUE;
@@ -46,7 +46,7 @@ namespace Event
     {
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
         {
-            itr->data->RemoveListener(in_rListener, in_rType);
+            itr->_data->RemoveListener(in_rListener, in_rType);
         }
 
         return TRUE;
@@ -57,7 +57,7 @@ namespace Event
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
         {
             // 指定タイプの全リスナーを破棄
-            itr->data->RemoveAllListener(in_rType);
+            itr->_data->RemoveAllListener(in_rType);
         }
 
         return TRUE;
@@ -67,7 +67,7 @@ namespace Event
     {
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
         {
-            itr->data->QueueEvent(in_spEventData);
+            itr->_data->QueueEvent(in_spEventData);
         }
 
         return TRUE;
@@ -91,7 +91,7 @@ namespace Event
         auto itr = this->_mEventMng.Begin();
         while (itr != this->_mEventMng.End())
         {
-            this->RemoveEventManager(itr->key);
+            this->RemoveEventManager(itr->_key);
             itr = this->_mEventMng.Begin();
         }
 
@@ -105,7 +105,7 @@ namespace Event
         {
             // TODO: 指定時間でイベント処理を途中終了しないようにする
             // TODO: マルチコアかマルチスレッドを使うかも
-            itr->data->Tick(EventManager::EConstancs_Infinite);
+            itr->_data->Tick(EventManager::EConstancs_Infinite);
         }
     }
 

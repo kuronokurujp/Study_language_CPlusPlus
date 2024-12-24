@@ -25,7 +25,7 @@ namespace InGame
         pWork->fSpeed                 = 1.0f;
         pWork->fFirstSpeed            = 6.0f;
         pWork->fAccele                = 1.0f;
-        pWork->fSize                  = 32.0f;
+        pWork->_fSize                  = 32.0f;
         in_pWork->uCollisionHashCode  = this->_uCollisionHashCode;
     }
 
@@ -51,7 +51,7 @@ namespace InGame
         // TODO: 描画内容を動的に切り替える
         // 円描画や矩形描画とか
         Render::Command2DCircleDraw(in_rViewHandle, pWork->pos, Core::Math::EAnchor_Center,
-                                    pWork->fSize, Core::Math::RGB::White);
+                                    pWork->_fSize, Core::Math::RGB::White);
 
         return TRUE;
     }
@@ -77,8 +77,8 @@ namespace InGame
             reinterpret_cast<const InGameBulletNormalWork* const>(in_pObj->aWork);
 
         out->eType                 = ECollisionType::ECollisionType_Circle2D;
-        out->data.circle2D.fRadius = pWork->fSize * 0.5f;
-        out->data.circle2D.pos     = pWork->pos;
+        out->_data.circle2D.fRadius = pWork->_fSize * 0.5f;
+        out->_data.circle2D.pos     = pWork->pos;
         out->uHashCode             = in_pObj->uCollisionHashCode;
         HE_ASSERT(out->uHashCode != 0);
 

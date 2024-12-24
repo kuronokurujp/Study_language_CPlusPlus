@@ -100,7 +100,7 @@ namespace InGame
         this->RemoveActor(&this->_playerHandle);
         for (auto itr = this->_mEnemyMap.Begin(); itr != this->_mEnemyMap.End(); ++itr)
         {
-            this->RemoveActor(&itr->data);
+            this->RemoveActor(&itr->_data);
         }
         this->_mEnemyMap.Clear();
 

@@ -69,7 +69,7 @@ namespace EnhancedInput
             struct Touch
             {
                 Platform::EInputMouseType eType;
-                HE::Float32 fX, fY;
+                HE::Float32 _fX, _fY;
             } touch;
         } item;
     };

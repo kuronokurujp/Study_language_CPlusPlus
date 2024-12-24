@@ -8,9 +8,9 @@ namespace AssetManager
     HE::Bool AssetManager::AssetDataText::_VLoad(Platform::FileInterface& in_rFile)
     {
         // ファイルをテキストでロード
-        auto [pData, uSize] = in_rFile.VLoadText(this->_path);
+        auto [pData, _uSize] = in_rFile.VLoadText(this->_path);
         this->_pText        = reinterpret_cast<HE::Char*>(pData);
-        this->_uSize        = uSize;
+        this->_uSize        = _uSize;
 
         return (this->_pText != NULL);
     }

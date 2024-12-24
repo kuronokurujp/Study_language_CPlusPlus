@@ -115,6 +115,7 @@ TEST_CASE("SDL2 Quad Draw GUITest")
 
             if (uStep == 0)
             {
+                ++uStep;
                 auto pAssetManagerModule =
                     HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
                 pAssetManagerModule->SetCurrentDir(HE_STR_TEXT("Assets"));
@@ -126,7 +127,11 @@ TEST_CASE("SDL2 Quad Draw GUITest")
                                                                 HE_STR_TEXT("Font/TestFont.ttf"));
                     CHECK(bRet);
                 }
-
+                return FALSE;
+            }
+            else if (uStep == 1)
+            {
+                ++uStep;
                 Core::Common::Handle windowHandle;
                 Core::Common::Handle viewPortHandle;
                 {
@@ -152,7 +157,7 @@ TEST_CASE("SDL2 Quad Draw GUITest")
 
                 return FALSE;
             }
-            else if (uStep == 1)
+            else if (uStep == 2)
             {
                 // ウィンドウが閉じたら終了
                 Core::Math::Rect2 rect;
@@ -232,6 +237,20 @@ TEST_CASE("SDL2 Quad Draw GUITest")
                                                 Core::Math::RGB::White);
                 }
 
+                // アンカー中心三角形描画テスト
+                {
+                    Core::Math::Vector2 pos(480.0f, 480.f - 32.0f);
+                    Render::Command2DTriangleDraw(sceneHandle, pos, Core::Math::EAnchor_Center,
+                                                  -90.0f, 32.0f, Core::Math::RGB::White);
+                }
+
+                // アンカー左上の三角形描画テスト
+                {
+                    Core::Math::Vector2 pos(480.0f, 0.f);
+                    Render::Command2DTriangleDraw(sceneHandle, pos, Core::Math::EAnchor_Left,
+                                                  -90.0f, 32.0f, Core::Math::RGB::White);
+                }
+
                 return FALSE;
             }
 
@@ -239,37 +258,36 @@ TEST_CASE("SDL2 Quad Draw GUITest")
         });
 }
 
+/*
 TEST_CASE("SDL2 Load ImgTexture")
 {
     UnitTestRunnerByModuleOnly<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module,
                                Render::RenderModule>(
         []()
         {
-            /*
-                auto pPlatformModule = HE_ENGINE.PlatformModule();
-                // ゲームウィンドウを作成
-                auto spScreen = pPlatformModule->VScreen();
-                HE_ASSERT(spScreen);
+            auto pPlatformModule = HE_ENGINE.PlatformModule();
+            // ゲームウィンドウを作成
+            auto spScreen = pPlatformModule->VScreen();
+            HE_ASSERT(spScreen);
 
-                auto pAssetManagerModule =
-                    HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
-                pAssetManagerModule->SetMountDir(HE_STR_TEXT("Assets"));
+            auto pAssetManagerModule =
+                HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
+            pAssetManagerModule->SetCurrentDir(HE_STR_TEXT("Assets"));
 
-                // 画像データのバイナリアセットを作成
-                auto handle =
-                    pAssetManagerModule->Load<AssetManager::AssetDataBinary>("Image",
-                                                                             "Img/TestImg.png");
-                auto& rAsset = pAssetManagerModule->GetAsset<AssetManager::AssetDataBinary>(handle);
+            // 画像データのバイナリアセットを作成
+            auto handle =
+                pAssetManagerModule->Load<AssetManager::AssetDataBinary>("Image",
+                                                                         "Img/TestImg.png");
+            auto& rAsset = pAssetManagerModule->GetAsset<AssetManager::AssetDataBinary>(handle);
 
+            auto imgHandle = spScreen->VCreateTextureImage(rAsset.Mem(), rAsset.Size());
+            CHECK(imgHandle.Null() == FALSE);
 
-                auto imgHandle = spScreen->VCreateTextureImage(rAsset.Mem(), rAsset.Size());
-                CHECK(imgHandle.Null() == FALSE);
+            pAssetManagerModule->Unload(handle);
 
-                pAssetManagerModule->Unload(handle);
-
-                CHECK(spScreen->VReleaseTexture(imgHandle));
-                */
+            CHECK(spScreen->VReleaseTexture(imgHandle));
 
             return TRUE;
         });
 }
+*/

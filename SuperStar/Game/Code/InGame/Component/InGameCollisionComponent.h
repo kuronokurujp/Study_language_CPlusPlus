@@ -37,7 +37,7 @@ namespace InGame
                 HE::Float32 fRadius;
             } circle2D;
 
-        } data;
+        } _data;
     };
 
     /// <summary>

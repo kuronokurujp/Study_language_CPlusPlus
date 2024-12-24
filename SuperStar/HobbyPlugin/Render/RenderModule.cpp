@@ -82,7 +82,7 @@ namespace Render
 
         for (auto itr = mWindow.Begin(); itr != mWindow.End(); ++itr)
         {
-            this->DeleteWindow(itr->key);
+            this->DeleteWindow(itr->_key);
         }
     }
 
@@ -271,7 +271,7 @@ namespace Render
         auto mWindow = this->_poolWindow.GetUseDataMap();
         for (auto itr = mWindow.Begin(); itr != mWindow.End(); ++itr)
         {
-            itr->data->_Update(in_fDeltaTime);
+            itr->_data->_Update(in_fDeltaTime);
         }
     }
 
@@ -281,7 +281,7 @@ namespace Render
         auto mWindow = this->_poolWindow.GetUseDataMap();
         for (auto itr = mWindow.Begin(); itr != mWindow.End(); ++itr)
         {
-            itr->data->_Render();
+            itr->_data->_Render();
         }
     }
 

@@ -7,14 +7,21 @@ namespace AssetManager
 {
     HE::Bool AssetDataToml::_VLoad(Platform::FileInterface& in_rFileSystem)
     {
+        auto [szText, uFileSize] = in_rFileSystem.VLoadText(this->_path);
+        this->_pText = szText;
+
         // ファイルロード
-        this->_result = toml::parse_file(this->_path.Str());
+        // this->_result = toml::parse_file(this->_path.Str());
+        std::string_view st(this->_pText);
+        std::string_view stFilePath(this->_path.Str());
+        this->_result = toml::parse(st, stFilePath);
         if (this->_result.failed())
         {
             // エラーログを出してアサートで止める
             Core::Common::FixedString256 errorMsg(this->_result.error().description().data());
             HE_LOG_LINE(HE_STR_TEXT("%s"), errorMsg.Str());
             HE_ASSERT(FALSE);
+            HE_SAFE_DELETE_MEM(this->_pText);
 
             return FALSE;
         }
@@ -24,6 +31,7 @@ namespace AssetManager
 
     void AssetDataToml::_VUnload()
     {
+        HE_SAFE_DELETE_MEM(this->_pText);
     }
 
     AssetDataToml::Node AssetDataToml::GetRootNode()

@@ -50,17 +50,17 @@ namespace Module
     {
         if (this->_mAppModule.Contains(in_szName))
         {
-            return this->_mAppModule.FindKey(in_szName)->data;
+            return this->_mAppModule.FindKey(in_szName)->_data;
         }
 
         if (this->_mLogicModule.Contains(in_szName))
         {
-            return this->_mLogicModule.FindKey(in_szName)->data;
+            return this->_mLogicModule.FindKey(in_szName)->_data;
         }
 
         if (this->_mViewModule.Contains(in_szName))
         {
-            return this->_mViewModule.FindKey(in_szName)->data;
+            return this->_mViewModule.FindKey(in_szName)->_data;
         }
 
         // HE_ASSERT(FALSE);
@@ -95,19 +95,19 @@ namespace Module
         {
             for (auto b = this->_mViewModule.Begin(); b != this->_mViewModule.End(); ++b)
             {
-                HE_SAFE_DELETE_MEM(b->data);
+                HE_SAFE_DELETE_MEM(b->_data);
             }
             this->_mViewModule.Clear();
 
             for (auto b = this->_mLogicModule.Begin(); b != this->_mLogicModule.End(); ++b)
             {
-                HE_SAFE_DELETE_MEM(b->data);
+                HE_SAFE_DELETE_MEM(b->_data);
             }
             this->_mLogicModule.Clear();
 
             for (auto b = this->_mAppModule.Begin(); b != this->_mAppModule.End(); ++b)
             {
-                HE_SAFE_DELETE_MEM(b->data);
+                HE_SAFE_DELETE_MEM(b->_data);
             }
             this->_mAppModule.Clear();
         }
@@ -210,9 +210,9 @@ namespace Module
                 // ゲーム特有処理の前段となる
                 for (auto b = this->_mAppModule.Begin(); b != this->_mAppModule.End(); ++b)
                 {
-                    if (this->_StartModule(*b->data))
+                    if (this->_StartModule(*b->_data))
                     {
-                        this->_vAppModule.PushBack(b->data);
+                        this->_vAppModule.PushBack(b->_data);
                     }
                 }
                 this->_SortModuleVector(&this->_vAppModule);
@@ -223,9 +223,9 @@ namespace Module
             {
                 for (auto b = this->_mLogicModule.Begin(); b != this->_mLogicModule.End(); ++b)
                 {
-                    if (this->_StartModule(*b->data))
+                    if (this->_StartModule(*b->_data))
                     {
-                        this->_vLogicModule.PushBack(b->data);
+                        this->_vLogicModule.PushBack(b->_data);
                     }
                 }
 
@@ -236,9 +236,9 @@ namespace Module
             {
                 for (auto b = this->_mViewModule.Begin(); b != this->_mViewModule.End(); ++b)
                 {
-                    if (this->_StartModule(*b->data))
+                    if (this->_StartModule(*b->_data))
                     {
-                        this->_vViewModule.PushBack(b->data);
+                        this->_vViewModule.PushBack(b->_data);
                     }
                 }
 

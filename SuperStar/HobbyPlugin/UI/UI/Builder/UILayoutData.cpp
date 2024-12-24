@@ -118,7 +118,7 @@ namespace UI::Builder
             // サードパーティライブラリのノードポインタを保存
             out->pNode = in_rNode.internal_object();
 
-            Node::Data* pData = &out->data;
+            Node::Data* pData = &out->_data;
 
             // TODO: ノードから反映する情報を抜き出す
             pData->eWidgetType = UI::Builder::EWidget_None;
@@ -132,16 +132,16 @@ namespace UI::Builder
             {
                 pData->eWidgetType = UI::Builder::EWidget_Widget;
                 auto pWidget       = &pData->exData.widget;
-                pWidget->fX        = in_rNode.attribute("x").as_float();
-                pWidget->fY        = in_rNode.attribute("y").as_float();
+                pWidget->_fX        = in_rNode.attribute("x").as_float();
+                pWidget->_fY        = in_rNode.attribute("y").as_float();
             }
             else if (szAttrName == HE_STR_TEXT("b"))
             {
                 pData->eWidgetType = UI::Builder::EWidget_Button;
                 auto pBtn          = &pData->exData.button;
-                pBtn->fX           = in_rNode.attribute("x").as_float();
-                pBtn->fY           = in_rNode.attribute("y").as_float();
-                pBtn->eAnchor      = _GetPosAnchor(in_rNode);
+                pBtn->_fX           = in_rNode.attribute("x").as_float();
+                pBtn->_fY           = in_rNode.attribute("y").as_float();
+                pBtn->_eAnchor      = _GetPosAnchor(in_rNode);
 
                 auto s = in_rNode.attribute("style").value();
                 _ParseStyle(&pBtn->style, s, static_cast<HE::Uint32>(::strlen(s)));
@@ -150,9 +150,9 @@ namespace UI::Builder
             {
                 pData->eWidgetType = UI::Builder::EWidget_Label;
                 auto pLabel        = &pData->exData.label;
-                pLabel->fX         = in_rNode.attribute("x").as_float();
-                pLabel->fY         = in_rNode.attribute("y").as_float();
-                pLabel->eAnchor    = _GetPosAnchor(in_rNode);
+                pLabel->_fX         = in_rNode.attribute("x").as_float();
+                pLabel->_fY         = in_rNode.attribute("y").as_float();
+                pLabel->_eAnchor    = _GetPosAnchor(in_rNode);
 
                 // ローカライズテキストか
                 if (in_rNode.attribute("loc").as_bool())

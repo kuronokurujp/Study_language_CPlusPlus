@@ -62,7 +62,7 @@ namespace UI
 
         pTrans->TransformLocalToWorldRect2D(&rect, orgRect);
 
-        if (rect.InSidePoint(Core::Math::Vector2(in_rTouch.fX, in_rTouch.fY)))
+        if (rect.InSidePoint(Core::Math::Vector2(in_rTouch._fX, in_rTouch._fY)))
         {
             this->_pushHandler->OnPush();
         }

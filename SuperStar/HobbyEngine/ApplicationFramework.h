@@ -9,21 +9,36 @@ class ApplicationEngineFramework
 {
 public:
     /// <summary>
-    /// ゲーム開始
+    /// 初期化
     /// </summary>
-    virtual HE::Bool VStart(const HE::Bool in_bDebug);
+    HE::Bool Init(const HE::Bool in_bDebug);
 
     /// <summary>
-    /// ゲームループ
+    /// 解放
     /// </summary>
-    virtual HE::Bool VGameLoop();
+    void Release();
+
+    /// <summary>
+    /// 処理中
+    /// </summary>
+    void Running();
+
+protected:
+    /// <summary>
+    /// ゲーム開始前のロード
+    /// </summary>
+    virtual HE::Bool _VLoad() = 0;
+
+    /// <summary>
+    /// ゲーム開始
+    /// </summary>
+    virtual HE::Bool _VStart() = 0;
 
     /// <summary>
     /// ゲーム終了
     /// </summary>
-    virtual HE::Bool VEnd();
+    virtual HE::Bool _VEnd() = 0;
 
-protected:
     /// <summary>
     /// エンジンのモジュールを登録・解除
     /// </summary>

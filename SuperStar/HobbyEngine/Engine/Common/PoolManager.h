@@ -232,7 +232,7 @@ namespace Core::Common
                                    in_rHandle.Null() == FALSE && "解放するデータがないとだめ");
 
             T* pRemoveObj = this->_upUserSlot->at(in_rHandle);
-            if (pRemoveObj != NULL)
+            if (pRemoveObj == NULL)
             {
                 in_rHandle.Clear();
                 return TRUE;

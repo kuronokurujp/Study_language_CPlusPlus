@@ -52,8 +52,8 @@ namespace Core::Common
             if (0 < this->_uSize)
             {
                 // 配列先頭からのデータを一つ横にずらしてインデックス0に空きを作る
-                HE::Uint32 uSize = this->_uSize * sizeof(TType);
-                ::memmove(&this->_pBuff[1], &this->_pBuff[0], uSize);
+                HE::Uint32 _uSize = this->_uSize * sizeof(TType);
+                ::memmove(&this->_pBuff[1], &this->_pBuff[0], _uSize);
             }
 
             // コピー処理が発生
@@ -89,8 +89,8 @@ namespace Core::Common
 
             // データ末尾位置より前に挿入
             // 配置したデータを一つ後ろにずらす
-            const HE::Uint32 uSize = (this->_uSize - in_uIndex) * sizeof(TType);
-            ::memmove(&this->_pBuff[in_uIndex + 1], &this->_pBuff[in_uIndex], uSize);
+            const HE::Uint32 _uSize = (this->_uSize - in_uIndex) * sizeof(TType);
+            ::memmove(&this->_pBuff[in_uIndex + 1], &this->_pBuff[in_uIndex], _uSize);
 
             // 後ろに一つずらした事で挿入先が空いたので挿入
             this->_pBuff[in_uIndex] = in_rData;
@@ -169,8 +169,8 @@ namespace Core::Common
             {
                 // 削除する要素位置に上書きして削除
                 // メモリ移動のみで高速削除できる
-                const HE::Uint32 uSize = (uLastIndex - in_uIndex) * sizeof(TType);
-                ::memmove(&this->_pBuff[in_uIndex], &this->_pBuff[in_uIndex + 1], uSize);
+                const HE::Uint32 _uSize = (uLastIndex - in_uIndex) * sizeof(TType);
+                ::memmove(&this->_pBuff[in_uIndex], &this->_pBuff[in_uIndex + 1], _uSize);
             }
             else
             {
@@ -216,16 +216,16 @@ namespace Core::Common
         {
             if (in_rInitList.size() <= 0) return;
 
-            const HE::Uint32 uSize = HE_MIN(TCapacity, in_rInitList.size());
+            const HE::Uint32 _uSize = HE_MIN(TCapacity, in_rInitList.size());
 
             auto it = in_rInitList.begin();
-            for (HE::Uint32 i = 0; i < uSize; ++i)
+            for (HE::Uint32 i = 0; i < _uSize; ++i)
             {
                 this->_aBuff[i] = *it;
                 ++it;
             }
 
-            this->_uSize = uSize;
+            this->_uSize = _uSize;
         }
 
         virtual ~FixedVector() = default;

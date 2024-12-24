@@ -146,7 +146,7 @@ namespace Actor
         // 保留グループに設定したタスクを更新グループに移動
         for (auto b = this->_pendingDataMap.Begin(); b != this->_pendingDataMap.End(); ++b)
         {
-            const auto pData = &b->data;
+            const auto pData = &b->_data;
             const HE::Bool bRet =
                 this->_taskManager.MoveGropuTask(pData->handle, pData->sMoveGroupId);
             HE_ASSERT(bRet && "保留中のタスクを稼働中に切り替え失敗した");

@@ -16,7 +16,7 @@ TEST_CASE("Test Paramater Asset Load")
         {
             auto pAssetManagerModule =
                 HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
-            pAssetManagerModule->SetMountDir(HE_STR_TEXT("Assets"));
+            pAssetManagerModule->SetCurrentDir(HE_STR_TEXT("Assets"));
             auto handle = pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
                 HE_STR_TEXT("PlayerParamater"), Core::File::Path("Paramater/Test.json"));
 

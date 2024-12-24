@@ -110,7 +110,7 @@ TEST_CASE("Lua Module Script Func Catch")
                             CHECK(in_rLuaFuncData.uArgCount == 1);
 
                             CHECK(in_rLuaFuncData.aArg[0].eValType == Lua::ELuaFuncArgType_Str);
-                            CHECK(HE_STR_CMP(in_rLuaFuncData.aArg[0].data.szText,
+                            CHECK(HE_STR_CMP(in_rLuaFuncData.aArg[0]._data.szText,
                                              HE_STR_TEXT("test")) == 0);
                         }
                         else if (HE_STR_CMP(in_rLuaFuncData.szFuncName,
@@ -119,10 +119,10 @@ TEST_CASE("Lua Module Script Func Catch")
                             CHECK(in_rLuaFuncData.uArgCount == 2);
 
                             CHECK(in_rLuaFuncData.aArg[0].eValType == Lua::ELuaFuncArgType_Float32);
-                            CHECK(in_rLuaFuncData.aArg[0].data.fVal == 2.0f);
+                            CHECK(in_rLuaFuncData.aArg[0]._data.fVal == 2.0f);
 
                             CHECK(in_rLuaFuncData.aArg[1].eValType == Lua::ELuaFuncArgType_Str);
-                            CHECK(HE_STR_CMP(in_rLuaFuncData.aArg[1].data.szText,
+                            CHECK(HE_STR_CMP(in_rLuaFuncData.aArg[1]._data.szText,
                                              HE_STR_TEXT("test")) == 0);
                         }
                     });

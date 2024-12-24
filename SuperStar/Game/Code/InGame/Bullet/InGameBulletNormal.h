@@ -21,7 +21,7 @@ namespace InGame
         HE::Float32 fAccele     = 0.0f;
 
         // 弾のサイズ
-        HE::Float32 fSize = 32.0f;
+        HE::Float32 _fSize = 32.0f;
     };
 
     /// <summary>

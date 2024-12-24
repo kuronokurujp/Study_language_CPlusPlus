@@ -36,16 +36,16 @@ namespace Core::Common
         // キーとデータのペア構造体
         struct Pair
         {
-            TKey key;
-            TData data;
+            TKey _key;
+            TData _data;
         };
 
         // カスタムマップのイテレーター
         // STL::Mapと同じように扱うために用意
-        class IteratorChar final
+        class Iterator final
         {
         public:
-            IteratorChar(Node* in_pNode) : _pNode(in_pNode) {}
+            Iterator(Node* in_pNode) : _pNode(in_pNode) {}
 
             inline const HE::Bool IsValid() const HE_NOEXCEPT { return (this->_pNode != NULL); }
 
@@ -56,14 +56,14 @@ namespace Core::Common
             const Pair* operator->() const { return &this->_pNode->_pair; }
 
             // インクリメント
-            IteratorChar& operator++()
+            Iterator& operator++()
             {
                 this->_pNode = this->_pNode->_pNext;
                 return *this;
             }
 
             // インクリメント
-            IteratorChar operator++(int)
+            Iterator operator++(int)
             {
                 IteratorChar iter = *this;
                 ++(*this);
@@ -71,14 +71,14 @@ namespace Core::Common
             }
 
             // デクリメント
-            IteratorChar& operator--()
+            Iterator& operator--()
             {
                 this->_pNode = this->_pNode->_pPrev;
                 return *this;
             }
 
             // デクリメント
-            IteratorChar operator--(int)
+            Iterator operator--(int)
             {
                 IteratorChar iter = *this;
                 --(*this);
@@ -86,16 +86,16 @@ namespace Core::Common
             }
 
             // 比較
-            bool operator==(const IteratorChar& in_rIter) const HE_NOEXCEPT
+            bool operator==(const Iterator& in_rIter) const HE_NOEXCEPT
             {
                 return (this->_pNode == in_rIter._pNode);
             }
 
             // 比較
-            bool operator!=(const IteratorChar& in_crIter) const { return !(*this == in_crIter); }
+            bool operator!=(const Iterator& in_crIter) const { return !(*this == in_crIter); }
 
             // 代入
-            const IteratorChar& operator=(const IteratorChar& in_rIter)
+            const Iterator& operator=(const Iterator& in_rIter)
             {
                 this->_pNode = in_rIter._pNode;
                 return *this;
@@ -165,7 +165,7 @@ namespace Core::Common
         /// <summary>
         /// キーとデータを追加
         /// </summary>
-        IteratorChar Add(const TKey& in_rKey, const TData& in_rData)
+        Iterator Add(const TKey& in_rKey, const TData& in_rData)
         {
             return this->_Add(in_rKey, &in_rData);
         }
@@ -174,19 +174,19 @@ namespace Core::Common
         /// キーとデータを追加
         /// DATAがムーブセマンティック用
         /// </summary>
-        IteratorChar AddByMoveData(const TKey& in_rKey, TData&& in_rData)
+        Iterator AddByMoveData(const TKey& in_rKey, TData&& in_rData)
         {
             // 赤ノードを作る
             Node* pNode = this->_NewNode();
             if (pNode == NULL) return this->End();
 
-            pNode->_pair.key = in_rKey;
+            pNode->_pair._key = in_rKey;
             {
                 // 添え字アクセスで作る場合はデータが無い
                 // コピーして渡す
                 if constexpr (IsUniquePtrByTemplateType<TData>::value)
                 {
-                    pNode->_pair.data = std::move(in_rData);
+                    pNode->_pair._data = std::move(in_rData);
                 }
                 else
                 {
@@ -199,13 +199,13 @@ namespace Core::Common
             // ルートは常に黒維持
             this->_pRoot->_uColor = Node::EColor::EColor_Black;
 
-            return IteratorChar(pNode);
+            return Iterator(pNode);
         }
 
         /// <summary>
         /// キーからデータ検索
         /// </summary>
-        IteratorChar FindKey(const TKey& in_trKey) const
+        Iterator FindKey(const TKey& in_trKey) const
         {
             // ツリーが空なら終端を返す
             if (this->Empty()) return this->End();
@@ -219,14 +219,14 @@ namespace Core::Common
             else
             {
                 // 見つかった
-                return IteratorChar(tpNode);
+                return Iterator(tpNode);
             }
         }
 
         /// <summary>
         /// データからキー検索
         /// </summary>
-        IteratorChar FindData(const TData& in_rData)
+        Iterator FindData(const TData& in_rData)
         {
             // ツリーが空なら終端を返す
             if (this->Empty()) return this->End();
@@ -240,7 +240,7 @@ namespace Core::Common
             else
             {
                 // 見つかった
-                return IteratorChar(tpNode);
+                return Iterator(tpNode);
             }
         }
 
@@ -277,13 +277,13 @@ namespace Core::Common
         /// <summary>
         /// データ削除(イテレータ版)
         /// </summary>
-        HE::Bool Erase(IteratorChar in_iter)
+        HE::Bool Erase(Iterator in_iter)
         {
             // 終端ノードは消させない
             if (in_iter == this->End()) return FALSE;
 
             // ツリーを辿って削除 &再構築
-            this->_pRoot = this->_Erase(this->_pRoot, in_iter._pNode->_pair.key);
+            this->_pRoot = this->_Erase(this->_pRoot, in_iter._pNode->_pair._key);
 
             // まだツリーが存在するなら、ルートノードを黒にしておく
             if (this->_pRoot) this->_pRoot->_uColor = Node::EColor::EColor_Black;
@@ -317,12 +317,12 @@ namespace Core::Common
         /// 先頭イテレーターを取得
         /// データが空なら終端イテレーターを取得
         /// </summary>
-        IteratorChar Begin() const HE_NOEXCEPT { return IteratorChar(this->_head._pNext); }
+        Iterator Begin() const HE_NOEXCEPT { return Iterator(this->_head._pNext); }
 
         /// <summary>
         /// 終端イテレーター取得
         /// </summary>
-        IteratorChar End() const HE_NOEXCEPT { return this->_iteratorTail; }
+        Iterator End() const HE_NOEXCEPT { return this->_iteratorTail; }
 
         /// <summary>
         /// KEYを添え字にしてデータアクセス
@@ -360,7 +360,7 @@ namespace Core::Common
 
         inline TData& FindOrAddKey(const TKey& in_trKey)
         {
-            IteratorChar it = this->FindKey(in_trKey);
+            Iterator it = this->FindKey(in_trKey);
             if (it == this->End())
             {
                 // 無ければ追加する
@@ -369,7 +369,7 @@ namespace Core::Common
             }
 
             // データの参照を返す
-            return it->data;
+            return it->_data;
         }
 
 #ifdef HE_ENGINE_DEBUG
@@ -392,12 +392,12 @@ namespace Core::Common
 
             // 左ノードがあればコンペア
             if (in_pNode->_pLeft &&
-                this->_CompareByKey(in_pNode->_pair.key, in_pNode->_pLeft->_pair.key) != -1)
+                this->_CompareByKey(in_pNode->_pair._key, in_pNode->_pLeft->_pair._key) != -1)
                 return FALSE;
 
             // 右ノードがあればコンペア
             if (in_pNode->_pRight &&
-                this->_CompareByKey(in_pNode->_pair.key, in_pNode->_pRight->_pair.key) != 1)
+                this->_CompareByKey(in_pNode->_pair._key, in_pNode->_pRight->_pair._key) != 1)
                 return FALSE;
 
             // 自分の左ノードをチェック
@@ -487,7 +487,7 @@ namespace Core::Common
             Node* p = &this->_aNode[in_pNode->_uIndex];
             if (p)
             {
-                this->_DestroyNodeData(p->_pair.data);
+                this->_DestroyNodeData(p->_pair._data);
             }
             this->_sFreeIndex.PushBack(in_pNode->_uIndex);
 
@@ -495,13 +495,13 @@ namespace Core::Common
         }
 
         // ノードを追加する
-        IteratorChar _Add(const TKey& in_rKey, const TData* in_pData)
+        Iterator _Add(const TKey& in_rKey, const TData* in_pData)
         {
             // 赤ノードを作る
             Node* pNode = this->_NewNode();
             if (pNode == NULL) return this->End();
 
-            pNode->_pair.key = in_rKey;
+            pNode->_pair._key = in_rKey;
             if (in_pData != NULL)
             {
                 // 添え字アクセスで作る場合はデータが無い
@@ -512,7 +512,7 @@ namespace Core::Common
                 }
                 else
                 {
-                    pNode->_pair.data = *in_pData;
+                    pNode->_pair._data = *in_pData;
                 }
             }
 
@@ -521,7 +521,7 @@ namespace Core::Common
             // ルートは常に黒維持
             this->_pRoot->_uColor = Node::EColor::EColor_Black;
 
-            return IteratorChar(pNode);
+            return Iterator(pNode);
         }
 
         /// <summary>
@@ -534,7 +534,7 @@ namespace Core::Common
             if (in_pNode == NULL) return in_pAdd;
 
             // キーの比較
-            HE::Sint32 iCmpResult = this->_CompareByKey(in_pNode->_pair.key, in_pAdd->_pair.key);
+            HE::Sint32 iCmpResult = this->_CompareByKey(in_pNode->_pair._key, in_pAdd->_pair._key);
 
             // ノード挿入
             if (iCmpResult == 0)
@@ -626,7 +626,7 @@ namespace Core::Common
             if (in_pNode == NULL) return NULL;
 
             // 比較する
-            HE::Sint32 iCmpResult = this->_CompareByKey(in_pNode->_pair.key, in_rKey);
+            HE::Sint32 iCmpResult = this->_CompareByKey(in_pNode->_pair._key, in_rKey);
             if (iCmpResult == 0)
             {
                 // 探しているノードだった
@@ -651,7 +651,7 @@ namespace Core::Common
             if (in_pNode == NULL) return NULL;
 
             // 比較する
-            HE::Sint32 iCmpResult = this->_CompareByData(in_pNode->_pair.data, in_rData);
+            HE::Sint32 iCmpResult = this->_CompareByData(in_pNode->_pair._data, in_rData);
             if (iCmpResult == 0)
             {
                 // 探しているノードだった
@@ -672,7 +672,7 @@ namespace Core::Common
         // キーに対応したノードを探して削除
         Node* _Erase(Node* in_pNode, const TKey& in_trKey)
         {
-            if (this->_CompareByKey(in_pNode->_pair.key, in_trKey) < 0)
+            if (this->_CompareByKey(in_pNode->_pair._key, in_trKey) < 0)
             {
                 // 削除ノードは左にある
                 if (!this->_IsRed(in_pNode->_pLeft) && !this->_IsRed(in_pNode->_pLeft->_pLeft))
@@ -689,7 +689,7 @@ namespace Core::Common
                     in_pNode = this->_RotateRight(in_pNode);
                 }
 
-                if (this->_CompareByKey(in_pNode->_pair.key, in_trKey) == 0 &&
+                if (this->_CompareByKey(in_pNode->_pair._key, in_trKey) == 0 &&
                     (in_pNode->_pRight == NULL))
                 {
                     // NULLを返すことで、親からこのpNodeを外させる
@@ -702,7 +702,7 @@ namespace Core::Common
                     in_pNode = this->_MoveRedRight(in_pNode);
                 }
 
-                if (this->_CompareByKey(in_pNode->_pair.key, in_trKey) == 0)
+                if (this->_CompareByKey(in_pNode->_pair._key, in_trKey) == 0)
                 {
                     // このノードを削除したいが、左右に別のノードがくっついている
                     // 自分の値に一番近いノードを探す
@@ -747,7 +747,7 @@ namespace Core::Common
             for (const Node* p = in_mpOther->_head._pNext; (p != &in_mpOther->_tail) && (p != NULL);
                  p             = p->_pNext)
             {
-                this->Add(p->_pair.key, p->_pair.data);
+                this->Add(p->_pair._key, p->_pair._data);
             }
         }
 
@@ -956,7 +956,7 @@ namespace Core::Common
         Node _head;
         Node _tail;
 
-        IteratorChar _iteratorTail;
+        Iterator _iteratorTail;
 
         HE::Uint32 _uNodeNum       = 0;
         HE::Uint32 _uFreeStackSize = 0;

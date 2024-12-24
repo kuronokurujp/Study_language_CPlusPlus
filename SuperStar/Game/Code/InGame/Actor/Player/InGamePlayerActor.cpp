@@ -118,7 +118,7 @@ namespace InGame
         // 弾の機能解放
         for (auto itr = this->_mShotStrategy.Begin(); itr != this->_mShotStrategy.End(); ++itr)
         {
-            itr->data.reset();
+            itr->_data.reset();
         }
 
         return InGameScene2DActor::VEnd();

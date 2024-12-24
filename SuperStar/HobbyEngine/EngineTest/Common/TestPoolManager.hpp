@@ -112,7 +112,7 @@ TEST_CASE("PoolManager FixPoolManager AllDelete")
     auto m = poolManagerWithUint32.GetUseDataMap();
     for (auto itr = m.Begin(); itr != m.End(); ++itr)
     {
-        CHECK(poolManagerWithUint32.Free(itr->key));
+        CHECK(poolManagerWithUint32.Free(itr->_key));
     }
     CHECK(poolManagerWithUint32.Empty());
 }

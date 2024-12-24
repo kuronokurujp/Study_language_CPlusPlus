@@ -8,9 +8,9 @@ namespace AssetManager
     HE::Bool AssetManager::AssetDataBinary::_VLoad(Platform::FileInterface& in_rFile)
     {
         // ファイルをバイナル形式でロード
-        auto [pData, uSize] = in_rFile.VLoadBinary(this->_path);
+        auto [pData, _uSize] = in_rFile.VLoadBinary(this->_path);
         this->_pData        = pData;
-        this->_uSize        = uSize;
+        this->_uSize        = _uSize;
 
         return (this->_pData != NULL);
     }

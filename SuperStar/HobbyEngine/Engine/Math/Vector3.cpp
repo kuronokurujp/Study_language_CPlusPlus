@@ -18,14 +18,14 @@ namespace Core::Math
     }
 
     // 値設定
-    void Vector3::SetPosition(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ)
+    void Vector3::Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ)
     {
         this->_fX = in_fX;
         this->_fY = in_fY;
         this->_fZ = in_fZ;
     }
 
-    void Vector3::SetPosition(const HE::Float32 in_fVal)
+    void Vector3::Set(const HE::Float32 in_fVal)
     {
         this->_fX = this->_fY = this->_fZ = in_fVal;
     }

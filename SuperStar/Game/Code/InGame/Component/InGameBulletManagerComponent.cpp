@@ -172,7 +172,7 @@ namespace InGame
         out->ulMetaData = in_uColIndex;
 
         // ストラテジー毎にコリジョンデータを作成
-        return itr->data->VOutputCollisionData(out, &pBullet->work);
+        return itr->_data->VOutputCollisionData(out, &pBullet->work);
     }
 
     void InGameBulletManagerComponent::_ForEachObject(
@@ -189,9 +189,9 @@ namespace InGame
             if (this->_mBulletStrategy.Contains(pObject->aName) == FALSE) continue;
 
             auto itr = this->_mBulletStrategy.FindKey(pObject->aName);
-            HE_ASSERT(itr->data->VWorkSize() <= sizeof(pObject->work));
+            HE_ASSERT(itr->_data->VWorkSize() <= sizeof(pObject->work));
 
-            if (in_func(pObject, itr->data.get()) == FALSE)
+            if (in_func(pObject, itr->_data.get()) == FALSE)
             {
                 this->_vBullet.RemoveAt(i);
             }

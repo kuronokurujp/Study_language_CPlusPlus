@@ -25,7 +25,7 @@ namespace Lua
         {
             HE::Float32 fVal;
             HE::Char szText[128];
-        } data;
+        } _data;
     };
 
     /// <summary>

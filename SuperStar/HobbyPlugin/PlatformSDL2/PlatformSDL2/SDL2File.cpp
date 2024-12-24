@@ -46,7 +46,7 @@ namespace PlatformSDL2
         HE_ASSERT_RETURN_VALUE(FALSE, 0 < in_uSize && "ファイルの読み込みサイズが0以下");
 
         auto itr  = this->_mFileHandle.FindKey(in_rHandle);
-        auto size = itr->data->_pSDLRWOpen->read(itr->data->_pSDLRWOpen, out_pBuff, 1,
+        auto size = itr->_data->_pSDLRWOpen->read(itr->_data->_pSDLRWOpen, out_pBuff, 1,
                                                  static_cast<size_t>(in_uSize));
         HE_ASSERT_RETURN_VALUE(FALSE, size == in_uSize);
 
@@ -59,7 +59,7 @@ namespace PlatformSDL2
 
         auto itr = this->_mFileHandle.FindKey(in_rHandle);
 
-        return itr->data->_iFileSize;
+        return itr->_data->_iFileSize;
     }
 
     HE::Bool File::VFileClose(const Core::Common::Handle& in_rHandle)
@@ -68,9 +68,9 @@ namespace PlatformSDL2
 
         auto itr = this->_mFileHandle.FindKey(in_rHandle);
 
-        itr->data->_pSDLRWOpen->close(itr->data->_pSDLRWOpen);
+        itr->_data->_pSDLRWOpen->close(itr->_data->_pSDLRWOpen);
 
-        HE_SAFE_DELETE_MEM(itr->data);
+        HE_SAFE_DELETE_MEM(itr->_data);
 
         return TRUE;
     }
@@ -81,18 +81,18 @@ namespace PlatformSDL2
         auto handle = this->VFileOpen(in_rPath.Str());
         HE_ASSERT_RETURN_VALUE((std::tuple<void*, HE::Uint32>(NULL, 0)), handle.Null() == FALSE);
 
-        auto uSize = this->VFileSize(handle);
+        auto _uSize = this->VFileSize(handle);
 
         // TODO: メモリページは指定したい
-        void* pData = HE_ALLOC_MEM(uSize, 0);
+        void* pData = HE_ALLOC_MEM(_uSize, 0);
         if (pData != NULL)
         {
-            ::memset(pData, 0, uSize);
+            ::memset(pData, 0, _uSize);
 
             // ロード
             HE::Bool bRet = FALSE;
 
-            if (this->VFileRead(pData, handle, uSize))
+            if (this->VFileRead(pData, handle, _uSize))
             {
                 bRet = TRUE;
             }
@@ -105,7 +105,7 @@ namespace PlatformSDL2
 
         this->VFileClose(handle);
 
-        return std::tuple<void*, HE::Uint32>(pData, uSize);
+        return std::tuple<void*, HE::Uint32>(pData, _uSize);
     }
 
     std::tuple<HE::Char*, HE::Uint32> File::VLoadText(const Core::File::Path& in_rPath)
@@ -115,21 +115,21 @@ namespace PlatformSDL2
         HE_ASSERT_RETURN_VALUE((std::tuple<HE::Char*, HE::Uint32>(NULL, 0)),
                                handle.Null() == FALSE);
 
-        auto uSize = this->VFileSize(handle);
+        auto _uSize = this->VFileSize(handle);
 
         // TODO: メモリページは指定したい
-        HE::Char* pData = reinterpret_cast<HE::Char*>(HE_ALLOC_MEM(uSize + 1, 0));
+        HE::Char* pData = reinterpret_cast<HE::Char*>(HE_ALLOC_MEM(_uSize + 1, 0));
         if (pData != NULL)
         {
-            ::memset(pData, 0, uSize + 1);
+            ::memset(pData, 0, _uSize + 1);
 
             // ロード
             HE::Bool bRet = FALSE;
 
-            if (this->VFileRead(pData, handle, uSize))
+            if (this->VFileRead(pData, handle, _uSize))
             {
                 bRet         = TRUE;
-                pData[uSize] = HE_STR_TEXT('\0');
+                pData[_uSize] = HE_STR_TEXT('\0');
             }
             else
             {
@@ -140,7 +140,7 @@ namespace PlatformSDL2
 
         this->VFileClose(handle);
 
-        return std::tuple<HE::Char*, HE::Uint32>(pData, uSize);
+        return std::tuple<HE::Char*, HE::Uint32>(pData, _uSize);
     }
 
 }  // namespace PlatformSDL2

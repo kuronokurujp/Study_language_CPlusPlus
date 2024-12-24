@@ -38,7 +38,7 @@ namespace PlatformSDL2
         /// <summary>
         /// 2Dテキスト描画
         /// </summary>
-        void VDrawText2D(const Platform::ViewPortConfig& in_rViewConfig,
+        void V2DDrawText(const Platform::ViewPortConfig& in_rViewConfig,
                          const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAnchor,
                          const HE::Char* in_szText, const HE::Uint32 in_uTextSize,
                          const Core::Math::Color in_color) override final;
@@ -46,17 +46,25 @@ namespace PlatformSDL2
         /// <summary>
         /// 2Dの矩形描画
         /// </summary>
-        void VDrawQuad2D(const Platform::ViewPortConfig& in_rViewConfig,
+        void V2DDrawQuad(const Platform::ViewPortConfig& in_rViewConfig,
                          const Core::Math::Rect2& in_rRect2D,
                          const Core::Math::Color in_color) override final;
 
         /// <summary>
         /// 2Dの円描画
         /// </summary>
-        void VDrawCircle2D(const Platform::ViewPortConfig& in_rViewConfig,
+        void V2DDrawCircle(const Platform::ViewPortConfig& in_rViewConfig,
                            const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAchor,
                            const HE::Float32 in_fSize,
                            const Core::Math::Color in_color) override final;
+
+        /// <summary>
+        /// 2Dの三角形描画
+        /// </summary>
+        void V2DDrawTriangle(const Platform::ViewPortConfig& in_rViewConfig,
+                             const Core::Math::Vector2& in_rPos,
+                             const Core::Math::EAnchor in_eAchor, const HE::Float32 in_rAngleDegress,
+                             const HE::Float32 in_fSize, const Core::Math::Color) override final;
 
     private:
         PlatformSDL2::PlatformSDL2Module* _pSDL2Module = NULL;
@@ -64,6 +72,7 @@ namespace PlatformSDL2
 
         void* _p2DQuadMesh   = NULL;
         void* _p2DCircleMesh = NULL;
+        void* _p2DTriangleMesh = NULL;
 
         void* _p2DGeometoryMat = NULL;
         void* _p2DQuadMat      = NULL;

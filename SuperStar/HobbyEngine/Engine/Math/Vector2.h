@@ -86,11 +86,12 @@ namespace Core::Math
         /// <summary>
         /// Sets the specified in value.
         /// </summary>
-        inline void SetPosition(const HE::Float32 in_fValue) HE_NOEXCEPT
+        inline void Set(const HE::Float32 in_fValue) HE_NOEXCEPT
         {
             this->_fX = this->_fY = in_fValue;
         }
-        inline void SetPosition(const HE::Float32 in_fX, const HE::Float32 in_fY) HE_NOEXCEPT
+
+        inline void Set(const HE::Float32 in_fX, const HE::Float32 in_fY) HE_NOEXCEPT
         {
             this->_fX = in_fX;
             this->_fY = in_fY;
@@ -99,7 +100,7 @@ namespace Core::Math
         /// <summary>
         /// ベクトル型で設定
         /// </summary>
-        inline void SetPosition(const Vector2& in_rValue) HE_NOEXCEPT
+        inline void Set(const Vector2& in_rValue) HE_NOEXCEPT
         {
             this->_fX = in_rValue._fX;
             this->_fY = in_rValue._fY;
@@ -241,7 +242,7 @@ namespace Core::Math
             const HE::Float32 cfDot = 2 * Dot(in_nv, flipV);
             Vector2 v(in_nv._fX * cfDot, in_nv._fY * cfDot);
             v -= flipV;
-            out->SetPosition(v);
+            out->Set(v);
         }
 
         // 頻繁にアクセスする変数にはprivate指定にはしない

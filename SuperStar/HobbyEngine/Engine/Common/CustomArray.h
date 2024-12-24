@@ -34,13 +34,13 @@ namespace Core::Common
         /// <summary>
         /// 指定した要素に値をコピーして設定
         /// </summary>
-        inline void SetPosition(const HE::Uint32 in_uIndex, const TType& in_data) HE_NOEXCEPT
+        inline void Set(const HE::Uint32 in_uIndex, const TType& in_data) HE_NOEXCEPT
         {
             HE_ASSERT(in_uIndex < this->_uCapacity);
             this->_pBuff[in_uIndex] = in_data;
         }
 
-        inline void SetPosition(const HE::Uint32 in_uIndex, TType&& in_data) HE_NOEXCEPT
+        inline void Set(const HE::Uint32 in_uIndex, TType&& in_data) HE_NOEXCEPT
         {
             HE_ASSERT(in_uIndex < this->_uCapacity);
             this->_pBuff[in_uIndex] = std::move(in_data);

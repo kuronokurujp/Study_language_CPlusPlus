@@ -12,13 +12,13 @@ namespace Render
                                Platform::ScreenInterface* in_pScreen)
     {
         // TODO: コマンドに応じた描画処理をする
-        switch (in_pCommand->uType)
+        switch (in_pCommand->_uType)
         {
             // 画面クリア
             case Render::ECmdType_ClsScreen:
             {
-                const Render::CmdClsScreen* pClsScreen = &in_pCommand->data.clsScree;
-                const auto& rColor                     = pClsScreen->color;
+                const Render::CmdClsScreen* pClsScreen = &in_pCommand->_data._clsScree;
+                const auto& rColor                     = pClsScreen->_color;
 
                 in_pScreen->VCls(rColor.c32.r, rColor.c32.b, rColor.c32.g);
                 break;
@@ -27,13 +27,13 @@ namespace Render
             // 矩形を描画
             case Render::ECmdType_2DQuadDraw:
             {
-                const Render::Cmd2DQuadDraw* pRect2D = &in_pCommand->data.rect2DDraw;
+                const Render::Cmd2DQuadDraw* pRect2D = &in_pCommand->_data._2DDrawRect;
 
                 Core::Math::Rect2 r;
-                r.SetRect(pRect2D->fLeftX, pRect2D->fRightX, pRect2D->fLeftY, pRect2D->fRightY,
+                r.SetRect(pRect2D->_fLeftX, pRect2D->_fRightX, pRect2D->_fLeftY, pRect2D->_fRightY,
                           Core::Math::EAnchor::EAnchor_Left);
 
-                in_pScreen->VDrawQuad2D(in_rViewPortConfig, r, pRect2D->color);
+                in_pScreen->V2DDrawQuad(in_rViewPortConfig, r, pRect2D->_color);
                 break;
             }
 
@@ -42,10 +42,10 @@ namespace Render
             {
                 // データ置換
                 const Render::Cmd2DPointArrayDraw* pCmdPoint2DCloud =
-                    &in_pCommand->data.pointCloud2DDraw;
-                HE_ASSERT(0 < pCmdPoint2DCloud->uCount && "点群の点が一つもないのはだめ");
+                    &in_pCommand->_data._2DDrawPointCloud;
+                HE_ASSERT(0 < pCmdPoint2DCloud->_uCount && "点群の点が一つもないのはだめ");
 
-                if (0 < pCmdPoint2DCloud->uCount)
+                if (0 < pCmdPoint2DCloud->_uCount)
                 {
                     /*
                         const HE::Uint32 num =
@@ -76,10 +76,10 @@ namespace Render
             // 点描画
             case Render::ECmdType_2DPointDraw:
             {
-                const Render::Cmd2DPointDraw* pCmdPoint2D = &in_pCommand->data.point2DDraw;
+                const Render::Cmd2DPointDraw* pCmdPoint2D = &in_pCommand->_data._2DDrawPoint;
 
-                const Render::Point2D* pPoint2D = &pCmdPoint2D->point;
-                const auto& rColor              = pPoint2D->color;
+                const Render::Point2D* pPoint2D = &pCmdPoint2D->_point;
+                const auto& rColor              = pPoint2D->_color;
                 /*
                 const auto uColor = ::GetColor(rColor.c32.r, rColor.c32.g,
                 rColor.c32.b);
@@ -93,23 +93,34 @@ namespace Render
             // 2次元の円描画
             case Render::ECmdType_2DCircleDraw:
             {
-                const Render::Cmd2DCircleDraw* pCmdCircle = &in_pCommand->data.circle2DDraw;
+                const Render::Cmd2DCircleDraw* pCmd = &in_pCommand->_data._2DDrawCircle;
 
-                const Render::Point2D& rPoint = pCmdCircle->point;
-                in_pScreen->VDrawCircle2D(in_rViewPortConfig,
-                                          Core::Math::Vector2(rPoint.fX, rPoint.fY),
-                                          pCmdCircle->eAnchor, pCmdCircle->fSize, rPoint.color);
+                const Render::Point2D& rPoint = pCmd->_point;
+                in_pScreen->V2DDrawCircle(in_rViewPortConfig,
+                                          Core::Math::Vector2(rPoint._fX, rPoint._fY), pCmd->_eAnchor,
+                                          pCmd->_fSize, rPoint._color);
                 break;
             }
+
             // 2Dテキストを描画
             case Render::ECmdType_2DTextDraw:
             {
-                const Render::Cmd2DTextDraw* pText2D = &in_pCommand->data.text2DDraw;
+                const Render::Cmd2DTextDraw* pCmd = &in_pCommand->_data._2DDrawText;
 
-                in_pScreen->VDrawText2D(in_rViewPortConfig,
-                                        Core::Math::Vector2(pText2D->fX, pText2D->fY),
-                                        pText2D->anchor, pText2D->szChars, pText2D->uSize,
-                                        pText2D->color);
+                in_pScreen->V2DDrawText(in_rViewPortConfig, Core::Math::Vector2(pCmd->_fX, pCmd->_fY),
+                                        pCmd->_eAnchor, pCmd->_szChars, pCmd->_uSize, pCmd->_color);
+                break;
+            }
+
+            // TODO: 2Dの三角形を描画
+            case Render::ECmdType_2DTriangleDraw:
+            {
+                const Render::Cmd2DTriangleDraw* pCmd = &in_pCommand->_data._2DDrawTriangle;
+                const Render::Point2D& rPoint         = pCmd->_point;
+                in_pScreen->V2DDrawTriangle(in_rViewPortConfig,
+                                            Core::Math::Vector2(rPoint._fX, rPoint._fY),
+                                            pCmd->_eAnchor, pCmd->_fAngleDegrees, pCmd->_fSize, rPoint._color);
+
                 break;
             }
         }

@@ -121,12 +121,12 @@ namespace UI
         UI::Builder::Node layoutNode;
         bRet = asset.OutputNode(&layoutNode, node, "l");
         HE_ASSERT(bRet);
-        HE_ASSERT(layoutNode.data.eWidgetType == UI::Builder::EWidget_Layout &&
+        HE_ASSERT(layoutNode._data.eWidgetType == UI::Builder::EWidget_Layout &&
                   "レイアウトノードが存在しない");
 
         // レイアウトを作成
         UIWidgetHandlePack widgetHandlePack =
-            this->NewLayer(Core::Common::FixedString64(layoutNode.data.szId), in_uSort,
+            this->NewLayer(Core::Common::FixedString64(layoutNode._data.szId), in_uSort,
                            in_rLevelHandle);
 
         // レイアウトノード下にあるWidgetを取得
@@ -147,7 +147,7 @@ namespace UI
             while (stack.Empty() == FALSE)
             {
                 auto widgetNode                       = stack.PopBack();
-                const auto pNodeData                  = &widgetNode.data;
+                const auto pNodeData                  = &widgetNode._data;
                 const UI::Builder::EWidget widgetType = pNodeData->eWidgetType;
                 // TODO: 関数テーブルにしてswitch文を消す方向にするかも
                 // 今は種類が少ないからいいが, 数が膨大になるとまずい
@@ -166,8 +166,8 @@ namespace UI
                             &pNodeData->exData.label;
                         const UI::Builder::Style* pStyle = &pLabel->style;
                         Core::Math::Rect2 rect;
-                        rect.SetPosition(pLabel->fX, pLabel->fY, pStyle->fW, pStyle->fH,
-                                         Local::mPosAnthorToRect2Anchor[pLabel->eAnchor]);
+                        rect.SetPosition(pLabel->_fX, pLabel->_fY, pStyle->fW, pStyle->fH,
+                                         Local::mPosAnthorToRect2Anchor[pLabel->_eAnchor]);
 
                         auto h =
                             this->NewLabelWidget(Core::Common::FixedString64(pNodeData->szId), sort,
@@ -187,8 +187,8 @@ namespace UI
                         const UI::Builder::Style* pStyle = &pButton->style;
 
                         Core::Math::Rect2 rect;
-                        rect.SetPosition(pButton->fX, pButton->fY, pStyle->fW, pStyle->fH,
-                                         Local::mPosAnthorToRect2Anchor[pButton->eAnchor]);
+                        rect.SetPosition(pButton->_fX, pButton->_fY, pStyle->fW, pStyle->fH,
+                                         Local::mPosAnthorToRect2Anchor[pButton->_eAnchor]);
                         auto h = this->NewButtonWidget(Core::Common::FixedString64(pNodeData->szId),
                                                        sort, rect, pStyle->uColor, in_rViewHandle,
                                                        in_rLevelHandle);

@@ -40,13 +40,13 @@ namespace Event
         {
             for (auto itr = this->_mRegistry.Begin(); itr != this->_mRegistry.End(); ++itr)
             {
-                for (auto itr2 = itr->data.begin(); itr2 != itr->data.end(); ++itr2)
+                for (auto itr2 = itr->_data.begin(); itr2 != itr->_data.end(); ++itr2)
                 {
                     itr2->reset();
                     (*itr2) = NULL;
                 }
 
-                itr->data.clear();
+                itr->_data.clear();
             }
             this->_mRegistry.Clear();
         }
@@ -74,7 +74,7 @@ namespace Event
         // リスナーマップリスト更新
 
         // mapテーブルからハッシュ指定したテーブルデータリストを取得
-        EventListenerTable& rTable = itr->data;
+        EventListenerTable& rTable = itr->_data;
 
         // マップから取得した要素にあるリスナーリストにすでに登録されているかチェック
         // すでに登録済みならリスト登録はスキップ
@@ -103,7 +103,7 @@ namespace Event
         // 既存のマッピングのエントリをたどる、見つかったら削除する
         for (auto itr = this->_mRegistry.Begin(); itr != this->_mRegistry.End(); ++itr)
         {
-            EventListenerTable& table = itr->data;
+            EventListenerTable& table = itr->_data;
             for (EventListenerTable::iterator it2 = table.begin(), it2End = table.end();
                  it2 != it2End; it2++)
             {
@@ -136,7 +136,7 @@ namespace Event
         if (tableItr == this->_mRegistry.End()) return FALSE;
 
         // 共有ポインターを完全破棄
-        for (auto itr = tableItr->data.begin(); itr != tableItr->data.end(); ++itr)
+        for (auto itr = tableItr->_data.begin(); itr != tableItr->_data.end(); ++itr)
         {
             itr->reset();
             (*itr) = NULL;
@@ -259,7 +259,7 @@ namespace Event
             {
                 if (itSpecalListener != this->_mRegistry.End())
                 {
-                    EventListenerTable const& table = itSpecalListener->data;
+                    EventListenerTable const& table = itSpecalListener->_data;
                     for (EventListenerTable::const_iterator listener         = table.begin(),
                                                             listenerEndPoint = table.end();
                          listener != listenerEndPoint; listener++)
@@ -279,8 +279,8 @@ namespace Event
                 if (itListeners == this->_mRegistry.End()) continue;
 
                 // イベントタイプに対応したリスナーを呼ぶ
-                const HE::Uint32 uEventId        = itListeners->key;
-                EventListenerTable const& lTable = itListeners->data;
+                const HE::Uint32 uEventId        = itListeners->_key;
+                EventListenerTable const& lTable = itListeners->_data;
 
                 for (EventListenerTable::const_iterator listener = lTable.begin(),
                                                         end      = lTable.end();
@@ -353,7 +353,7 @@ namespace Event
         // イベント型には現在リスナーがない
         if (itListeners == this->_mRegistry.End()) return FALSE;
 
-        EventListenerTable const& table = itListeners->data;
+        EventListenerTable const& table = itListeners->_data;
 
         // このイベント型には以前はリスナーがあったが今はない
         if (table.size() <= 0) return FALSE;

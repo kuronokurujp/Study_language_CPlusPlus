@@ -17,11 +17,11 @@ namespace InGame
         static HE::Bool IsHitWithCircle2D(const CollisionData& in_rSelfColData,
                                           const CollisionData& in_rTargetColData)
         {
-            auto len = Core::Math::Vector2::Distance(in_rSelfColData.data.circle2D.pos,
-                                                     in_rTargetColData.data.circle2D.pos);
+            auto len = Core::Math::Vector2::Distance(in_rSelfColData._data.circle2D.pos,
+                                                     in_rTargetColData._data.circle2D.pos);
 
-            return (len <= (in_rSelfColData.data.circle2D.fRadius +
-                            in_rTargetColData.data.circle2D.fRadius));
+            return (len <= (in_rSelfColData._data.circle2D.fRadius +
+                            in_rTargetColData._data.circle2D.fRadius));
         }
 
         /// <summary>
@@ -151,8 +151,8 @@ namespace InGame
         HE_ASSERT(pTrans);
 
         auto worldPos              = pTrans->GetWorldPos();
-        out->data.circle2D.pos     = Core::Math::Vector2(worldPos._fX, worldPos._fY);
-        out->data.circle2D.fRadius = this->_fRadius;
+        out->_data.circle2D.pos     = Core::Math::Vector2(worldPos._fX, worldPos._fY);
+        out->_data.circle2D.fRadius = this->_fRadius;
         out->eType                 = ECollisionType::ECollisionType_Circle2D;
         out->uHashCode             = this->_uHashCode;
         out->ulMetaData            = this->_ulMetaData;

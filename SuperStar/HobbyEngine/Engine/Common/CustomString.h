@@ -84,8 +84,8 @@ namespace Core::Common
         HE::Char FirstChar() const { return this->_szBuff[0]; }
         HE::Char LastChar() const
         {
-            auto uSize = static_cast<HE::Uint32>(HE_STR_SIZE(this->_szBuff));
-            return this->_szBuff[uSize - 1];
+            auto _uSize = static_cast<HE::Uint32>(HE_STR_SIZE(this->_szBuff));
+            return this->_szBuff[_uSize - 1];
         }
 
         HE::Sint32 Find(const HE::Char* in_szName, const HE::Uint32 in_uStart = 0) const;
@@ -188,12 +188,12 @@ namespace Core::Common
         Concatenate(TArgs... args)
         {
             // 引数の個数を取得
-            const HE::Uint32 uCount = static_cast<HE::Uint32>(sizeof...(args));
-            if (uCount <= 0) return;
+            const HE::Uint32 _uCount = static_cast<HE::Uint32>(sizeof...(args));
+            if (_uCount <= 0) return;
 
             // 初期化リストを使用して引数を処理
             const HE::Char* carrValue[] = {args...};
-            for (HE::Uint32 i = 0; i < uCount; ++i) this->_Add(carrValue[i]);
+            for (HE::Uint32 i = 0; i < _uCount; ++i) this->_Add(carrValue[i]);
         }
 
         /// <summary>
@@ -399,7 +399,7 @@ namespace Core::Common
             {
                 if (name.Empty() == FALSE)
                 {
-                    out.SetPosition(arrayIndex, name);
+                    out.Set(arrayIndex, name);
                     ++arrayIndex;
                 }
                 name.Clear();
@@ -414,7 +414,7 @@ namespace Core::Common
 
         if (name.Empty() == FALSE)
         {
-            out.SetPosition(arrayIndex, name);
+            out.Set(arrayIndex, name);
             ++arrayIndex;
         }
     }

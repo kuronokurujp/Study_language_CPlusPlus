@@ -141,7 +141,7 @@ private:
 #define HE_CREATE_ENGINE        \
     {                           \
         static Engine s_engine; \
-        s_engine.SetPosition(); \
+        s_engine.Setup();       \
     }
 // エンジン削除
 #define HE_DELETE_ENGINE     \

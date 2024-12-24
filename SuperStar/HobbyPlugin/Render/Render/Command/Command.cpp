@@ -15,18 +15,18 @@ namespace Render
         // 必要なコマンド情報を作る
         Command cmd;
         {
-            cmd.uType = ECmdType_2DTextDraw;
+            cmd._uType = ECmdType_2DTextDraw;
 
-            Cmd2DTextDraw* pText2D = &cmd.data.text2DDraw;
-            static_assert(sizeof(cmd.data.text2DDraw) <= sizeof(cmd.data.ulaWork));
+            Cmd2DTextDraw* pText2D = &cmd._data._2DDrawText;
+            static_assert(sizeof(cmd._data._2DDrawText) <= sizeof(cmd._data._ulaWork));
 
-            pText2D->fX     = in_rPos._fX;
-            pText2D->fY     = in_rPos._fY;
-            pText2D->color  = in_color;
-            pText2D->anchor = in_eAnchor;
-            pText2D->uSize  = in_uSize;
-            HE_STR_ERRNO e  = HE_STR_CPY_S(pText2D->szChars, HE_ARRAY_NUM(pText2D->szChars),
-                                           in_szrName.Str(), in_szrName.Capacity());
+            pText2D->_fX      = in_rPos._fX;
+            pText2D->_fY      = in_rPos._fY;
+            pText2D->_color   = in_color;
+            pText2D->_eAnchor = in_eAnchor;
+            pText2D->_uSize   = in_uSize;
+            HE_STR_ERRNO e    = HE_STR_CPY_S(pText2D->_szChars, HE_ARRAY_NUM(pText2D->_szChars),
+                                             in_szrName.Str(), in_szrName.Capacity());
             HE_ASSERT(HE_STR_SUCCESS(e) && "文字列コピーに失敗");
         }
 
@@ -42,15 +42,15 @@ namespace Render
         // 必要なコマンド情報を作る
         Command cmd;
         {
-            cmd.uType              = ECmdType_2DQuadDraw;
-            Cmd2DQuadDraw* pRect2D = &cmd.data.rect2DDraw;
-            HE_STATIC_ASSERT(sizeof(cmd.data.rect2DDraw) <= sizeof(cmd.data.ulaWork));
+            cmd._uType             = ECmdType_2DQuadDraw;
+            Cmd2DQuadDraw* pRect2D = &cmd._data._2DDrawRect;
+            HE_STATIC_ASSERT(sizeof(cmd._data._2DDrawRect) <= sizeof(cmd._data._ulaWork));
 
-            pRect2D->fLeftX  = in_rRect._fLeft;
-            pRect2D->fLeftY  = in_rRect._fTop;
-            pRect2D->fRightX = in_rRect._fRight;
-            pRect2D->fRightY = in_rRect._fBottom;
-            pRect2D->color   = in_color;
+            pRect2D->_fLeftX  = in_rRect._fLeft;
+            pRect2D->_fLeftY  = in_rRect._fTop;
+            pRect2D->_fRightX = in_rRect._fRight;
+            pRect2D->_fRightY = in_rRect._fBottom;
+            pRect2D->_color   = in_color;
         }
 
         auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
@@ -64,14 +64,14 @@ namespace Render
         // 必要なコマンド情報を作る
         Command cmd;
         {
-            cmd.uType                   = ECmdType_2DPointDraw;
-            Cmd2DPointDraw* pCmdPoint2D = &cmd.data.point2DDraw;
-            HE_STATIC_ASSERT(sizeof(cmd.data.point2DDraw) <= sizeof(cmd.data.ulaWork));
+            cmd._uType                  = ECmdType_2DPointDraw;
+            Cmd2DPointDraw* pCmdPoint2D = &cmd._data._2DDrawPoint;
+            HE_STATIC_ASSERT(sizeof(cmd._data._2DDrawPoint) <= sizeof(cmd._data._ulaWork));
 
-            Point2D* pPoint2D = &pCmdPoint2D->point;
-            pPoint2D->fX      = in_rPos._fX;
-            pPoint2D->fY      = in_rPos._fY;
-            pPoint2D->color   = in_rColor;
+            Point2D* pPoint2D = &pCmdPoint2D->_point;
+            pPoint2D->_fX     = in_rPos._fX;
+            pPoint2D->_fY     = in_rPos._fY;
+            pPoint2D->_color  = in_rColor;
         }
 
         auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
@@ -86,12 +86,12 @@ namespace Render
         // 必要なコマンド情報を作る
         Command cmd;
         {
-            cmd.uType                 = ECmdType_2DPointArrayDraw;
-            Cmd2DPointArrayDraw* pCmd = &cmd.data.pointCloud2DDraw;
-            HE_STATIC_ASSERT(sizeof(cmd.data.pointCloud2DDraw) <= sizeof(cmd.data.ulaWork));
+            cmd._uType                = ECmdType_2DPointArrayDraw;
+            Cmd2DPointArrayDraw* pCmd = &cmd._data._2DDrawPointCloud;
+            HE_STATIC_ASSERT(sizeof(cmd._data._2DDrawPointCloud) <= sizeof(cmd._data._ulaWork));
             // 引数のポインタをそのまま使用している
-            pCmd->aPoint = in_aPoint;
-            pCmd->uCount = in_uCount;
+            pCmd->_aPoint = in_aPoint;
+            pCmd->_uCount = in_uCount;
         }
         auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
         pModule->PushSceneRenderCommand(in_rViewHandle, std::move(cmd));
@@ -105,9 +105,9 @@ namespace Render
         // 必要なコマンド情報を作る
         Command cmd;
         {
-            cmd.uType                = ECmdType_ClsScreen;
-            CmdClsScreen* pClsScreen = &cmd.data.clsScree;
-            HE_STATIC_ASSERT(sizeof(cmd.data.clsScree) <= sizeof(cmd.data.ulaWork));
+            cmd._uType               = ECmdType_ClsScreen;
+            CmdClsScreen* pClsScreen = &cmd._data._clsScree;
+            HE_STATIC_ASSERT(sizeof(cmd._data._clsScree) <= sizeof(cmd._data._ulaWork));
         }
         auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
         pModule->PushSceneRenderCommand(in_rViewHandle, std::move(cmd));
@@ -124,14 +124,45 @@ namespace Render
         // 必要なコマンド情報を作る
         Command cmd;
         {
-            cmd.uType             = ECmdType_2DCircleDraw;
-            Cmd2DCircleDraw* pCmd = &cmd.data.circle2DDraw;
-            HE_STATIC_ASSERT(sizeof(cmd.data.circle2DDraw) <= sizeof(cmd.data.ulaWork));
-            pCmd->point.fX    = in_rPos._fX;
-            pCmd->point.fY    = in_rPos._fY;
-            pCmd->point.color = in_rColor;
-            pCmd->fSize       = in_fSize;
-            pCmd->eAnchor     = in_eAhchor;
+            cmd._uType            = ECmdType_2DCircleDraw;
+            Cmd2DCircleDraw* pCmd = &cmd._data._2DDrawCircle;
+            HE_STATIC_ASSERT(sizeof(cmd._data._2DDrawCircle) <= sizeof(cmd._data._ulaWork));
+            pCmd->_point._fX    = in_rPos._fX;
+            pCmd->_point._fY    = in_rPos._fY;
+            pCmd->_point._color = in_rColor;
+            pCmd->_fSize        = in_fSize;
+            pCmd->_eAnchor      = in_eAhchor;
+        }
+
+        auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
+        pModule->PushSceneRenderCommand(in_rViewHandle, std::move(cmd));
+    }
+
+    /// <summary>
+    /// TODO: 三角形の2D描画
+    /// </summary>
+    void Command2DTriangleDraw(const Core::Common::Handle& in_rViewHandle,
+                               const Core::Math::Vector2& in_rPos,
+                               const Core::Math::EAnchor in_eAhchor,
+                               const HE::Float32 in_fAngleDegress, const HE::Float32 in_fSize,
+                               const Core::Math::Color& in_rColor)
+    {
+        // 2D円の描画コマンドを作る
+        HE_ASSERT(in_rViewHandle.Null() == FALSE);
+
+        // 必要なコマンド情報を作る
+        Command cmd;
+        {
+            cmd._uType              = ECmdType_2DTriangleDraw;
+            Cmd2DTriangleDraw* pCmd = &cmd._data._2DDrawTriangle;
+            HE_STATIC_ASSERT(sizeof(cmd._data._2DDrawCircle) <= sizeof(cmd._data._ulaWork));
+
+            pCmd->_point._fX     = in_rPos._fX;
+            pCmd->_point._fY     = in_rPos._fY;
+            pCmd->_point._color  = in_rColor;
+            pCmd->_fAngleDegrees = in_fAngleDegress;
+            pCmd->_fSize         = in_fSize;
+            pCmd->_eAnchor       = in_eAhchor;
         }
 
         auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();

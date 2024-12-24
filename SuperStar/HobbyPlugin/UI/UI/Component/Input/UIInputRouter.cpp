@@ -19,7 +19,7 @@ namespace UI
         // UIのユーザー入力があるかチェック
         if (pInputMap->Contains(HE_STR_TEXT("UIButton")) == FALSE) return;
 
-        auto input = pInputMap->FindKey(HE_STR_TEXT("UIButton"))->data;
+        auto input = pInputMap->FindKey(HE_STR_TEXT("UIButton"))->_data;
 
         // 入力結果をWidgetに通知
         Widget* pWidget = reinterpret_cast<Widget*>(in_pSelfObject);
@@ -29,7 +29,7 @@ namespace UI
         Core::Common::FixedStack<Actor::Component*, 128> sWidgetComponent;
         pWidget->OutputChildrenComponent(&sWidgetComponent, &UIWidgetComponent::CLASS_RTTI);
 
-        HE::Uint32 uSize = sWidgetComponent.Size();
+        HE::Uint32 _uSize = sWidgetComponent.Size();
         Core::Common::Handle handle;
 
         // UIに関わる, マウスのクリックやキーボードなどの結果を受け取り, 各入力端末へ通知する

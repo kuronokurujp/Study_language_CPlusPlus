@@ -101,7 +101,7 @@ namespace Platform
         /// <summary>
         /// 2Dのテキスト描画
         /// </summary>
-        virtual void VDrawText2D(const ViewPortConfig& in_rViewConfg,
+        virtual void V2DDrawText(const ViewPortConfig& in_rViewConfg,
                                  const Core::Math::Vector2& in_rPos,
                                  const Core::Math::EAnchor in_eAnchor, const HE::Char* in_szText,
                                  const HE::Uint32 in_uTextSize, const Core::Math::Color) = 0;
@@ -109,15 +109,24 @@ namespace Platform
         /// <summary>
         /// 2Dの矩形描画
         /// </summary>
-        virtual void VDrawQuad2D(const ViewPortConfig& in_rViewConfig,
+        virtual void V2DDrawQuad(const ViewPortConfig& in_rViewConfig,
                                  const Core::Math::Rect2& in_rRect2D, const Core::Math::Color) = 0;
 
         /// <summary>
         /// 2Dの円描画
         /// </summary>
-        virtual void VDrawCircle2D(const ViewPortConfig& in_rViewConfig,
+        virtual void V2DDrawCircle(const ViewPortConfig& in_rViewConfig,
                                    const Core::Math::Vector2& in_rPos,
                                    const Core::Math::EAnchor in_eAchor, const HE::Float32 in_fSize,
                                    const Core::Math::Color) = 0;
+
+        /// <summary>
+        /// 2Dの三角形描画
+        /// </summary>
+        virtual void V2DDrawTriangle(const ViewPortConfig& in_rViewConfig,
+                                     const Core::Math::Vector2& in_rPos,
+                                     const Core::Math::EAnchor in_eAchor,
+                                     const HE::Float32 in_rAngleDegress, const HE::Float32 in_fSize,
+                                     const Core::Math::Color) = 0;
     };
 }  // namespace Platform

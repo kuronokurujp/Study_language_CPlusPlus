@@ -2,22 +2,6 @@
 
 namespace Core::Math
 {
-    /*
-        // 2Dの矩形クラス
-        Rect2::Rect2(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
-                     const HE::Float32 in_fH, const EAnchor in_eAnchor)
-        {
-            this->SetPosition(in_fX, in_fY, in_fW, in_fH, in_eAnchor);
-        }
-        */
-
-    /*
-        Rect2::Rect2(const Rect2& in_rRect)
-        {
-            ::memcpy(this, &in_rRect, sizeof(Rect2));
-        }
-        */
-
     void Rect2::SetPosition(const HE::Float32 in_fX, const HE::Float32 in_fY,
                             const HE::Float32 in_fW, const HE::Float32 in_fH,
                             const EAnchor in_eAnchor)
@@ -67,26 +51,26 @@ namespace Core::Math
     /// </summary>
     const Vector2 Rect2::Pos() const
     {
-        HE::Float32 fX = 0.0f, fY = 0.0f;
+        HE::Float32 _fX = 0.0f, _fY = 0.0f;
 
         switch (this->_eAnchor)
         {
             case EAnchor_Left:
             {
-                fX = this->_fLeft;
-                fY = this->_fTop;
+                _fX = this->_fLeft;
+                _fY = this->_fTop;
                 break;
             }
 
             case EAnchor_Center:
             {
-                fX = this->_fLeft + (this->Width() * 0.5f);
-                fY = this->_fTop + (this->Height() * 0.5f);
+                _fX = this->_fLeft + (this->Width() * 0.5f);
+                _fY = this->_fTop + (this->Height() * 0.5f);
 
                 break;
             }
         }
-        return (Vector2(fX, fY));
+        return (Vector2(_fX, _fY));
     }
 
     /// <summary>

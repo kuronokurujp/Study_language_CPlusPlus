@@ -17,7 +17,7 @@ namespace Localization
         // ロードしたアセットを全て破棄
         for (auto it = this->_locateDataMap.Begin(); it != this->_locateDataMap.End(); ++it)
         {
-            this->UnloadTextAll(it->key);
+            this->UnloadTextAll(it->_key);
         }
 
         auto pLocalModule = this->GetDependenceModule<AssetManager::AssetManagerModule>();
@@ -67,10 +67,10 @@ namespace Localization
         for (auto it = map.Begin(); it != map.End(); ++it)
         {
             szTmp = in_szLocateName.Str();
-            szTmp.Concatenate(HE_STR_TEXT("/"), it->key.Str());
+            szTmp.Concatenate(HE_STR_TEXT("/"), it->_key.Str());
 
-            auto h = pLocalModule->Load<LocateAssetData>(szTmp.Str(), it->data._textFilePath.Str());
-            textMap.Add(it->key, h);
+            auto h = pLocalModule->Load<LocateAssetData>(szTmp.Str(), it->_data._textFilePath.Str());
+            textMap.Add(it->_key, h);
         }
         HE_ASSERT(0 < textMap.Size());
 
@@ -87,7 +87,7 @@ namespace Localization
         auto pMap = &this->_locateDataMap[in_szLocateName.Str()];
         for (auto it = pMap->Begin(); it != pMap->End(); ++it)
         {
-            pLocalModule->Unload(it->data);
+            pLocalModule->Unload(it->_data);
         }
         pMap->Clear();
 
@@ -104,10 +104,10 @@ namespace Localization
         auto locateIter = this->_locateDataMap.FindKey(in_szLocateName.Str());
         HE_ASSERT(locateIter.IsValid());
 
-        auto groupIter = locateIter->data.FindKey(in_szGroupName.Str());
+        auto groupIter = locateIter->_data.FindKey(in_szGroupName.Str());
         HE_ASSERT(groupIter.IsValid());
 
-        LocateAssetData& rData = pLocalModule->GetAsset<LocateAssetData>(groupIter->data);
+        LocateAssetData& rData = pLocalModule->GetAsset<LocateAssetData>(groupIter->_data);
 
         // テキストを取得
         HE_ASSERT(in_szKey.Size() <= 256);
@@ -141,13 +141,13 @@ namespace Localization
         Core::Common::FixedString128 locateStr;
         for (auto it = mLocateNode.Begin(); it != mLocateNode.End(); ++it)
         {
-            locateStr = it->key.Str();
+            locateStr = it->_key.Str();
             locateStr.ToUpper();
 
             Core::Common::FixedMap<Core::Common::FixedString128, LocateData, 32> mData;
 
             mGroupNode.Clear();
-            it->data.OutputNodeMap(&mGroupNode, HE_STR_EMPTY);
+            it->_data.OutputNodeMap(&mGroupNode, HE_STR_EMPTY);
 
             for (auto groupIt = mGroupNode.Begin(); groupIt != mGroupNode.End(); ++groupIt)
             {
@@ -155,13 +155,13 @@ namespace Localization
                 Core::File::Path path(dataRootPath);
                 path += Core::File::Path(locateStr.Str());
                 path +=
-                    Core::File::Path(groupIt->data.GetNode(HE_STR_TEXT("json")).GetString().Str());
+                    Core::File::Path(groupIt->_data.GetNode(HE_STR_TEXT("json")).GetString().Str());
 
-                LocateData data(path);
-                HE_LOG_LINE(HE_STR_TEXT("%s"), data._textFilePath.Str());
+                LocateData _data(path);
+                HE_LOG_LINE(HE_STR_TEXT("%s"), _data._textFilePath.Str());
 
-                const Core::Common::FixedString128 szGroupName(groupIt->key.Str());
-                mData.Add(szGroupName, data);
+                const Core::Common::FixedString128 szGroupName(groupIt->_key.Str());
+                mData.Add(szGroupName, _data);
             }
 
             this->_locateDataMap.Add(locateStr, mData);
@@ -176,7 +176,7 @@ namespace Localization
 
         Core::Common::FixedString128 key(in_szLocateName);
         auto it = this->_locateDataMap.FindKey(key);
-        return it->data;
+        return it->_data;
     }
 
     const Core::Common::FixedString1024& LocateAssetData::GetText(const HE::UTF8* in_szKey)

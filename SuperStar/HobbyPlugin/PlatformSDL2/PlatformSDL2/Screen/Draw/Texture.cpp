@@ -36,6 +36,8 @@ namespace PlatformSDL2
     {
         // 画像を書き込むためにテクスチャを有効化
         glActiveTexture(this->_uUnitID);
+        HE_ASSERT(glGetError() == GL_NO_ERROR);
+
         ::glBindTexture(this->_uTextureType, this->_uTextureID);
 
         // TODO: 使うテクスチャーの縦横

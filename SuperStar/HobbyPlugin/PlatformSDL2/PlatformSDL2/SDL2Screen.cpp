@@ -168,7 +168,7 @@ namespace PlatformSDL2
             this->_p2DQuadMesh = p2DQuadMesh;
         }
 
-        // : 2D円のメッシュ構築
+        // 2D円のメッシュ構築
         {
             auto p2DCircleMesh = HE_NEW_MEM(Mesh, 0)();
             struct CircleVertex
@@ -235,6 +235,52 @@ namespace PlatformSDL2
             this->_p2DCircleMesh = p2DCircleMesh;
         }
 
+        // 2Dの三角形メッシュ
+        {
+            auto pMesh = HE_NEW_MEM(Mesh, 0)();
+            pMesh->Init();
+
+            struct LocalVertex
+            {
+                // 頂点の位置
+                Core::Math::Vector3 position;
+                // UV座標
+                Core::Math::Vector2 uv;
+            };
+
+            std::vector<LocalVertex> vertices;
+
+            vertices.push_back(
+                {Core::Math::Vector3(0.5f, 0.0f, 0.0f), Core::Math::Vector2(0.5f, 0.f)});
+            vertices.push_back(
+                {Core::Math::Vector3(0.0f, -1.0f, 0.0f), Core::Math::Vector2(0.f, 1.f)});
+            vertices.push_back(
+                {Core::Math::Vector3(1.0f, -1.0f, 0.0f), Core::Math::Vector2(1.f, 1.f)});
+
+            //  頂点など描画に必要な情報をバインド
+            {
+                Mesh::IndexData bindMeshIndexData;
+                {
+                    bindMeshIndexData._pIndices      = NULL;
+                    bindMeshIndexData._uIndicesCount = 0;
+                }
+
+                Mesh::VertexData bindMeshVertexData;
+                {
+                    bindMeshVertexData._pVertices      = vertices.data();
+                    bindMeshVertexData._uVerticesCount = vertices.size();
+                    bindMeshVertexData._uVertSize      = sizeof(LocalVertex);
+                    bindMeshVertexData._aBindLayout    = {
+                        Mesh::LayoutData(3, sizeof(LocalVertex::position)),
+                        Mesh::LayoutData(2, sizeof(LocalVertex::uv)),
+                    };
+                }
+
+                pMesh->WriteDrawData(bindMeshVertexData, bindMeshIndexData);
+            }
+            this->_p2DTriangleMesh = pMesh;
+        }
+
         // 白色のテクスチャ作成
         {
             HE::Uint32 aPixel[1] = {Core::Math::RGB::White.c};
@@ -250,6 +296,12 @@ namespace PlatformSDL2
             auto pWhiteTex = reinterpret_cast<TextureSurface*>(this->_pWhiteTex);
             pWhiteTex->Release();
             HE_SAFE_DELETE_MEM(pWhiteTex);
+        }
+
+        {
+            auto pMesh = reinterpret_cast<Mesh*>(this->_p2DTriangleMesh);
+            pMesh->Release();
+            HE_SAFE_DELETE_MEM(this->_p2DTriangleMesh);
         }
 
         {
@@ -288,7 +340,6 @@ namespace PlatformSDL2
     {
         auto spSt = HE_MAKE_CUSTOM_UNIQUE_PTR((SDL2WindowStrategy), in_rConfig,
                                               static_cast<void*>(s_pShareContext));
-
         if (s_pDummyWindow)
         {
             ::SDL_DestroyWindow(s_pDummyWindow);
@@ -320,15 +371,15 @@ namespace PlatformSDL2
 
     void Screen::VCls(const HE::Uint32 in_uR, const HE::Uint32 in_uG, const HE::Uint32 in_uB)
     {
-        HE::Float32 fR = static_cast<HE::Float32>(in_uR) / 255.0f;
-        HE::Float32 fG = static_cast<HE::Float32>(in_uG) / 255.0f;
-        HE::Float32 fB = static_cast<HE::Float32>(in_uB) / 255.0f;
+        HE::Float32 fR = static_cast<HE::Float32>(in_uR) * Core::Math::fInvert255;
+        HE::Float32 fG = static_cast<HE::Float32>(in_uG) * Core::Math::fInvert255;
+        HE::Float32 fB = static_cast<HE::Float32>(in_uB) * Core::Math::fInvert255;
 
         // 色は0 - 1.0
         ::glClearColor(fR, fG, fB, 1.0f);
     }
 
-    void Screen::VDrawText2D(const Platform::ViewPortConfig& in_rViewConfig,
+    void Screen::V2DDrawText(const Platform::ViewPortConfig& in_rViewConfig,
                              const Core::Math::Vector2& in_rPos,
                              const Core::Math::EAnchor in_eAnchor, const HE::Char* in_szText,
                              const HE::Uint32 in_uTextSize, const Core::Math::Color in_color)
@@ -371,25 +422,27 @@ namespace PlatformSDL2
 
             constexpr HE::Float32 fSX = 0;
             constexpr HE::Float32 fSY = 0;
-            HE::Float32 fX            = fSX;
-            HE::Float32 fY            = fSY;
+            HE::Float32 _fX           = fSX;
+            HE::Float32 _fY           = fSY;
 
             Core::Common::g_szTempFixedString1024 = in_szText;
-            auto itrEnd                           = Core::Common::g_szTempFixedString1024.End();
+            if (Core::Common::g_szTempFixedString1024.Length() <= 0) return;
+
+            auto itrEnd = Core::Common::g_szTempFixedString1024.End();
             for (auto itr = Core::Common::g_szTempFixedString1024.Begin(); itr != itrEnd; ++itr)
             {
                 if ((*itr)[0] == HE_STR_TEXT('\n'))
                 {
                     // 改行したら左端に戻す
-                    fX = fSX;
+                    _fX = fSX;
                     // 1行分下にずらす
-                    fY -= fMeshHeight;
+                    _fY -= fMeshHeight;
 
                     // 改行時にダミー頂点を挿入してつながりをリセット
                     // 前の行の最後の頂点をコピー
                     s_vertices.push_back(s_vertices.back());
                     // 新しい行の左下
-                    s_vertices.push_back({Core::Math::Vector3(fX, fY - fMeshHeight, 0.0f),
+                    s_vertices.push_back({Core::Math::Vector3(_fX, _fY - fMeshHeight, 0.0f),
                                           // UVは仮の値
                                           Core::Math::Vector2(0.0f, 0.0f)});
                     continue;
@@ -400,27 +453,33 @@ namespace PlatformSDL2
 
                 // グリフのUV値を元に設定
                 auto pGlyph = pFontMat->GetGlyph(uUnicode);
+                if (pGlyph == NULL) continue;
 
                 // 頂点データ：四角形をGL_TRIANGLE_STRIPに対応させる (時計回り)
                 // 左下
-                s_vertices.push_back({Core::Math::Vector3(fX, fY - fMeshHeight, 0.0f),
+                s_vertices.push_back({Core::Math::Vector3(_fX, _fY - fMeshHeight, 0.0f),
                                       Core::Math::Vector2(pGlyph->_fTexSU, pGlyph->_fTexEV)});
 
                 // 左上
-                s_vertices.push_back({Core::Math::Vector3(fX, fY, 0.0f),
+                s_vertices.push_back({Core::Math::Vector3(_fX, _fY, 0.0f),
                                       Core::Math::Vector2(pGlyph->_fTexSU, pGlyph->_fTexSV)});
                 // 右下
-                s_vertices.push_back({Core::Math::Vector3(fX + fMeshWidth, fY - fMeshHeight, 0.0f),
-                                      Core::Math::Vector2(pGlyph->_fTexEU, pGlyph->_fTexEV)});
+                s_vertices.push_back(
+                    {Core::Math::Vector3(_fX + fMeshWidth, _fY - fMeshHeight, 0.0f),
+                     Core::Math::Vector2(pGlyph->_fTexEU, pGlyph->_fTexEV)});
                 // 右上
-                s_vertices.push_back({Core::Math::Vector3(fX + fMeshWidth, fY, 0.0f),
+                s_vertices.push_back({Core::Math::Vector3(_fX + fMeshWidth, _fY, 0.0f),
                                       Core::Math::Vector2(pGlyph->_fTexEU, pGlyph->_fTexSV)});
 
                 // 次の文字の位置に移動
-                fX += fMeshWidth;
+                _fX += fMeshWidth;
                 // 1文字あたり4つの頂点
                 uIndexOffset += 4;
             }
+
+            // 頂点情報がない状態でテクスチャやマテリアルを有効にすると無効となってエラーになる
+            // なので頂点情報がない場合は描画関連の処理せず終了させる
+            if (s_vertices.size() <= 0) return;
 
             //  頂点など描画に必要な情報をバインド
             {
@@ -477,7 +536,7 @@ namespace PlatformSDL2
                                     -in_rPos._fY + (in_rViewConfig._uHeight >> 1), 0.0f));
 
             Core::Math::Matrix4 world;
-            world.SetPosition(scaleMat);
+            world.Set(scaleMat);
 
             world.Mul(transMat);
             pFontMat->SetPropertyMatrix("uWorldTransform", world);
@@ -491,12 +550,12 @@ namespace PlatformSDL2
         // 色設定
         {
             const Core::Math::Color32& rC32 = in_color.c32;
-            Core::Math::Vector4 color(static_cast<HE::Float32>(rC32.r) * Core::Math::fInvert255,
-                                      static_cast<HE::Float32>(rC32.g) * Core::Math::fInvert255,
-                                      static_cast<HE::Float32>(rC32.b) * Core::Math::fInvert255,
-                                      static_cast<HE::Float32>(rC32.a) * Core::Math::fInvert255);
+            Core::Math::Vector4 _color(static_cast<HE::Float32>(rC32.r) * Core::Math::fInvert255,
+                                       static_cast<HE::Float32>(rC32.g) * Core::Math::fInvert255,
+                                       static_cast<HE::Float32>(rC32.b) * Core::Math::fInvert255,
+                                       static_cast<HE::Float32>(rC32.a) * Core::Math::fInvert255);
 
-            pFontMat->SetPropertyVector4("uColor", color);
+            pFontMat->SetPropertyVector4("uColor", _color);
         }
 
         // すべての準備が整ったので描画
@@ -514,7 +573,7 @@ namespace PlatformSDL2
         pMesh->FreeDrawData();
     }
 
-    void Screen::VDrawQuad2D(const Platform::ViewPortConfig& in_rViewConfig,
+    void Screen::V2DDrawQuad(const Platform::ViewPortConfig& in_rViewConfig,
                              const Core::Math::Rect2& in_rRect2D, const Core::Math::Color in_color)
     {
         auto p2DQuadMat = reinterpret_cast<Material*>(this->_p2DQuadMat);
@@ -550,7 +609,7 @@ namespace PlatformSDL2
                                         -(pos._fY) + (in_rViewConfig._uHeight >> 1), 0.0f));
 
                 Core::Math::Matrix4 world;
-                world.SetPosition(scaleMat);
+                world.Set(scaleMat);
 
                 world.Mul(transMat);
                 p2DQuadMat->SetPropertyMatrix("uWorldTransform", world);
@@ -562,13 +621,13 @@ namespace PlatformSDL2
             // 色設定
             {
                 const Core::Math::Color32& rC32 = in_color.c32;
-                Core::Math::Vector4 color(static_cast<HE::Float32>(rC32.r) * Core::Math::fInvert255,
-                                          static_cast<HE::Float32>(rC32.g) * Core::Math::fInvert255,
-                                          static_cast<HE::Float32>(rC32.b) * Core::Math::fInvert255,
-                                          static_cast<HE::Float32>(rC32.a) *
-                                              Core::Math::fInvert255);
+                Core::Math::Vector4
+                    _color(static_cast<HE::Float32>(rC32.r) * Core::Math::fInvert255,
+                           static_cast<HE::Float32>(rC32.g) * Core::Math::fInvert255,
+                           static_cast<HE::Float32>(rC32.b) * Core::Math::fInvert255,
+                           static_cast<HE::Float32>(rC32.a) * Core::Math::fInvert255);
 
-                p2DQuadMat->SetPropertyVector4("uColor", color);
+                p2DQuadMat->SetPropertyVector4("uColor", _color);
             }
 
             auto p2DQuadMesh = reinterpret_cast<Mesh*>(this->_p2DQuadMesh);
@@ -578,7 +637,7 @@ namespace PlatformSDL2
         p2DQuadMat->Disable();
     }
 
-    void Screen::VDrawCircle2D(const Platform::ViewPortConfig& in_rViewConfig,
+    void Screen::V2DDrawCircle(const Platform::ViewPortConfig& in_rViewConfig,
                                const Core::Math::Vector2& in_rPos,
                                const Core::Math::EAnchor in_eAchor, const HE::Float32 in_fSize,
                                const Core::Math::Color in_color)
@@ -628,7 +687,7 @@ namespace PlatformSDL2
                                         0.0f));
 
                 Core::Math::Matrix4 world;
-                world.SetPosition(scaleMat);
+                world.Set(scaleMat);
 
                 world.Mul(transMat);
                 pMat->SetPropertyMatrix("uWorldTransform", world);
@@ -640,17 +699,102 @@ namespace PlatformSDL2
             // 色設定
             {
                 const Core::Math::Color32& rC32 = in_color.c32;
-                Core::Math::Vector4 color(static_cast<HE::Float32>(rC32.r) * Core::Math::fInvert255,
-                                          static_cast<HE::Float32>(rC32.g) * Core::Math::fInvert255,
-                                          static_cast<HE::Float32>(rC32.b) * Core::Math::fInvert255,
-                                          static_cast<HE::Float32>(rC32.a) *
-                                              Core::Math::fInvert255);
+                Core::Math::Vector4
+                    _color(static_cast<HE::Float32>(rC32.r) * Core::Math::fInvert255,
+                           static_cast<HE::Float32>(rC32.g) * Core::Math::fInvert255,
+                           static_cast<HE::Float32>(rC32.b) * Core::Math::fInvert255,
+                           static_cast<HE::Float32>(rC32.a) * Core::Math::fInvert255);
 
-                pMat->SetPropertyVector4("uColor", color);
+                pMat->SetPropertyVector4("uColor", _color);
             }
 
             auto pMesh = reinterpret_cast<Mesh*>(this->_p2DCircleMesh);
             pMesh->DrawByVertexOnly(GL_TRIANGLE_FAN);
+        }
+        pWhiteTex->Disable();
+        pMat->Disable();
+    }
+
+    void Screen::V2DDrawTriangle(const Platform::ViewPortConfig& in_rViewConfig,
+                                 const Core::Math::Vector2& in_rPos,
+                                 const Core::Math::EAnchor in_eAchor,
+                                 const HE::Float32 in_fAngleDegress, const HE::Float32 in_fSize,
+                                 const Core::Math::Color in_color)
+    {
+        auto pMat = reinterpret_cast<Material*>(this->_p2DGeometoryMat);
+        pMat->Enable();
+
+        auto pWhiteTex = reinterpret_cast<TextureSurface*>(this->_pWhiteTex);
+        pWhiteTex->Enable();
+        {
+            // 射影はシンプルなのを利用
+            {
+                Core::Math::Matrix4 viewProj;
+                Core::Math::Matrix4::OutputSimpleViewProj(&viewProj,
+                                                          static_cast<HE::Float32>(
+                                                              in_rViewConfig._uWidth),
+                                                          static_cast<HE::Float32>(
+                                                              in_rViewConfig._uHeight));
+                pMat->SetPropertyMatrix("uViewProj", viewProj);
+            }
+
+            // 座標を設定
+            {
+                HE::Float32 fOffset = 0.0f;
+                switch (in_eAchor)
+                {
+                    case Core::Math::EAnchor_Left:
+                    {
+                        break;
+                    }
+
+                    case Core::Math::EAnchor_Center:
+                    {
+                        fOffset = in_fSize * 0.5f;
+                        break;
+                    }
+                }
+
+                Core::Math::Matrix4 scaleMat;
+                Core::Math::Matrix4::OutputScale(&scaleMat, in_fSize, in_fSize, 1.0f);
+
+                Core::Math::Matrix4 rotZMat;
+                Core::Math::Matrix4::OutputRotationZ(&rotZMat, Core::Math::DegreesToRadians(
+                                                                   in_fAngleDegress));
+
+                Core::Math::Matrix4 transMat;
+                Core::Math::Matrix4::OutputTranslation(
+                    &transMat,
+                    Core::Math::Vector3((in_rPos._fX - fOffset) - (in_rViewConfig._uWidth >> 1),
+                                        -(in_rPos._fY - fOffset) + (in_rViewConfig._uHeight >> 1),
+                                        0.0f));
+
+                Core::Math::Matrix4 world;
+                world.Set(scaleMat);
+
+                world.Mul(rotZMat);
+
+                world.Mul(transMat);
+                pMat->SetPropertyMatrix("uWorldTransform", world);
+            }
+
+            // 白色の1x1テクスチャを設定
+            pMat->SetPropertyTexture("uTexture", pWhiteTex);
+
+            // 色設定
+            {
+                const Core::Math::Color32& rC32 = in_color.c32;
+                Core::Math::Vector4
+                    _color(static_cast<HE::Float32>(rC32.r) * Core::Math::fInvert255,
+                           static_cast<HE::Float32>(rC32.g) * Core::Math::fInvert255,
+                           static_cast<HE::Float32>(rC32.b) * Core::Math::fInvert255,
+                           static_cast<HE::Float32>(rC32.a) * Core::Math::fInvert255);
+
+                pMat->SetPropertyVector4("uColor", _color);
+            }
+
+            auto pMesh = reinterpret_cast<Mesh*>(this->_p2DTriangleMesh);
+            pMesh->DrawByVertexOnly(GL_TRIANGLES);
         }
         pWhiteTex->Disable();
         pMat->Disable();

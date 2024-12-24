@@ -585,9 +585,9 @@ namespace Core::Memory
         // ファイル名をコピーする
         {
             HE::Uint32 uMaxCount = HE_ARRAY_NUM(pAllocateMemoryBlock->_szFileName);
-            HE::Uint32 uCount    = HE_MIN(static_cast<HE::Uint32>(::strlen(in_szFile)), uMaxCount);
+            HE::Uint32 _uCount    = HE_MIN(static_cast<HE::Uint32>(::strlen(in_szFile)), uMaxCount);
             ::strncpy_s(pAllocateMemoryBlock->_szFileName, in_szFile,
-                        uCount * sizeof(pAllocateMemoryBlock->_szFileName[0]));
+                        _uCount * sizeof(pAllocateMemoryBlock->_szFileName[0]));
         }
         pAllocateMemoryBlock->_uLine = in_uLine;
 

@@ -24,7 +24,7 @@ namespace EnhancedInput
     {
         for (auto it = in_mrAction.Begin(); it != in_mrAction.End(); ++it)
         {
-            this->_mMappingAction.Add(it->key, it->data);
+            this->_mMappingAction.Add(it->_key, it->_data);
         }
     }
 
@@ -32,7 +32,7 @@ namespace EnhancedInput
     {
         for (auto it = in_mrAction.Begin(); it != in_mrAction.End(); ++it)
         {
-            this->_mMappingAction.Erase(it->key);
+            this->_mMappingAction.Erase(it->_key);
         }
     }
 
@@ -78,34 +78,34 @@ namespace EnhancedInput
         for (auto it = this->_mMappingAction.Begin(); it != this->_mMappingAction.End(); ++it)
         {
             // 発生している場合は発生リストに登録
-            for (HE::Uint32 i = 0; i < it->data.aKeyboardKeys.Size(); ++i)
+            for (HE::Uint32 i = 0; i < it->_data.aKeyboardKeys.Size(); ++i)
             {
-                const auto eKey = it->data.aKeyboardKeys[i];
+                const auto eKey = it->_data.aKeyboardKeys[i];
                 if (inputState._keyboard.GetKeyState(eKey))
                 {
                     InputData inputData;
                     inputData.eType              = EInputType_Keyboard;
                     inputData.item.keyboard.eKey = eKey;
 
-                    this->_mInputAction[it->key].PushBack(inputData);
+                    this->_mInputAction[it->_key].PushBack(inputData);
                 }
             }
 
-            for (HE::Uint32 i = 0; i < it->data.aTouchs.Size(); ++i)
+            for (HE::Uint32 i = 0; i < it->_data.aTouchs.Size(); ++i)
             {
-                const auto eTouch      = it->data.aTouchs[i];
-                const auto eTouchState = inputState._touch.GetTouchState(it->data.aTouchs[i]);
+                const auto eTouch      = it->_data.aTouchs[i];
+                const auto eTouchState = inputState._touch.GetTouchState(it->_data.aTouchs[i]);
                 if (eTouchState == Platform::EInputState::EInputState_PRESSED)
                 {
                     const auto pos = inputState._touch.GetWorldPos();
 
                     InputData inputData;
                     inputData.eType            = EInputType_Touch;
-                    inputData.item.touch.fX    = pos._fX;
-                    inputData.item.touch.fY    = pos._fY;
+                    inputData.item.touch._fX    = pos._fX;
+                    inputData.item.touch._fY    = pos._fY;
                     inputData.item.touch.eType = eTouch;
 
-                    auto& r = this->_mInputAction[it->key];
+                    auto& r = this->_mInputAction[it->_key];
                     r.PushBack(inputData);
                 }
             }

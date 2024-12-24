@@ -50,14 +50,14 @@ namespace UI::Builder
             {
                 struct Widget
                 {
-                    HE::Float32 fX, fY;
+                    HE::Float32 _fX, _fY;
                 } widget;
 
                 struct Label
                 {
-                    EAnchor eAnchor;
+                    EAnchor _eAnchor;
                     HE::Bool bLoc;
-                    HE::Float32 fX, fY;
+                    HE::Float32 _fX, _fY;
                     HE::Char szLoc[64];
                     HE::Char szText[64];
                     Style style;
@@ -65,8 +65,8 @@ namespace UI::Builder
 
                 struct Button
                 {
-                    EAnchor eAnchor;
-                    HE::Float32 fX, fY;
+                    EAnchor _eAnchor;
+                    HE::Float32 _fX, _fY;
                     Style style;
                 } button;
 
@@ -75,7 +75,7 @@ namespace UI::Builder
                     Style style;
                 } layout;
             } exData;
-        } data;
+        } _data;
     };
 
     /// <summary>

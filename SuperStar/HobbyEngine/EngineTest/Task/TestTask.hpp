@@ -131,7 +131,7 @@ namespace Core
         }
 
         static TaskManager manager;
-        static const HE::Uint32 taskNum = 32;
+        static const HE::Uint32 taskNum = 256;
 
         // タスクシステムの初期化
         CHECK(manager.Init(taskNum, 3));
@@ -166,7 +166,7 @@ namespace Core
         }
 
         static TaskManager manager;
-        static const HE::Uint32 taskNum = 32;
+        static const HE::Uint32 taskNum = 256;
 
         // タスクシステムの初期化
         CHECK(manager.Init(taskNum, Local::EGroup_Num));
@@ -270,7 +270,7 @@ namespace Core
             CHECK(memoryManager.CheckAllMemoryBlock());
         }
         static TaskManager manager;
-        static const HE::Uint32 taskNum = 32;
+        static const HE::Uint32 taskNum = 256;
 
         // タスクシステムの初期化
         CHECK(manager.Init(taskNum, Local::EGroup_Num));
@@ -346,7 +346,7 @@ namespace Core
             CHECK(memoryManager.CheckAllMemoryBlock());
         }
         static TaskManager manager;
-        static const HE::Uint32 taskNum = 32;
+        static const HE::Uint32 taskNum = 256;
 
         // タスクシステムの初期化
         CHECK(manager.Init(taskNum, Local::EGroup_Num));
@@ -459,7 +459,7 @@ namespace Core
         };
 
         static TaskManager manager;
-        static const HE::Uint32 taskNum = 32;
+        static const HE::Uint32 taskNum = 256;
 
         // タスクシステムの初期化
         CHECK(manager.Init(taskNum, EGroup_Num));

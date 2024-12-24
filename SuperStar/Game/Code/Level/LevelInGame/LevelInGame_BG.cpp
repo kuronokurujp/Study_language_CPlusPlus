@@ -29,14 +29,14 @@ namespace Level
                 HE_ALLOC_MEM(sizeof(Render::Point2D) * this->_uPointCount, 0));
             for (HE::Uint32 i = 0; i < this->_uPointCount; ++i)
             {
-                const HE::Float32 fX = static_cast<HE::Float32>(
+                const HE::Float32 _fX = static_cast<HE::Float32>(
                     pSystem->VGetRand(pViewPort->Width()));  // rScene2DEnv._uWidth));
-                const HE::Float32 fY = static_cast<HE::Float32>(
+                const HE::Float32 _fY = static_cast<HE::Float32>(
                     pSystem->VGetRand(pViewPort->Height()));  // rScene2DEnv._uHeight));
                 Render::Point2D* p = &this->_aPoint[i];
-                p->fX              = fX;
-                p->fY              = fY;
-                p->color           = Core::Math::RGB::White;
+                p->_fX              = _fX;
+                p->_fY              = _fY;
+                p->_color           = Core::Math::RGB::White;
             }
         }
 
@@ -68,11 +68,11 @@ namespace Level
         // 左から右へ動かす
         for (HE::Uint32 i = 0; i < this->_uPointCount; ++i)
         {
-            this->_aPoint[i].fX -= 0.5f;
-            if (this->_aPoint[i].fX < 0)
+            this->_aPoint[i]._fX -= 0.5f;
+            if (this->_aPoint[i]._fX < 0)
             {
-                this->_aPoint[i].fX = fMaxXPos;
-                this->_aPoint[i].fY =
+                this->_aPoint[i]._fX = fMaxXPos;
+                this->_aPoint[i]._fY =
                     pSystem->VGetRand(pViewPort->Height());  // rScene2DEnv._uHeight);
             }
         }

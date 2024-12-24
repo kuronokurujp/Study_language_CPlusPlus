@@ -2,10 +2,8 @@
 
 #include "Engine/Engine.h"
 
-HE::Bool ApplicationEngineFramework::VStart(const HE::Bool in_bDebug)
+HE::Bool ApplicationEngineFramework::Init(const HE::Bool in_bDebug)
 {
-    HE_LOG_LINE(HE_STR_TEXT("game start"));
-
     // エンジン起動
     HE_CREATE_ENGINE;
 
@@ -21,11 +19,22 @@ HE::Bool ApplicationEngineFramework::VStart(const HE::Bool in_bDebug)
     HE_ASSERT(bInitRet && "初期化に失敗");
     if (bInitRet == FALSE) return FALSE;
 
-    return TRUE;
+    return HE::Bool();
 }
 
-HE::Bool ApplicationEngineFramework::VGameLoop()
+void ApplicationEngineFramework::Release()
 {
+    this->_VUnRegistEngineModule();
+
+    HE_DELETE_ENGINE;
+}
+
+void ApplicationEngineFramework::Running()
+{
+    this->_VLoad();
+
+    this->_VStart();
+
     // ゲームループ
     HE::Float32 fDelta = 0.0f;
     while (HE_ENGINE.IsAppQuit() == FALSE)
@@ -44,16 +53,5 @@ HE::Bool ApplicationEngineFramework::VGameLoop()
         if (HE_ENGINE.LateUpdateLoop(fDelta) == FALSE) break;
     }
 
-    return TRUE;
-}
-
-HE::Bool ApplicationEngineFramework::VEnd()
-{
-    HE_LOG_LINE(HE_STR_TEXT("game end"));
-
-    this->_VUnRegistEngineModule();
-
-    HE_DELETE_ENGINE;
-
-    return TRUE;
+    this->_VEnd();
 }

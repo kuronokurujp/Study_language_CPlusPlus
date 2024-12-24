@@ -47,8 +47,8 @@ namespace Core::Math
         inline void Clear() { this->_fX = this->_fY = this->_fZ = 0.0f; }
 
         // 値設定
-        void SetPosition(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ);
-        void SetPosition(const HE::Float32 in_val);
+        void Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ);
+        void Set(const HE::Float32 in_val);
 
         // 掛け算
         void Mul(const HE::Float32 b);

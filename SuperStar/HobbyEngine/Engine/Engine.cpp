@@ -25,7 +25,7 @@ HE::Bool Engine::Init()
 
     this->_bInit = TRUE;
 
-    this->_memoryManager.SetPosition();
+    this->_memoryManager.Setup();
 
     // メモリ管理
     // カスタムメモリ確保

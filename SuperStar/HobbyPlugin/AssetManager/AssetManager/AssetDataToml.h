@@ -43,13 +43,13 @@ namespace AssetManager
             GetNode(TArgs... args)
             {
                 // 引数の個数を取得
-                HE::Uint32 uCount = static_cast<HE::Uint32>(sizeof...(args));
-                if (uCount <= 0) return Node();
+                HE::Uint32 _uCount = static_cast<HE::Uint32>(sizeof...(args));
+                if (_uCount <= 0) return Node();
 
                 // 初期化リストを使用して引数を処理
                 const HE::Char* values[] = {args...};
 
-                return this->_GetNode(values, uCount);
+                return this->_GetNode(values, _uCount);
             }
 
             template <typename... TArgs>
@@ -58,12 +58,12 @@ namespace AssetManager
             OutputNodeMap(ToolNodeMapType* out, TArgs... args)
             {
                 // 引数の個数を取得
-                HE::Uint32 uCount = static_cast<HE::Uint32>(sizeof...(args));
-                if (uCount <= 0) return FALSE;
+                HE::Uint32 _uCount = static_cast<HE::Uint32>(sizeof...(args));
+                if (_uCount <= 0) return FALSE;
 
                 // 初期化リストを使用して引数を処理
                 const HE::Char* szaName[] = {args...};
-                return this->_OutputNodeMap(out, szaName, uCount);
+                return this->_OutputNodeMap(out, szaName, _uCount);
             }
 
         private:
@@ -84,5 +84,6 @@ namespace AssetManager
 
     private:
         toml::parse_result _result;
+        HE::Char* _pText = NULL;
     };
 }  // namespace AssetManager

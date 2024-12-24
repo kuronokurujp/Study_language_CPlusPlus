@@ -15,7 +15,7 @@ namespace Core::Math
         /// <summary>
         /// Sets the specified in x.
         /// </summary>
-        void SetPosition(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ,
+        void Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ,
                  const HE::Float32 in_fW);
 
         /// <summary>
