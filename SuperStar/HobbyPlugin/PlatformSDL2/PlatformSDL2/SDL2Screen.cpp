@@ -1,6 +1,5 @@
 ﻿#include "SDL2Screen.h"
 
-// #include <algorithm>
 #include "./../PlatformSDL2Module.h"
 #include "./SDL2Font.h"
 #include "./Screen/Draw/Material.h"
@@ -15,16 +14,6 @@
 
 namespace PlatformSDL2
 {
-    /*
-        using MaterialPool = Core::Common::RuntimePoolManager<Material>;
-        using MeshPool     = Core::Common::RuntimePoolManager<Mesh>;
-        using TexturePool  = Core::Common::RuntimePoolManager<TextureBase>;
-
-        static Core::Memory::SharedPtr<MaterialPool> s_poolMaterial;
-        static Core::Memory::SharedPtr<MeshPool> s_poolMesh;
-        static Core::Memory::SharedPtr<TexturePool> s_poolTexture;
-        */
-
     static SDL_Window* s_pDummyWindow    = NULL;
     static SDL_GLContext s_pShareContext = NULL;
 
@@ -33,18 +22,6 @@ namespace PlatformSDL2
         HE_ASSERT(in_pSDL2Module);
 
         this->_pSDL2Module = in_pSDL2Module;
-
-        /*
-                // TODO: 確保した数値は仮
-                s_poolMaterial = HE_MAKE_CUSTOM_SHARED_PTR((MaterialPool));
-                s_poolMaterial->ReservePool(1024);
-
-                s_poolMesh = HE_MAKE_CUSTOM_SHARED_PTR((MeshPool));
-                s_poolMesh->ReservePool(1024);
-
-                s_poolTexture = HE_MAKE_CUSTOM_SHARED_PTR((TexturePool));
-                s_poolTexture->ReservePool(1024);
-                */
 
         // ダミーのウィンドウとコンテキスト生成
         // なぜこうしているのか？
@@ -74,34 +51,236 @@ namespace PlatformSDL2
             }
         }
 
-        // TODO: フォント用のメッシュは常に使うので常駐
-        auto pFontMesh = HE_NEW_MEM(Mesh, 0)();
-        pFontMesh->Init();
+        // フォント用のメッシュは常に使うので常駐
+        {
+            auto pFontMesh = HE_NEW_MEM(Mesh, 0)();
+            pFontMesh->Init();
+            this->_pFontMesh = pFontMesh;
+        }
 
-        this->_pFontMesh = pFontMesh;
+        // 2D矩形用のマテリアルを作成
+        {
+            auto p2DQuadMat = HE_NEW_MEM(Material, 0);
+
+            // 描画処理でプロパティ名を直指定しているので外部ファイル化はしない
+            // TODO: シェーダーを差し替える機能もいずれ考える
+            // 頂点シェーダーのコード
+            constexpr HE::UTF8* szVertShaderText =
+                " \
+            #version 330 \n \
+            uniform mat4 uWorldTransform; \
+            uniform mat4 uViewProj; \
+            out vec2 fragTexCoord; \
+            void main() \
+            {\
+                fragTexCoord = vec2(gl_VertexID % 2, gl_VertexID / 2); \
+                vec4 pos     = vec4(fragTexCoord.x, -fragTexCoord.y, 0.0, 1.0);\
+                gl_Position  = pos * uWorldTransform * uViewProj;\
+            }";
+
+            // ピクセルシェーダーのコード
+            constexpr HE::UTF8* szFragShaderText =
+                " \
+            #version 330 \n \
+            in vec2 fragTexCoord; \
+            out vec4 outColor; \
+            uniform sampler2D uTexture; \
+            uniform vec4 uColor; \
+            void main() \
+            {\
+                vec4 tex = texture2D(uTexture, fragTexCoord);\
+                outColor = tex * uColor;\
+            }";
+
+            if (p2DQuadMat->LoadShader(szVertShaderText, szFragShaderText) == FALSE)
+            {
+                HE_ASSERT(FALSE && "2D矩形のシェーダーロードに失敗");
+            }
+            this->_p2DQuadMat = p2DQuadMat;
+        }
+
+        // 2D汎用幾何学用のマテリアルを作成
+        {
+            auto pMat = HE_NEW_MEM(Material, 0);
+
+            // 描画処理でプロパティ名を直指定しているので外部ファイル化はしない
+            // TODO: シェーダーを差し替える機能もいずれ考える
+            // 頂点シェーダーのコード
+            constexpr HE::UTF8* szVertShaderText =
+                " \
+            #version 330 \n \
+            uniform mat4 uWorldTransform; \
+            uniform mat4 uViewProj; \
+            layout(location = 0) in vec3 inPosition; \
+            layout(location = 1) in vec2 inTexCoord; \
+            out vec2 fragTexCoord; \
+            void main() \
+            {\
+                fragTexCoord = inTexCoord; \
+                vec4 pos     = vec4(inPosition, 1.0);\
+                gl_Position  = pos * uWorldTransform * uViewProj;\
+            }";
+
+            // ピクセルシェーダーのコード
+            constexpr HE::UTF8* szFragShaderText =
+                " \
+            #version 330 \n \
+            in vec2 fragTexCoord; \
+            out vec4 outColor; \
+            uniform sampler2D uTexture; \
+            uniform vec4 uColor; \
+            void main() \
+            {\
+                vec4 tex = texture2D(uTexture, fragTexCoord);\
+                outColor = tex * uColor;\
+            }";
+
+            if (pMat->LoadShader(szVertShaderText, szFragShaderText) == FALSE)
+            {
+                HE_ASSERT(FALSE && "2D幾何学のシェーダーロードに失敗");
+            }
+            this->_p2DGeometoryMat = pMat;
+        }
+
+        // 2Dの矩形メッシュ作成
+        {
+            auto p2DQuadMesh = HE_NEW_MEM(Mesh, 0)();
+            p2DQuadMesh->Init();
+
+            //  頂点など描画に必要な情報をバインド
+            {
+                Mesh::IndexData bindMeshIndexData;
+                {
+                    bindMeshIndexData._pIndices      = NULL;
+                    bindMeshIndexData._uIndicesCount = 0;
+                }
+
+                Mesh::VertexData bindMeshVertexData;
+                {
+                    bindMeshVertexData._pVertices      = NULL;
+                    bindMeshVertexData._uVerticesCount = 0;
+                    bindMeshVertexData._uVertSize      = 0;
+                    bindMeshVertexData._aBindLayout    = {};
+                }
+
+                p2DQuadMesh->WriteDrawData(bindMeshVertexData, bindMeshIndexData);
+            }
+            this->_p2DQuadMesh = p2DQuadMesh;
+        }
+
+        // : 2D円のメッシュ構築
+        {
+            auto p2DCircleMesh = HE_NEW_MEM(Mesh, 0)();
+            struct CircleVertex
+            {
+                // 頂点の位置
+                Core::Math::Vector3 position;
+                // UV座標
+                Core::Math::Vector2 uv;
+            };
+
+            std::vector<CircleVertex> vertices;
+            // 以下の値を上げると円の描画精度が上がるが,メモリ消費量が上がる
+            constexpr HE::Uint32 uSides = 256;
+
+            // 円の縦横の辺の長さは1にする
+            // 円の半径1だと円のサイズは2になるので0.5で半分にしている
+            // 円の原点左上にしている
+            const Core::Math::Vector3 cx(0.5f, -0.5f, 0.0f);
+
+            Core::Math::Vector3 vec(0.0f, 0.0f, 0.0f);
+            Core::Math::Vector2 uv(0.5f, 0.5f);
+
+            vertices.push_back({cx, uv});
+            for (auto i = 0; i <= uSides; ++i)
+            {
+                const auto fRate = Core::Math::Range0to1(i, uSides);
+                const auto fRad  = Core::Math::fTwoPI * fRate;
+                const auto fSin  = Core::Math::Sin(fRad);
+                const auto fCos  = Core::Math::Cos(fRad);
+
+                vec._fX = 0.5f + fCos * 0.5f;
+                vec._fY = -0.5f + fSin * 0.5f;
+                vec._fZ = 0.0f;
+
+                uv._fX = 0.5f + 0.5f * fCos;
+                uv._fY = 0.5f + 0.5f * fSin;
+
+                vertices.push_back({vec, uv});
+            }
+            p2DCircleMesh->Init();
+
+            //  頂点など描画に必要な情報をバインド
+            {
+                Mesh::IndexData bindMeshIndexData;
+                {
+                    bindMeshIndexData._pIndices      = NULL;
+                    bindMeshIndexData._uIndicesCount = 0;
+                }
+
+                Mesh::VertexData bindMeshVertexData;
+                {
+                    bindMeshVertexData._pVertices      = vertices.data();
+                    bindMeshVertexData._uVerticesCount = vertices.size();
+                    bindMeshVertexData._uVertSize      = sizeof(CircleVertex);
+                    bindMeshVertexData._aBindLayout    = {
+                        Mesh::LayoutData(3, sizeof(CircleVertex::position)),
+                        Mesh::LayoutData(2, sizeof(CircleVertex::uv)),
+                    };
+                }
+
+                p2DCircleMesh->WriteDrawData(bindMeshVertexData, bindMeshIndexData);
+            }
+
+            this->_p2DCircleMesh = p2DCircleMesh;
+        }
+
+        // 白色のテクスチャ作成
+        {
+            HE::Uint32 aPixel[1] = {Core::Math::RGB::White.c};
+            auto pWhiteTex =
+                HE_NEW_MEM(TextureSurface, 0)(GL_TEXTURE_2D, GL_TEXTURE0, aPixel, 1, 1);
+            this->_pWhiteTex = pWhiteTex;
+        }
     }
 
     void Screen::VRelease()
     {
-        auto pFontMesh = reinterpret_cast<Mesh*>(this->_pFontMesh);
-        pFontMesh->Release();
-        HE_SAFE_DELETE_MEM(pFontMesh);
+        {
+            auto pWhiteTex = reinterpret_cast<TextureSurface*>(this->_pWhiteTex);
+            pWhiteTex->Release();
+            HE_SAFE_DELETE_MEM(pWhiteTex);
+        }
 
-        /*
-            // 確保したマテリアルを解放
-            {
-                s_poolMaterial->ReleasePool([](Material* in_pMat) { in_pMat->VRelease(); });
-                s_poolMaterial.reset();
-            }
+        {
+            auto p2DCircleMesh = reinterpret_cast<Mesh*>(this->_p2DCircleMesh);
+            p2DCircleMesh->Release();
+            HE_SAFE_DELETE_MEM(this->_p2DCircleMesh);
+        }
 
-            // 確保したメッシュを解放
-            s_poolMesh->ReleasePool();
-            s_poolMesh.reset();
+        {
+            auto pFontMesh = reinterpret_cast<Mesh*>(this->_pFontMesh);
+            pFontMesh->Release();
+            HE_SAFE_DELETE_MEM(this->_pFontMesh);
+        }
 
-            // 確保したテクスチャを解放
-            s_poolTexture->ReleasePool([](TextureBase* in_pTex) { in_pTex->Release(); });
-            s_poolTexture.reset();
-            */
+        {
+            auto p2DQuadMesh = reinterpret_cast<Mesh*>(this->_p2DQuadMesh);
+            p2DQuadMesh->Release();
+            HE_SAFE_DELETE_MEM(this->_p2DQuadMesh);
+        }
+
+        {
+            auto pMat = reinterpret_cast<Material*>(this->_p2DGeometoryMat);
+            pMat->VRelease();
+            HE_SAFE_DELETE_MEM(this->_p2DGeometoryMat);
+        }
+
+        {
+            auto p2DQuadMat = reinterpret_cast<Material*>(this->_p2DQuadMat);
+            p2DQuadMat->VRelease();
+            HE_SAFE_DELETE_MEM(this->_p2DQuadMat);
+        }
     }
 
     Core::Memory::UniquePtr<Platform::WindowStrategy> Screen::VCreateWindowStrategy(
@@ -150,10 +329,9 @@ namespace PlatformSDL2
     }
 
     void Screen::VDrawText2D(const Platform::ViewPortConfig& in_rViewConfig,
-                             const Core::Math::Vector2& in_rPos, const HE::Char* in_szText,
-                             const HE::Uint32 in_uTextSize,
-                             const Core::Math::Rect2::EAnchor in_eAnchor,
-                             const Core::Math::Color& in_rColor)
+                             const Core::Math::Vector2& in_rPos,
+                             const Core::Math::EAnchor in_eAnchor, const HE::Char* in_szText,
+                             const HE::Uint32 in_uTextSize, const Core::Math::Color in_color)
     {
         // TODO: アンカー処理がまだ
 
@@ -191,10 +369,10 @@ namespace PlatformSDL2
             constexpr HE::Float32 fMeshWidth  = 1.0f;
             constexpr HE::Float32 fMeshHeight = 1.0f;
 
-            HE::Float32 fSX = 0;
-            HE::Float32 fSY = 0;
-            HE::Float32 fX  = fSX;
-            HE::Float32 fY  = fSY;
+            constexpr HE::Float32 fSX = 0;
+            constexpr HE::Float32 fSY = 0;
+            HE::Float32 fX            = fSX;
+            HE::Float32 fY            = fSY;
 
             Core::Common::g_szTempFixedString1024 = in_szText;
             auto itrEnd                           = Core::Common::g_szTempFixedString1024.End();
@@ -237,33 +415,6 @@ namespace PlatformSDL2
                 // 右上
                 s_vertices.push_back({Core::Math::Vector3(fX + fMeshWidth, fY, 0.0f),
                                       Core::Math::Vector2(pGlyph->_fTexEU, pGlyph->_fTexSV)});
-
-                /*
-                                // 左下
-                                s_vertices.push_back(
-                                    {Core::Math::Vector3(-1.f, -1.f, 0.0f), Core::Math::Vector2(0,
-                   1)});
-                                // 右下
-                                s_vertices.push_back(
-                                    {Core::Math::Vector3(1.f, -1.f, 0.0f), Core::Math::Vector2(1,
-                   1)});
-                                // 右上
-                                s_vertices.push_back(
-                                    {Core::Math::Vector3(1.f, 1.f, 0.0f), Core::Math::Vector2(1,
-                   0)});
-                                // 左上
-                                s_vertices.push_back(
-                                    {Core::Math::Vector3(-1.f, 1.f, 0.0f), Core::Math::Vector2(0,
-                   0)});
-
-                                // インデックスデータ：2つの三角形 (0, 1, 2) と (2, 3, 0)
-                                s_indices.push_back(0);
-                                s_indices.push_back(1);
-                                s_indices.push_back(2);
-                                s_indices.push_back(2);
-                                s_indices.push_back(3);
-                                s_indices.push_back(0);
-                                */
 
                 // 次の文字の位置に移動
                 fX += fMeshWidth;
@@ -326,7 +477,7 @@ namespace PlatformSDL2
                                     -in_rPos._fY + (in_rViewConfig._uHeight >> 1), 0.0f));
 
             Core::Math::Matrix4 world;
-            world.Set(scaleMat);
+            world.SetPosition(scaleMat);
 
             world.Mul(transMat);
             pFontMat->SetPropertyMatrix("uWorldTransform", world);
@@ -335,6 +486,17 @@ namespace PlatformSDL2
         // フォントテクスチャ設定
         {
             pFontMat->SetPropertyTexture("uTexture", pFontTex.get());
+        }
+
+        // 色設定
+        {
+            const Core::Math::Color32& rC32 = in_color.c32;
+            Core::Math::Vector4 color(static_cast<HE::Float32>(rC32.r) * Core::Math::fInvert255,
+                                      static_cast<HE::Float32>(rC32.g) * Core::Math::fInvert255,
+                                      static_cast<HE::Float32>(rC32.b) * Core::Math::fInvert255,
+                                      static_cast<HE::Float32>(rC32.a) * Core::Math::fInvert255);
+
+            pFontMat->SetPropertyVector4("uColor", color);
         }
 
         // すべての準備が整ったので描画
@@ -347,6 +509,151 @@ namespace PlatformSDL2
             // テクスチャを無効
             pFontTex->Disable();
         }
+
+        // 描画内容は動的に変化するので描画データを破棄する
         pMesh->FreeDrawData();
     }
+
+    void Screen::VDrawQuad2D(const Platform::ViewPortConfig& in_rViewConfig,
+                             const Core::Math::Rect2& in_rRect2D, const Core::Math::Color in_color)
+    {
+        auto p2DQuadMat = reinterpret_cast<Material*>(this->_p2DQuadMat);
+        p2DQuadMat->Enable();
+
+        auto pWhiteTex = reinterpret_cast<TextureSurface*>(this->_pWhiteTex);
+        pWhiteTex->Enable();
+        {
+            // 射影はシンプルなのを利用
+            {
+                Core::Math::Matrix4 viewProj;
+                Core::Math::Matrix4::OutputSimpleViewProj(&viewProj,
+                                                          static_cast<HE::Float32>(
+                                                              in_rViewConfig._uWidth),
+                                                          static_cast<HE::Float32>(
+                                                              in_rViewConfig._uHeight));
+                p2DQuadMat->SetPropertyMatrix("uViewProj", viewProj);
+            }
+
+            // 座標を設定
+            {
+                const auto fW = in_rRect2D.Width();
+                const auto fH = in_rRect2D.Height();
+
+                Core::Math::Matrix4 scaleMat;
+                Core::Math::Matrix4::OutputScale(&scaleMat, fW, fH, 1.0f);
+
+                Core::Math::Matrix4 transMat;
+                const auto pos = in_rRect2D.Pos();
+                Core::Math::Matrix4::OutputTranslation(
+                    &transMat,
+                    Core::Math::Vector3(pos._fX - (in_rViewConfig._uWidth >> 1),
+                                        -(pos._fY) + (in_rViewConfig._uHeight >> 1), 0.0f));
+
+                Core::Math::Matrix4 world;
+                world.SetPosition(scaleMat);
+
+                world.Mul(transMat);
+                p2DQuadMat->SetPropertyMatrix("uWorldTransform", world);
+            }
+
+            // 白色の1x1テクスチャを設定
+            p2DQuadMat->SetPropertyTexture("uTexture", pWhiteTex);
+
+            // 色設定
+            {
+                const Core::Math::Color32& rC32 = in_color.c32;
+                Core::Math::Vector4 color(static_cast<HE::Float32>(rC32.r) * Core::Math::fInvert255,
+                                          static_cast<HE::Float32>(rC32.g) * Core::Math::fInvert255,
+                                          static_cast<HE::Float32>(rC32.b) * Core::Math::fInvert255,
+                                          static_cast<HE::Float32>(rC32.a) *
+                                              Core::Math::fInvert255);
+
+                p2DQuadMat->SetPropertyVector4("uColor", color);
+            }
+
+            auto p2DQuadMesh = reinterpret_cast<Mesh*>(this->_p2DQuadMesh);
+            p2DQuadMesh->DrawByVertexOnly(GL_TRIANGLE_STRIP, 4);
+        }
+        pWhiteTex->Disable();
+        p2DQuadMat->Disable();
+    }
+
+    void Screen::VDrawCircle2D(const Platform::ViewPortConfig& in_rViewConfig,
+                               const Core::Math::Vector2& in_rPos,
+                               const Core::Math::EAnchor in_eAchor, const HE::Float32 in_fSize,
+                               const Core::Math::Color in_color)
+    {
+        auto pMat = reinterpret_cast<Material*>(this->_p2DGeometoryMat);
+        pMat->Enable();
+
+        auto pWhiteTex = reinterpret_cast<TextureSurface*>(this->_pWhiteTex);
+        pWhiteTex->Enable();
+        {
+            // 射影はシンプルなのを利用
+            {
+                Core::Math::Matrix4 viewProj;
+                Core::Math::Matrix4::OutputSimpleViewProj(&viewProj,
+                                                          static_cast<HE::Float32>(
+                                                              in_rViewConfig._uWidth),
+                                                          static_cast<HE::Float32>(
+                                                              in_rViewConfig._uHeight));
+                pMat->SetPropertyMatrix("uViewProj", viewProj);
+            }
+
+            // 座標を設定
+            {
+                HE::Float32 fOffset = 0.0f;
+                switch (in_eAchor)
+                {
+                    case Core::Math::EAnchor_Left:
+                    {
+                        break;
+                    }
+
+                    case Core::Math::EAnchor_Center:
+                    {
+                        fOffset = in_fSize * 0.5f;
+                        break;
+                    }
+                }
+
+                Core::Math::Matrix4 scaleMat;
+                Core::Math::Matrix4::OutputScale(&scaleMat, in_fSize, in_fSize, 1.0f);
+
+                Core::Math::Matrix4 transMat;
+                Core::Math::Matrix4::OutputTranslation(
+                    &transMat,
+                    Core::Math::Vector3((in_rPos._fX - fOffset) - (in_rViewConfig._uWidth >> 1),
+                                        -(in_rPos._fY - fOffset) + (in_rViewConfig._uHeight >> 1),
+                                        0.0f));
+
+                Core::Math::Matrix4 world;
+                world.SetPosition(scaleMat);
+
+                world.Mul(transMat);
+                pMat->SetPropertyMatrix("uWorldTransform", world);
+            }
+
+            // 白色の1x1テクスチャを設定
+            pMat->SetPropertyTexture("uTexture", pWhiteTex);
+
+            // 色設定
+            {
+                const Core::Math::Color32& rC32 = in_color.c32;
+                Core::Math::Vector4 color(static_cast<HE::Float32>(rC32.r) * Core::Math::fInvert255,
+                                          static_cast<HE::Float32>(rC32.g) * Core::Math::fInvert255,
+                                          static_cast<HE::Float32>(rC32.b) * Core::Math::fInvert255,
+                                          static_cast<HE::Float32>(rC32.a) *
+                                              Core::Math::fInvert255);
+
+                pMat->SetPropertyVector4("uColor", color);
+            }
+
+            auto pMesh = reinterpret_cast<Mesh*>(this->_p2DCircleMesh);
+            pMesh->DrawByVertexOnly(GL_TRIANGLE_FAN);
+        }
+        pWhiteTex->Disable();
+        pMat->Disable();
+    }
+
 }  // namespace PlatformSDL2

@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "Engine/Core.h"
+
+#include "MathCore.h"
 #include "Vector2.h"
 
 namespace Core::Math
@@ -9,22 +11,14 @@ namespace Core::Math
     class Rect2 final
     {
     public:
-        /// <summary>
-        /// 矩形の基準位置タイプ
-        /// </summary>
-        enum EAnchor
-        {
-            EAnchor_Left = 0,
-            EAnchor_Center,
-        };
-
         Rect2() { this->Clear(); }
 
-        Rect2(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
-              const HE::Float32 in_fH, const EAnchor in_eAnchor);
+        void SetPosition(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
+                         const HE::Float32 in_fH, const EAnchor in_eAnchor);
 
-        void Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
-                 const HE::Float32 in_fH, const EAnchor in_eAnchor);
+        void SetRect(const HE::Float32 in_fLeft, const HE::Float32 in_fRight,
+                     const HE::Float32 in_fTop, const HE::Float32 in_fBottom,
+                     const EAnchor in_eAnchor);
 
         /// <summary>
         /// Gets the position.

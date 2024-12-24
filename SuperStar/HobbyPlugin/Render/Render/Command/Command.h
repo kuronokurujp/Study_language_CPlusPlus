@@ -20,7 +20,7 @@ namespace Render
         // テキスト描画
         ECmdType_2DTextDraw,
         // 矩形描画
-        ECmdType_2DRectDraw,
+        ECmdType_2DQuadDraw,
         // 点描画
         ECmdType_2DPointDraw,
         // 点群描画
@@ -38,7 +38,7 @@ namespace Render
         HE::Float32 fY   = 0.0f;
         HE::Uint32 uSize = 0;
         Core::Math::Color color;
-        Core::Math::Rect2::EAnchor anchor = Core::Math::Rect2::EAnchor_Left;
+        Core::Math::EAnchor anchor = Core::Math::EAnchor_Left;
 
         HE::Char szChars[128] = {0};
     };
@@ -46,7 +46,7 @@ namespace Render
     /// <summary>
     /// 2D画面に矩形を表示
     /// </summary>
-    struct Cmd2DRectDraw
+    struct Cmd2DQuadDraw
     {
         HE::Float32 fLeftX = 0.0f;
         HE::Float32 fLeftY = 0.0f;
@@ -86,7 +86,7 @@ namespace Render
     {
         Point2D point;
         HE::Float32 fSize = 0.0f;
-        Core::Math::Color color;
+        Core::Math::EAnchor eAnchor = Core::Math::EAnchor_Left;
     };
 
     /// <summary>
@@ -105,7 +105,7 @@ namespace Render
             CmdClsScreen clsScree;
 
             Cmd2DTextDraw text2DDraw;
-            Cmd2DRectDraw rect2DDraw;
+            Cmd2DQuadDraw rect2DDraw;
             Cmd2DPointDraw point2DDraw;
             Cmd2DPointArrayDraw pointCloud2DDraw;
             Cmd2DCircleDraw circle2DDraw;
@@ -120,14 +120,14 @@ namespace Render
                                   const Core::Math::Vector2& in_rPos,
                                   const Core::Common::StringBase& in_str, const HE::Uint32 in_uSize,
                                   const Core::Math::Color in_color,
-                                  const Core::Math::Rect2::EAnchor in_eAnchor);
+                                  const Core::Math::EAnchor in_eAnchor);
 
     /// <summary>
     /// 2D矩形描画
     /// </summary>
-    extern void Command2DRectDraw(const Core::Common::Handle& in_rViewHandle,
+    extern void Command2DQuadDraw(const Core::Common::Handle& in_rViewHandle,
                                   const Core::Math::Rect2& in_rRect,
-                                  const Core::Math::Color& in_rColor);
+                                  const Core::Math::Color in_color);
 
     /// <summary>
     /// 2D点描画
@@ -151,7 +151,7 @@ namespace Render
     /// 2D円の描画
     /// </summary>
     extern void Command2DCircleDraw(const Core::Common::Handle& in_rViewHandle,
-                                    const Core::Math::Vector2& in_rPos, const HE::Float32 in_fSize,
+                                    const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAhchor, const HE::Float32 in_fSize,
                                     const Core::Math::Color& in_rColor);
 
 }  // namespace Render

@@ -9,11 +9,11 @@ namespace UI
     // クラス内のみで利用する
     namespace Local
     {
-        static Core::Common::FixedMap<Builder::EAnchor, Core::Math::Rect2::EAnchor, 3>
+        static Core::Common::FixedMap<Builder::EAnchor, Core::Math::EAnchor, 3>
             mPosAnthorToRect2Anchor = {{Builder::EAnchor::EAnchor_Left,
-                                        Core::Math::Rect2::EAnchor::EAnchor_Left},
+                                        Core::Math::EAnchor::EAnchor_Left},
                                        {Builder::EAnchor::EPosAnchor_Center,
-                                        Core::Math::Rect2::EAnchor::EAnchor_Center}};
+                                        Core::Math::EAnchor::EAnchor_Center}};
     }
 
     UIModule::UIModule() : ModuleBase(ModuleName())
@@ -165,9 +165,9 @@ namespace UI
                         const UI::Builder::Node::Data::ExData::Label* pLabel =
                             &pNodeData->exData.label;
                         const UI::Builder::Style* pStyle = &pLabel->style;
-                        const Core::Math::Rect2 rect =
-                            Core::Math::Rect2(pLabel->fX, pLabel->fY, pStyle->fW, pStyle->fH,
-                                              Local::mPosAnthorToRect2Anchor[pLabel->eAnchor]);
+                        Core::Math::Rect2 rect;
+                        rect.SetPosition(pLabel->fX, pLabel->fY, pStyle->fW, pStyle->fH,
+                                         Local::mPosAnthorToRect2Anchor[pLabel->eAnchor]);
 
                         auto h =
                             this->NewLabelWidget(Core::Common::FixedString64(pNodeData->szId), sort,
@@ -186,11 +186,12 @@ namespace UI
                             &pNodeData->exData.button;
                         const UI::Builder::Style* pStyle = &pButton->style;
 
-                        auto h = this->NewButtonWidget(
-                            Core::Common::FixedString64(pNodeData->szId), sort,
-                            Core::Math::Rect2(pButton->fX, pButton->fY, pStyle->fW, pStyle->fH,
-                                              Local::mPosAnthorToRect2Anchor[pButton->eAnchor]),
-                            pStyle->uColor, in_rViewHandle, in_rLevelHandle);
+                        Core::Math::Rect2 rect;
+                        rect.SetPosition(pButton->fX, pButton->fY, pStyle->fW, pStyle->fH,
+                                         Local::mPosAnthorToRect2Anchor[pButton->eAnchor]);
+                        auto h = this->NewButtonWidget(Core::Common::FixedString64(pNodeData->szId),
+                                                       sort, rect, pStyle->uColor, in_rViewHandle,
+                                                       in_rLevelHandle);
 
                         // ボタンを押した時のイベントを設定
                         {
@@ -276,8 +277,11 @@ namespace UI
             pText->SetPos(in_rTextRect.Pos());
             pText->SetViewHandle(in_rViewHandle);
             pText->SetText(in_szText);
-            pText->SetRect(Core::Math::Rect2(0, 0, in_rTextRect.Width(), in_rTextRect.Height(),
-                                             in_rTextRect._eAnchor));
+
+            Core::Math::Rect2 rect;
+            rect.SetPosition(0, 0, in_rTextRect.Width(), in_rTextRect.Height(),
+                             in_rTextRect._eAnchor);
+            pText->SetRect(rect);
             pText->SetColor(in_uTextColor);
             pText->SetLocGroupName(in_szLocGroupName);
             pText->SetAnchor(in_rTextRect._eAnchor);

@@ -50,8 +50,8 @@ namespace InGame
         // 描画コマンド追加
         // TODO: 描画内容を動的に切り替える
         // 円描画や矩形描画とか
-        Render::Command2DCircleDraw(in_rViewHandle, pWork->pos, pWork->fSize * 0.5f,
-                                    Core::Math::RGB::White);
+        Render::Command2DCircleDraw(in_rViewHandle, pWork->pos, Core::Math::EAnchor_Center,
+                                    pWork->fSize, Core::Math::RGB::White);
 
         return TRUE;
     }

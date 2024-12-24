@@ -89,8 +89,8 @@ namespace InGame
                 static_cast<HE::Float32>(pViewPort->Height());  // rrSceneView2DEnv._uHeight);
 
             const HE::Float32 fSideLength = 100.0f;
-            activeScreenInSide.Set(-fSideLength, -fSideLength, 2 * fSideLength + fW,
-                                   2 * fSideLength + fH, Core::Math::Rect2::EAnchor_Left);
+            activeScreenInSide.SetPosition(-fSideLength, -fSideLength, 2 * fSideLength + fW,
+                                   2 * fSideLength + fH, Core::Math::EAnchor_Left);
         }
 
         this->_ForEachObject(

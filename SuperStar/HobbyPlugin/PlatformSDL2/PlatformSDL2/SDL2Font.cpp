@@ -1,9 +1,8 @@
 ﻿#include "SDL2Font.h"
 
-#include <GL/glew.h>
-
 #include "./Screen/Draw/Material.h"
 #include "./Screen/Draw/Texture.h"
+#include "GL/glew.h"
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_ttf.h"
 #include "freetype/freetype.h"
@@ -23,6 +22,7 @@ namespace PlatformSDL2
             TTF_Font* _pTTFFont = NULL;
         };
 
+        // フォントサイズ一覧
         constexpr HE::Uint32 aFontSize[] = {64};
 
         static FontData OpenFont(void* in_pFontBinary, const HE::Uint32 in_uFontDataSize,
@@ -83,6 +83,7 @@ namespace PlatformSDL2
                                            const HE::Uint32 in_uTexH, const SDL_Color in_color)
         {
             // SDLサーフェイスを作成
+            // TODO: エンディアン違いを考えていない
             *out_ppSurface = ::SDL_CreateRGBSurface(0, in_uTexW, in_uTexH, 32,
                                                     0x00FF0000,   // Red mask
                                                     0x0000FF00,   // Green mask
@@ -168,36 +169,43 @@ namespace PlatformSDL2
     }
 
     HE::Bool Font::VLoad(const Platform::EFontSize in_eSizeType,
-                         std::initializer_list<Core::File::Path> in_aPath)
+                         const Core::File::Path& in_rTTFFilePath)
     {
-        // ttf,vert,fragファイルのパスが入っている
-        HE_ASSERT(in_aPath.size() == 3);
-
-        auto filePathItr = in_aPath.begin();
         // ttfファイルロード
-        auto [pFontBinary, uFontBinarySize] = this->_pModule->VFile()->VLoadBinary(*filePathItr);
+        auto [pFontBinary, uFontBinarySize] = this->_pModule->VFile()->VLoadBinary(in_rTTFFilePath);
         HE_ASSERT_RETURN_VALUE(NullHandle, pFontBinary);
-        ++filePathItr;
 
-        // 頂点シェーダーをロード
-        auto [pFontMatVertShaderText, uFontMatVerShaderSize] =
-            this->_pModule->VFile()->VLoadText(*filePathItr);
-        if (pFontMatVertShaderText == NULL)
-        {
-            HE_SAFE_DELETE_MEM(pFontBinary);
-            return FALSE;
-        }
-        ++filePathItr;
+        // 描画処理でプロパティ名を直指定しているので外部ファイル化はしない
+        // TODO: シェーダーを差し替える機能もいずれ考える
+        // 頂点シェーダーのコード
+        constexpr HE::UTF8* pFontMatVertShaderText =
+            " \
+            #version 330 \n \
+            uniform mat4 uWorldTransform; \
+            uniform mat4 uViewProj; \
+            layout(location = 0) in vec3 inPosition; \
+            layout(location = 1) in vec2 inTexCoord; \
+            out vec2 fragTexCoord; \
+            void main() \
+            {\
+                vec4 pos     = vec4(inPosition, 1.0);\
+                gl_Position  = pos * uWorldTransform * uViewProj;\
+                fragTexCoord = inTexCoord;\
+            }";
 
-        // ピクセルシェーダーをロード
-        auto [pFontMatFragShaderText, uFontMatFragShaderSize] =
-            this->_pModule->VFile()->VLoadText(*filePathItr);
-        if (pFontMatFragShaderText == NULL)
-        {
-            HE_SAFE_DELETE_MEM(pFontBinary);
-            HE_SAFE_DELETE_MEM(pFontMatVertShaderText);
-            return FALSE;
-        }
+        // ピクセルシェーダーのコード
+        constexpr HE::UTF8* pFontMatFragShaderText =
+            " \
+            #version 330 \n \
+            in vec2 fragTexCoord; \
+            out vec4 outColor; \
+            uniform sampler2D uTexture; \
+            uniform vec4 uColor;\
+            void main() \
+            {\
+                vec4 tex = texture2D(uTexture, fragTexCoord);\
+                outColor = tex * uColor;\
+            }";
 
         HE::Uint32 uFontSize = Local::aFontSize[in_eSizeType];
         Local::FontData fontData;
@@ -227,8 +235,6 @@ namespace PlatformSDL2
 
         ::SDL_FreeSurface(pFontSurf);
 
-        HE_SAFE_DELETE_MEM(pFontMatFragShaderText);
-        HE_SAFE_DELETE_MEM(pFontMatVertShaderText);
         HE_SAFE_DELETE_MEM(pFontBinary);
 
         return TRUE;

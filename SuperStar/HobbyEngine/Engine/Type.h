@@ -1,7 +1,12 @@
 ﻿#pragma once
 
+#include <cstdint>
+
 // Windows環境かどうか
 #if defined(_WIN64) || defined(_WIN86)
+
+// Windowsはリトルエンディアン
+#define HE_LITTLE_ENDIAN
 
 // コンソールかどうか
 #ifdef _WINDOWS
@@ -25,12 +30,8 @@
 
 namespace HE
 {
-// x64 / x84でのポインタを整数へキャストする型
-#ifdef HE_X64
-    using Ptr = unsigned long long;
-#else
-    using Ptr = unsigned int;
-#endif
+    // x64 / x84でのポインタの型が変わる
+    using Ptr = std::uintptr_t;
 
     using Int    = int;
     using Sint32 = signed long;

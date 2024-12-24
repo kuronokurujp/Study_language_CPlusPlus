@@ -30,22 +30,45 @@ namespace PlatformSDL2
             override final;
 
         /// <summary>
-        /// TODO: 画面を色クリア
+        /// 画面を色クリア
         /// </summary>
         void VCls(const HE::Uint32 in_uR, const HE::Uint32 in_uG,
                   const HE::Uint32 in_uB) override final;
 
         /// <summary>
-        /// TODO: 2Dテキスト描画
+        /// 2Dテキスト描画
         /// </summary>
         void VDrawText2D(const Platform::ViewPortConfig& in_rViewConfig,
-                         const Core::Math::Vector2& in_rPos, const HE::Char* in_szText,
-                         const HE::Uint32 in_uTextSize, const Core::Math::Rect2::EAnchor in_eAnchor,
-                         const Core::Math::Color& in_rColor) override final;
+                         const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAnchor,
+                         const HE::Char* in_szText, const HE::Uint32 in_uTextSize,
+                         const Core::Math::Color in_color) override final;
+
+        /// <summary>
+        /// 2Dの矩形描画
+        /// </summary>
+        void VDrawQuad2D(const Platform::ViewPortConfig& in_rViewConfig,
+                         const Core::Math::Rect2& in_rRect2D,
+                         const Core::Math::Color in_color) override final;
+
+        /// <summary>
+        /// 2Dの円描画
+        /// </summary>
+        void VDrawCircle2D(const Platform::ViewPortConfig& in_rViewConfig,
+                           const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAchor,
+                           const HE::Float32 in_fSize,
+                           const Core::Math::Color in_color) override final;
 
     private:
         PlatformSDL2::PlatformSDL2Module* _pSDL2Module = NULL;
         void* _pFontMesh                               = NULL;
+
+        void* _p2DQuadMesh   = NULL;
+        void* _p2DCircleMesh = NULL;
+
+        void* _p2DGeometoryMat = NULL;
+        void* _p2DQuadMat      = NULL;
+
+        void* _pWhiteTex = NULL;
     };
 
 }  // namespace PlatformSDL2

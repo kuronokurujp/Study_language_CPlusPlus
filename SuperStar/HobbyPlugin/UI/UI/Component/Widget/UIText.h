@@ -59,7 +59,7 @@ namespace UI
             this->_szLocGroup = in_szGroupName;
         }
 
-        inline void SetAnchor(const Core::Math::Rect2::EAnchor in_eAnchor)
+        inline void SetAnchor(const Core::Math::EAnchor in_eAnchor)
         {
             this->_eAnchor = in_eAnchor;
         }
@@ -75,7 +75,7 @@ namespace UI
             this->_szDrawText.Clear();
             this->_szLocGroup.Clear();
             this->_rect.Clear();
-            this->_eAnchor = Core::Math::Rect2::EAnchor_Left;
+            this->_eAnchor = Core::Math::EAnchor_Left;
         }
 
     private:
@@ -83,7 +83,7 @@ namespace UI
         Core::Common::FixedString1024 _szDrawText;
         Core::Common::FixedString128 _szLocGroup;
         Core::Math::Rect2 _rect;
-        Core::Math::Rect2::EAnchor _eAnchor = Core::Math::Rect2::EAnchor_Left;
+        Core::Math::EAnchor _eAnchor = Core::Math::EAnchor_Left;
         HE::Uint32 _uFontSize               = 32;
     };
 }  // namespace UI

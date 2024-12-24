@@ -141,7 +141,7 @@ private:
 #define HE_CREATE_ENGINE        \
     {                           \
         static Engine s_engine; \
-        s_engine.Set();         \
+        s_engine.SetPosition(); \
     }
 // エンジン削除
 #define HE_DELETE_ENGINE     \
@@ -180,6 +180,11 @@ static void UnitTestRunnerByModuleOnly(std::function<HE::Bool()> in_func)
         if (HE_ENGINE.BeforeUpdateLoop(d))
         {
             const HE::Float32 d = HE_ENGINE.GetDeltaTimeSec();
+
+            if (HE_ENGINE.WaitFrameLoop() == FALSE)
+            {
+                break;
+            }
 
             if (HE_ENGINE.MainUpdateLoop(d))
             {

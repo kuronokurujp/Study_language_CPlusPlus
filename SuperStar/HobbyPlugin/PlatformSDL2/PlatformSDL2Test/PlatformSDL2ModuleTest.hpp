@@ -10,6 +10,7 @@
 // GUIテスト
 // ウィンドウが開く
 // TODO: ウィンドウで表示後に一定時間後に画像保存する仕組みがほしいな
+/*
 TEST_CASE("SDL2 Font Load GUITest")
 {
     HE::Uint32 uStep = 0;
@@ -33,10 +34,8 @@ TEST_CASE("SDL2 Font Load GUITest")
                 {
                     // ロードするフォントファイルパスを渡す
                     // シェーダーファイルも渡す.(プラットフォームによっては使わない)
-                    auto bRet =
-                        pPlatformModule->VFont()->VLoad(Platform::EFontSize_64,
-                                                        {"Font/TestFont.ttf", "Shader/Font.vert",
-                                                         "Shader/Font.frag"});
+                    auto bRet = pPlatformModule->VFont()->VLoad(Platform::EFontSize_64,
+                                                                HE_STR_TEXT("Font/TestFont.ttf"));
                     CHECK(bRet);
                 }
 
@@ -92,6 +91,146 @@ TEST_CASE("SDL2 Font Load GUITest")
                 Render::Command2DTextDraw(sceneHandle, Core::Math::Vector2(0.0f, 32.0f * 5.f), s2,
                                           32, Core::Math::RGB::White,
                                           Core::Math::Rect2::EAnchor::EAnchor_Left);
+
+                return FALSE;
+            }
+
+            return TRUE;
+        });
+}
+*/
+
+TEST_CASE("SDL2 Quad Draw GUITest")
+{
+    HE::Uint32 uStep = 0;
+    Core::Common::Handle sceneHandle;
+    Core::Common::Handle fontMatHandle;
+
+    UnitTestRunnerByModuleOnly<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module,
+                               Render::RenderModule>(
+        [&uStep, &sceneHandle, &fontMatHandle]()
+        {
+            auto pPlatformModule = HE_ENGINE.PlatformModule();
+            auto pRenderModule   = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
+
+            if (uStep == 0)
+            {
+                auto pAssetManagerModule =
+                    HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
+                pAssetManagerModule->SetCurrentDir(HE_STR_TEXT("Assets"));
+
+                // フォントデータのバイナリアセットを作成
+                {
+                    // ロードするフォントファイルパスを渡す
+                    auto bRet = pPlatformModule->VFont()->VLoad(Platform::EFontSize_64,
+                                                                HE_STR_TEXT("Font/TestFont.ttf"));
+                    CHECK(bRet);
+                }
+
+                Core::Common::Handle windowHandle;
+                Core::Common::Handle viewPortHandle;
+                {
+                    // ゲームウィンドウを生成
+                    windowHandle = pRenderModule->NewWindow(640, 480);
+
+                    // 画面に表示するビューポート
+                    // ゲームウィンドウで利用するビューポートを追加
+                    viewPortHandle = pRenderModule->AddViewPort(windowHandle, 640, 480);
+                }
+
+                // UIのゲームシーンを追加
+                {
+                    auto [handle, pScene] =
+                        pRenderModule->AddSceneViewUI(windowHandle, viewPortHandle);
+                    sceneHandle = handle;
+                }
+
+                // ゲームウィンドウを表示
+                pRenderModule->ShowWindow(windowHandle);
+
+                ++uStep;
+
+                return FALSE;
+            }
+            else if (uStep == 1)
+            {
+                // ウィンドウが閉じたら終了
+                Core::Math::Rect2 rect;
+                // 左隅にぴったり表示しているかのテスト
+                {
+                    rect.SetPosition(0.f, 0.0f, 32.0f, 32.0f, Core::Math::EAnchor_Left);
+                    Render::Command2DQuadDraw(sceneHandle, rect, Core::Math::RGB::Red);
+                }
+
+                // 左隅の矩形と1ドット右にずらして矩形表示しているかテスト
+                {
+                    rect.SetPosition(33.f, 0.0f, 32.0f, 32.0f, Core::Math::EAnchor_Left);
+                    Render::Command2DQuadDraw(sceneHandle, rect, Core::Math::RGB::Yellow);
+                }
+
+                // 左隅の矩形と1ドット下にずらして矩形表示しているかテスト
+                {
+                    rect.SetPosition(0.f, 33.0f, 32.0f, 32.0f, Core::Math::EAnchor_Left);
+                    Render::Command2DQuadDraw(sceneHandle, rect, Core::Math::RGB::Yellow);
+                }
+
+                // テキストの下地で矩形が表示しているかテスト
+                {
+                    rect.SetPosition(0.f, 32.0f * 5.0f, 32.0f * 5.f, 32.0f,
+                                     Core::Math::EAnchor_Left);
+                    Render::Command2DQuadDraw(sceneHandle, rect, Core::Math::RGB::Red);
+
+                    // テキスト表示
+                    Core::Common::FixedString1024 s2(HE_STR_TEXT("Ss"));
+                    Render::Command2DTextDraw(sceneHandle, Core::Math::Vector2(0.0f, 32.0f * 5.f),
+                                              s2, 32, Core::Math::RGB::Blue,
+                                              Core::Math::EAnchor_Left);
+                }
+
+                // 画面真ん中に矩形表示のアンカーが真ん中
+                {
+                    rect.SetPosition(320.0f, 240.0f, 32.0f, 32.0f, Core::Math::EAnchor_Center);
+                    Render::Command2DQuadDraw(sceneHandle, rect, Core::Math::RGB::Red);
+                }
+
+                // 画面真ん中に矩形表示してかつアンカーが左上
+                {
+                    rect.SetPosition(320.0f, 240.0f, 32.0f, 32.0f, Core::Math::EAnchor_Left);
+                    Render::Command2DQuadDraw(sceneHandle, rect, Core::Math::RGB::White);
+                }
+
+                // 画面左下に矩形表示してかつアンカーが左上
+                {
+                    rect.SetPosition(0.0f, 480.0f - 32.0f, 32.0f, 32.0f, Core::Math::EAnchor_Left);
+                    Render::Command2DQuadDraw(sceneHandle, rect, Core::Math::RGB::White);
+                }
+
+                // 画面右上に矩形表示してかつアンカーが左上
+                {
+                    rect.SetPosition(640.0 - 32.0f, 0.0f, 32.0f, 32.0f, Core::Math::EAnchor_Left);
+                    Render::Command2DQuadDraw(sceneHandle, rect, Core::Math::RGB::White);
+                }
+
+                // 画面右下に矩形表示してかつアンカーが左上
+                {
+                    rect.SetPosition(640.0f - 32.0f, 480.0f - 32.0f, 32.0f, 32.0f,
+                                     Core::Math::EAnchor_Left);
+                    Render::Command2DQuadDraw(sceneHandle, rect, Core::Math::RGB::White);
+                }
+
+                // アンカーが左上で円描画の画面真ん中上のテスト
+                {
+                    Core::Math::Vector2 pos(320.0f, 0.0f);
+                    Render::Command2DCircleDraw(sceneHandle, pos, Core::Math::EAnchor_Left, 32,
+                                                Core::Math::RGB::White);
+                }
+
+                // アンカーが中心で画面真ん中下の円描画のテスト
+                {
+                    Core::Math::Vector2 pos(320.0f, 480.f - 16.0f);
+                    Render::Command2DCircleDraw(sceneHandle, pos, Core::Math::EAnchor_Center, 32,
+                                                Core::Math::RGB::White);
+                }
 
                 return FALSE;
             }

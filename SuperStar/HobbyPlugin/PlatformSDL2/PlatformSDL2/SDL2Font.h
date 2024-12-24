@@ -15,8 +15,7 @@ namespace PlatformSDL2
 
         void VRelease() override final;
 
-        HE::Bool VLoad(const Platform::EFontSize in_eSizeType,
-                       std::initializer_list<Core::File::Path>) override final;
+        HE::Bool VLoad(const Platform::EFontSize in_eSizeType, const Core::File::Path& in_rTTFFilePath) override final;
 
         void VUnload() override final;
 

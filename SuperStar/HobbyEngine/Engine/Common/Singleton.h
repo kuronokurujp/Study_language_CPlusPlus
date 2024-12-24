@@ -17,7 +17,7 @@ namespace Core::Common
         HE_CLASS_MOVE_NG(Singleton);
 
     public:
-        Singleton() { this->Set(); }
+        Singleton() { this->SetPosition(); }
 
         virtual ~Singleton()
         {
@@ -33,7 +33,7 @@ namespace Core::Common
             }
         }
 
-        void Set()
+        void SetPosition()
         {
             if (T::_pInstance)
             {

@@ -34,6 +34,11 @@ namespace Core::Math
             return (outputX + outputY + outputZ + outputW);
         }
 
+        /// <summary>
+        /// ベクトル要素をfloatポインタで返す.
+        /// </summary>
+        const HE::Float32* GetAsFloatPtr() const HE_NOEXCEPT { return &this->_fX; }
+
     public:
         // 頻繁にアクセスする変数にはprivate指定にはしない
         HE::Float32 _fX = 0.0f, _fY = 0.0f, _fZ = 0.0f, _fW = 0.0f;

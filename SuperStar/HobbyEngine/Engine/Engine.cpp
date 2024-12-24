@@ -25,7 +25,7 @@ HE::Bool Engine::Init()
 
     this->_bInit = TRUE;
 
-    this->_memoryManager.Set();
+    this->_memoryManager.SetPosition();
 
     // メモリ管理
     // カスタムメモリ確保
@@ -142,7 +142,7 @@ HE::Bool Engine::WaitFrameLoop()
 
     if (this->_spFPS != NULL)
     {
-        HE::Uint64 ulBeginTimeMSec = this->_spFPS->GetLastTimeMSec();
+        HE::Uint64 ulBeginMSec = this->_spFPS->GetLastTimeMSec();
 
         // 固定フレームモード
         if (this->_spFPS->IsFixedMode())
@@ -168,6 +168,7 @@ HE::Bool Engine::WaitFrameLoop()
         }
 
         HE::Uint64 ulEndMSec = this->_spFPS->GetLastTimeMSec();
+        //HE_LOG_LINE(HE_STR_TEXT("%d"), this->_spFPS->GetFrameRate());
     }
 
     return (pPlatform->VIsQuit() == FALSE);

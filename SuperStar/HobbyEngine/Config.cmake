@@ -59,6 +59,7 @@ set(ENGINE_TARGET_FILES
     Engine/Math/Vector3.h
     Engine/Math/Vector3.cpp
     Engine/Math/Vector4.h
+    Engine/Math/MathCore.h
     
     Engine/Memory/Memory.cpp
     Engine/Memory/Memory.h

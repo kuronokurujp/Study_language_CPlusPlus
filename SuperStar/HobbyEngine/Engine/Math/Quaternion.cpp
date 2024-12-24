@@ -15,7 +15,7 @@ namespace Core::Math
     Quaternion::Quaternion(const HE::Float32 in_fX, const HE::Float32 in_fY,
                            const HE::Float32 in_fZ, const HE::Float32 in_fW)
     {
-        this->Set(in_fX, in_fY, in_fZ, in_fW);
+        this->SetPosition(in_fX, in_fY, in_fZ, in_fW);
     }
 
     Quaternion::Quaternion(const Vector3& in_rAxis, const HE::Float32 in_fAngle)
@@ -45,7 +45,7 @@ namespace Core::Math
         this->_fZ = fCosYAxis * fCosXAxis * fSinZAxis - fSinYAxis * fSinXAxis * fCosZAxis;
     }
 
-    void Quaternion::Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ,
+    void Quaternion::SetPosition(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fZ,
                          const HE::Float32 in_fW)
     {
         this->_fX = in_fX;

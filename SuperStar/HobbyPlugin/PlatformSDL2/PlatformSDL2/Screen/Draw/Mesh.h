@@ -24,36 +24,39 @@ namespace PlatformSDL2
 
         struct VertexData
         {
-            void* _pVertices;
-            HE::Uint32 _uVerticesCount;
-            HE::Uint32 _uVertSize;
+            void* _pVertices           = NULL;
+            HE::Uint32 _uVerticesCount = 0;
+            HE::Uint32 _uVertSize      = 0;
 
             std::initializer_list<LayoutData> _aBindLayout;
         };
 
         struct IndexData
         {
-            HE::Uint32* _pIndices;
-            HE::Uint32 _uIndicesCount;
+            HE::Uint32* _pIndices     = NULL;
+            HE::Uint32 _uIndicesCount = 0;
         };
 
         void Init();
         void Release();
 
-        // TODO: 描画データを書き込む
+        // 描画データを書き込む
         // 描画前に行う
-        // バインド後でないとシェーダーにパラメータを渡せない
+        // この処理をした後でないとシェーダーにパラメータを渡せない
         void WriteDrawData(const VertexData& in_rMeshVertexData,
                            const IndexData& in_rMeshIndexData);
+        /// <summary>
+        /// 書き込んだ描画データを解放
+        /// </summary>
         void FreeDrawData();
 
         /// <summary>
         /// 描画モードの設定と要素数を指定できる
-        /// バインドデータに依存するのでバインドしたデータとの整合性を考えないといけない
+        /// 書き込みデータに依存するので書き込みしたデータとの整合性を考えないといけない
         /// 頂点のみで頂点インデックスは使わない.
         /// 高速描画できる
         /// </summary>
-        void DrawByVertexOnly(const HE::Uint32 in_uMode);
+        void DrawByVertexOnly(const HE::Uint32 in_uMode, const HE::Uint32 in_uVertCoun = 0);
 
         /// <summary>
         /// 頂点と頂点インデックスを使って描画
@@ -62,6 +65,6 @@ namespace PlatformSDL2
         void DrawByVertexAndIndex(const HE::Uint32 in_uMode);
 
     private:
-        void* _pVertexArray = NULL;
+        void* _pMeshLayout = NULL;
     };
 }  // namespace PlatformSDL2

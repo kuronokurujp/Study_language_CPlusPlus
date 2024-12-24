@@ -37,7 +37,9 @@ namespace UI
     {
         UIWidgetComponent::VUpdate(in_fDeltaTime);
 
-        Core::Math::Rect2 srcRect(0.0f, 0.0f, this->_fWidth, this->_fHeight, this->_eAnchor);
+        Core::Math::Rect2 srcRect;
+        srcRect.SetPosition(0.0f, 0.0f, this->_fWidth, this->_fHeight, this->_eAnchor);
+
         Core::Math::Rect2 rect;
 
         auto pTrans = this->GetTransformComponent();
@@ -46,13 +48,14 @@ namespace UI
         pTrans->TransformLocalToWorldRect2D(&rect, srcRect);
 
         // 描画コマンドを追加
-        Render::Command2DRectDraw(this->_viewHandle, rect, {this->_uColor});
+        Render::Command2DQuadDraw(this->_viewHandle, rect, {this->_uColor});
     }
 
     void UIButtonComponent::VOnTouch(const EnhancedInput::InputData::Item::Touch& in_rTouch)
     {
         Core::Math::Rect2 rect;
-        Core::Math::Rect2 orgRect(0.0f, 0.0f, this->_fWidth, this->_fHeight, this->_eAnchor);
+        Core::Math::Rect2 orgRect;
+        orgRect.SetPosition(0.0f, 0.0f, this->_fWidth, this->_fHeight, this->_eAnchor);
 
         auto pTrans = this->GetTransformComponent();
         HE_ASSERT(pTrans);

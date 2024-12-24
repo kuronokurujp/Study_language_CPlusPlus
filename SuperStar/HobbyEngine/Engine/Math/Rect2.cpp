@@ -2,15 +2,25 @@
 
 namespace Core::Math
 {
-    // 2Dの矩形クラス
-    Rect2::Rect2(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
-                 const HE::Float32 in_fH, const EAnchor in_eAnchor)
-    {
-        this->Set(in_fX, in_fY, in_fW, in_fH, in_eAnchor);
-    }
+    /*
+        // 2Dの矩形クラス
+        Rect2::Rect2(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
+                     const HE::Float32 in_fH, const EAnchor in_eAnchor)
+        {
+            this->SetPosition(in_fX, in_fY, in_fW, in_fH, in_eAnchor);
+        }
+        */
 
-    void Rect2::Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
-                    const HE::Float32 in_fH, const EAnchor in_eAnchor)
+    /*
+        Rect2::Rect2(const Rect2& in_rRect)
+        {
+            ::memcpy(this, &in_rRect, sizeof(Rect2));
+        }
+        */
+
+    void Rect2::SetPosition(const HE::Float32 in_fX, const HE::Float32 in_fY,
+                            const HE::Float32 in_fW, const HE::Float32 in_fH,
+                            const EAnchor in_eAnchor)
     {
         this->Clear();
 
@@ -38,6 +48,17 @@ namespace Core::Math
                 break;
             }
         }
+        this->_eAnchor = in_eAnchor;
+    }
+
+    void Rect2::SetRect(const HE::Float32 in_fLeft, const HE::Float32 in_fRight,
+                        const HE::Float32 in_fTop, const HE::Float32 in_fBottom,
+                        const EAnchor in_eAnchor)
+    {
+        this->_fLeft   = in_fLeft;
+        this->_fRight  = in_fRight;
+        this->_fTop    = in_fTop;
+        this->_fBottom = in_fBottom;
         this->_eAnchor = in_eAnchor;
     }
 

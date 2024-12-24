@@ -399,7 +399,7 @@ namespace Core::Common
             {
                 if (name.Empty() == FALSE)
                 {
-                    out.Set(arrayIndex, name);
+                    out.SetPosition(arrayIndex, name);
                     ++arrayIndex;
                 }
                 name.Clear();
@@ -414,7 +414,7 @@ namespace Core::Common
 
         if (name.Empty() == FALSE)
         {
-            out.Set(arrayIndex, name);
+            out.SetPosition(arrayIndex, name);
             ++arrayIndex;
         }
     }

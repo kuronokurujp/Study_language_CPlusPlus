@@ -25,10 +25,15 @@ namespace Render
             }
 
             // 矩形を描画
-            case Render::ECmdType_2DRectDraw:
+            case Render::ECmdType_2DQuadDraw:
             {
-                const Render::Cmd2DRectDraw* pRect2D = &in_pCommand->data.rect2DDraw;
+                const Render::Cmd2DQuadDraw* pRect2D = &in_pCommand->data.rect2DDraw;
 
+                Core::Math::Rect2 r;
+                r.SetRect(pRect2D->fLeftX, pRect2D->fRightX, pRect2D->fLeftY, pRect2D->fRightY,
+                          Core::Math::EAnchor::EAnchor_Left);
+
+                in_pScreen->VDrawQuad2D(in_rViewPortConfig, r, pRect2D->color);
                 break;
             }
 
@@ -89,16 +94,11 @@ namespace Render
             case Render::ECmdType_2DCircleDraw:
             {
                 const Render::Cmd2DCircleDraw* pCmdCircle = &in_pCommand->data.circle2DDraw;
-                const Core::Math::Color* pColor           = &pCmdCircle->color;
-                /*
-                const Uint32 uColor =
-                    ::GetColor(pColor->c32.r, pColor->c32.g, pColor->c32.b);
 
-                // 円を描画
-                ::DrawCircleAA(pCmdCircle->point.fX, pCmdCircle->point.fY,
-                               pCmdCircle->fSize, 32, uColor, TRUE);
-
-*/
+                const Render::Point2D& rPoint = pCmdCircle->point;
+                in_pScreen->VDrawCircle2D(in_rViewPortConfig,
+                                          Core::Math::Vector2(rPoint.fX, rPoint.fY),
+                                          pCmdCircle->eAnchor, pCmdCircle->fSize, rPoint.color);
                 break;
             }
             // 2Dテキストを描画
@@ -108,7 +108,7 @@ namespace Render
 
                 in_pScreen->VDrawText2D(in_rViewPortConfig,
                                         Core::Math::Vector2(pText2D->fX, pText2D->fY),
-                                        pText2D->szChars, pText2D->uSize, pText2D->anchor,
+                                        pText2D->anchor, pText2D->szChars, pText2D->uSize,
                                         pText2D->color);
                 break;
             }

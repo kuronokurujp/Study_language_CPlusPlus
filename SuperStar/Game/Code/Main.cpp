@@ -8,7 +8,6 @@
 // 外部モジュール一覧
 #include "ActorModule.h"
 #include "AssetManagerModule.h"
-// #include "DXLibModule.h"
 #include "EnhancedInputModule.h"
 #include "EventModule.h"
 #include "LevelModule.h"
@@ -118,10 +117,10 @@ HE::Bool WinGameMain::VStart(const HE::Bool in_bDebug)
     pLocateModule->LoadSystemFile(Core::Common::FixedString256(HE_STR_TEXT("Locate/System.toml")));
     pLocateModule->LoadTextAll(Core::Common::FixedString16(HE_STR_TEXT("JP")));
 
-    // TODO: フォント用意
+    // フォント用意
     {
         auto spFont = pPlatformModule->VFont();
-        // spFont->VLoad(HE_STR_TEXT("Font/PixelMplus12-Regular.ttf"));
+        spFont->VLoad(Platform::EFontSize::EFontSize_64, HE_STR_TEXT("Font/Font.ttf"));
     }
 
     // ゲーム画面表示準備
@@ -140,7 +139,6 @@ HE::Bool WinGameMain::VStart(const HE::Bool in_bDebug)
         Game::g_sceneUIHandle = sceneUIHandle;
 
         // ゲームウィンドウを表示
-        // spScreen->VShowWindow(windowHandle);
         pRenderModule->ShowWindow(windowHandle);
     }
 
@@ -162,7 +160,6 @@ HE::Bool WinGameMain::VEnd()
 
 HE::Bool WinGameMain::_VRegistEngineModule()
 {
-    // HE_ENGINE.AddModule<DXLib::DXLibModule>();
     HE_ENGINE.AddModule<PlatformSDL2::PlatformSDL2Module>();
     HE_ENGINE.AddModule<Render::RenderModule>();
     HE_ENGINE.AddModule<Actor::ActorModule>();

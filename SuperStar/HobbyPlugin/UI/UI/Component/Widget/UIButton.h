@@ -93,7 +93,7 @@ namespace UI
 
         void SetWidth(const HE::Float32 in_fW) { this->_fWidth = in_fW; }
         void SetHeight(const HE::Float32 in_fH) { this->_fHeight = in_fH; }
-        void SetAnchor(const Core::Math::Rect2::EAnchor in_eAnchor) { this->_eAnchor = in_eAnchor; }
+        void SetAnchor(const Core::Math::EAnchor in_eAnchor) { this->_eAnchor = in_eAnchor; }
 
         /// <summary>
         /// タッチイベント
@@ -108,13 +108,13 @@ namespace UI
             this->_pushHandler.release();
             this->_fWidth  = 0.0f;
             this->_fHeight = 0.0f;
-            this->_eAnchor = Core::Math::Rect2::EAnchor_Left;
+            this->_eAnchor = Core::Math::EAnchor_Left;
         }
 
     private:
         Core::Memory::UniquePtr<UIButtonMessageHandler> _pushHandler;
         HE::Float32 _fWidth                 = 0.0f;
         HE::Float32 _fHeight                = 0.0f;
-        Core::Math::Rect2::EAnchor _eAnchor = Core::Math::Rect2::EAnchor_Left;
+        Core::Math::EAnchor _eAnchor = Core::Math::EAnchor_Left;
     };
 }  // namespace UI

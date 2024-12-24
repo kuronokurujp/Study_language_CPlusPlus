@@ -37,6 +37,7 @@ namespace PlatformSDL2
         void SetPropertyMatrix(const HE::UTF8* in_pName, const Core::Math::Matrix4&);
         // シェーダーにベクトルを渡す
         void SetPropertyVector3(const HE::UTF8* in_pName, const Core::Math::Vector3&);
+        void SetPropertyVector4(const HE::UTF8* in_pName, const Core::Math::Vector4&);
         // シェーダーにFloat32に渡す
         void SetPropertyFloat(const HE::UTF8* in_pName, const HE::Float32);
         // シェーダーにテクスチャを渡す

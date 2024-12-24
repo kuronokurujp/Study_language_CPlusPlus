@@ -155,7 +155,7 @@ namespace Core::Math
             {0.0f, 0.0f, 0.0f, 1.0f},
         };
 
-        out->Set(faTtemp);
+        out->SetPosition(faTtemp);
     }
 
     /// <summary>
@@ -170,7 +170,7 @@ namespace Core::Math
             {in_rPos._fX, in_rPos._fY, in_rPos._fZ, 1.0f},
         };
 
-        out->Set(faTemp);
+        out->SetPosition(faTemp);
     }
 
     // 縦横のサイズを元に単位正方形の座標系に行列変換する行列作成
@@ -184,7 +184,7 @@ namespace Core::Math
             {0.0f, 0.0f, 1.0f, 1.0f},
         };
 
-        out->Set(faTemp);
+        out->SetPosition(faTemp);
     }
 
     // カメラ情報からビュー行列生成
@@ -213,7 +213,7 @@ namespace Core::Math
             {trans._fX, trans._fY, trans._fZ, 1.0f},
         };
 
-        out->Set(faTemp);
+        out->SetPosition(faTemp);
     }
 
     // 正射影行列作成
@@ -227,7 +227,7 @@ namespace Core::Math
             {0.0f, 0.0f, 1.0f / (in_fFar - in_fNear), 0.0f},
             {0.0f, 0.0f, in_fNear / (in_fNear - in_fFar), 1.0f},
         };
-        out->Set(faTemp);
+        out->SetPosition(faTemp);
     }
 
     // 透視射影行列作成
@@ -248,6 +248,6 @@ namespace Core::Math
             {0.0f, 0.0f, in_fFar / (in_fFar - in_fNear), 1.0f},
             {0.0f, 0.0f, -in_fNear * in_fFar / (in_fFar - in_fNear), 0.0f},
         };
-        out->Set(faTemp);
+        out->SetPosition(faTemp);
     }
 }  // namespace Core::Math

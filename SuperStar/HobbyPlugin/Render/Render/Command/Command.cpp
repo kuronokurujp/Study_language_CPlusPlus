@@ -8,8 +8,7 @@ namespace Render
     void Command2DTextDraw(const Core::Common::Handle& in_rViewHandle,
                            const Core::Math::Vector2& in_rPos,
                            const Core::Common::StringBase& in_szrName, const HE::Uint32 in_uSize,
-                           const Core::Math::Color in_color,
-                           const Core::Math::Rect2::EAnchor in_eAnchor)
+                           const Core::Math::Color in_color, const Core::Math::EAnchor in_eAnchor)
     {
         HE_ASSERT(in_rViewHandle.Null() == FALSE);
 
@@ -35,23 +34,23 @@ namespace Render
         pModule->PushSceneRenderCommand(in_rViewHandle, std::move(cmd));
     }
 
-    void Command2DRectDraw(const Core::Common::Handle& in_rViewHandle,
-                           const Core::Math::Rect2& in_rRect, const Core::Math::Color& in_rColor)
+    void Command2DQuadDraw(const Core::Common::Handle& in_rViewHandle,
+                           const Core::Math::Rect2& in_rRect, const Core::Math::Color in_color)
     {
         HE_ASSERT(in_rViewHandle.Null() == FALSE);
 
         // 必要なコマンド情報を作る
         Command cmd;
         {
-            cmd.uType              = ECmdType_2DRectDraw;
-            Cmd2DRectDraw* pRect2D = &cmd.data.rect2DDraw;
+            cmd.uType              = ECmdType_2DQuadDraw;
+            Cmd2DQuadDraw* pRect2D = &cmd.data.rect2DDraw;
             HE_STATIC_ASSERT(sizeof(cmd.data.rect2DDraw) <= sizeof(cmd.data.ulaWork));
 
             pRect2D->fLeftX  = in_rRect._fLeft;
             pRect2D->fLeftY  = in_rRect._fTop;
             pRect2D->fRightX = in_rRect._fRight;
             pRect2D->fRightY = in_rRect._fBottom;
-            pRect2D->color   = in_rColor;
+            pRect2D->color   = in_color;
         }
 
         auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
@@ -115,7 +114,8 @@ namespace Render
     }
 
     void Command2DCircleDraw(const Core::Common::Handle& in_rViewHandle,
-                             const Core::Math::Vector2& in_rPos, const HE::Float32 in_fSize,
+                             const Core::Math::Vector2& in_rPos,
+                             const Core::Math::EAnchor in_eAhchor, const HE::Float32 in_fSize,
                              const Core::Math::Color& in_rColor)
     {
         // 2D円の描画コマンドを作る
@@ -127,10 +127,11 @@ namespace Render
             cmd.uType             = ECmdType_2DCircleDraw;
             Cmd2DCircleDraw* pCmd = &cmd.data.circle2DDraw;
             HE_STATIC_ASSERT(sizeof(cmd.data.circle2DDraw) <= sizeof(cmd.data.ulaWork));
-            pCmd->point.fX = in_rPos._fX;
-            pCmd->point.fY = in_rPos._fY;
-            pCmd->color    = in_rColor;
-            pCmd->fSize    = in_fSize;
+            pCmd->point.fX    = in_rPos._fX;
+            pCmd->point.fY    = in_rPos._fY;
+            pCmd->point.color = in_rColor;
+            pCmd->fSize       = in_fSize;
+            pCmd->eAnchor     = in_eAhchor;
         }
 
         auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();

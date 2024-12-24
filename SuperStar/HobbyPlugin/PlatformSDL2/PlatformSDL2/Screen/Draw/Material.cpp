@@ -133,7 +133,7 @@ namespace PlatformSDL2
         }
 
         // シェーダーを有効化
-        void SetActive()
+        void Enable()
         {
             glUseProgram(this->shaderProgram);
             HE_ASSERT(glGetError() == GL_NO_ERROR);
@@ -173,8 +173,8 @@ namespace PlatformSDL2
 #endif
         }
 
-        // シェーダーにベクトルを渡す
-        void SetVectorUniform(const HE::UTF8* in_pName, const Core::Math::Vector3& in_rVec3)
+        // シェーダーにベクトル3dを渡す
+        void SetVector3Uniform(const HE::UTF8* in_pName, const Core::Math::Vector3& in_rVec3)
         {
             GLuint loc = glGetUniformLocation(this->shaderProgram, in_pName);
 
@@ -185,6 +185,21 @@ namespace PlatformSDL2
             glUniform3fv(loc, 1, in_rVec3.GetAsFloatPtr());
 #ifdef HE_ENGINE_DEBUG
             this->_ValidateUniformByDebug("3fv", in_pName);
+#endif
+        }
+
+        // シェーダーにベクトル4dを渡す
+        void SetVector4Uniform(const HE::UTF8* in_pName, const Core::Math::Vector4& in_rVec4)
+        {
+            GLuint loc = glGetUniformLocation(this->shaderProgram, in_pName);
+
+#ifdef HE_ENGINE_DEBUG
+            this->_ValidateUniformByDebug("Location", in_pName);
+#endif
+
+            glUniform4fv(loc, 1, in_rVec4.GetAsFloatPtr());
+#ifdef HE_ENGINE_DEBUG
+            this->_ValidateUniformByDebug("4fv", in_pName);
 #endif
         }
 
@@ -334,7 +349,7 @@ namespace PlatformSDL2
     {
         // OpenGLのシェーダを有効
         OpenGLShader* pShader = reinterpret_cast<OpenGLShader*>(this->_pShader);
-        pShader->SetActive();
+        pShader->Enable();
     }
 
     void Material::Disable()
@@ -350,7 +365,13 @@ namespace PlatformSDL2
     void Material::SetPropertyVector3(const HE::UTF8* in_pName, const Core::Math::Vector3& in_rVec3)
     {
         OpenGLShader* pShader = reinterpret_cast<OpenGLShader*>(this->_pShader);
-        pShader->SetVectorUniform(in_pName, in_rVec3);
+        pShader->SetVector3Uniform(in_pName, in_rVec3);
+    }
+
+    void Material::SetPropertyVector4(const HE::UTF8* in_pName, const Core::Math::Vector4& in_rVec4)
+    {
+        OpenGLShader* pShader = reinterpret_cast<OpenGLShader*>(this->_pShader);
+        pShader->SetVector4Uniform(in_pName, in_rVec4);
     }
 
     void Material::SetPropertyFloat(const HE::UTF8* in_pName, const HE::Float32 in_value)

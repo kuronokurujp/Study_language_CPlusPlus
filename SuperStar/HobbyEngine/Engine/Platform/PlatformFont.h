@@ -20,7 +20,7 @@ namespace Platform
         virtual void VRelease() = 0;
 
         virtual HE::Bool VLoad(const EFontSize in_eSizeType,
-                               std::initializer_list<Core::File::Path>) = 0;
+                               const Core::File::Path& in_rTTFFilePath) = 0;
         virtual void VUnload()                                          = 0;
     };
 }  // namespace Platform
