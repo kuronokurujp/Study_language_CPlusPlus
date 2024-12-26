@@ -157,7 +157,7 @@ TEST_CASE("SDL2 Quad Draw GUITest")
 
                 return FALSE;
             }
-            else if (uStep == 2)
+            else if (uStep == 3)
             {
                 // ウィンドウが閉じたら終了
                 Core::Math::Rect2 rect;
@@ -186,9 +186,14 @@ TEST_CASE("SDL2 Quad Draw GUITest")
                     Render::Command2DQuadDraw(sceneHandle, rect, Core::Math::RGB::Red);
 
                     // テキスト表示
-                    Core::Common::FixedString1024 s2(HE_STR_TEXT("Ss"));
+                    Core::Common::FixedString1024 s2(HE_STR_TEXT("タイトルルルルルルルルルルルルルルルるあ"));
                     Render::Command2DTextDraw(sceneHandle, Core::Math::Vector2(0.0f, 32.0f * 5.f),
                                               s2, 32, Core::Math::RGB::Blue,
+                                              Core::Math::EAnchor_Left);
+
+                    Core::Common::FixedString1024 s3(HE_STR_TEXT("プレイ"));
+                    Render::Command2DTextDraw(sceneHandle, Core::Math::Vector2(0.0f, 64.0f * 5.f),
+                                              s3, 32, Core::Math::RGB::Blue,
                                               Core::Math::EAnchor_Left);
                 }
 
