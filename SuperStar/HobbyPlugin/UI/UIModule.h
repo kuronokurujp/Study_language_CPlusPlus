@@ -85,14 +85,12 @@ namespace UI
         /// </summary>
         /// <param name="in_bLoc">ローカライズテキスト対象フラグ</param>
         /// <returns></returns>
-        const UIWidgetHandlePack NewLabelWidget(const Core::Common::StringBase& in_szrName,
-                                                const HE::Uint32 in_sort,
-                                                const HE::Char* in_pLocGroupName,
-                                                const HE::Char* in_szText,
-                                                const Core::Math::Rect2& in_rTextRect,
-                                                const HE::Uint32 in_uTextColor,
-                                                const Core::Common::Handle& in_rViewHandle,
-                                                const Core::Common::Handle& in_rLevelHandle);
+        const UIWidgetHandlePack NewLabelWidget(
+            const Core::Common::StringBase& in_szrName, const HE::Uint32 in_sort,
+            const HE::Char* in_pLocGroupName, const HE::Char* in_szText,
+            const HE::Uint32 in_uFontSize, const Core::Math::Rect2& in_rTextRect,
+            const HE::Uint32 in_uTextColor, const Core::Common::Handle& in_rViewHandle,
+            const Core::Common::Handle& in_rLevelHandle);
 
         /// <summary>
         /// ボタンWidget作成

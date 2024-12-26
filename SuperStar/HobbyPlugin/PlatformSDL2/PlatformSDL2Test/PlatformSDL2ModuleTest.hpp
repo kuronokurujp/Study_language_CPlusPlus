@@ -186,15 +186,16 @@ TEST_CASE("SDL2 Quad Draw GUITest")
                     Render::Command2DQuadDraw(sceneHandle, rect, Core::Math::RGB::Red);
 
                     // テキスト表示
-                    Core::Common::FixedString1024 s2(HE_STR_TEXT("タイトルルルルルルルルルルルルルルルるあ"));
+                    Core::Common::FixedString1024 s2(
+                        HE_STR_TEXT("タイトルルルルルルルルルルルルルルるあ"));
                     Render::Command2DTextDraw(sceneHandle, Core::Math::Vector2(0.0f, 32.0f * 5.f),
                                               s2, 32, Core::Math::RGB::Blue,
-                                              Core::Math::EAnchor_Left);
+                                              Core::Math::EAnchor_Left, 2.0f);
 
-                    Core::Common::FixedString1024 s3(HE_STR_TEXT("プレイ"));
+                    Core::Common::FixedString1024 s3(HE_STR_TEXT("MMM"));
                     Render::Command2DTextDraw(sceneHandle, Core::Math::Vector2(0.0f, 64.0f * 5.f),
-                                              s3, 32, Core::Math::RGB::Blue,
-                                              Core::Math::EAnchor_Left);
+                                              s3, 16, Core::Math::RGB::Blue,
+                                              Core::Math::EAnchor_Left, 2.0f);
                 }
 
                 // 画面真ん中に矩形表示のアンカーが真ん中
@@ -254,6 +255,17 @@ TEST_CASE("SDL2 Quad Draw GUITest")
                     Core::Math::Vector2 pos(480.0f, 0.f);
                     Render::Command2DTriangleDraw(sceneHandle, pos, Core::Math::EAnchor_Left,
                                                   -90.0f, 32.0f, Core::Math::RGB::White);
+                }
+
+                // 中心位置にテキスト表示
+                {
+                    Core::Common::FixedString1024 s3(HE_STR_TEXT("AABBBBBBBAABBBBBBBAA"));
+                    //Core::Common::FixedString1024 s3(HE_STR_TEXT("ABA"));
+                    //Core::Common::FixedString1024 s3(HE_STR_TEXT("AAAAAABBAAAAAA"));
+                    //Core::Common::FixedString1024 s3(HE_STR_TEXT("B"));
+                    Render::Command2DTextDraw(sceneHandle, Core::Math::Vector2(320.0f, 240.0f),
+                                              s3, 32, Core::Math::RGB::Blue,
+                                              Core::Math::EAnchor_Center, 0);
                 }
 
                 return FALSE;

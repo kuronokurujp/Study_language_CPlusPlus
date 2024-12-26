@@ -121,12 +121,12 @@ namespace UI
         UI::Builder::Node layoutNode;
         bRet = asset.OutputNode(&layoutNode, node, "l");
         HE_ASSERT(bRet);
-        HE_ASSERT(layoutNode._data.eWidgetType == UI::Builder::EWidget_Layout &&
+        HE_ASSERT(layoutNode._data._eWidgetType == UI::Builder::EWidget_Layout &&
                   "レイアウトノードが存在しない");
 
         // レイアウトを作成
         UIWidgetHandlePack widgetHandlePack =
-            this->NewLayer(Core::Common::FixedString64(layoutNode._data.szId), in_uSort,
+            this->NewLayer(Core::Common::FixedString64(layoutNode._data._szId), in_uSort,
                            in_rLevelHandle);
 
         // レイアウトノード下にあるWidgetを取得
@@ -148,7 +148,7 @@ namespace UI
             {
                 auto widgetNode                       = stack.PopBack();
                 const auto pNodeData                  = &widgetNode._data;
-                const UI::Builder::EWidget widgetType = pNodeData->eWidgetType;
+                const UI::Builder::EWidget widgetType = pNodeData->_eWidgetType;
                 // TODO: 関数テーブルにしてswitch文を消す方向にするかも
                 // 今は種類が少ないからいいが, 数が膨大になるとまずい
                 switch (widgetType)
@@ -163,16 +163,16 @@ namespace UI
                     case UI::Builder::EWidget_Label:
                     {
                         const UI::Builder::Node::Data::ExData::Label* pLabel =
-                            &pNodeData->exData.label;
-                        const UI::Builder::Style* pStyle = &pLabel->style;
+                            &pNodeData->_exData._label;
+                        const UI::Builder::Style* pStyle = &pLabel->_style;
                         Core::Math::Rect2 rect;
-                        rect.SetPosition(pLabel->_fX, pLabel->_fY, pStyle->fW, pStyle->fH,
+                        rect.SetPosition(pLabel->_fX, pLabel->_fY, pStyle->_fW, pStyle->_fH,
                                          Local::mPosAnthorToRect2Anchor[pLabel->_eAnchor]);
 
                         auto h =
-                            this->NewLabelWidget(Core::Common::FixedString64(pNodeData->szId), sort,
-                                                 pLabel->szLoc, pLabel->szText, rect,
-                                                 pStyle->uColor, in_rViewHandle, in_rLevelHandle);
+                            this->NewLabelWidget(Core::Common::FixedString64(pNodeData->_szId), sort,
+                                                 pLabel->szLoc, pLabel->szText, pStyle->_uSize, rect,
+                                                 pStyle->_uColor, in_rViewHandle, in_rLevelHandle);
 
                         this->AddChildWidget(hParentWidget, h);
                         hParentWidget = h;
@@ -183,14 +183,14 @@ namespace UI
                     case UI::Builder::EWidget_Button:
                     {
                         const UI::Builder::Node::Data::ExData::Button* pButton =
-                            &pNodeData->exData.button;
-                        const UI::Builder::Style* pStyle = &pButton->style;
+                            &pNodeData->_exData.button;
+                        const UI::Builder::Style* pStyle = &pButton->_style;
 
                         Core::Math::Rect2 rect;
-                        rect.SetPosition(pButton->_fX, pButton->_fY, pStyle->fW, pStyle->fH,
+                        rect.SetPosition(pButton->_fX, pButton->_fY, pStyle->_fW, pStyle->_fH,
                                          Local::mPosAnthorToRect2Anchor[pButton->_eAnchor]);
-                        auto h = this->NewButtonWidget(Core::Common::FixedString64(pNodeData->szId),
-                                                       sort, rect, pStyle->uColor, in_rViewHandle,
+                        auto h = this->NewButtonWidget(Core::Common::FixedString64(pNodeData->_szId),
+                                                       sort, rect, pStyle->_uColor, in_rViewHandle,
                                                        in_rLevelHandle);
 
                         // ボタンを押した時のイベントを設定
@@ -210,7 +210,7 @@ namespace UI
                             //                                pWidget->GetComponent<UI::UIButtonComponent>(handle);
 
                             auto handler = HE_MAKE_CUSTOM_UNIQUE_PTR(
-                                (UI::UIButtonMessageHandlerDefault), pNodeData->szId,
+                                (UI::UIButtonMessageHandlerDefault), pNodeData->_szId,
                                 [this, &widgetHandlePack](Core::Common::StringBase& in_msg)
                                 {
                                     auto pLevelModule =
@@ -255,7 +255,7 @@ namespace UI
 
     const UIWidgetHandlePack UIModule::NewLabelWidget(
         const Core::Common::StringBase& in_szrName, const HE::Uint32 in_uSort,
-        const HE::Char* in_szLocGroupName, const HE::Char* in_szText,
+        const HE::Char* in_szLocGroupName, const HE::Char* in_szText, const HE::Uint32 in_uFontSize,
         const Core::Math::Rect2& in_rTextRect, const HE::Uint32 in_uTextColor,
         const Core::Common::Handle& in_rViewHandle, const Core::Common::Handle& in_rLevelHandle)
     {
@@ -285,6 +285,7 @@ namespace UI
             pText->SetColor(in_uTextColor);
             pText->SetLocGroupName(in_szLocGroupName);
             pText->SetAnchor(in_rTextRect._eAnchor);
+            pText->SetFontSize(in_uFontSize);
         }
 
         return handlePack;

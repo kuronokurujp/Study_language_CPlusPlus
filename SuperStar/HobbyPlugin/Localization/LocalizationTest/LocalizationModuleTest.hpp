@@ -26,7 +26,6 @@ TEST_CASE("Localization Module Text")
                                     HE_STR_TEXT("TitleLevelName"));
 
             CHECK(Core::Common::g_szTempFixedString1024 == HE_STR_TEXT("タイトル"));
-            HE_LOG_LINE(HE_STR_TEXT("%s"), HE_STR_TEXT("日本語で文字化けしないよ"));
 
             return TRUE;
         });

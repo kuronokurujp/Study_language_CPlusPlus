@@ -15,8 +15,8 @@ namespace UI::Builder
     /// </summary>
     namespace Local
     {
-        static const HE::Char s_treeNodeDelimita = HE_STR_TEXT('.');
-        static const HE::Char s_locGroupDelimita = HE_STR_TEXT('.');
+        constexpr HE::Char s_treeNodeDelimita = HE_STR_TEXT('.');
+        constexpr HE::Char s_locGroupDelimita = HE_STR_TEXT('.');
 
         /// <summary>
         /// UIのスタイルカラー
@@ -37,17 +37,17 @@ namespace UI::Builder
         /// <summary>
         /// UIデータの色名とカラーと対応したテーブル一覧
         /// </summary>
-        StyleColor s_aColorTable[] = {StyleColor("white", Core::Math::RGB::White),
-                                      StyleColor("black", Core::Math::RGB::Black),
-                                      StyleColor("red", Core::Math::RGB::Red),
-                                      StyleColor("blue", Core::Math::RGB::Blue),
-                                      StyleColor("green", Core::Math::RGB::Green),
-                                      StyleColor("yellow", Core::Math::RGB::Yellow),
-                                      StyleColor("cyan", Core::Math::RGB::Cyan),
-                                      StyleColor("magenta", Core::Math::RGB::Magenta),
-                                      StyleColor("ornage", Core::Math::RGB::Orange)};
+        static const StyleColor s_aColorTable[] = {StyleColor("white", Core::Math::RGB::White),
+                                                   StyleColor("black", Core::Math::RGB::Black),
+                                                   StyleColor("red", Core::Math::RGB::Red),
+                                                   StyleColor("blue", Core::Math::RGB::Blue),
+                                                   StyleColor("green", Core::Math::RGB::Green),
+                                                   StyleColor("yellow", Core::Math::RGB::Yellow),
+                                                   StyleColor("cyan", Core::Math::RGB::Cyan),
+                                                   StyleColor("magenta", Core::Math::RGB::Magenta),
+                                                   StyleColor("ornage", Core::Math::RGB::Orange)};
 
-        static const EAnchor _GetPosAnchor(const pugi::xml_node& in_rNode)
+        static const EAnchor GetPosAnchor(const pugi::xml_node& in_rNode)
         {
             const pugi::char_t* s = in_rNode.attribute("anchor").as_string();
             if (s == NULL) return EAnchor_Left;
@@ -60,12 +60,17 @@ namespace UI::Builder
             return EAnchor_Left;
         }
 
-        static void _ParseStyle(Style* out, const HE::UTF8* in_szName, const HE::Uint32 in_uSize)
+        static void ParseStyle(Style* out, const HE::UTF8* in_szName, const HE::Uint32 in_uSize)
         {
             static HE::UTF8 buff[1024] = {0};
 
             HE_ASSERT(in_uSize < HE_ARRAY_SIZE(buff));
-            ::memset(out, 0, sizeof(Style));
+            {
+                out->_fH     = 0.0f;
+                out->_fW     = 0.0f;
+                out->_uColor = 0;
+                out->_uSize  = 32;
+            }
 
             ::memcpy_s(buff, HE_ARRAY_SIZE(buff), in_szName, in_uSize);
             HE::UTF8* pRestartToken = NULL;
@@ -83,26 +88,30 @@ namespace UI::Builder
 
                     if (::strcmp(szKey, "w") == 0)
                     {
-                        out->fW = static_cast<HE::Float32>(::atof(pValue));
+                        out->_fW = static_cast<HE::Float32>(::atof(pValue));
                     }
                     else if (::strcmp(szKey, "h") == 0)
                     {
-                        out->fH = static_cast<HE::Float32>(::atoi(pValue));
+                        out->_fH = static_cast<HE::Float32>(::atoi(pValue));
                     }
                     else if (::strcmp(szKey, "color") == 0)
                     {
                         HE::UTF8 szColorName[128] = {0};
                         ::strncpy_s(szColorName, HE_ARRAY_NUM(szColorName), pValue,
                                     HE_ARRAY_NUM(szColorName));
-                        // TODO: キーワードと色名の対応テーブルを作る
+                        // TODO: キーワードと色名の対応ハッシュテーブルを作る
                         for (HE::Uint32 i = 0; i < HE_ARRAY_NUM(s_aColorTable); ++i)
                         {
                             if (::strcmp(s_aColorTable[i].szName, szColorName) == 0)
                             {
-                                out->uColor = s_aColorTable[i].rgba.c;
+                                out->_uColor = s_aColorTable[i].rgba.c;
                                 break;
                             }
                         }
+                    }
+                    else if (::strcmp(szKey, "size") == 0)
+                    {
+                        out->_uSize = static_cast<HE::Uint32>(::atoi(pValue));
                     }
                 }
 
@@ -116,43 +125,43 @@ namespace UI::Builder
             ::memset(out, 0, sizeof(Node));
 
             // サードパーティライブラリのノードポインタを保存
-            out->pNode = in_rNode.internal_object();
+            out->_pNode = in_rNode.internal_object();
 
             Node::Data* pData = &out->_data;
 
             // TODO: ノードから反映する情報を抜き出す
-            pData->eWidgetType = UI::Builder::EWidget_None;
+            pData->_eWidgetType = UI::Builder::EWidget_None;
 
             Core::Common::FixedString128 szAttrName = in_rNode.name();
             if (szAttrName == HE_STR_TEXT("ui"))
             {
-                pData->eWidgetType = UI::Builder::EWidget_Root;
+                pData->_eWidgetType = UI::Builder::EWidget_Root;
             }
             else if (szAttrName == HE_STR_TEXT("w"))
             {
-                pData->eWidgetType = UI::Builder::EWidget_Widget;
-                auto pWidget       = &pData->exData.widget;
+                pData->_eWidgetType = UI::Builder::EWidget_Widget;
+                auto pWidget        = &pData->_exData._widget;
                 pWidget->_fX        = in_rNode.attribute("x").as_float();
                 pWidget->_fY        = in_rNode.attribute("y").as_float();
             }
             else if (szAttrName == HE_STR_TEXT("b"))
             {
-                pData->eWidgetType = UI::Builder::EWidget_Button;
-                auto pBtn          = &pData->exData.button;
+                pData->_eWidgetType = UI::Builder::EWidget_Button;
+                auto pBtn           = &pData->_exData.button;
                 pBtn->_fX           = in_rNode.attribute("x").as_float();
                 pBtn->_fY           = in_rNode.attribute("y").as_float();
-                pBtn->_eAnchor      = _GetPosAnchor(in_rNode);
+                pBtn->_eAnchor      = GetPosAnchor(in_rNode);
 
                 auto s = in_rNode.attribute("style").value();
-                _ParseStyle(&pBtn->style, s, static_cast<HE::Uint32>(::strlen(s)));
+                ParseStyle(&pBtn->_style, s, static_cast<HE::Uint32>(::strlen(s)));
             }
             else if (szAttrName == HE_STR_TEXT("t"))
             {
-                pData->eWidgetType = UI::Builder::EWidget_Label;
-                auto pLabel        = &pData->exData.label;
+                pData->_eWidgetType = UI::Builder::EWidget_Label;
+                auto pLabel         = &pData->_exData._label;
                 pLabel->_fX         = in_rNode.attribute("x").as_float();
                 pLabel->_fY         = in_rNode.attribute("y").as_float();
-                pLabel->_eAnchor    = _GetPosAnchor(in_rNode);
+                pLabel->_eAnchor    = GetPosAnchor(in_rNode);
 
                 // ローカライズテキストか
                 if (in_rNode.attribute("loc").as_bool())
@@ -163,12 +172,14 @@ namespace UI::Builder
                 auto t = in_rNode.attribute("text").value();
                 if (0 < ::strlen(t))
                 {
-                    Core::Common::FixedString1024 szTmp(t);
+                    Core::Common::g_szTempFixedString1024 = t;
                     if (pLabel->bLoc)
                     {
                         Core::Common::FixedArray<Core::Common::FixedString1024, 3> aSplitName;
 
-                        Core::Common::OutputSplitString(aSplitName, szTmp, s_locGroupDelimita);
+                        Core::Common::OutputSplitString(aSplitName,
+                                                        Core::Common::g_szTempFixedString1024,
+                                                        s_locGroupDelimita);
                         HE_STR_CPY_S(pLabel->szLoc, HE_ARRAY_NUM(pLabel->szLoc),
                                      aSplitName[0].Str(), aSplitName[0].Size());
 
@@ -177,25 +188,26 @@ namespace UI::Builder
                     }
                     else
                     {
-                        HE_STR_CPY_S(pLabel->szText, HE_ARRAY_NUM(pLabel->szText), szTmp.Str(),
-                                     szTmp.Size());
+                        HE_STR_CPY_S(pLabel->szText, HE_ARRAY_NUM(pLabel->szText),
+                                     Core::Common::g_szTempFixedString1024.Str(),
+                                     Core::Common::g_szTempFixedString1024.Size());
                     }
                 }
 
                 auto s = in_rNode.attribute("style").value();
-                _ParseStyle(&pLabel->style, s, static_cast<HE::Uint32>(::strlen(s)));
+                ParseStyle(&pLabel->_style, s, static_cast<HE::Uint32>(::strlen(s)));
             }
             else if (szAttrName == HE_STR_TEXT("l"))
             {
-                pData->eWidgetType = UI::Builder::EWidget_Layout;
-                auto pLayout       = &pData->exData.layout;
+                pData->_eWidgetType = UI::Builder::EWidget_Layout;
+                auto pLayout        = &pData->_exData._layout;
 
                 auto s = in_rNode.attribute("style").value();
-                _ParseStyle(&pLayout->style, s, static_cast<HE::Uint32>(::strlen(s)));
+                ParseStyle(&pLayout->_style, s, static_cast<HE::Uint32>(::strlen(s)));
             }
 
             Core::Common::FixedString1024 szIdName(in_rNode.attribute("id").value());
-            HE_STR_ERRNO e = HE_STR_CPY_S(pData->szId, HE_ARRAY_NUM(pData->szId), szIdName.Str(),
+            HE_STR_ERRNO e = HE_STR_CPY_S(pData->_szId, HE_ARRAY_NUM(pData->_szId), szIdName.Str(),
                                           szIdName.Size());
             HE_ASSERT(HE_STR_SUCCESS(e) && "文字列のコピーでエラー");
         }
@@ -220,9 +232,9 @@ namespace UI::Builder
                                       const HE::UTF8* in_szName)
     {
         HE_ASSERT(out);
-        HE_ASSERT(in_rParentNode.pNode);
+        HE_ASSERT(in_rParentNode._pNode);
 
-        pugi::xml_node libNode(in_rParentNode.pNode);
+        pugi::xml_node libNode(in_rParentNode._pNode);
         libNode = libNode.child(in_szName);
 
         Local::ApplyNode(out, libNode);
@@ -235,7 +247,7 @@ namespace UI::Builder
     {
         HE_ASSERT(out);
 
-        pugi::xml_node libNode(in_rParentNode.pNode);
+        pugi::xml_node libNode(in_rParentNode._pNode);
         {
             for (auto b = libNode.begin(); b != libNode.end(); ++b)
             {

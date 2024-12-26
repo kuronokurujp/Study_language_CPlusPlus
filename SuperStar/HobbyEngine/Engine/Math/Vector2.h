@@ -19,6 +19,7 @@ namespace Core::Math
         // コピーは代入文でできるようにするのがわかりやすいのでexplicitはつけない
         Vector2(const Vector2& in_v) { this->_fX = in_v._fX, this->_fY = in_v._fY; }
         Vector2(Vector2& in_v) { this->_fX = in_v._fX, this->_fY = in_v._fY; }
+        Vector2(const HE::Float32 in_fV) { this->_fX = this->_fY = in_fV; }
 
         /// <summary>
         /// 0で初期化

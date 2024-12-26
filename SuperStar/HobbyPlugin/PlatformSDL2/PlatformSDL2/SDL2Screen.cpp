@@ -382,9 +382,13 @@ namespace PlatformSDL2
     void Screen::V2DDrawText(const Platform::ViewPortConfig& in_rViewConfig,
                              const Core::Math::Vector2& in_rPos,
                              const Core::Math::EAnchor in_eAnchor, const HE::Char* in_szText,
-                             const HE::Uint32 in_uTextSize, const Core::Math::Color in_color)
+                             const HE::Uint32 in_uTextSize, const HE::Uint32 in_uSpace,
+                             const Core::Math::Color in_color)
     {
-        // TODO: アンカー処理がまだ
+        if (in_uTextSize <= 0) return;
+
+        Core::Common::g_szTempFixedString1024 = in_szText;
+        if (Core::Common::g_szTempFixedString1024.Length() <= 0) return;
 
         auto pFontInterface = this->_pSDL2Module->VFont();
         Font* pFont         = reinterpret_cast<Font*>(pFontInterface.get());
@@ -411,6 +415,9 @@ namespace PlatformSDL2
         static std::vector<Vertex> s_vertices;
         s_vertices.clear();
 
+        HE::Float32 fObjectWidth  = 0.0f;
+        HE::Float32 fObjectHeight = 0.0f;
+
         // 文字列に合わせて頂点配列を作り描画
         Mesh* pMesh = reinterpret_cast<Mesh*>(this->_pFontMesh);
         {
@@ -425,12 +432,23 @@ namespace PlatformSDL2
             HE::Float32 _fX           = fSX;
             HE::Float32 _fY           = fSY;
 
-            Core::Common::g_szTempFixedString1024 = in_szText;
-            if (Core::Common::g_szTempFixedString1024.Length() <= 0) return;
+            const HE::Float32 fSpace = (1.0f / static_cast<HE::Float32>(in_uTextSize)) *
+                                       static_cast<HE::Float32>(in_uSpace);
+
+            HE::Float32 fTmpWidth     = 0.0f;
+            HE::Uint32 uVerticalCount = 0;
+            fObjectHeight             = static_cast<HE::Float32>(in_uTextSize);
 
             auto itrEnd = Core::Common::g_szTempFixedString1024.End();
             for (auto itr = Core::Common::g_szTempFixedString1024.Begin(); itr != itrEnd; ++itr)
             {
+                // UTF8からunicodeに変える
+                const HE::Uint32 uUnicode = Core::Common::GetUTF8CharToUnicode(*itr);
+
+                // グリフのUV値を元に設定
+                auto pGlyph = pFontMat->GetGlyph(uUnicode);
+                if (pGlyph == NULL) continue;
+
                 if ((*itr)[0] == HE_STR_TEXT('\n'))
                 {
                     // 改行したら左端に戻す
@@ -445,15 +463,26 @@ namespace PlatformSDL2
                     s_vertices.push_back({Core::Math::Vector3(_fX, _fY - fMeshHeight, 0.0f),
                                           // UVは仮の値
                                           Core::Math::Vector2(0.0f, 0.0f)});
+
+                    // 改行になったので横の最大サイズを更新
+                    if (fObjectWidth < fTmpWidth) fObjectWidth = fTmpWidth;
+                    fTmpWidth = 0.0f;
+
+                    fObjectHeight += static_cast<HE::Float32>(in_uTextSize);
+                    uVerticalCount = 0;
+
                     continue;
                 }
 
-                // UTF8からunicodeに変える
-                const HE::Uint32 uUnicode = Core::Common::GetUTF8CharToUnicode(*itr);
+                // 横の仮サイズを更新
+                {
+                    fTmpWidth += static_cast<HE::Float32>(in_uTextSize);
 
-                // グリフのUV値を元に設定
-                auto pGlyph = pFontMat->GetGlyph(uUnicode);
-                if (pGlyph == NULL) continue;
+                    // スペース値も入れる
+                    // 行の最初の1文字はスペースがないのでスペースサイズは不要
+                    if (0 < uVerticalCount) fTmpWidth += static_cast<HE::Float32>(in_uSpace);
+                }
+                ++uVerticalCount;
 
                 // 頂点データ：四角形をGL_TRIANGLE_STRIPに対応させる (時計回り)
                 // 左下
@@ -475,11 +504,41 @@ namespace PlatformSDL2
                 _fX += fMeshWidth;
                 // 1文字あたり4つの頂点
                 uIndexOffset += 4;
+
+                //  文字と文字の間にスペースを入れれるか試し
+                if (0.0f < fSpace)
+                {
+                    // 頂点データ：四角形をGL_TRIANGLE_STRIPに対応させる (時計回り)
+                    // 左下
+                    s_vertices.push_back({Core::Math::Vector3(_fX, _fY - fMeshHeight, 0.0f),
+                                          Core::Math::Vector2(-1.0f)});
+
+                    // 左上
+                    s_vertices.push_back(
+                        {Core::Math::Vector3(_fX, _fY, 0.0f), Core::Math::Vector2(-1.0f)});
+                    // 右下
+                    s_vertices.push_back(
+                        {Core::Math::Vector3(_fX + fSpace, _fY - fMeshHeight, 0.0f),
+                         Core::Math::Vector2(-1.0f)});
+                    // 右上
+                    s_vertices.push_back(
+                        {Core::Math::Vector3(_fX + fSpace, _fY, 0.0f), Core::Math::Vector2(-1.f)});
+
+                    // 次の文字の位置に移動
+                    _fX += fSpace;
+                    // 1文字あたり4つの頂点
+                    uIndexOffset += 4;
+                }
             }
 
             // 頂点情報がない状態でテクスチャやマテリアルを有効にすると無効となってエラーになる
             // なので頂点情報がない場合は描画関連の処理せず終了させる
             if (s_vertices.size() <= 0) return;
+
+            if (fObjectWidth < fTmpWidth)
+            {
+                fObjectWidth = fTmpWidth;
+            }
 
             //  頂点など描画に必要な情報をバインド
             {
@@ -525,6 +584,21 @@ namespace PlatformSDL2
 
         // 座標を設定
         {
+            switch (in_eAnchor)
+            {
+                case Core::Math::EAnchor_Left:
+                {
+                    fObjectWidth = fObjectHeight = 0.0f;
+                    break;
+                }
+                case Core::Math::EAnchor_Center:
+                {
+                    fObjectWidth *= 0.5f;
+                    fObjectHeight *= 0.5f;
+                    break;
+                }
+            }
+
             Core::Math::Matrix4 scaleMat;
             Core::Math::Matrix4::OutputScale(&scaleMat, in_uTextSize, in_uTextSize, 1.0f);
 
@@ -532,8 +606,9 @@ namespace PlatformSDL2
             // 原点を画面の左上にする
             Core::Math::Matrix4::OutputTranslation(
                 &transMat,
-                Core::Math::Vector3(in_rPos._fX - (in_rViewConfig._uWidth >> 1),
-                                    -in_rPos._fY + (in_rViewConfig._uHeight >> 1), 0.0f));
+                Core::Math::Vector3((in_rPos._fX - fObjectWidth) - (in_rViewConfig._uWidth >> 1),
+                                    -(in_rPos._fY - fObjectHeight) + (in_rViewConfig._uHeight >> 1),
+                                    0.0f));
 
             Core::Math::Matrix4 world;
             world.Set(scaleMat);

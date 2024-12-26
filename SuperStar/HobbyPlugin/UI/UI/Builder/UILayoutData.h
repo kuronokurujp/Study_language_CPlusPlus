@@ -29,29 +29,30 @@ namespace UI::Builder
 
     struct Style
     {
-        HE::Float32 fW, fH;
-        HE::Uint32 uColor;
+        HE::Float32 _fW, _fH;
+        HE::Uint32 _uSize;
+        HE::Uint32 _uColor;
     };
 
     struct Node
     {
         // サードパーティのxmlライブラリのノードポインタ
-        pugi::xml_node_struct* pNode = NULL;
+        pugi::xml_node_struct* _pNode = NULL;
 
         /// <summary>
         /// エンジン用のデータ
         /// </summary>
         struct Data
         {
-            HE::Char szId[64]   = {0};
-            EWidget eWidgetType = EWidget::EWidget_None;
+            HE::Char _szId[64]   = {0};
+            EWidget _eWidgetType = EWidget::EWidget_None;
 
             union ExData
             {
                 struct Widget
                 {
                     HE::Float32 _fX, _fY;
-                } widget;
+                } _widget;
 
                 struct Label
                 {
@@ -60,21 +61,21 @@ namespace UI::Builder
                     HE::Float32 _fX, _fY;
                     HE::Char szLoc[64];
                     HE::Char szText[64];
-                    Style style;
-                } label;
+                    Style _style;
+                } _label;
 
                 struct Button
                 {
                     EAnchor _eAnchor;
                     HE::Float32 _fX, _fY;
-                    Style style;
+                    Style _style;
                 } button;
 
                 struct Layout
                 {
-                    Style style;
-                } layout;
-            } exData;
+                    Style _style;
+                } _layout;
+            } _exData;
         } _data;
     };
 

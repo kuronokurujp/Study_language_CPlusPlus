@@ -39,6 +39,7 @@ namespace Render
         HE::Float32 _fX   = 0.0f;
         HE::Float32 _fY   = 0.0f;
         HE::Uint32 _uSize = 0;
+        HE::Uint32 _uSpace = 0;
         Core::Math::Color _color;
         Core::Math::EAnchor _eAnchor = Core::Math::EAnchor_Left;
 
@@ -138,7 +139,7 @@ namespace Render
                                   const Core::Math::Vector2& in_rPos,
                                   const Core::Common::StringBase& in_str, const HE::Uint32 in_uSize,
                                   const Core::Math::Color in_color,
-                                  const Core::Math::EAnchor in_eAnchor);
+                                  const Core::Math::EAnchor in_eAnchor, const HE::Uint32 in_uSpace);
 
     /// <summary>
     /// 2D矩形描画

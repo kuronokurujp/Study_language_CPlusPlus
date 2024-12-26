@@ -101,10 +101,10 @@ namespace Platform
         /// <summary>
         /// 2Dのテキスト描画
         /// </summary>
-        virtual void V2DDrawText(const ViewPortConfig& in_rViewConfg,
-                                 const Core::Math::Vector2& in_rPos,
+        virtual void V2DDrawText(const ViewPortConfig&, const Core::Math::Vector2& in_rPos,
                                  const Core::Math::EAnchor in_eAnchor, const HE::Char* in_szText,
-                                 const HE::Uint32 in_uTextSize, const Core::Math::Color) = 0;
+                                 const HE::Uint32 in_uTextSize, const HE::Uint32 in_uSpace,
+                                 const Core::Math::Color) = 0;
 
         /// <summary>
         /// 2Dの矩形描画

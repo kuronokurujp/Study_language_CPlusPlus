@@ -97,8 +97,8 @@ namespace Render
 
                 const Render::Point2D& rPoint = pCmd->_point;
                 in_pScreen->V2DDrawCircle(in_rViewPortConfig,
-                                          Core::Math::Vector2(rPoint._fX, rPoint._fY), pCmd->_eAnchor,
-                                          pCmd->_fSize, rPoint._color);
+                                          Core::Math::Vector2(rPoint._fX, rPoint._fY),
+                                          pCmd->_eAnchor, pCmd->_fSize, rPoint._color);
                 break;
             }
 
@@ -107,8 +107,9 @@ namespace Render
             {
                 const Render::Cmd2DTextDraw* pCmd = &in_pCommand->_data._2DDrawText;
 
-                in_pScreen->V2DDrawText(in_rViewPortConfig, Core::Math::Vector2(pCmd->_fX, pCmd->_fY),
-                                        pCmd->_eAnchor, pCmd->_szChars, pCmd->_uSize, pCmd->_color);
+                in_pScreen->V2DDrawText(in_rViewPortConfig,
+                                        Core::Math::Vector2(pCmd->_fX, pCmd->_fY), pCmd->_eAnchor,
+                                        pCmd->_szChars, pCmd->_uSize, pCmd->_uSpace, pCmd->_color);
                 break;
             }
 
@@ -119,7 +120,8 @@ namespace Render
                 const Render::Point2D& rPoint         = pCmd->_point;
                 in_pScreen->V2DDrawTriangle(in_rViewPortConfig,
                                             Core::Math::Vector2(rPoint._fX, rPoint._fY),
-                                            pCmd->_eAnchor, pCmd->_fAngleDegrees, pCmd->_fSize, rPoint._color);
+                                            pCmd->_eAnchor, pCmd->_fAngleDegrees, pCmd->_fSize,
+                                            rPoint._color);
 
                 break;
             }

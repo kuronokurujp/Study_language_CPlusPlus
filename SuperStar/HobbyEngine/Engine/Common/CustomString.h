@@ -84,6 +84,10 @@ namespace Core::Common
             return this->_szBuff[_uSize - 1];
         }
 
+        /// <summary>
+        /// 文字列を見つける
+        /// 存在しない場合はSize関数の値を渡す
+        /// </summary>
         HE::Sint32 Find(const HE::Char* in_szName, const HE::Uint32 in_uStart = 0) const;
 
         HE::Bool Empty() const HE_NOEXCEPT { return this->_szBuff[0] == '\0'; }

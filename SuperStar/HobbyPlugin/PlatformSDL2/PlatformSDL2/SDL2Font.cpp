@@ -203,6 +203,7 @@ namespace PlatformSDL2
             uniform vec4 uColor;\
             void main() \
             {\
+                if (fragTexCoord.x < 0.0) { discard; } \
                 vec4 tex = texture2D(uTexture, fragTexCoord);\
                 outColor = tex * uColor;\
             }";

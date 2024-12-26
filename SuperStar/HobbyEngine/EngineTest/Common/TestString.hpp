@@ -17,6 +17,7 @@ TEST_CASE("FixString Use")
     // 文字位置判定が意図通りか
     CHECK(str.Find(HE_STR_TEXT("t")) == 0);
     CHECK(str.Find(HE_STR_TEXT("s")) == 2);
+    CHECK(str.Find(HE_STR_TEXT("2")) == str.Size());
 
     // 日本語が使えるか
     Core::Common::FixedString<128> str2(HE_STR_TEXT("日本語"));

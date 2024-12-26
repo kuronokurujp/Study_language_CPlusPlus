@@ -40,7 +40,7 @@ namespace PlatformSDL2
         /// </summary>
         void V2DDrawText(const Platform::ViewPortConfig& in_rViewConfig,
                          const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAnchor,
-                         const HE::Char* in_szText, const HE::Uint32 in_uTextSize,
+                         const HE::Char* in_szText, const HE::Uint32 in_uTextSize, const HE::Uint32 in_uSpace,
                          const Core::Math::Color in_color) override final;
 
         /// <summary>

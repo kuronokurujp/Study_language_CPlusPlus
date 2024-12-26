@@ -188,11 +188,11 @@ namespace Core::Common
 
     HE::Sint32 StringBase::Find(const HE::Char* in_szName, const HE::Uint32 in_uStart) const
     {
-        const HE::Uint32 _uCount = this->Size();
-        if (_uCount <= in_uStart) return -1;
+        const HE::Uint32 uCount = this->Size();
+        if (uCount <= in_uStart) return uCount;
 
         const HE::Char* szFind = HE_STR_STR(this->_szBuff + in_uStart, in_szName);
-        if (szFind == NULL) return -1;
+        if (szFind == NULL) return uCount;
 
         return static_cast<HE::Sint32>(szFind - this->_szBuff);
     }
