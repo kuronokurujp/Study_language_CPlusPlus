@@ -210,11 +210,11 @@ set_target_properties(${TEST_APP_NAME} PROPERTIES
 target_link_libraries(${TEST_APP_NAME} ${PLUGIN_LIBRARIES})
 
 # ループで全てのターゲットに対してプリプロセッサ定義を設定
-foreach(lib ${PLUGIN_LIBRARIES})
-  target_compile_definitions(${lib} PRIVATE
-    $<$<CONFIG:UnitTest>:HE_USE_STD_UNIQUE_PTR>
-  )
-endforeach()
+# foreach(lib ${PLUGIN_LIBRARIES})
+#  target_compile_definitions(${lib} PRIVATE
+#    $<$<CONFIG:UnitTest>:HE_USE_STD_UNIQUE_PTR>
+#  )
+#endforeach()
 
 # アプリのビルド前にバッチファイルを実行させるターゲットに依存させて
 # アプリのビルド前にバッチファイルを実行させている
