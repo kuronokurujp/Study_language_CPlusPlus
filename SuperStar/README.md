@@ -45,10 +45,10 @@
 
 ## 自作ツール一覧
 
-| Name                                                                                           | Version | 説明                   |
-| ---------------------------------------------------------------------------------------------- | ------- | ---------------------- |
-| [GameDataMaker](https://github.com/kuronokurujp/Stduy_language_Python/tree/main/GameDataMaker) | v0.0.1  | ゲームのパラメータ生成 |
-| [FontConveter](https://github.com/kuronokurujp/Stduy_language_Python/tree/main/FontConverter) | v0.0.1  | ゲームで使うフォント生成 |
+| Name                                                                                           | Version | 説明                     |
+| ---------------------------------------------------------------------------------------------- | ------- | ------------------------ |
+| [GameDataMaker](https://github.com/kuronokurujp/Stduy_language_Python/tree/main/GameDataMaker) | v0.0.1  | ゲームのパラメータ生成   |
+| [FontConveter](https://github.com/kuronokurujp/Stduy_language_Python/tree/main/FontConverter)  | v0.0.1  | ゲームで使うフォント生成 |
 
 ## 開発目的
 
@@ -175,18 +175,18 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
 2. 自動整形することでコンパイルが通らない可能性をつぶすため
 
 ## モジュール追加手順
-1. Engine/Script/Generater/CreateModule/CreateModule.batを実行
+
+1. Engine/Script/Generater/CreateModule/CreateModule.bat を実行
     - バッチファイル実行すると作成するモジュール名とモジュールをどこに作成するかのパス入力があります。<br>
-     モジュールを作成する箇所はHobbyPluginディレクトリにしてください。
-        
-2. vcpkgを使う場合
-    1. モジュールでvcpkgが管理しているライブラリを使う場合は.vcpkg.jsonにインストールするライブラリを記述してください。
-        - [vcpkgが取り扱っているライブラリの検索サイト](https://vcpkg.link/)
-        - [vcpkg.jsonの書き方](https://learn.microsoft.com/ja-jp/vcpkg/reference/vcpkg-json)
+      モジュールを作成する箇所は HobbyPlugin ディレクトリにしてください。
+2. vcpkg を使う場合
+    1. モジュールで vcpkg が管理しているライブラリを使う場合は.vcpkg.json にインストールするライブラリを記述してください。
+        - [vcpkg が取り扱っているライブラリの検索サイト](https://vcpkg.link/)
+        - [vcpkg.json の書き方](https://learn.microsoft.com/ja-jp/vcpkg/reference/vcpkg-json)
         - 注意点
             - "builtin-baseline"項目は記述しないでください。
-    1. CMakeLists.txtにvcpkgでインストールしたパッケージを使えるように記述
-        - CMakeLists.txtにはスケルトンコードがあるでそれを書き換える
+    1. CMakeLists.txt に vcpkg でインストールしたパッケージを使えるように記述
+        - CMakeLists.txt にはスケルトンコードがあるでそれを書き換える
 
 ## コーディング規約
 
@@ -426,6 +426,13 @@ TaskManager.hpp
 
 -   git の無視ファイルに Debug ディレクトリを指定しているのでディレクトリ名に Debug を使ってはいけない
 
+# 開発時のトラブルシューティング
+
+1. char 型配列に入れた UTF8 エンコードの日本語文字列を VisualStudio2022 のデバッガーで確認したら文字列が文字化け
+    - 以下のサイトの説明通り対応したら解決した
+        - https://qiita.com/m_nai/items/645c7836db27f6d2b436
+    - サイトの説明では VSCode 上での出来事だったが, VisualStudio2022 通用した
+
 # 参考サイト
 
 ## chocolate(windows のパッケージ管理ツール)
@@ -434,9 +441,10 @@ TaskManager.hpp
 -   [Chocolatey とは、Windows 用のパッケージ管理システムの概要と特徴](https://www.issoh.co.jp/tech/details/3520/)
 
 ## vcpkg
-- [vcpkg公式ドキュメント](https://learn.microsoft.com/ja-jp/vcpkg/)
-- [vcpkgが取り扱っているライブラリの検索サイト](https://vcpkg.link/)
-- [vcpkg.jsonの書き方](https://learn.microsoft.com/ja-jp/vcpkg/reference/vcpkg-json)
+
+-   [vcpkg 公式ドキュメント](https://learn.microsoft.com/ja-jp/vcpkg/)
+-   [vcpkg が取り扱っているライブラリの検索サイト](https://vcpkg.link/)
+-   [vcpkg.json の書き方](https://learn.microsoft.com/ja-jp/vcpkg/reference/vcpkg-json)
 
 ## Git
 
