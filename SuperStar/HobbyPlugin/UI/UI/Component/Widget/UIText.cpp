@@ -20,8 +20,8 @@ namespace UI
             auto pLocalModule = HE_ENGINE.ModuleManager().Get<Localization::LocalizationModule>();
             HE_ASSERT(pLocalModule);
 
-            this->_szDrawText = pLocalModule->Text(Core::Common::FixedString16(HE_STR_TEXT("JP")),
-                                                   this->_szLocGroup, this->_szText);
+            this->_szDrawText =
+                pLocalModule->Text(HE_STR_TEXT("JP"), this->_szLocGroup.Str(), this->_szText.Str());
         }
         else
         {

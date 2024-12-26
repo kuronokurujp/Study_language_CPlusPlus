@@ -8,7 +8,7 @@ namespace AssetManager
     HE::Bool AssetDataToml::_VLoad(Platform::FileInterface& in_rFileSystem)
     {
         auto [szText, uFileSize] = in_rFileSystem.VLoadText(this->_path);
-        this->_pText = szText;
+        this->_pText             = szText;
 
         // ファイルロード
         // this->_result = toml::parse_file(this->_path.Str());
@@ -40,10 +40,19 @@ namespace AssetManager
         return Node(rNode);
     }
 
-    const Core::Common::FixedString512 AssetDataToml::Node::GetString() const
+    void AssetDataToml::Node::OutputString(Core::Common::StringBase* out) const
     {
+        HE_ASSERT_RETURN(out);
+
         std::optional<std::string_view> s = this->_node.value<std::string_view>();
-        return Core::Common::FixedString512(s->data());
+        if (s)
+        {
+            *out = s->data();
+        }
+        else
+        {
+            *out = HE_STR_TEXT("");
+        }
     }
 
     AssetDataToml::Node AssetDataToml::Node::_GetNode(const HE::Char* in_szaName[],

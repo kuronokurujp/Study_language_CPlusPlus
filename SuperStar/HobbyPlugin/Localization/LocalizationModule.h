@@ -59,7 +59,17 @@ namespace Localization
     {
     public:
         /// <summary>
-        /// テキスト取得
+        /// TODO: テキストサイズ
+        /// </summary>
+        const HE::Uint32 GetTextSize(const HE::UTF8*);
+
+        /// <summary>
+        /// TODO: テキストカラー
+        /// </summary>
+        const HE::Uint32 GetTextColor(const HE::UTF8*);
+
+        /// <summary>
+        /// テキスト
         /// </summary>
         const Core::Common::FixedString1024& GetText(const HE::UTF8*);
 
@@ -92,9 +102,8 @@ namespace Localization
         HE::Bool UnloadTextAll(const Core::Common::StringBase&);
 
         // ローカライズテキストを取得
-        const HE::Char* Text(const Core::Common::StringBase& in_szrLocateName,
-                             const Core::Common::StringBase& in_szrGroupName,
-                             const Core::Common::StringBase& in_szrKey);
+        const HE::Char* Text(const HE::Char* in_szLocateName, const HE::Char* in_szGroupName,
+                             const HE::Char* in_szKey);
 
     protected:
         /// <summary>

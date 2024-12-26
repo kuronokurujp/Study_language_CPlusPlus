@@ -19,8 +19,8 @@ namespace PlatformSDL2
         virtual const Core::Common::Handle VFileOpen(const Core::File::Path& in_rPath) override;
         HE::Bool VFileClose(const Core::Common::Handle&) override final;
 
-        HE::Bool VFileRead(void* out_pBuff, const Core::Common::Handle& in_rHandle,
-                           const HE::Uint32 in_size) override final;
+        HE::Uint32 VFileRead(void* out_pBuff, const Core::Common::Handle& in_rHandle,
+                             const HE::Uint32 in_size) override final;
         HE::Sint32 VFileSize(const Core::Common::Handle&) override final;
 
         // TODO: ファイルを開いて一気にバイナルデータを出力するのが必要かも

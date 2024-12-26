@@ -5,57 +5,61 @@
 
 namespace AssetManager
 {
-    static HE::Bool _OutputValueBySimdJson(simdjson::fallback::ondemand::value* out,
-                                           simdjson::ondemand::document& in_rDoc,
-                                           const std::initializer_list<const HE::UTF8*>& in_rTokens)
+    namespace Local
     {
-        HE_ASSERT(out);
-        HE_ASSERT(0 < in_rTokens.size());
-
-        try
+        static HE::Bool OutputValueBySimdJson(
+            simdjson::fallback::ondemand::value* out, simdjson::ondemand::document& in_rDoc,
+            const std::initializer_list<const HE::UTF8*>& in_rTokens)
         {
-            auto itr = in_rTokens.begin();
+            HE_ASSERT(out);
+            HE_ASSERT(0 < in_rTokens.size());
 
-            auto v     = in_rDoc[*itr];
-            auto error = v.error();
-            if (error != simdjson::error_code::SUCCESS)
+            try
             {
-                HE_PG_LOG_LINE(HE_STR_TEXT("error(%d): Token(%s)"), error, *itr);
-                return FALSE;
-            }
+                auto itr = in_rTokens.begin();
 
-            // 複数トークンでの取得
-            ++itr;
-            for (; itr != in_rTokens.end(); ++itr)
-            {
-                v     = v[*itr];
-                error = v.error();
+                auto v     = in_rDoc[*itr];
+                auto error = v.error();
                 if (error != simdjson::error_code::SUCCESS)
                 {
                     HE_PG_LOG_LINE(HE_STR_TEXT("error(%d): Token(%s)"), error, *itr);
                     return FALSE;
                 }
+
+                // 複数トークンでの取得
+                ++itr;
+                for (; itr != in_rTokens.end(); ++itr)
+                {
+                    v     = v[*itr];
+                    error = v.error();
+                    if (error != simdjson::error_code::SUCCESS)
+                    {
+                        HE_PG_LOG_LINE(HE_STR_TEXT("error(%d): Token(%s)"), error, *itr);
+                        return FALSE;
+                    }
+                }
+
+                // 要素を出力
+                v.get(*out);
+
+                return TRUE;
+            }
+            catch (const simdjson::simdjson_error& e)
+            {
+                HE_PG_LOG_LINE(HE_STR_TEXT("json要素がない: %s"), e.what());
             }
 
-            // 要素を出力
-            v.get(*out);
-
-            return TRUE;
+            return FALSE;
         }
-        catch (const simdjson::simdjson_error& e)
-        {
-            HE_PG_LOG_LINE(HE_STR_TEXT("json要素がない: %s"), e.what());
-        }
-
-        return FALSE;
-    }
+    }  // namespace Local
 
     HE::Uint32 AssetDataJson::VGetUInt32(const std::initializer_list<const HE::UTF8*>& in_rTokens)
     {
         simdjson::fallback::ondemand::value val;
-        if (_OutputValueBySimdJson(&val,
-                                   *(reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc)),
-                                   in_rTokens) == FALSE)
+        if (Local::OutputValueBySimdJson(&val,
+                                         *(reinterpret_cast<simdjson::ondemand::document*>(
+                                             this->_pDoc)),
+                                         in_rTokens) == FALSE)
             return 0;
 
         HE_ASSERT(val.is_integer());
@@ -70,9 +74,10 @@ namespace AssetManager
     HE::Float32 AssetDataJson::VGetFloat32(const std::initializer_list<const HE::UTF8*>& in_rTokens)
     {
         simdjson::fallback::ondemand::value val;
-        if (_OutputValueBySimdJson(&val,
-                                   *(reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc)),
-                                   in_rTokens) == FALSE)
+        if (Local::OutputValueBySimdJson(&val,
+                                         *(reinterpret_cast<simdjson::ondemand::document*>(
+                                             this->_pDoc)),
+                                         in_rTokens) == FALSE)
             return 0;
 
         return static_cast<HE::Float32>(val.get_double().value_unsafe());
@@ -84,9 +89,10 @@ namespace AssetManager
         Core::Common::FixedString1024 str;
 
         simdjson::fallback::ondemand::value val;
-        if (_OutputValueBySimdJson(&val,
-                                   *(reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc)),
-                                   in_rTokens) == FALSE)
+        if (Local::OutputValueBySimdJson(&val,
+                                         *(reinterpret_cast<simdjson::ondemand::document*>(
+                                             this->_pDoc)),
+                                         in_rTokens) == FALSE)
             return str;
 
         HE_ASSERT(val.is_string());
@@ -99,9 +105,10 @@ namespace AssetManager
     HE::Bool AssetDataJson::IsToken(const std::initializer_list<const HE::UTF8*>& in_rTokens)
     {
         simdjson::fallback::ondemand::value val;
-        if (_OutputValueBySimdJson(&val,
-                                   *(reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc)),
-                                   in_rTokens) == FALSE)
+        if (Local::OutputValueBySimdJson(&val,
+                                         *(reinterpret_cast<simdjson::ondemand::document*>(
+                                             this->_pDoc)),
+                                         in_rTokens) == FALSE)
             return FALSE;
 
         return TRUE;
@@ -111,66 +118,38 @@ namespace AssetManager
     {
         HE::Bool bRet = TRUE;
 
-        // ファイルを開く
-        this->_fileHandle = in_rFileSystem.VFileOpen(this->_path);
-        HE_ASSERT(this->_fileHandle.Null() == FALSE);
+        auto [pText, uSize] = in_rFileSystem.VLoadText(this->_path);
+        try
         {
-            HE::UTF8* pReadTmpBuff = NULL;
-            try
+            // 読み込んだメモリをjsonデータとして展開
+            // 展開時にjsonを展開するためのメモリ確保をする
+            HE_ASSERT(simdjson::validate_utf8(pText, uSize));
+
+            this->_json   = HE_MAKE_CUSTOM_UNIQUE_PTR((simdjson::padded_string), pText, uSize);
+            this->_parser = HE_MAKE_CUSTOM_UNIQUE_PTR((simdjson::ondemand::parser), (uSize * 2));
             {
-                // 開いたファイルのデータサイズを取得して読み込むメモリを確保
-                HE::Sint32 iSize    = in_rFileSystem.VFileSize(this->_fileHandle);
-                HE::Sint32 iMemSize = iSize + 1;
-                // TODO: メモリページを外部から指定できるようにする
-                pReadTmpBuff =
-                    reinterpret_cast<HE::UTF8*>(HE_ALLOC_MEM(sizeof(HE::UTF8) * iMemSize, 0));
-                ::memset(pReadTmpBuff, '\0', iMemSize);
+                this->_pDoc = HE_NEW_MEM(simdjson::ondemand::document, 0);
+                simdjson::ondemand::document* pDoc =
+                    reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc);
 
-                // ファイルの読み込み
-                if (in_rFileSystem.VFileRead(pReadTmpBuff, this->_fileHandle, iSize))
+                auto resultCode = this->_parser->iterate(*this->_json).get(*pDoc);
+                if (resultCode != simdjson::error_code::SUCCESS)
                 {
-                    // 読み込んだメモリをjsonデータとして展開
-                    // 展開時にjsonを展開するためのメモリ確保をする
-                    pReadTmpBuff[iSize] = '\n';
-                    HE_ASSERT(simdjson::validate_utf8(pReadTmpBuff, iMemSize));
+                    HE_PG_LOG_LINE(HE_STR_TEXT("%s ファイルエラー: %d"), this->_path.Str(),
+                                   resultCode);
+                    HE_LOG_LINE(HE_STR_TEXT("エラーのjson内容"));
+                    HE_LOG_LINE(HE_STR_TEXT("%s"), pText);
 
-                    this->_json =
-                        HE_MAKE_CUSTOM_UNIQUE_PTR((simdjson::padded_string), pReadTmpBuff, iSize);
-                    this->_parser =
-                        HE_MAKE_CUSTOM_UNIQUE_PTR((simdjson::ondemand::parser), (iSize * 2));
-                    {
-                        this->_pDoc = HE_NEW_MEM(simdjson::ondemand::document, 0);
-                        simdjson::ondemand::document* pDoc =
-                            reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc);
-
-                        auto resultCode = this->_parser->iterate(*this->_json).get(*pDoc);
-                        if (resultCode != simdjson::error_code::SUCCESS)
-                        {
-                            HE_PG_LOG_LINE(HE_STR_TEXT("%s ファイルエラー: %d"), this->_path.Str(),
-                                           resultCode);
-                            HE_LOG_LINE(HE_STR_TEXT("エラーのjson内容"));
-                            HE_LOG_LINE(HE_STR_TEXT("%s"), pReadTmpBuff);
-
-                            bRet = FALSE;
-                        }
-                    }
-                }
-                else
-                {
-                    HE_ASSERT(0);
+                    bRet = FALSE;
                 }
             }
-            catch (const simdjson::simdjson_error& e)
-            {
-                HE_PG_LOG_LINE(HE_STR_TEXT("%s ファイルの扱いに失敗: %s"), this->_path.Str(),
-                               e.what());
-                bRet = FALSE;
-            }
-            // jsonに展開した時のメモリを利用するので読み込んだメモリを解放
-            HE_SAFE_DELETE_MEM(pReadTmpBuff);
         }
-        // ファイルを閉じる
-        in_rFileSystem.VFileClose(this->_fileHandle);
+        catch (const simdjson::simdjson_error& e)
+        {
+            HE_PG_LOG_LINE(HE_STR_TEXT("%s ファイルの扱いに失敗: %s"), this->_path.Str(), e.what());
+            bRet = FALSE;
+        }
+        HE_SAFE_DELETE_MEM(pText);
 
         return bRet;
     }

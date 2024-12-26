@@ -69,7 +69,8 @@ namespace Localization
             szTmp = in_szLocateName.Str();
             szTmp.Concatenate(HE_STR_TEXT("/"), it->_key.Str());
 
-            auto h = pLocalModule->Load<LocateAssetData>(szTmp.Str(), it->_data._textFilePath.Str());
+            auto h =
+                pLocalModule->Load<LocateAssetData>(szTmp.Str(), it->_data._textFilePath.Str());
             textMap.Add(it->_key, h);
         }
         HE_ASSERT(0 < textMap.Size());
@@ -94,27 +95,30 @@ namespace Localization
         return TRUE;
     }
 
-    const HE::Char* LocalizationModule::Text(const Core::Common::StringBase& in_szLocateName,
-                                             const Core::Common::StringBase& in_szGroupName,
-                                             const Core::Common::StringBase& in_szKey)
+    const HE::Char* LocalizationModule::Text(const HE::Char* in_szLocateName,
+                                             const HE::Char* in_szGroupName,
+                                             const HE::Char* in_szKey)
     {
         auto pLocalModule = this->GetDependenceModule<AssetManager::AssetManagerModule>();
         HE_ASSERT(pLocalModule);
 
-        auto locateIter = this->_locateDataMap.FindKey(in_szLocateName.Str());
+        auto locateIter = this->_locateDataMap.FindKey(in_szLocateName);
         HE_ASSERT(locateIter.IsValid());
 
-        auto groupIter = locateIter->_data.FindKey(in_szGroupName.Str());
+        auto groupIter = locateIter->_data.FindKey(in_szGroupName);
         HE_ASSERT(groupIter.IsValid());
 
         LocateAssetData& rData = pLocalModule->GetAsset<LocateAssetData>(groupIter->_data);
 
         // テキストを取得
-        HE_ASSERT(in_szKey.Size() <= 256);
+        Core::Common::g_szTempFixedString1024 = in_szKey;
+        HE_ASSERT(Core::Common::g_szTempFixedString1024.Size() <= 256);
+
         // 作業用の変数
         static HE::UTF8 szKeyByTempBuff[256] = {0};
 
-        in_szKey.OutputUTF8(szKeyByTempBuff, in_szKey.Size());
+        Core::Common::g_szTempFixedString1024.OutputUTF8(szKeyByTempBuff,
+                                                         HE_ARRAY_NUM(szKeyByTempBuff));
         return rData.GetText(szKeyByTempBuff).Str();
     }
 
@@ -126,9 +130,10 @@ namespace Localization
         auto rootNode = this->GetRootNode();
 
         // コンフィグデータからデータパスのディレクトリ名を取得
-        Core::Common::FixedString512 pathName =
-            rootNode.GetNode(HE_STR_TEXT("config"), HE_STR_TEXT("current_dir")).GetString();
-        Core::File::Path dataRootPath(pathName.Str());
+        rootNode.GetNode(HE_STR_TEXT("config"), HE_STR_TEXT("current_dir"))
+            .OutputString(&Core::Common::g_szTempFixedString1024);
+
+        Core::File::Path dataRootPath(Core::Common::g_szTempFixedString1024.Str());
 
         // Locateデータ構築
         AssetManager::AssetDataToml::Node locateNode = rootNode.GetNode(HE_STR_TEXT("locate"));
@@ -154,8 +159,10 @@ namespace Localization
                 // ファイルパス連結する
                 Core::File::Path path(dataRootPath);
                 path += Core::File::Path(locateStr.Str());
-                path +=
-                    Core::File::Path(groupIt->_data.GetNode(HE_STR_TEXT("json")).GetString().Str());
+
+                groupIt->_data.GetNode(HE_STR_TEXT("json"))
+                    .OutputString(&Core::Common::g_szTempFixedString1024);
+                path += Core::File::Path(Core::Common::g_szTempFixedString1024.Str());
 
                 LocateData _data(path);
                 HE_LOG_LINE(HE_STR_TEXT("%s"), _data._textFilePath.Str());
@@ -177,6 +184,16 @@ namespace Localization
         Core::Common::FixedString128 key(in_szLocateName);
         auto it = this->_locateDataMap.FindKey(key);
         return it->_data;
+    }
+
+    const HE::Uint32 LocateAssetData::GetTextSize(const HE::UTF8* in_szKey)
+    {
+        return this->VGetUInt32({in_szKey, "size"});
+    }
+
+    const HE::Uint32 LocateAssetData::GetTextColor(const HE::UTF8* in_szKey)
+    {
+        return this->VGetUInt32({in_szKey, "color"});
     }
 
     const Core::Common::FixedString1024& LocateAssetData::GetText(const HE::UTF8* in_szKey)

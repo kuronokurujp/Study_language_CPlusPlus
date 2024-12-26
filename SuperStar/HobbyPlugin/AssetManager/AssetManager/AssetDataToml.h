@@ -35,7 +35,10 @@ namespace AssetManager
             Node(toml::node_view<toml::node> in_node) : _node(in_node) {}
             Node(toml::node& in_rNode) : _node(in_rNode) {}
 
-            const Core::Common::FixedString512 GetString() const;
+            /// <summary>
+            /// 文字列を出力
+            /// </summary>
+            void OutputString(Core::Common::StringBase*) const;
 
             template <typename... TArgs>
             typename std::enable_if<(std::is_same<TArgs, const HE::Char*>::value && ...),
