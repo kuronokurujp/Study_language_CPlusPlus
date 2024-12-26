@@ -6,7 +6,7 @@
 
 namespace PlatformSDL2
 {
-    namespace Loacl
+    namespace Local
     {
         constexpr HE::Uint32 aGameKeyMap[Platform::EKeyboard::EKeyboard_MAX] = {
             SDL_SCANCODE_BACKSPACE,
@@ -180,14 +180,6 @@ namespace PlatformSDL2
 
         // キーボード入力取得
         const ::Uint8* pKeyboardState = ::SDL_GetKeyboardState(nullptr);
-        /*
-        // キーボードのescキーを押したら終了
-        if (pKeyboardState[SDL_SCANCODE_ESCAPE])
-        {
-            this->_bQuit = TRUE;
-            return;
-        }
-        */
 
         // キー入力の処理
         {
@@ -195,8 +187,10 @@ namespace PlatformSDL2
             {
                 // キーの前情報を設定
                 this->_state._keyboard._aPrevState[i] = this->_state._keyboard._aCurrState[i];
+
                 // キーの新しい情報を設定
-                this->_state._keyboard._aCurrState[i] = pKeyboardState[i];
+                if (pKeyboardState[Local::aGameKeyMap[i]])
+                    this->_state._keyboard._aCurrState[i] = 1;
             }
         }
 
