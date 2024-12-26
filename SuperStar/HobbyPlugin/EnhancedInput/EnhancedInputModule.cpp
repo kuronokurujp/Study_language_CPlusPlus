@@ -58,11 +58,12 @@ namespace EnhancedInput
 
     void EnhancedInputModule::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
     {
-        this->_mInputAction.Clear();
     }
 
     void EnhancedInputModule::_Update(const HE::Float32 in_fDeltaTime)
     {
+        this->_mInputAction.Clear();
+
         auto pPlatformModule = this->GetDependenceModule<Platform::PlatformModule>();
         HE_ASSERT(pPlatformModule);
 
@@ -101,8 +102,8 @@ namespace EnhancedInput
 
                     InputData inputData;
                     inputData.eType            = EInputType_Touch;
-                    inputData.item.touch._fX    = pos._fX;
-                    inputData.item.touch._fY    = pos._fY;
+                    inputData.item.touch._fX   = pos._fX;
+                    inputData.item.touch._fY   = pos._fY;
                     inputData.item.touch.eType = eTouch;
 
                     auto& r = this->_mInputAction[it->_key];

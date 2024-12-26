@@ -6,38 +6,122 @@
 
 namespace PlatformSDL2
 {
-    /*
-        static const HE::HE::Uint32 s_iaKeyMaps[Platform::EKeyboard::EKeyboard_MAX] = {
-            KEY_INPUT_BACK,        KEY_INPUT_TAB,       KEY_INPUT_RETURN,   KEY_INPUT_LSHIFT,
-            KEY_INPUT_RSHIFT,      KEY_INPUT_LCONTROL,  KEY_INPUT_RCONTROL, KEY_INPUT_ESCAPE,
-            KEY_INPUT_SPACE,       KEY_INPUT_PGUP,      KEY_INPUT_PGDN,     KEY_INPUT_END,
-            KEY_INPUT_HOME,        KEY_INPUT_LEFT,      KEY_INPUT_UP,       KEY_INPUT_RIGHT,
-            KEY_INPUT_DOWN,        KEY_INPUT_INSERT,    KEY_INPUT_DELETE,   KEY_INPUT_MINUS,
-            KEY_INPUT_YEN,         KEY_INPUT_PREVTRACK, KEY_INPUT_PERIOD,   KEY_INPUT_SLASH,
-            KEY_INPUT_LALT,        KEY_INPUT_RALT,      KEY_INPUT_SCROLL,   KEY_INPUT_SEMICOLON,
-            KEY_INPUT_COLON,       KEY_INPUT_LBRACKET,  KEY_INPUT_RBRACKET, KEY_INPUT_AT,
-            KEY_INPUT_BACKSLASH,   KEY_INPUT_COMMA,     KEY_INPUT_KANJI,    KEY_INPUT_CONVERT,
-            KEY_INPUT_NOCONVERT,   KEY_INPUT_KANA,      KEY_INPUT_APPS,     KEY_INPUT_CAPSLOCK,
-            KEY_INPUT_SYSRQ,       KEY_INPUT_PAUSE,     KEY_INPUT_LWIN,     KEY_INPUT_RWIN,
-            KEY_INPUT_NUMLOCK,     KEY_INPUT_NUMPAD0,   KEY_INPUT_NUMPAD1,  KEY_INPUT_NUMPAD2,
-            KEY_INPUT_NUMPAD3,     KEY_INPUT_NUMPAD4,   KEY_INPUT_NUMPAD5,  KEY_INPUT_NUMPAD6,
-            KEY_INPUT_NUMPAD7,     KEY_INPUT_NUMPAD8,   KEY_INPUT_NUMPAD9,  KEY_INPUT_MULTIPLY,
-            KEY_INPUT_ADD,         KEY_INPUT_SUBTRACT,  KEY_INPUT_DECIMAL,  KEY_INPUT_DIVIDE,
-            KEY_INPUT_NUMPADENTER, KEY_INPUT_F1,        KEY_INPUT_F2,       KEY_INPUT_F3,
-            KEY_INPUT_F4,          KEY_INPUT_F5,        KEY_INPUT_F6,       KEY_INPUT_F7,
-            KEY_INPUT_F8,          KEY_INPUT_F9,        KEY_INPUT_F10,      KEY_INPUT_F11,
-            KEY_INPUT_F12,         KEY_INPUT_A,         KEY_INPUT_B,        KEY_INPUT_C,
-            KEY_INPUT_D,           KEY_INPUT_E,         KEY_INPUT_F,        KEY_INPUT_G,
-            KEY_INPUT_H,           KEY_INPUT_I,         KEY_INPUT_J,        KEY_INPUT_K,
-            KEY_INPUT_L,           KEY_INPUT_M,         KEY_INPUT_N,        KEY_INPUT_O,
-            KEY_INPUT_P,           KEY_INPUT_Q,         KEY_INPUT_R,        KEY_INPUT_S,
-            KEY_INPUT_T,           KEY_INPUT_U,         KEY_INPUT_V,        KEY_INPUT_W,
-            KEY_INPUT_X,           KEY_INPUT_Y,         KEY_INPUT_Z,        KEY_INPUT_0,
-            KEY_INPUT_1,           KEY_INPUT_2,         KEY_INPUT_3,        KEY_INPUT_4,
-            KEY_INPUT_5,           KEY_INPUT_6,         KEY_INPUT_7,        KEY_INPUT_8,
-            KEY_INPUT_9,
+    namespace Loacl
+    {
+        constexpr HE::Uint32 aGameKeyMap[Platform::EKeyboard::EKeyboard_MAX] = {
+            SDL_SCANCODE_BACKSPACE,
+            SDL_SCANCODE_TAB,
+            SDL_SCANCODE_RETURN,
+            SDL_SCANCODE_LSHIFT,
+            SDL_SCANCODE_RSHIFT,
+            SDL_SCANCODE_LCTRL,
+            SDL_SCANCODE_RCTRL,
+            SDL_SCANCODE_ESCAPE,
+            SDL_SCANCODE_SPACE,
+            SDL_SCANCODE_PAGEUP,
+            SDL_SCANCODE_PAGEDOWN,
+            SDL_SCANCODE_END,
+            SDL_SCANCODE_HOME,
+            SDL_SCANCODE_LEFT,
+            SDL_SCANCODE_UP,
+            SDL_SCANCODE_RIGHT,
+            SDL_SCANCODE_DOWN,
+            SDL_SCANCODE_INSERT,
+            SDL_SCANCODE_DELETE,
+            SDL_SCANCODE_MINUS,
+            SDL_SCANCODE_BACKSLASH,
+            SDL_SCANCODE_KP_POWER,
+            SDL_SCANCODE_PERIOD,
+            SDL_SCANCODE_SLASH,
+            SDL_SCANCODE_LALT,
+            SDL_SCANCODE_RALT,
+            SDL_SCANCODE_SCROLLLOCK,
+            SDL_SCANCODE_SEMICOLON,
+            SDL_SCANCODE_PERIOD,
+            SDL_SCANCODE_LEFTBRACKET,
+            SDL_SCANCODE_RIGHTBRACKET,
+            SDL_SCANCODE_KP_AT,
+            SDL_SCANCODE_BACKSLASH,
+            SDL_SCANCODE_COMMA,
+            SDL_SCANCODE_LANG5,
+            SDL_SCANCODE_LANG2,
+            // TODO: NoConvertがないようなのでConvertと同じにした
+            SDL_SCANCODE_LANG2,
+            // TODO: カナとひらがなが別になっているはどういうことだろうか？
+            SDL_SCANCODE_LANG3,
+            SDL_SCANCODE_APPLICATION,
+            SDL_SCANCODE_CAPSLOCK,
+            SDL_SCANCODE_SYSREQ,
+            SDL_SCANCODE_PAUSE,
+            SDL_SCANCODE_COMPUTER,
+            SDL_SCANCODE_COMPUTER,
+            SDL_SCANCODE_NUMLOCKCLEAR,
+            SDL_SCANCODE_KP_0,
+            SDL_SCANCODE_KP_1,
+            SDL_SCANCODE_KP_2,
+            SDL_SCANCODE_KP_3,
+            SDL_SCANCODE_KP_4,
+            SDL_SCANCODE_KP_5,
+            SDL_SCANCODE_KP_6,
+            SDL_SCANCODE_KP_7,
+            SDL_SCANCODE_KP_8,
+            SDL_SCANCODE_KP_9,
+            SDL_SCANCODE_KP_MULTIPLY,
+            SDL_SCANCODE_KP_PLUS,
+            SDL_SCANCODE_KP_PLUSMINUS,
+            SDL_SCANCODE_KP_DECIMAL,
+            SDL_SCANCODE_KP_DIVIDE,
+            SDL_SCANCODE_KP_ENTER,
+            SDL_SCANCODE_F1,
+            SDL_SCANCODE_F2,
+            SDL_SCANCODE_F3,
+            SDL_SCANCODE_F4,
+            SDL_SCANCODE_F5,
+            SDL_SCANCODE_F6,
+            SDL_SCANCODE_F7,
+            SDL_SCANCODE_F8,
+            SDL_SCANCODE_F9,
+            SDL_SCANCODE_F10,
+            SDL_SCANCODE_F11,
+            SDL_SCANCODE_F12,
+            SDL_SCANCODE_A,
+            SDL_SCANCODE_B,
+            SDL_SCANCODE_C,
+            SDL_SCANCODE_D,
+            SDL_SCANCODE_E,
+            SDL_SCANCODE_F,
+            SDL_SCANCODE_G,
+            SDL_SCANCODE_H,
+            SDL_SCANCODE_I,
+            SDL_SCANCODE_J,
+            SDL_SCANCODE_K,
+            SDL_SCANCODE_L,
+            SDL_SCANCODE_M,
+            SDL_SCANCODE_N,
+            SDL_SCANCODE_O,
+            SDL_SCANCODE_P,
+            SDL_SCANCODE_Q,
+            SDL_SCANCODE_R,
+            SDL_SCANCODE_S,
+            SDL_SCANCODE_T,
+            SDL_SCANCODE_U,
+            SDL_SCANCODE_V,
+            SDL_SCANCODE_W,
+            SDL_SCANCODE_X,
+            SDL_SCANCODE_Y,
+            SDL_SCANCODE_Z,
+            SDL_SCANCODE_0,
+            SDL_SCANCODE_1,
+            SDL_SCANCODE_2,
+            SDL_SCANCODE_3,
+            SDL_SCANCODE_4,
+            SDL_SCANCODE_5,
+            SDL_SCANCODE_6,
+            SDL_SCANCODE_7,
+            SDL_SCANCODE_8,
+            SDL_SCANCODE_9,
         };
-        */
+    }
 
     void Input::VInit()
     {
@@ -72,7 +156,7 @@ namespace PlatformSDL2
 
         // SDLシステム内で発生したイベントはすべてキューに積まれている
         // キューに積まれたイベントを取得して分岐処理している
-        while (SDL_PollEvent(&eventData))
+        while (::SDL_PollEvent(&eventData))
         {
             switch (eventData.type)
             {
@@ -94,13 +178,16 @@ namespace PlatformSDL2
             }
         }
 
+        // キーボード入力取得
+        const ::Uint8* pKeyboardState = ::SDL_GetKeyboardState(nullptr);
+        /*
         // キーボードのescキーを押したら終了
-        const ::Uint8* pKeyboardState = SDL_GetKeyboardState(nullptr);
         if (pKeyboardState[SDL_SCANCODE_ESCAPE])
         {
             this->_bQuit = TRUE;
             return;
         }
+        */
 
         // キー入力の処理
         {
@@ -109,38 +196,38 @@ namespace PlatformSDL2
                 // キーの前情報を設定
                 this->_state._keyboard._aPrevState[i] = this->_state._keyboard._aCurrState[i];
                 // キーの新しい情報を設定
-                // this->_state._keyboard._aCurrState[i] = CheckHitKey(s_iaKeyMaps[i]);
+                this->_state._keyboard._aCurrState[i] = pKeyboardState[i];
             }
         }
 
         // タッチ入力
         {
-            int x = 0;
-            int y = 0;
-            // GetMousePoint(&x, &y);
+            int x                = 0;
+            int y                = 0;
+            ::Uint32 mouseButton = ::SDL_GetMouseState(&x, &y);
+
             this->_state._touch._pos._fX = static_cast<HE::Float32>(x);
             this->_state._touch._pos._fY = static_cast<HE::Float32>(y);
 
             this->_uPrevButton = this->_state._touch._uCurrTouchState;
-            // this->_uCurrButton = GetMouseInput();
+            this->_uCurrButton = mouseButton;
 
             this->_state._touch._uPrevTouchState = 0;
             this->_state._touch._uCurrTouchState = 0;
-            /*
-            if (this->_uPrevButton & MOUSE_INPUT_LEFT)
+
+            if (this->_uPrevButton & SDL_BUTTON_LMASK)
                 this->_state._touch._uPrevTouchState |= Platform::EInputMouseType_Left;
-            if (this->_uPrevButton & MOUSE_INPUT_RIGHT)
+            if (this->_uPrevButton & SDL_BUTTON_RMASK)
                 this->_state._touch._uPrevTouchState |= Platform::EInputMouseType_Right;
-            if (this->_uPrevButton & MOUSE_INPUT_MIDDLE)
+            if (this->_uPrevButton & SDL_BUTTON_MMASK)
                 this->_state._touch._uPrevTouchState |= Platform::EInputMouseType_Middle;
 
-            if (this->_uCurrButton & MOUSE_INPUT_LEFT)
+            if (this->_uCurrButton & SDL_BUTTON_LMASK)
                 this->_state._touch._uCurrTouchState |= Platform::EInputMouseType_Left;
-            if (this->_uCurrButton & MOUSE_INPUT_RIGHT)
+            if (this->_uCurrButton & SDL_BUTTON_RMASK)
                 this->_state._touch._uCurrTouchState |= Platform::EInputMouseType_Right;
-            if (this->_uCurrButton & MOUSE_INPUT_MIDDLE)
+            if (this->_uCurrButton & SDL_BUTTON_MMASK)
                 this->_state._touch._uCurrTouchState |= Platform::EInputMouseType_Middle;
-                */
         }
     }
 }  // namespace PlatformSDL2
