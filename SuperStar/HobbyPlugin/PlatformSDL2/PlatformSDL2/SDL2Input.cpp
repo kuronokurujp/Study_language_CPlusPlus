@@ -189,6 +189,7 @@ namespace PlatformSDL2
                 this->_state._keyboard._aPrevState[i] = this->_state._keyboard._aCurrState[i];
 
                 // キーの新しい情報を設定
+                this->_state._keyboard._aCurrState[i] = 0;
                 if (pKeyboardState[Local::aGameKeyMap[i]])
                     this->_state._keyboard._aCurrState[i] = 1;
             }
