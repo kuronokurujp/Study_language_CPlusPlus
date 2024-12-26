@@ -1,11 +1,9 @@
 ﻿#pragma once
 
 // ゲームプロジェクトはアプリプロジェクトでコードの実態を入れ込むためにcppファイルもインクルードしないといけない
+#include "../PlatformSDL2/PlatformSDL2Module.h"
 #include "Code/Asset/ParamaterAssetData.cpp"
 #include "Code/Asset/ParamaterAssetData.h"
-
-#define HE_UNIT_TEST_MODE
-#include "../PlatformSDL2/PlatformSDL2Module.h"
 #include "Engine/Common/Function.h"
 #include "Engine/Engine.h"
 

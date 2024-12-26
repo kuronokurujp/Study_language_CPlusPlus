@@ -1,8 +1,6 @@
 ﻿#pragma once
 
 #include "../LuaModule.h"
-
-#define HE_UNIT_TEST_MODE
 #include "Engine/Common/Function.h"
 #include "Engine/Engine.h"
 

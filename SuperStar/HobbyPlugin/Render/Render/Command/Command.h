@@ -95,13 +95,13 @@ namespace Render
     };
 
     /// <summary>
-    /// TODO: 画面に2D三角形を描画
+    /// 画面に2D三角形を描画
     /// </summary>
     struct Cmd2DTriangleDraw
     {
         Point2D _point;
         HE::Float32 _fSize = 0.0f;
-        // TODO: 三角形の角度(度)
+        // 三角形の角度(度)
         HE::Float32 _fAngleDegrees   = 0.0f;
         Core::Math::EAnchor _eAnchor = Core::Math::EAnchor_Left;
     };

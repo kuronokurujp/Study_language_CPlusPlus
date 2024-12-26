@@ -3,13 +3,6 @@
 #include "Engine/Common/Singleton.h"
 #include "Engine/MiniEngine.h"
 
-// デバッグビルドのみ有効
-#ifdef HE_ENGINE_DEBUG
-#ifdef HE_UNIT_TEST_MODE
-#include <functional>
-#endif
-#endif
-
 // 前方宣言
 namespace Core::Time
 {
@@ -153,6 +146,8 @@ private:
 #ifdef HE_ENGINE_DEBUG
 // ユニットテスト専用
 #ifdef HE_UNIT_TEST_MODE
+
+#include <functional>
 
 /// <summary>
 /// 一つのモジュールを単体テスト実行

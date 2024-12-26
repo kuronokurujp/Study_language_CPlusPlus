@@ -1,13 +1,9 @@
 ﻿#pragma once
 
-#include "CustomArray.h"
-#include "Engine/Core.h"
-
-#ifdef HE_WIN
-
 #include <string_view>
 
-#endif
+#include "CustomArray.h"
+#include "Engine/Core.h"
 
 namespace Core::Common
 {
