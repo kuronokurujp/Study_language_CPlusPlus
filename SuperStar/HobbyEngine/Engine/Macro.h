@@ -9,6 +9,85 @@
 #include "Str.h"
 #include "Type.h"
 
+// 配列の要素数
+// 配列のポイントでは利用できない
+#define HE_ARRAY_NUM(_array_) (sizeof((_array_)) / sizeof(((_array_)[0])))
+
+// 配列の全データサイズ
+// 配列のポイントでは利用できない
+#define HE_ARRAY_SIZE(_tbl_) (sizeof(_tbl_))
+
+// コンパイル時のアサート
+#define HE_STATIC_ASSERT(...) static_assert(__VA_ARGS__)
+
+// デフォルトコンストラクタを封印
+#define HE_CLASS_DEFAULT_CONSTRUCT_NG(_x_) _x_() = delete;
+
+// クラスのコピー封印
+#define HE_CLASS_COPY_CONSTRUCT_NG(_x_) \
+    _x_(_x_&)       = delete;           \
+    _x_(const _x_&) = delete;
+
+#define HE_CLASS_COPY_NG(_x_)            \
+    _x_(_x_&)                  = delete; \
+    _x_(const _x_&)            = delete; \
+    _x_& operator=(_x_&)       = delete; \
+    _x_& operator=(const _x_&) = delete;
+
+// セマンティクスコンストラクターと演算子を封印
+#define HE_CLASS_MOVE_CONSTRUCT_NG(_x_) \
+    _x_(_x_&&)       = delete;          \
+    _x_(const _x_&&) = delete;
+
+#define HE_CLASS_MOVE_OPERATOR_NG(_x_)    \
+    _x_& operator=(_x_&&)       = delete; \
+    _x_& operator=(const _x_&&) = delete;
+
+#define HE_CLASS_MOVE_NG(_x_)             \
+    _x_(_x_&&)                  = delete; \
+    _x_(const _x_&&)            = delete; \
+    _x_& operator=(_x_&&)       = delete; \
+    _x_& operator=(const _x_&&) = delete;
+
+// 値のmin/maxマクロ
+// 上限値の制御
+#define HE_MAX(__src__, __max__) ((__src__) < (__max__) ? (__max__) : (__src__))
+// 下限値の制御
+#define HE_MIN(__src__, __min__) ((__src__) < (__min__) ? (__src__) : (__min__))
+
+// 最大・最小の値でリピートした値を返すマクロ
+// 浮動小数点数型の場合
+template <typename T>
+typename std::enable_if<std::is_floating_point<T>::value, T>::type HE_LOOP_IN_RANGE(T t, T min,
+                                                                                    T max)
+{
+    T length = max - min;
+    T offset = t - min;
+    T n      = std::floor(offset / length);
+    return offset - n * length + min;
+}
+
+// 整数型の場合
+template <typename T>
+typename std::enable_if<std::is_integral<T>::value, T>::type HE_LOOP_IN_RANGE(T t, T min, T max)
+{
+    T length = max - min + 1;
+    T offset = t - min;
+    T n      = offset / length;
+    return offset - n * length + min;
+}
+
+// 値をmin/max内で丸めるマクロ
+#define HE_CLAMP(__src__, __min__, __max__) \
+    ((__src__) > (__max__) ? (__max__) : ((__src__) < (__min__) ? (__min__) : (__src__)))
+
+// 例外を作らないキーワード
+// クラスのメソッドで絶対に例外が起きない処理ではつける
+// 例外をつけないコードをコンパイラが生成して最適化になる
+// 処理が入らないプロパティのゲッターやセッターで使うのがいいと思う
+#define HE_NOEXCEPT noexcept
+
+// デバッグとリリースで切り替えるマクロ
 #ifdef HE_ENGINE_DEBUG
 
 #include <cassert>
@@ -84,6 +163,7 @@ void HE_LOG_UPDATE_FORMAT_STRING(std::wstring& in_szFormat, size_t& in_rPos, con
     {
         if (in_rPos != std::wstring::npos)
         {
+            // TODO: ANSI文字は正常に出るが、日本語など2byte以上を使う文字では文字化けする
             in_szFormat.replace(in_rPos, 2, L"%hs");
         }
     }
@@ -99,24 +179,27 @@ HE::Bool HE_LOG_CREATE_FORMATERD_STRING(HE::WChar* out, const HE::Char* in_szFor
                                         TArgs... in_args)
 {
 #ifdef HE_CHARACTER_CODE_UTF8
-    static HE::WChar szFormat[HE_LOG_MSG_SIZE] = {};
+    // static HE::WChar szFormat[HE_LOG_MSG_SIZE]    = {};
+    static HE::UTF8 szUTF8Format[HE_LOG_MSG_SIZE] = {};
+
+    int size = HE_MIN(std::snprintf(NULL, 0, in_szFormat, in_args...) + 1, HE_LOG_MSG_SIZE);
+
+    std::snprintf(szUTF8Format, size, in_szFormat, in_args...);
+
     {
         // 利用する文字数を取得
         HE::Sint32 iUseSize =
-            MultiByteToWideChar(CP_UTF8, 0, in_szFormat, HE_LOG_MSG_SIZE, NULL, 0);
+            MultiByteToWideChar(CP_UTF8, 0, szUTF8Format, HE_LOG_MSG_SIZE, NULL, 0);
         // 利用する文字数が制限を超えていないかチェック
         HE_ASSERT_RETURN_VALUE(FALSE, iUseSize <= HE_LOG_MSG_SIZE);
 
         // HE::UTF8文字列からUTF16の文字列に変える
-        MultiByteToWideChar(CP_UTF8, 0, in_szFormat, HE_LOG_MSG_SIZE, &szFormat[0], iUseSize);
+        MultiByteToWideChar(CP_UTF8, 0, szUTF8Format, HE_LOG_MSG_SIZE, out, iUseSize);
     }
-    std::wstring szDynamicFormat = szFormat;
+    // std::wstring szDynamicFormat = szFormat;
 #else
     std::wstring szDynamicFormat = in_szFormat;
-#endif
-
-    size_t pos = szDynamicFormat.find(L"%");
-
+    size_t pos                   = szDynamicFormat.find(L"%");
     // 各引数に応じてフォーマット文字列を変更する
     // フォーマット置換データが文字列のwchar_t型とchart型と両方使える
     ((HE_LOG_UPDATE_FORMAT_STRING(szDynamicFormat, pos, in_args)), ...);
@@ -133,6 +216,8 @@ HE::Bool HE_LOG_CREATE_FORMATERD_STRING(HE::WChar* out, const HE::Char* in_szFor
     {
         return FALSE;
     }
+
+#endif
 
     return TRUE;
 }
@@ -253,81 +338,3 @@ void HE_LOG_LINE(const HE::Char* in_szFormat, TArgs... in_args)
 #else
 
 #endif
-
-// 配列の要素数
-// 配列のポイントでは利用できない
-#define HE_ARRAY_NUM(_array_) (sizeof((_array_)) / sizeof(((_array_)[0])))
-
-// 配列の全データサイズ
-// 配列のポイントでは利用できない
-#define HE_ARRAY_SIZE(_tbl_) (sizeof(_tbl_))
-
-// コンパイル時のアサート
-#define HE_STATIC_ASSERT(...) static_assert(__VA_ARGS__)
-
-// デフォルトコンストラクタを封印
-#define HE_CLASS_DEFAULT_CONSTRUCT_NG(_x_) _x_() = delete;
-
-// クラスのコピー封印
-#define HE_CLASS_COPY_CONSTRUCT_NG(_x_) \
-    _x_(_x_&)       = delete;           \
-    _x_(const _x_&) = delete;
-
-#define HE_CLASS_COPY_NG(_x_)            \
-    _x_(_x_&)                  = delete; \
-    _x_(const _x_&)            = delete; \
-    _x_& operator=(_x_&)       = delete; \
-    _x_& operator=(const _x_&) = delete;
-
-// セマンティクスコンストラクターと演算子を封印
-#define HE_CLASS_MOVE_CONSTRUCT_NG(_x_) \
-    _x_(_x_&&)       = delete;          \
-    _x_(const _x_&&) = delete;
-
-#define HE_CLASS_MOVE_OPERATOR_NG(_x_)    \
-    _x_& operator=(_x_&&)       = delete; \
-    _x_& operator=(const _x_&&) = delete;
-
-#define HE_CLASS_MOVE_NG(_x_)             \
-    _x_(_x_&&)                  = delete; \
-    _x_(const _x_&&)            = delete; \
-    _x_& operator=(_x_&&)       = delete; \
-    _x_& operator=(const _x_&&) = delete;
-
-// 値のmin/maxマクロ
-// 上限値の制御
-#define HE_MAX(__src__, __max__) ((__src__) < (__max__) ? (__max__) : (__src__))
-// 下限値の制御
-#define HE_MIN(__src__, __min__) ((__src__) < (__min__) ? (__src__) : (__min__))
-
-// 最大・最小の値でリピートした値を返すマクロ
-// 浮動小数点数型の場合
-template <typename T>
-typename std::enable_if<std::is_floating_point<T>::value, T>::type HE_LOOP_IN_RANGE(T t, T min,
-                                                                                    T max)
-{
-    T length = max - min;
-    T offset = t - min;
-    T n      = std::floor(offset / length);
-    return offset - n * length + min;
-}
-
-// 整数型の場合
-template <typename T>
-typename std::enable_if<std::is_integral<T>::value, T>::type HE_LOOP_IN_RANGE(T t, T min, T max)
-{
-    T length = max - min + 1;
-    T offset = t - min;
-    T n      = offset / length;
-    return offset - n * length + min;
-}
-
-// 値をmin/max内で丸めるマクロ
-#define HE_CLAMP(__src__, __min__, __max__) \
-    ((__src__) > (__max__) ? (__max__) : ((__src__) < (__min__) ? (__min__) : (__src__)))
-
-// 例外を作らないキーワード
-// クラスのメソッドで絶対に例外が起きない処理ではつける
-// 例外をつけないコードをコンパイラが生成して最適化になる
-// 処理が入らないプロパティのゲッターやセッターで使うのがいいと思う
-#define HE_NOEXCEPT noexcept
