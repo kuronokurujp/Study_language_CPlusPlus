@@ -9,8 +9,8 @@ namespace Level
 {
     namespace Local
     {
-        static const HE::Char* szInputActionNameByGameStart = HE_STR_TEXT("TitleLevel_GameStart");
-        static const HE::Char* szInputActionNameByGameEnd   = HE_STR_TEXT("TitleLevel_GameEnd");
+        constexpr HE::Char* szInputActionNameByGameStart = HE_STR_TEXT("TitleLevel_GameStart");
+        constexpr HE::Char* szInputActionNameByGameEnd   = HE_STR_TEXT("TitleLevel_GameEnd");
 
         static const EnhancedInput::ActionMap mInputAction =
             {{szInputActionNameByGameStart,
