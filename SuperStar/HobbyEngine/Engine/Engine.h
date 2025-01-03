@@ -34,6 +34,11 @@ public:
     HE::Bool Init();
 
     /// <summary>
+    /// エンジン破棄
+    /// </summary>
+    HE::Bool VRelease() override final;
+
+    /// <summary>
     /// モジュールを作成して追加
     /// </summary>
     template <class T>
@@ -56,11 +61,6 @@ public:
     /// Initメソッドを事前に呼ばないとエラーになる
     /// </summary>
     HE::Bool Start();
-
-    /// <summary>
-    /// エンジン破棄
-    /// </summary>
-    HE::Bool VRelease() override final;
 
     // エンジンを稼働させるためのループ用メソッド
     HE::Bool BeforeUpdateLoop(const HE::Float32);
@@ -86,21 +86,14 @@ public:
     Platform::PlatformModule* PlatformModule();
 
     /// <summary>
-    /// デバッグモードかどうか
-    /// </summary>
-    /// <returns></returns>
-    inline HE::Bool IsDebugMode() const
-    {
-#ifdef _DEBUG
-        return TRUE;
-#endif
-        return FALSE;
-    }
-
-    /// <summary>
     /// １フレームの差分時間を秒で取得
     /// </summary>
     HE::Float32 GetDeltaTimeSec();
+
+    /// <summary>
+    /// FPS取得
+    /// </summary>
+    HE::Uint32 GetFPS();
 
     /// <summary>
     /// アプリを辞める状態か
@@ -153,7 +146,8 @@ private:
 /// 一つのモジュールを単体テスト実行
 /// </summary>
 template <class... TArgs>
-static void UnitTestRunnerByModuleOnly(std::function<HE::Bool()> in_func)
+static void UnitTestRunnerByModuleOnly(std::function<HE::Bool()> in_runFunc,
+                                       std::function<void()> in_endFunc = NULL)
 {
     // エンジン起動
     HE_CREATE_ENGINE;
@@ -185,7 +179,7 @@ static void UnitTestRunnerByModuleOnly(std::function<HE::Bool()> in_func)
             {
                 HE_ENGINE.LateUpdateLoop(d);
                 // モジュールのテスト
-                bEnd = in_func();
+                bEnd = in_runFunc();
             }
             else
             {
@@ -196,6 +190,11 @@ static void UnitTestRunnerByModuleOnly(std::function<HE::Bool()> in_func)
         {
             bEnd = TRUE;
         }
+    }
+
+    if (in_endFunc)
+    {
+        in_endFunc();
     }
 
     // エンジン終了

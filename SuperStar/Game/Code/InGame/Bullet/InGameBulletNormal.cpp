@@ -25,7 +25,7 @@ namespace InGame
         pWork->fSpeed                 = 1.0f;
         pWork->fFirstSpeed            = 6.0f;
         pWork->fAccele                = 1.0f;
-        pWork->_fSize                  = 32.0f;
+        pWork->_fSize                 = 32.0f;
         in_pWork->uCollisionHashCode  = this->_uCollisionHashCode;
     }
 
@@ -76,10 +76,10 @@ namespace InGame
         const InGameBulletNormalWork* const pWork =
             reinterpret_cast<const InGameBulletNormalWork* const>(in_pObj->aWork);
 
-        out->eType                 = ECollisionType::ECollisionType_Circle2D;
+        out->eType                  = ECollisionType::ECollisionType_Circle2D;
         out->_data.circle2D.fRadius = pWork->_fSize * 0.5f;
         out->_data.circle2D.pos     = pWork->pos;
-        out->uHashCode             = in_pObj->uCollisionHashCode;
+        out->uHashCode              = in_pObj->uCollisionHashCode;
         HE_ASSERT(out->uHashCode != 0);
 
         return TRUE;

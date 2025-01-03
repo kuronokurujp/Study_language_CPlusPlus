@@ -100,6 +100,7 @@ TEST_CASE("SDL2 Font Load GUITest")
 }
 */
 
+/*
 TEST_CASE("SDL2 Quad Draw GUITest")
 {
     HE::Uint32 uStep = 0;
@@ -267,6 +268,217 @@ TEST_CASE("SDL2 Quad Draw GUITest")
                                               s3, 32, Core::Math::RGB::Blue,
                                               Core::Math::EAnchor_Center, 0);
                 }
+
+                return FALSE;
+            }
+
+            return TRUE;
+        });
+}
+*/
+
+/*
+TEST_CASE("SDL2 Draw Particle")
+{
+    HE::Uint32 uStep = 0;
+    Core::Common::Handle renderHandle;
+    Core::Common::Handle fontMatHandle;
+
+    Core::Common::Handle prticleHandle;
+
+    HE::Uint32 uMoveStep = 0;
+    Core::Math::Vector2 pos(320.f, 240.0f);
+    UnitTestRunnerByModuleOnly<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module,
+                               Render::RenderModule>(
+        [&uStep, &renderHandle, &fontMatHandle, &uMoveStep, &pos, &prticleHandle]()
+        {
+            auto pPlatformModule = HE_ENGINE.PlatformModule();
+            auto pRenderModule   = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
+
+            if (uStep == 0)
+            {
+                ++uStep;
+                auto pAssetManagerModule =
+                    HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
+                pAssetManagerModule->SetCurrentDir(HE_STR_TEXT("Assets"));
+
+                return FALSE;
+            }
+            else if (uStep == 1)
+            {
+                ++uStep;
+                Core::Common::Handle windowHandle;
+                Core::Common::Handle viewPortHandle;
+                {
+                    // ゲームウィンドウを生成
+                    windowHandle = pRenderModule->NewWindow(640, 480);
+
+                    // 画面に表示するビューポート
+                    // ゲームウィンドウで利用するビューポートを追加
+                    viewPortHandle = pRenderModule->AddViewPort(windowHandle, 640, 480);
+                }
+
+                // UIのゲームシーンを追加
+                {
+                    auto [handle, pScene] =
+                        pRenderModule->AddSceneViewUI(windowHandle, viewPortHandle);
+                    renderHandle = handle;
+                }
+
+                // ゲームウィンドウを表示
+                pRenderModule->ShowWindow(windowHandle);
+
+                ++uStep;
+
+                return FALSE;
+            }
+            else if (uStep == 3)
+            {
+                // TODO: パーティクル作成
+                {
+                    Core::Common::FixedArray<Core::Math::Vector3, 1000> aPos;
+                    Core::Common::FixedArray<Core::Math::Vector3, 1000> aVelocity;
+                    Core::Common::FixedArray<Core::Math::Color, 1000> aColor;
+
+                    for (HE::Uint32 i = 0; i < 1000; ++i)
+                    {
+                        auto x = pPlatformModule->VSystem()->VGetRandByFloat(-1.0f, 1.0f);
+                        auto y = pPlatformModule->VSystem()->VGetRandByFloat(-1.0f, 1.0f);
+
+                        Core::Math::Vector3 p(static_cast<HE::Float32>(x),
+                                              static_cast<HE::Float32>(y), 0.0f);
+                        aPos.Set(i, p);
+
+                        Core::Math::Vector3 v(0.0f, 0.0f, 0.0f);
+                        aVelocity.Set(i, v);
+
+                        aColor.Set(i, Core::Math::RGB::White);
+                    }
+
+                    auto [handle, pBlob] = pRenderModule->CreatePrticle(renderHandle);
+                    pBlob->Init(aPos.Capacity());
+                    prticleHandle = handle;
+
+                    pBlob->SetPositions(aPos);
+                    pBlob->SetVelocitys(aVelocity);
+                    pBlob->SetColors(aColor);
+                }
+                ++uStep;
+
+                return FALSE;
+            }
+            else if (uStep == 4)
+            {
+                // ウィンドウが閉じたら終了
+                // TODO: 点群移動
+                // TODO: 点群表示
+                Render::Command2DParticalDraw(renderHandle, prticleHandle, pos);
+                pos._fY -= 0.5f;
+
+                return FALSE;
+            }
+
+            return TRUE;
+        },
+        [&prticleHandle]()
+        {
+            auto pPlatformModule = HE_ENGINE.PlatformModule();
+            auto pRenderModule   = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
+            pRenderModule->DeletePrticle(prticleHandle);
+        });
+}
+*/
+
+TEST_CASE("SDL2 Draw MoveTest")
+{
+    HE::Uint32 uStep = 0;
+    Core::Common::Handle sceneHandle;
+    Core::Common::Handle fontMatHandle;
+
+    HE::Uint32 uMoveStep = 0;
+    Core::Math::Vector2 pos(100, 100);
+    UnitTestRunnerByModuleOnly<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module,
+                               Render::RenderModule>(
+        [&uStep, &sceneHandle, &fontMatHandle, &uMoveStep, &pos]()
+        {
+            auto pPlatformModule = HE_ENGINE.PlatformModule();
+            auto pRenderModule   = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
+
+            if (uStep == 0)
+            {
+                ++uStep;
+                auto pAssetManagerModule =
+                    HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
+                pAssetManagerModule->SetCurrentDir(HE_STR_TEXT("Assets"));
+
+                // フォントデータのバイナリアセットを作成
+                {
+                    // ロードするフォントファイルパスを渡す
+                    auto bRet = pPlatformModule->VFont()->VLoad(Platform::EFontSize_64,
+                                                                HE_STR_TEXT("Font/TestFont.ttf"));
+                    CHECK(bRet);
+                }
+                return FALSE;
+            }
+            else if (uStep == 1)
+            {
+                ++uStep;
+                Core::Common::Handle windowHandle;
+                Core::Common::Handle viewPortHandle;
+                {
+                    // ゲームウィンドウを生成
+                    windowHandle = pRenderModule->NewWindow(640, 480);
+
+                    // 画面に表示するビューポート
+                    // ゲームウィンドウで利用するビューポートを追加
+                    viewPortHandle = pRenderModule->AddViewPort(windowHandle, 640, 480);
+                }
+
+                // UIのゲームシーンを追加
+                {
+                    auto [handle, pScene] =
+                        pRenderModule->AddSceneViewUI(windowHandle, viewPortHandle);
+                    sceneHandle = handle;
+                }
+
+                // ゲームウィンドウを表示
+                pRenderModule->ShowWindow(windowHandle);
+
+                ++uStep;
+
+                return FALSE;
+            }
+            else if (uStep == 3)
+            {
+                // ウィンドウが閉じたら終了
+                // 左隅にぴったり表示しているかのテスト
+                Core::Math::Rect2 rect;
+                rect.SetPosition(pos._fX, pos._fY, 32.0f, 32.0f, Core::Math::EAnchor_Left);
+                auto fM = 1.0f;
+                if (uMoveStep == 0)
+                {
+                    pos._fX += fM;
+                    if (640.0f <= pos._fX)
+                    {
+                        uMoveStep = 1;
+                    }
+                }
+                else
+                {
+                    pos._fX -= fM;
+                    if (pos._fX <= 0.0f)
+                    {
+                        uMoveStep = 0;
+                    }
+                }
+
+                Render::Command2DQuadDraw(sceneHandle, rect, Core::Math::RGB::Red);
+
+                Core::Common::FixedString1024 s;
+                s.Format(HE_STR_TEXT("FPS(%d)"), HE_ENGINE.GetFPS());
+
+                Render::Command2DTextDraw(sceneHandle, Core::Math::Vector2(0.0f, 0.0f), s, 16,
+                                          Core::Math::RGB::White, Core::Math::EAnchor_Left, 0);
 
                 return FALSE;
             }

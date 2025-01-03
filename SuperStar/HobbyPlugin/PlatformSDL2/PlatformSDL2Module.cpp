@@ -75,7 +75,6 @@ namespace PlatformSDL2
             // 描画のダブルバッファリングを有効にする
             // これで描画くずれが防げる
             SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
             // 描画計算をGPU任せにする(0ならCPU任せになる)
             SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
         }

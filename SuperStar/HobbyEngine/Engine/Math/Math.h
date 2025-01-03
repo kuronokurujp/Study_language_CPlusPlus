@@ -19,8 +19,6 @@ namespace Core::Math
     /// <summary>
     /// クォータニオンを行列に変えたのを返す
     /// </summary>
-    // extern Matrix4 ConvQuaternionToMatrix4(const Quaternion& in_rQuaternion);
-
     extern void OutputQuaternionToMatrix4(Matrix4* out, const Quaternion& in_rQuaternion);
 
 }  // namespace Core::Math

@@ -55,7 +55,7 @@ namespace Core::Common
             HE_ASSERT(0 < in_arArray._uCapacity);
 
             const HE::Uint32 uMinCapacity = HE_MIN(this->_uCapacity, in_arArray._uCapacity);
-            std::copy(this->_pBuff, this->_pBuff + uMinCapacity, this->_pBuff);
+            std::copy(in_arArray._pBuff, in_arArray._pBuff + uMinCapacity, this->_pBuff);
         }
 
         TType& operator[](const HE::Uint32 in_uIndex) const

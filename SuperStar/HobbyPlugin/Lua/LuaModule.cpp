@@ -91,7 +91,7 @@ namespace Lua
                     pArgData->eValType = ELuaFuncArgType_Float32;
 
                     const HE::Float32 fVal = lua_tonumber(in_pLuaState, i);
-                    pArgData->_data.fVal    = fVal;
+                    pArgData->_data.fVal   = fVal;
                     break;
                 }
                 case LUA_TSTRING:
@@ -408,7 +408,7 @@ namespace Lua
             {
                 if (1 < itr->_data.use_count())
                 {
-                    itr->_data->Call(rData);
+                    itr->_data->CallByMove(rData);
                 }
                 else
                 {

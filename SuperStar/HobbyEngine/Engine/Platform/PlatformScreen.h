@@ -92,11 +92,31 @@ namespace Platform
         virtual Core::Memory::UniquePtr<SceneStrategyInterface> VCreateSceneUIStrategy() = 0;
         virtual Core::Memory::UniquePtr<SceneStrategyInterface> VCreateScene2DStrategy() = 0;
 
+        // TODO: パーティクルの生成
+        // 描画は戻り値のハンドルを指定
+        // 事前に生成しておく必要がある
+        virtual Core::Common::Handle VParticalCreate(const HE::Uint32 in_uCount) = 0;
+
+        /// <summary>
+        /// TODO: 生成したパーティクルを削除
+        /// </summary>
+        virtual void VParticalDelete(Core::Common::Handle) = 0;
+
+        virtual void VParticalSetPositions(const Core::Common::Handle,
+                                           const Core::Common::ArrayBase<Core::Math::Vector3>&) = 0;
+        virtual void VParticalSetVelocitys(const Core::Common::Handle,
+                                           const Core::Common::ArrayBase<Core::Math::Vector3>&) = 0;
+
         /// <summary>
         /// 画面を色クリア
         /// </summary>
         virtual void VCls(const HE::Uint32 in_uR, const HE::Uint32 in_uG,
                           const HE::Uint32 in_uB) = 0;
+
+        // TODO: パーティクルの描画
+        virtual void V2DDrawPartical(const Platform::ViewPortConfig& in_rViewConfig,
+                                     const Core::Common::Handle in_rParticleHandle,
+                                     const Core::Math::Vector3&) = 0;
 
         /// <summary>
         /// 2Dのテキスト描画

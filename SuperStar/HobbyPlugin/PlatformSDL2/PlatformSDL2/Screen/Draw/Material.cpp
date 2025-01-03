@@ -407,8 +407,7 @@ namespace PlatformSDL2
 
     const FontMaterial::Glyph* FontMaterial::GetGlyph(const HE::Uint32 in_uUnicode)
     {
-        if (this->_mGlyphs.find(in_uUnicode) == this->_mGlyphs.end())
-            return NULL;
+        if (this->_mGlyphs.find(in_uUnicode) == this->_mGlyphs.end()) return NULL;
 
         return &this->_mGlyphs[in_uUnicode];
     }

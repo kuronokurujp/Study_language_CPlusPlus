@@ -113,8 +113,8 @@ namespace UI
 
     private:
         Core::Memory::UniquePtr<UIButtonMessageHandler> _pushHandler;
-        HE::Float32 _fWidth                 = 0.0f;
-        HE::Float32 _fHeight                = 0.0f;
+        HE::Float32 _fWidth          = 0.0f;
+        HE::Float32 _fHeight         = 0.0f;
         Core::Math::EAnchor _eAnchor = Core::Math::EAnchor_Left;
     };
 }  // namespace UI

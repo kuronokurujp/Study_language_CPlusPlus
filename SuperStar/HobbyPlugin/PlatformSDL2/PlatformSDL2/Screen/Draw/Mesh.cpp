@@ -7,6 +7,8 @@ namespace PlatformSDL2
 {
     namespace Local
     {
+        // TODO: これクラス化する必要あるのか？
+        // 使いまわしをしないのであればメッシュに入れればいい気が
         /// <summary>
         /// OpenGLのメッシュ構築するレイアウト
         /// </summary>
@@ -19,12 +21,13 @@ namespace PlatformSDL2
             {
                 // 頂点リストオブジェクトを作成して書き込み開始する
                 glGenVertexArrays(1, &this->_vertexArrayObject);
+                HE_ASSERT(glGetError() == GL_NO_ERROR);
                 glBindVertexArray(this->_vertexArrayObject);
             }
 
             void EndWrite() { glBindVertexArray(0); }
 
-            void WriteVertexAndLayout(const Mesh::VertexData& in_rMeshVertexData)
+            void WriteVertexAndLayout(const MeshVertexData& in_rMeshVertexData)
             {
                 this->_uVertCount = 0;
 
@@ -39,9 +42,8 @@ namespace PlatformSDL2
                     // 頂点情報を格納するバッファ生成
                     // GL_ARRAY_BUFFERで指定
                     glBindBuffer(GL_ARRAY_BUFFER, this->_vertexBufferObject);
-                    // GenBufferで作成したデータ領域に書き込むサイズを計算
-                    // 頂点データ構造(x,y,z,u,v) => 3次元座標とUV座標
 
+                    // GenBufferで作成したデータ領域に書き込むサイズを計算
                     HE::Uint32 uVertexsSize = this->_uVertCount * uVertSize;
                     glBufferData(GL_ARRAY_BUFFER, uVertexsSize, in_rMeshVertexData._pVertices,
                                  GL_STATIC_DRAW);
@@ -73,7 +75,7 @@ namespace PlatformSDL2
                 }
             }
 
-            void WriteIndices(const Mesh::IndexData& in_rMeshIndexData)
+            void WriteIndices(const MeshIndexData& in_rMeshIndexData)
             {
                 this->_uIndicesCount = 0;
 
@@ -107,6 +109,8 @@ namespace PlatformSDL2
             const HE::Uint32 GetIndicesCount() const { return this->_uIndicesCount; }
             const HE::Uint32 GetVertsCount() const { return this->_uVertCount; }
 
+            GLuint GetVertexBufferObject() const { return this->_vertexBufferObject; }
+
         protected:
             HE::Uint32 _uVertCount     = 0;
             HE::Uint32 _uIndicesCount  = 0;
@@ -132,8 +136,8 @@ namespace PlatformSDL2
         HE_SAFE_DELETE_MEM(this->_pMeshLayout);
     }
 
-    void Mesh::WriteDrawData(const VertexData& in_rMeshVertexData,
-                             const IndexData& in_rMeshIndexData)
+    void Mesh::Write(const MeshVertexData& in_rMeshVertexData,
+                     const MeshIndexData& in_rMeshIndexData)
     {
         auto pMeshLayout = reinterpret_cast<Local::MeshLayout*>(this->_pMeshLayout);
         HE_ASSERT_RETURN(pMeshLayout);
@@ -152,7 +156,7 @@ namespace PlatformSDL2
         pMeshLayout->EndWrite();
     }
 
-    void Mesh::FreeDrawData()
+    void Mesh::Free()
     {
         auto pMeshLayout = reinterpret_cast<Local::MeshLayout*>(this->_pMeshLayout);
         HE_ASSERT_RETURN(pMeshLayout);
@@ -187,4 +191,104 @@ namespace PlatformSDL2
 
         pMeshLayout->Disable();
     }
+
+    void ParticleMesh::Init(const HE::Uint32 in_uCount)
+    {
+        this->_pMeshLayout = HE_NEW_MEM(Local::MeshLayout, 0)();
+        auto pMeshLayout   = reinterpret_cast<Local::MeshLayout*>(this->_pMeshLayout);
+        HE_ASSERT_RETURN(pMeshLayout);
+
+        pMeshLayout->BeginWrite();
+        {
+            //  頂点など描画に必要な情報をバインド
+            MeshVertexData bindMeshVertexData;
+            {
+                // ポイント描画なので頂点情報は不要
+                bindMeshVertexData._pVertices      = NULL;
+                bindMeshVertexData._uVerticesCount = in_uCount;
+                bindMeshVertexData._uVertSize      = sizeof(Item);
+                bindMeshVertexData._aBindLayout    = {MeshLayoutData(3, sizeof(Item::position)),
+                                                      MeshLayoutData(3, sizeof(Item::velocity))};
+            }
+
+            // 頂点とそれに紐づいた頂点レイアウトの書き込み
+            pMeshLayout->WriteVertexAndLayout(bindMeshVertexData);
+        }
+        pMeshLayout->EndWrite();
+
+        this->_pItems = reinterpret_cast<Item*>(HE_ALLOC_MEM(sizeof(Item) * in_uCount, 0));
+
+        this->_uCount = in_uCount;
+    }
+
+    void ParticleMesh::Release()
+    {
+        auto pMeshLayout = reinterpret_cast<Local::MeshLayout*>(this->_pMeshLayout);
+        if (pMeshLayout)
+        {
+            pMeshLayout->Release();
+        }
+
+        HE_SAFE_DELETE_MEM(this->_pMeshLayout);
+        HE_SAFE_DELETE_MEM(this->_pItems);
+    }
+
+    void ParticleMesh::Draw()
+    {
+        auto pMeshLayout = reinterpret_cast<Local::MeshLayout*>(this->_pMeshLayout);
+        HE_ASSERT_RETURN(pMeshLayout);
+
+        HE::Uint32 uVertCount = pMeshLayout->GetVertsCount();
+        if (uVertCount <= 0)
+        {
+            return;
+        }
+
+        pMeshLayout->Enable();
+
+        if (this->_bUpdate)
+        {
+            // 頂点バッファオブジェクトを結合する
+            glBindBuffer(GL_ARRAY_BUFFER, pMeshLayout->GetVertexBufferObject());
+
+            // 頂点バッファオブジェクトにデータを格納する
+            Item* p = static_cast<Item*>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
+            for (auto i = 0; i < this->_uCount; ++i)
+            {
+                p->position = this->_pItems[i].position;
+                p->velocity = this->_pItems[i].velocity;
+                ++p;
+            }
+
+            glUnmapBuffer(GL_ARRAY_BUFFER);
+            this->_bUpdate = FALSE;
+        }
+
+        // 点で描画する
+        ::glDrawArrays(GL_POINTS, 0, uVertCount);
+
+        pMeshLayout->Disable();
+    }
+
+    void ParticleMesh::SetPositions(const Core::Common::ArrayBase<Core::Math::Vector3>& in_aPos)
+    {
+        HE_ASSERT_RETURN(in_aPos.Capacity() <= this->_uCount);
+        for (auto i = 0; i < in_aPos.Capacity(); ++i)
+        {
+            this->_pItems[i].position = in_aPos[i];
+        }
+        this->_bUpdate = TRUE;
+    }
+
+    void ParticleMesh::SetVelocitys(
+        const Core::Common::ArrayBase<Core::Math::Vector3>& in_aVelocity)
+    {
+        HE_ASSERT_RETURN(in_aVelocity.Capacity() <= this->_uCount);
+        for (auto i = 0; i < in_aVelocity.Capacity(); ++i)
+        {
+            this->_pItems[i].velocity = in_aVelocity[i];
+        }
+        this->_bUpdate = TRUE;
+    }
+
 }  // namespace PlatformSDL2

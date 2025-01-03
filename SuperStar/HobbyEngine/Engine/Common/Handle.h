@@ -10,6 +10,9 @@ namespace Core::Common
     class Handle final
     {
     public:
+        using ValueType = HE::Uint64;
+
+    public:
         Handle() { this->Clear(); }
         // 値をコピーする
         Handle(Handle& in_rHandle) { this->_ulHandle = in_rHandle._ulHandle; }
@@ -65,12 +68,12 @@ namespace Core::Common
             struct
             {
                 // マジックナンバー
-                HE::Uint64 _uMagic : ESize_MagicBit;
+                ValueType _uMagic : ESize_MagicBit;
                 // インデックス
-                HE::Uint64 _uIndex : ESize_IndexBit;
+                ValueType _uIndex : ESize_IndexBit;
             } _handleField;
 
-            HE::Uint64 _ulHandle = HE::ulInvalidUint64;
+            ValueType _ulHandle = HE::ulInvalidUint64;
         };
     };
 
@@ -86,7 +89,10 @@ namespace std
     class hash<Core::Common::Handle>
     {
     public:
-        size_t operator()(const Core::Common::Handle& p) const { return p.operator HE::Uint64(); }
+        size_t operator()(const Core::Common::Handle& p) const
+        {
+            return p.operator Core::Common::Handle::ValueType();
+        }
     };
 }  // namespace std
 

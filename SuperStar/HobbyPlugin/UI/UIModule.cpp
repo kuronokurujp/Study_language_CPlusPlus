@@ -169,10 +169,10 @@ namespace UI
                         rect.SetPosition(pLabel->_fX, pLabel->_fY, pStyle->_fW, pStyle->_fH,
                                          Local::mPosAnthorToRect2Anchor[pLabel->_eAnchor]);
 
-                        auto h =
-                            this->NewLabelWidget(Core::Common::FixedString64(pNodeData->_szId), sort,
-                                                 pLabel->szLoc, pLabel->szText, pStyle->_uSize, rect,
-                                                 pStyle->_uColor, in_rViewHandle, in_rLevelHandle);
+                        auto h = this->NewLabelWidget(Core::Common::FixedString64(pNodeData->_szId),
+                                                      sort, pLabel->szLoc, pLabel->szText,
+                                                      pStyle->_uSize, rect, pStyle->_uColor,
+                                                      in_rViewHandle, in_rLevelHandle);
 
                         this->AddChildWidget(hParentWidget, h);
                         hParentWidget = h;
@@ -189,9 +189,10 @@ namespace UI
                         Core::Math::Rect2 rect;
                         rect.SetPosition(pButton->_fX, pButton->_fY, pStyle->_fW, pStyle->_fH,
                                          Local::mPosAnthorToRect2Anchor[pButton->_eAnchor]);
-                        auto h = this->NewButtonWidget(Core::Common::FixedString64(pNodeData->_szId),
-                                                       sort, rect, pStyle->_uColor, in_rViewHandle,
-                                                       in_rLevelHandle);
+                        auto h =
+                            this->NewButtonWidget(Core::Common::FixedString64(pNodeData->_szId),
+                                                  sort, rect, pStyle->_uColor, in_rViewHandle,
+                                                  in_rLevelHandle);
 
                         // ボタンを押した時のイベントを設定
                         {

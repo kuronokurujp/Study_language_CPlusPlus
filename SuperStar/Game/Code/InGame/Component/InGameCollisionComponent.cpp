@@ -150,12 +150,12 @@ namespace InGame
         auto pTrans = this->_pOwner->GetComponent<Actor::TransformComponent>();
         HE_ASSERT(pTrans);
 
-        auto worldPos              = pTrans->GetWorldPos();
+        auto worldPos               = pTrans->GetWorldPos();
         out->_data.circle2D.pos     = Core::Math::Vector2(worldPos._fX, worldPos._fY);
         out->_data.circle2D.fRadius = this->_fRadius;
-        out->eType                 = ECollisionType::ECollisionType_Circle2D;
-        out->uHashCode             = this->_uHashCode;
-        out->ulMetaData            = this->_ulMetaData;
+        out->eType                  = ECollisionType::ECollisionType_Circle2D;
+        out->uHashCode              = this->_uHashCode;
+        out->ulMetaData             = this->_ulMetaData;
 
         return TRUE;
     }

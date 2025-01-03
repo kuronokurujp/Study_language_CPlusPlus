@@ -10,6 +10,11 @@ namespace Platform
     class SceneStrategyInterface;
 }
 
+namespace Render::Prticle
+{
+    class Blob;
+}
+
 namespace Render
 {
     /// <summary>
@@ -22,9 +27,14 @@ namespace Render
         friend class Window;
         friend class RenderModule;
 
+        using RuntimePoolPricleBlob = Core::Common::RuntimePoolManager<Render::Prticle::Blob>;
+
     public:
+        SceneViewBase();
         virtual ~SceneViewBase() = default;
         void Release();
+
+        const Render::Prticle::Blob& GetPrticle(const Core::Common::Handle);
 
     protected:
         HE::Bool _Begin(Core::Memory::UniquePtr<Platform::SceneStrategyInterface>);
@@ -43,6 +53,9 @@ namespace Render
         Core::Memory::UniquePtr<class Platform::SceneStrategyInterface> _upSt;
 
         CommandBuffer _commandBuff;
+
+    private:
+        RuntimePoolPricleBlob _runtimePoolPrticleBlob;
     };
 
 }  // namespace Render

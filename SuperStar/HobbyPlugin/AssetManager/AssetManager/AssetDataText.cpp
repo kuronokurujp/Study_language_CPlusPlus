@@ -9,8 +9,8 @@ namespace AssetManager
     {
         // ファイルをテキストでロード
         auto [pData, _uSize] = in_rFile.VLoadText(this->_path);
-        this->_pText        = reinterpret_cast<HE::Char*>(pData);
-        this->_uSize        = _uSize;
+        this->_pText         = reinterpret_cast<HE::Char*>(pData);
+        this->_uSize         = _uSize;
 
         return (this->_pText != NULL);
     }

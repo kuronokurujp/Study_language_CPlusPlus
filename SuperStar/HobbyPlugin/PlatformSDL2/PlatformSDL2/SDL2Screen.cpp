@@ -14,8 +14,14 @@
 
 namespace PlatformSDL2
 {
-    static SDL_Window* s_pDummyWindow    = NULL;
-    static SDL_GLContext s_pShareContext = NULL;
+    namespace Local
+    {
+        static SDL_Window* s_pDummyWindow    = NULL;
+        static SDL_GLContext s_pShareContext = NULL;
+
+        using PoolParticleMesh = Core::Common::RuntimePoolManager<ParticleMesh>;
+
+    }  // namespace Local
 
     Screen::Screen(PlatformSDL2::PlatformSDL2Module* in_pSDL2Module)
     {
@@ -27,8 +33,10 @@ namespace PlatformSDL2
         // なぜこうしているのか？
         // 利用するウィンドウを生成する前にOpenGLの命令が呼ぶケースがあるから
         // 利用するウィンドウが生成されたら消す
-        s_pDummyWindow  = SDL_CreateWindow("", 0, 0, 0, 0, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
-        s_pShareContext = SDL_GL_CreateContext(reinterpret_cast<SDL_Window*>(s_pDummyWindow));
+        Local::s_pDummyWindow =
+            SDL_CreateWindow("", 0, 0, 0, 0, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+        Local::s_pShareContext =
+            SDL_GL_CreateContext(reinterpret_cast<SDL_Window*>(Local::s_pDummyWindow));
         {
             // OpenGLの拡張を有効に
             glewExperimental  = GL_TRUE;
@@ -49,6 +57,17 @@ namespace PlatformSDL2
             {
                 HE_LOG_LINE(HE_STR_TEXT("GL_ARB_texture_non_power_of_two is NOT supported."));
             }
+
+            GLint samples;
+            glGetIntegerv(GL_SAMPLES, &samples);
+            if (0 < samples)
+            {
+                HE_LOG_LINE(HE_STR_TEXT("Antialiasing supported with %d samples"), samples);
+            }
+            else
+            {
+                HE_LOG_LINE(HE_STR_TEXT("Antialiasing not supported."));
+            }
         }
 
         // フォント用のメッシュは常に使うので常駐
@@ -68,6 +87,7 @@ namespace PlatformSDL2
             constexpr HE::UTF8* szVertShaderText =
                 " \
             #version 330 \n \
+            precision highp float; \
             uniform mat4 uWorldTransform; \
             uniform mat4 uViewProj; \
             out vec2 fragTexCoord; \
@@ -82,14 +102,15 @@ namespace PlatformSDL2
             constexpr HE::UTF8* szFragShaderText =
                 " \
             #version 330 \n \
+            precision highp float; \
             in vec2 fragTexCoord; \
             out vec4 outColor; \
             uniform sampler2D uTexture; \
             uniform vec4 uColor; \
             void main() \
             {\
-                vec4 tex = texture2D(uTexture, fragTexCoord);\
-                outColor = tex * uColor;\
+                vec3 c = texture2D(uTexture, fragTexCoord).rgb;\
+                outColor = vec4(c, 1) * uColor;\
             }";
 
             if (p2DQuadMat->LoadShader(szVertShaderText, szFragShaderText) == FALSE)
@@ -149,13 +170,13 @@ namespace PlatformSDL2
 
             //  頂点など描画に必要な情報をバインド
             {
-                Mesh::IndexData bindMeshIndexData;
+                MeshIndexData bindMeshIndexData;
                 {
                     bindMeshIndexData._pIndices      = NULL;
                     bindMeshIndexData._uIndicesCount = 0;
                 }
 
-                Mesh::VertexData bindMeshVertexData;
+                MeshVertexData bindMeshVertexData;
                 {
                     bindMeshVertexData._pVertices      = NULL;
                     bindMeshVertexData._uVerticesCount = 0;
@@ -163,7 +184,7 @@ namespace PlatformSDL2
                     bindMeshVertexData._aBindLayout    = {};
                 }
 
-                p2DQuadMesh->WriteDrawData(bindMeshVertexData, bindMeshIndexData);
+                p2DQuadMesh->Write(bindMeshVertexData, bindMeshIndexData);
             }
             this->_p2DQuadMesh = p2DQuadMesh;
         }
@@ -212,24 +233,24 @@ namespace PlatformSDL2
 
             //  頂点など描画に必要な情報をバインド
             {
-                Mesh::IndexData bindMeshIndexData;
+                MeshIndexData bindMeshIndexData;
                 {
                     bindMeshIndexData._pIndices      = NULL;
                     bindMeshIndexData._uIndicesCount = 0;
                 }
 
-                Mesh::VertexData bindMeshVertexData;
+                MeshVertexData bindMeshVertexData;
                 {
                     bindMeshVertexData._pVertices      = vertices.data();
                     bindMeshVertexData._uVerticesCount = vertices.size();
                     bindMeshVertexData._uVertSize      = sizeof(CircleVertex);
                     bindMeshVertexData._aBindLayout    = {
-                        Mesh::LayoutData(3, sizeof(CircleVertex::position)),
-                        Mesh::LayoutData(2, sizeof(CircleVertex::uv)),
+                        MeshLayoutData(3, sizeof(CircleVertex::position)),
+                        MeshLayoutData(2, sizeof(CircleVertex::uv)),
                     };
                 }
 
-                p2DCircleMesh->WriteDrawData(bindMeshVertexData, bindMeshIndexData);
+                p2DCircleMesh->Write(bindMeshVertexData, bindMeshIndexData);
             }
 
             this->_p2DCircleMesh = p2DCircleMesh;
@@ -259,24 +280,24 @@ namespace PlatformSDL2
 
             //  頂点など描画に必要な情報をバインド
             {
-                Mesh::IndexData bindMeshIndexData;
+                MeshIndexData bindMeshIndexData;
                 {
                     bindMeshIndexData._pIndices      = NULL;
                     bindMeshIndexData._uIndicesCount = 0;
                 }
 
-                Mesh::VertexData bindMeshVertexData;
+                MeshVertexData bindMeshVertexData;
                 {
                     bindMeshVertexData._pVertices      = vertices.data();
                     bindMeshVertexData._uVerticesCount = vertices.size();
                     bindMeshVertexData._uVertSize      = sizeof(LocalVertex);
                     bindMeshVertexData._aBindLayout    = {
-                        Mesh::LayoutData(3, sizeof(LocalVertex::position)),
-                        Mesh::LayoutData(2, sizeof(LocalVertex::uv)),
+                        MeshLayoutData(3, sizeof(LocalVertex::position)),
+                        MeshLayoutData(2, sizeof(LocalVertex::uv)),
                     };
                 }
 
-                pMesh->WriteDrawData(bindMeshVertexData, bindMeshIndexData);
+                pMesh->Write(bindMeshVertexData, bindMeshIndexData);
             }
             this->_p2DTriangleMesh = pMesh;
         }
@@ -287,6 +308,50 @@ namespace PlatformSDL2
             auto pWhiteTex =
                 HE_NEW_MEM(TextureSurface, 0)(GL_TEXTURE_2D, GL_TEXTURE0, aPixel, 1, 1);
             this->_pWhiteTex = pWhiteTex;
+        }
+
+        // TODO: パーティクルのマテリアルを生成
+        {
+            auto pMat = HE_NEW_MEM(Material, 0);
+
+            // 描画処理でプロパティ名を直指定しているので外部ファイル化はしない
+            // TODO: シェーダーを差し替える機能もいずれ考える
+            // 頂点シェーダーのコード
+            constexpr HE::UTF8* szVertShaderText =
+                " \
+            #version 330 \n \
+            uniform mat4 uWorldTransform; \
+            uniform mat4 uViewProj; \
+            layout(location = 0) in vec3 inPosition; \
+            layout(location = 1) in vec3 inVelocity; \
+            void main() \
+            {\
+                vec4 pos     = vec4(inPosition, 1.0);\
+                gl_Position  = pos * uWorldTransform * uViewProj;\
+            }";
+
+            // ピクセルシェーダーのコード
+            constexpr HE::UTF8* szFragShaderText =
+                " \
+            #version 330 \n \
+            out vec4 outColor; \
+            void main() \
+            {\
+                outColor = vec4(1,1,1,1);\
+            }";
+
+            if (pMat->LoadShader(szVertShaderText, szFragShaderText) == FALSE)
+            {
+                HE_ASSERT(FALSE && "2D幾何学のシェーダーロードに失敗");
+            }
+            this->_pParticleMat = pMat;
+        }
+
+        // TODO: パーティクルのメッシュプールを作成
+        {
+            auto pPool = HE_NEW_MEM(Local::PoolParticleMesh, 0);
+            pPool->ReservePool(1024);
+            this->_pPoolParticleMesh = pPool;
         }
     }
 
@@ -323,14 +388,26 @@ namespace PlatformSDL2
         }
 
         {
+            auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
+            pPool->ReleasePool([](ParticleMesh* in_pParticleMesh) { in_pParticleMesh->Release(); });
+            HE_SAFE_DELETE_MEM(this->_pPoolParticleMesh);
+        }
+
+        {
+            auto pMat = reinterpret_cast<Material*>(this->_pParticleMat);
+            pMat->VRelease();
+            HE_SAFE_DELETE_MEM(this->_pParticleMat);
+        }
+
+        {
             auto pMat = reinterpret_cast<Material*>(this->_p2DGeometoryMat);
             pMat->VRelease();
             HE_SAFE_DELETE_MEM(this->_p2DGeometoryMat);
         }
 
         {
-            auto p2DQuadMat = reinterpret_cast<Material*>(this->_p2DQuadMat);
-            p2DQuadMat->VRelease();
+            auto pMat = reinterpret_cast<Material*>(this->_p2DQuadMat);
+            pMat->VRelease();
             HE_SAFE_DELETE_MEM(this->_p2DQuadMat);
         }
     }
@@ -338,13 +415,11 @@ namespace PlatformSDL2
     Core::Memory::UniquePtr<Platform::WindowStrategy> Screen::VCreateWindowStrategy(
         const Platform::WindowConfig& in_rConfig)
     {
-        auto spSt = HE_MAKE_CUSTOM_UNIQUE_PTR((SDL2WindowStrategy), in_rConfig,
-                                              static_cast<void*>(s_pShareContext));
-        if (s_pDummyWindow)
-        {
-            ::SDL_DestroyWindow(s_pDummyWindow);
-            s_pDummyWindow = NULL;
-        }
+        auto spSt              = HE_MAKE_CUSTOM_UNIQUE_PTR((SDL2WindowStrategy), in_rConfig,
+                                                           SDL2WindowStrategy::Context(Local::s_pShareContext,
+                                                                                       Local::s_pDummyWindow));
+        Local::s_pDummyWindow  = NULL;
+        Local::s_pShareContext = NULL;
 
         return std::move(spSt);
     }
@@ -367,6 +442,95 @@ namespace PlatformSDL2
     {
         auto spSt = HE_MAKE_CUSTOM_UNIQUE_PTR((SDL2SceneStrategy2D));
         return std::move(spSt);
+    }
+
+    Core::Common::Handle Screen::VParticalCreate(const HE::Uint32 in_uCount)
+    {
+        // TODO: パーティクル用のメッシュを生成
+        auto pPool           = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
+        auto [handle, pMesh] = pPool->Alloc<ParticleMesh>();
+        HE_ASSERT(handle.Null() == FALSE);
+
+        pMesh->Init(in_uCount);
+
+        return handle;
+    }
+
+    void Screen::VParticalDelete(Core::Common::Handle in_handle)
+    {
+        // TODO: 生成したパーティクルを削除
+        auto pPool         = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
+        auto pParticleMesh = pPool->Ref(in_handle);
+        HE_ASSERT_RETURN(pParticleMesh);
+        pParticleMesh->Release();
+
+        pPool->Free(in_handle, FALSE);
+    }
+
+    void Screen::VParticalSetPositions(
+        const Core::Common::Handle in_rParticleHandle,
+        const Core::Common::ArrayBase<Core::Math::Vector3>& in_rPositions)
+    {
+        auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
+
+        auto pParticleMesh = pPool->Ref(in_rParticleHandle);
+        HE_ASSERT_RETURN(pParticleMesh);
+
+        pParticleMesh->SetPositions(in_rPositions);
+    }
+
+    void Screen::VParticalSetVelocitys(
+        const Core::Common::Handle in_rParticleHandle,
+        const Core::Common::ArrayBase<Core::Math::Vector3>& in_rVelocitys)
+    {
+        auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
+
+        auto pParticleMesh = pPool->Ref(in_rParticleHandle);
+        HE_ASSERT_RETURN(pParticleMesh);
+        pParticleMesh->SetVelocitys(in_rVelocitys);
+    }
+
+    void Screen::V2DDrawPartical(const Platform::ViewPortConfig& in_rViewConfig,
+                                 const Core::Common::Handle in_rParticleHandle,
+                                 const Core::Math::Vector3& in_rPos)
+    {
+        // TODO: 事前に生成したパーティクル用のメッシュを使って描画
+        auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
+
+        auto pParticleMesh = pPool->Ref(in_rParticleHandle);
+        HE_ASSERT_RETURN(pParticleMesh);
+
+        auto pMat = reinterpret_cast<Material*>(this->_pParticleMat);
+        pMat->Enable();
+        // 射影変換は2D座標系では利用しない
+        {
+            Core::Math::Matrix4 viewProj;
+            pMat->SetPropertyMatrix("uViewProj", viewProj);
+        }
+
+        // 座標設定
+        {
+            HE::Float32 fX = static_cast<HE::Float32>(in_rPos._fX);
+            HE::Float32 fY = static_cast<HE::Float32>(in_rPos._fY);
+
+            // -1 から 1に座標変換
+            if (fX != 0.0f) fX /= static_cast<HE::Float32>(in_rViewConfig._uWidth);
+            if (fY != 0.0f) fY /= static_cast<HE::Float32>(in_rViewConfig._uHeight);
+            fX = 2.0f * fX - 1.0f;
+            fY = -2.0f * fY + 1.0f;
+
+            Core::Math::Matrix4 transMat;
+            Core::Math::Matrix4::OutputTranslation(&transMat, Core::Math::Vector3(fX, fY, 0.0f));
+
+            Core::Math::Matrix4 world;
+            world.Set(transMat);
+
+            pMat->SetPropertyMatrix("uWorldTransform", world);
+        }
+
+        pParticleMesh->Draw();
+
+        //        pMat->Disable();
     }
 
     void Screen::VCls(const HE::Uint32 in_uR, const HE::Uint32 in_uG, const HE::Uint32 in_uB)
@@ -542,24 +706,24 @@ namespace PlatformSDL2
 
             //  頂点など描画に必要な情報をバインド
             {
-                Mesh::IndexData bindMeshIndexData;
+                MeshIndexData bindMeshIndexData;
                 {
                     bindMeshIndexData._pIndices      = NULL;
                     bindMeshIndexData._uIndicesCount = 0;
                 }
 
-                Mesh::VertexData bindMeshVertexData;
+                MeshVertexData bindMeshVertexData;
                 {
                     bindMeshVertexData._pVertices      = s_vertices.data();
                     bindMeshVertexData._uVerticesCount = s_vertices.size();
                     bindMeshVertexData._uVertSize      = sizeof(Vertex);
                     bindMeshVertexData._aBindLayout    = {
-                        Mesh::LayoutData(3, sizeof(Vertex::position)),
-                        Mesh::LayoutData(2, sizeof(Vertex::uv)),
+                        MeshLayoutData(3, sizeof(Vertex::position)),
+                        MeshLayoutData(2, sizeof(Vertex::uv)),
                     };
                 }
 
-                pMesh->WriteDrawData(bindMeshVertexData, bindMeshIndexData);
+                pMesh->Write(bindMeshVertexData, bindMeshIndexData);
             }
         }
 
@@ -639,13 +803,13 @@ namespace PlatformSDL2
         // 機能無効
         {
             // マテリアルを無効
-            pFontMat->Disable();
+            // pFontMat->Disable();
             // テクスチャを無効
-            pFontTex->Disable();
+            // pFontTex->Disable();
         }
 
         // 描画内容は動的に変化するので描画データを破棄する
-        pMesh->FreeDrawData();
+        pMesh->Free();
     }
 
     void Screen::V2DDrawQuad(const Platform::ViewPortConfig& in_rViewConfig,
@@ -670,6 +834,13 @@ namespace PlatformSDL2
 
             // 座標を設定
             {
+                const auto pos = in_rRect2D.Pos();
+
+                HE::Float32 x = pos._fX;
+                HE::Float32 y = -pos._fY;
+                x -= static_cast<HE::Float32>(in_rViewConfig._uWidth >> 1);
+                y += static_cast<HE::Float32>(in_rViewConfig._uHeight >> 1);
+
                 const auto fW = in_rRect2D.Width();
                 const auto fH = in_rRect2D.Height();
 
@@ -677,11 +848,7 @@ namespace PlatformSDL2
                 Core::Math::Matrix4::OutputScale(&scaleMat, fW, fH, 1.0f);
 
                 Core::Math::Matrix4 transMat;
-                const auto pos = in_rRect2D.Pos();
-                Core::Math::Matrix4::OutputTranslation(
-                    &transMat,
-                    Core::Math::Vector3(pos._fX - (in_rViewConfig._uWidth >> 1),
-                                        -(pos._fY) + (in_rViewConfig._uHeight >> 1), 0.0f));
+                Core::Math::Matrix4::OutputTranslation(&transMat, Core::Math::Vector3(x, y, 0.0f));
 
                 Core::Math::Matrix4 world;
                 world.Set(scaleMat);
@@ -708,8 +875,8 @@ namespace PlatformSDL2
             auto p2DQuadMesh = reinterpret_cast<Mesh*>(this->_p2DQuadMesh);
             p2DQuadMesh->DrawByVertexOnly(GL_TRIANGLE_STRIP, 4);
         }
-        pWhiteTex->Disable();
-        p2DQuadMat->Disable();
+        // pWhiteTex->Disable();
+        // p2DQuadMat->Disable();
     }
 
     void Screen::V2DDrawCircle(const Platform::ViewPortConfig& in_rViewConfig,
@@ -786,8 +953,8 @@ namespace PlatformSDL2
             auto pMesh = reinterpret_cast<Mesh*>(this->_p2DCircleMesh);
             pMesh->DrawByVertexOnly(GL_TRIANGLE_FAN);
         }
-        pWhiteTex->Disable();
-        pMat->Disable();
+        //        pWhiteTex->Disable();
+        //        pMat->Disable();
     }
 
     void Screen::V2DDrawTriangle(const Platform::ViewPortConfig& in_rViewConfig,
@@ -871,8 +1038,8 @@ namespace PlatformSDL2
             auto pMesh = reinterpret_cast<Mesh*>(this->_p2DTriangleMesh);
             pMesh->DrawByVertexOnly(GL_TRIANGLES);
         }
-        pWhiteTex->Disable();
-        pMat->Disable();
+        //        pWhiteTex->Disable();
+        //        pMat->Disable();
     }
 
 }  // namespace PlatformSDL2

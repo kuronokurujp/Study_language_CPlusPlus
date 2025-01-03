@@ -70,8 +70,8 @@ namespace Core::Time
         }
 
     private:
-        static inline const HE::Uint32 _uTimeAvgCount      = 10;
-        static inline const HE::Float32 _fFrameAvgTimeMSec = 1000.0f * _uTimeAvgCount;
+        static constexpr HE::Uint32 _uTimeAvgCount       = 10;
+        static constexpr HE::Float64 _ffFrameAvgTimeMSec = 1000.0f * _uTimeAvgCount;
 
         HE::Uint32 _uaPreviousTimeMSec[_uTimeAvgCount] = {0};
         HE::Float32 _uFrameRate                        = 0;

@@ -59,10 +59,7 @@ namespace UI
             this->_szLocGroup = in_szGroupName;
         }
 
-        inline void SetAnchor(const Core::Math::EAnchor in_eAnchor)
-        {
-            this->_eAnchor = in_eAnchor;
-        }
+        inline void SetAnchor(const Core::Math::EAnchor in_eAnchor) { this->_eAnchor = in_eAnchor; }
 
         inline void SetFontSize(const HE::Uint32 in_uFontSize) { this->_uFontSize = in_uFontSize; }
 
@@ -84,6 +81,6 @@ namespace UI
         Core::Common::FixedString128 _szLocGroup;
         Core::Math::Rect2 _rect;
         Core::Math::EAnchor _eAnchor = Core::Math::EAnchor_Left;
-        HE::Uint32 _uFontSize               = 32;
+        HE::Uint32 _uFontSize        = 32;
     };
 }  // namespace UI

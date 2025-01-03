@@ -18,7 +18,7 @@ namespace InGame
         {
             Core::Math::Rect2 srcRect;
             srcRect.SetPosition(0.0f, 0.0f, this->_size._fX, this->_size._fY,
-                                      Core::Math::EAnchor_Center);
+                                Core::Math::EAnchor_Center);
             in_pTrans->TransformLocalToWorldRect2D(&rect, srcRect);
         }
 

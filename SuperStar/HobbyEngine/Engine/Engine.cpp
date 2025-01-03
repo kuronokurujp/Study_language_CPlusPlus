@@ -168,7 +168,6 @@ HE::Bool Engine::WaitFrameLoop()
         }
 
         HE::Uint64 ulEndMSec = this->_spFPS->GetLastTimeMSec();
-        //HE_LOG_LINE(HE_STR_TEXT("%d"), this->_spFPS->GetFrameRate());
     }
 
     return (pPlatform->VIsQuit() == FALSE);
@@ -201,6 +200,12 @@ HE::Float32 Engine::GetDeltaTimeSec()
     if (pPlatform == NULL) return 0.0f;
 
     return this->_spFPS->GetDeltaTimeSec();
+}
+
+HE::Uint32 Engine::GetFPS()
+{
+    if (this->_spFPS == NULL) return 0;
+    return this->_spFPS->GetFrameRate();
 }
 
 HE::Bool Engine::IsAppQuit()

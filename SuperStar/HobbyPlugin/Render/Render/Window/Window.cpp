@@ -1,5 +1,6 @@
 ﻿#include "Window.h"
 
+#include "./../Particle/Blob.h"
 #include "./Scene.h"
 #include "./ViewPort.h"
 #include "Engine/Engine.h"
@@ -7,126 +8,142 @@
 
 namespace Render
 {
-    static void _RenderCommand(const Render::Command* in_pCommand,
-                               const Platform::ViewPortConfig& in_rViewPortConfig,
-                               Platform::ScreenInterface* in_pScreen)
+    namespace Local
     {
-        // TODO: コマンドに応じた描画処理をする
-        switch (in_pCommand->_uType)
+        static void RenderCommand(const Render::Command* in_pCommand,
+                                  const Platform::ViewPortConfig& in_rViewPortConfig,
+                                  Render::SceneViewBase* in_pBaseScene,
+                                  Platform::ScreenInterface* in_pScreen)
         {
-            // 画面クリア
-            case Render::ECmdType_ClsScreen:
+            // TODO: コマンドに応じた描画処理をする
+            switch (in_pCommand->_uType)
             {
-                const Render::CmdClsScreen* pClsScreen = &in_pCommand->_data._clsScree;
-                const auto& rColor                     = pClsScreen->_color;
-
-                in_pScreen->VCls(rColor.c32.r, rColor.c32.b, rColor.c32.g);
-                break;
-            }
-
-            // 矩形を描画
-            case Render::ECmdType_2DQuadDraw:
-            {
-                const Render::Cmd2DQuadDraw* pRect2D = &in_pCommand->_data._2DDrawRect;
-
-                Core::Math::Rect2 r;
-                r.SetRect(pRect2D->_fLeftX, pRect2D->_fRightX, pRect2D->_fLeftY, pRect2D->_fRightY,
-                          Core::Math::EAnchor::EAnchor_Left);
-
-                in_pScreen->V2DDrawQuad(in_rViewPortConfig, r, pRect2D->_color);
-                break;
-            }
-
-            // 点群描画
-            case Render::ECmdType_2DPointArrayDraw:
-            {
-                // データ置換
-                const Render::Cmd2DPointArrayDraw* pCmdPoint2DCloud =
-                    &in_pCommand->_data._2DDrawPointCloud;
-                HE_ASSERT(0 < pCmdPoint2DCloud->_uCount && "点群の点が一つもないのはだめ");
-
-                if (0 < pCmdPoint2DCloud->_uCount)
+                // 画面クリア
+                case Render::ECmdType_ClsScreen:
                 {
-                    /*
-                        const HE::Uint32 num =
-                            HE_MIN(pCmdPoint2DCloud->uCount, s_u2DPointCount);
-                            */
-                    /*
-                    std::transform(pCmdPoint2DCloud->aPoint,
-                    pCmdPoint2DCloud->aPoint + num, s_a2DPoint,
-                                   [](const Render::Point2D& src)
-                                   {
-                                       const auto& rColor = src.color;
-                                       const auto uColor =
-                                           ::GetColor(rColor.c32.r, rColor.c32.g,
-                                                      rColor.c32.b);
-                                       return ::POINTDATA{static_cast<int>(src.fX),
-                                                          static_cast<int>(src.fY),
-                    uColor, 0};
+                    const Render::CmdClsScreen* pClsScreen = &in_pCommand->_data._clsScree;
+                    const auto& rColor                     = pClsScreen->_color;
 
-                                   });
-
-                    // 点の集合を描画する
-                    ::DrawPixelSet(s_a2DPoint, num);
-                                   */
+                    in_pScreen->VCls(rColor.c32.r, rColor.c32.b, rColor.c32.g);
+                    break;
                 }
-                break;
-            }
 
-            // 点描画
-            case Render::ECmdType_2DPointDraw:
-            {
-                const Render::Cmd2DPointDraw* pCmdPoint2D = &in_pCommand->_data._2DDrawPoint;
+                // 矩形を描画
+                case Render::ECmdType_2DQuadDraw:
+                {
+                    const Render::Cmd2DQuadDraw* pRect2D = &in_pCommand->_data._2DDrawRect;
 
-                const Render::Point2D* pPoint2D = &pCmdPoint2D->_point;
-                const auto& rColor              = pPoint2D->_color;
-                /*
-                const auto uColor = ::GetColor(rColor.c32.r, rColor.c32.g,
-                rColor.c32.b);
-                ::DrawPixel(static_cast<int>(pPoint2D->fX),
-                static_cast<int>(pPoint2D->fY), uColor);
-                            */
+                    Core::Math::Rect2 r;
+                    r.SetRect(pRect2D->_fLeftX, pRect2D->_fRightX, pRect2D->_fLeftY,
+                              pRect2D->_fRightY, Core::Math::EAnchor::EAnchor_Left);
 
-                break;
-            }
+                    in_pScreen->V2DDrawQuad(in_rViewPortConfig, r, pRect2D->_color);
+                    break;
+                }
 
-            // 2次元の円描画
-            case Render::ECmdType_2DCircleDraw:
-            {
-                const Render::Cmd2DCircleDraw* pCmd = &in_pCommand->_data._2DDrawCircle;
+#if 0
+                // 点群描画
+                case Render::ECmdType_2DPointArrayDraw:
+                {
+                    // データ置換
+                    const Render::Cmd2DPointArrayDraw* pCmdPoint2DCloud =
+                        &in_pCommand->_data._2DDrawPointCloud;
+                    HE_ASSERT(0 < pCmdPoint2DCloud->_uCount && "点群の点が一つもないのはだめ");
 
-                const Render::Point2D& rPoint = pCmd->_point;
-                in_pScreen->V2DDrawCircle(in_rViewPortConfig,
-                                          Core::Math::Vector2(rPoint._fX, rPoint._fY),
-                                          pCmd->_eAnchor, pCmd->_fSize, rPoint._color);
-                break;
-            }
+                    if (0 < pCmdPoint2DCloud->_uCount)
+                    {
+                        /*
+                            const HE::Uint32 num =
+                                HE_MIN(pCmdPoint2DCloud->uCount, s_u2DPointCount);
+                                */
+                        /*
+                        std::transform(pCmdPoint2DCloud->aPoint,
+                        pCmdPoint2DCloud->aPoint + num, s_a2DPoint,
+                                       [](const Render::Point2D& src)
+                                       {
+                                           const auto& rColor = src.color;
+                                           const auto uColor =
+                                               ::GetColor(rColor.c32.r, rColor.c32.g,
+                                                          rColor.c32.b);
+                                           return ::POINTDATA{static_cast<int>(src.fX),
+                                                              static_cast<int>(src.fY),
+                        uColor, 0};
 
-            // 2Dテキストを描画
-            case Render::ECmdType_2DTextDraw:
-            {
-                const Render::Cmd2DTextDraw* pCmd = &in_pCommand->_data._2DDrawText;
+                                       });
 
-                in_pScreen->V2DDrawText(in_rViewPortConfig,
-                                        Core::Math::Vector2(pCmd->_fX, pCmd->_fY), pCmd->_eAnchor,
-                                        pCmd->_szChars, pCmd->_uSize, pCmd->_uSpace, pCmd->_color);
-                break;
-            }
+                        // 点の集合を描画する
+                        ::DrawPixelSet(s_a2DPoint, num);
+                                       */
+                    }
+                    break;
+                }
 
-            // TODO: 2Dの三角形を描画
-            case Render::ECmdType_2DTriangleDraw:
-            {
-                const Render::Cmd2DTriangleDraw* pCmd = &in_pCommand->_data._2DDrawTriangle;
-                const Render::Point2D& rPoint         = pCmd->_point;
-                in_pScreen->V2DDrawTriangle(in_rViewPortConfig,
-                                            Core::Math::Vector2(rPoint._fX, rPoint._fY),
-                                            pCmd->_eAnchor, pCmd->_fAngleDegrees, pCmd->_fSize,
-                                            rPoint._color);
+                // 点描画
+                case Render::ECmdType_2DPointDraw:
+                {
+                    const Render::Cmd2DPointDraw* pCmdPoint2D = &in_pCommand->_data._2DDrawPoint;
 
-                break;
+                    const Render::Point3D* pPoint2D = &pCmdPoint2D->_point;
+                    const auto& rColor              = pPoint2D->_color;
+                    /*
+                    const auto uColor = ::GetColor(rColor.c32.r, rColor.c32.g,
+                    rColor.c32.b);
+                    ::DrawPixel(static_cast<int>(pPoint2D->fX),
+                    static_cast<int>(pPoint2D->fY), uColor);
+                                */
+
+                    break;
+                }
+#endif
+                // 2次元の円描画
+                case Render::ECmdType_2DCircleDraw:
+                {
+                    const Render::Cmd2DCircleDraw* pCmd = &in_pCommand->_data._2DDrawCircle;
+
+                    // const Render::Point3D& rPoint = pCmd->_point;
+                    in_pScreen->V2DDrawCircle(in_rViewPortConfig,
+                                              Core::Math::Vector2(pCmd->_fX, pCmd->_fY),
+                                              pCmd->_eAnchor, pCmd->_fSize, pCmd->_color);
+                    break;
+                }
+
+                // 2Dテキストを描画
+                case Render::ECmdType_2DTextDraw:
+                {
+                    const Render::Cmd2DTextDraw* pCmd = &in_pCommand->_data._2DDrawText;
+
+                    in_pScreen->V2DDrawText(in_rViewPortConfig,
+                                            Core::Math::Vector2(pCmd->_fX, pCmd->_fY),
+                                            pCmd->_eAnchor, pCmd->_szChars, pCmd->_uSize,
+                                            pCmd->_uSpace, pCmd->_color);
+                    break;
+                }
+
+                // 2Dの三角形を描画
+                case Render::ECmdType_2DTriangleDraw:
+                {
+                    const Render::Cmd2DTriangleDraw* pCmd = &in_pCommand->_data._2DDrawTriangle;
+                    in_pScreen->V2DDrawTriangle(in_rViewPortConfig,
+                                                Core::Math::Vector2(pCmd->_fX, pCmd->_fY),
+                                                pCmd->_eAnchor, pCmd->_fAngleDegrees, pCmd->_fSize,
+                                                pCmd->_color);
+
+                    break;
+                }
+
+                // TODO: パーティクル描画
+                case Render::ECmdType_2DParticalDraw:
+                {
+                    const auto pCmd = &in_pCommand->_data._Particle;
+                    auto& p         = in_pBaseScene->GetPrticle(pCmd->handle);
+                    Core::Math::Vector3 pos(pCmd->_fX, pCmd->_fY, pCmd->_fZ);
+                    in_pScreen->V2DDrawPartical(in_rViewPortConfig, p.GetDrawHandle(), pos);
+
+                    break;
+                }
             }
         }
-    }
+    }  // namespace Local
 
     Core::Common::Handle Window::AddViewPort(
         Core::Memory::UniquePtr<Platform::ViewPortStrategy> in_upStg)
@@ -264,7 +281,8 @@ namespace Render
                     const Render::Command* pCommand = itrScene->second->_commandBuff.PopBack();
                     while (pCommand != NULL)
                     {
-                        _RenderCommand(pCommand, viewPortConfig, pPlatformScreen.get());
+                        Local::RenderCommand(pCommand, viewPortConfig, itrScene->second,
+                                             pPlatformScreen.get());
 
                         pCommand = itrScene->second->_commandBuff.PopBack();
                     }

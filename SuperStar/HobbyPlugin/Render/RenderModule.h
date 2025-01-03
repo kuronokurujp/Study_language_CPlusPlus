@@ -4,6 +4,7 @@
 
 // モジュールのヘッダーファイルは全てインクルードする
 #include "Render/Command/Command.h"
+#include "Render/Particle/Blob.h"
 #include "Render/Window/Scene.h"
 #include "Render/Window/ViewPort.h"
 #include "Render/Window/Window.h"
@@ -45,6 +46,7 @@ namespace Render
     public:
         using ViewHandleVector   = Core::Common::FixedVector<Core::Common::Handle, 32>;
         using WindowHandleKeyMap = Core::Common::FixedMap<HE::Uint64, Core::Common::Handle, 32>;
+        using ParticleBlobObject = std::tuple<Core::Common::Handle, Render::Prticle::Blob*>;
 
     public:
         RenderModule();
@@ -94,9 +96,24 @@ namespace Render
             const Core::Common::Handle& in_rViewPortHash);
 
         /// <summary>
-        /// シーンにレンダリングするコマンド追加
+        /// TODO: パーティクルの塊オブジェクト生成
         /// </summary>
-        HE::Bool PushSceneRenderCommand(const Core::Common::Handle&, Command&&);
+        ParticleBlobObject CreatePrticle(const Core::Common::Handle);
+
+        /// <summary>
+        /// TODO: 生成したパーティクルを削除
+        /// </summary>
+        void DeletePrticle(Core::Common::Handle&);
+
+        /// <summary>
+        /// 生成したパーティクルを取得
+        /// </summary>
+        Render::Prticle::Blob& GetPrticle(const Core::Common::Handle);
+
+        /// <summary>
+        /// レンダリングするコマンド追加
+        /// </summary>
+        HE::Bool PushRenderCommand(const Core::Common::Handle, Command&&);
 
     protected:
         /// <summary>
@@ -126,6 +143,7 @@ namespace Render
 
     private:
         Window* _GetWindow(const Core::Common::Handle&);
+        SceneViewBase* _GetSceneBase(const Core::Common::Handle);
 
         Core::Common::Handle _AddScene(const Core::Common::Handle& in_rWindowHandle,
                                        const Core::Common::Handle& in_rViewPortHandle,
@@ -135,11 +153,9 @@ namespace Render
         Core::Common::FixedPoolManager<Window, 32> _poolWindow;
         Core::Common::FixedPoolManager<RenderingContext, 32> _poolRenderingContext;
 
-        // Core::Memory::SharedPtr<MaterialPool> _spPoolMaterial;
-        //  Core::Memory::SharedPtr<MeshPool> _spPoolMesh;
-        //  Core::Memory::SharedPtr<TexturePool> _spPoolTexture;
-
         Core::Common::FixedStack<Core::Common::Handle, 32> _sStandupWindow;
+        // TODO: 自前のを作ったら差し替える
+        std::unordered_map<Core::Common::Handle, Render::Prticle::Blob*> _mParticleHandle;
     };
 
 }  // namespace Render

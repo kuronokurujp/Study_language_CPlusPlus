@@ -11,7 +11,10 @@ namespace PlatformSDL2
     class SDL2WindowStrategy final : public Platform::WindowStrategy
     {
     public:
-        SDL2WindowStrategy(const Platform::WindowConfig& in_rConfig, void* in_pGLContext);
+        using Context = std::tuple<void*, void*>;
+
+    public:
+        SDL2WindowStrategy(const Platform::WindowConfig& in_rConfig, Context in_pContext);
 
         void VBegin() override final;
         void VEnd() override final;
@@ -22,8 +25,8 @@ namespace PlatformSDL2
         void VEndRender() override final;
 
     private:
-        void* _pWindow  = NULL;
-        void* _pContext = NULL;
+        // void* _pWindow = NULL;
+        Context _context;
     };
 
 }  // namespace PlatformSDL2

@@ -90,7 +90,7 @@ namespace InGame
 
             const HE::Float32 fSideLength = 100.0f;
             activeScreenInSide.SetPosition(-fSideLength, -fSideLength, 2 * fSideLength + fW,
-                                   2 * fSideLength + fH, Core::Math::EAnchor_Left);
+                                           2 * fSideLength + fH, Core::Math::EAnchor_Left);
         }
 
         this->_ForEachObject(

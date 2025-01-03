@@ -5,13 +5,6 @@
 
 namespace Render
 {
-    struct Point2D
-    {
-        HE::Float32 _fX = 0.0f;
-        HE::Float32 _fY = 0.0f;
-        Core::Math::Color _color;
-    };
-
     // コマンド一覧
     enum ECmdType
     {
@@ -22,13 +15,15 @@ namespace Render
         // 矩形描画
         ECmdType_2DQuadDraw,
         // 点描画
-        ECmdType_2DPointDraw,
+        // ECmdType_2DPointDraw,
         // 点群描画
-        ECmdType_2DPointArrayDraw,
+        // ECmdType_2DPointArrayDraw,
         // 円の描画
         ECmdType_2DCircleDraw,
-        // TODO: 三角形の描画
-        ECmdType_2DTriangleDraw
+        // 三角形の描画
+        ECmdType_2DTriangleDraw,
+        // TODO: パーティクルの描画
+        ECmdType_2DParticalDraw
     };
 
     /// <summary>
@@ -36,9 +31,9 @@ namespace Render
     /// </summary>
     struct Cmd2DTextDraw
     {
-        HE::Float32 _fX   = 0.0f;
-        HE::Float32 _fY   = 0.0f;
-        HE::Uint32 _uSize = 0;
+        HE::Float32 _fX    = 0.0f;
+        HE::Float32 _fY    = 0.0f;
+        HE::Uint32 _uSize  = 0;
         HE::Uint32 _uSpace = 0;
         Core::Math::Color _color;
         Core::Math::EAnchor _eAnchor = Core::Math::EAnchor_Left;
@@ -60,22 +55,24 @@ namespace Render
         Core::Math::Color _color;
     };
 
-    /// <summary>
-    /// 2D上で点を描画
-    /// </summary>
-    struct Cmd2DPointDraw
-    {
-        Point2D _point;
-    };
+    /*
+        /// <summary>
+        /// 2D上で点を描画
+        /// </summary>
+        struct Cmd2DPointDraw
+        {
+            Point3D _point;
+        };
 
-    /// <summary>
-    /// 2D上で点群を描画
-    /// </summary>
-    struct Cmd2DPointArrayDraw
-    {
-        const Point2D* _aPoint = NULL;
-        HE::Uint32 _uCount     = 0;
-    };
+        /// <summary>
+        /// 2D上で点群を描画
+        /// </summary>
+        struct Cmd2DPointArrayDraw
+        {
+            const Point3D* _aPoint = NULL;
+            HE::Uint32 _uCount     = 0;
+        };
+        */
 
     /// <summary>
     /// 画面を指定色でクリア
@@ -90,7 +87,10 @@ namespace Render
     /// </summary>
     struct Cmd2DCircleDraw
     {
-        Point2D _point;
+        HE::Float32 _fX = 0.0f;
+        HE::Float32 _fY = 0.0f;
+        Core::Math::Color _color;
+        // Point3D _point;
         HE::Float32 _fSize           = 0.0f;
         Core::Math::EAnchor _eAnchor = Core::Math::EAnchor_Left;
     };
@@ -100,11 +100,24 @@ namespace Render
     /// </summary>
     struct Cmd2DTriangleDraw
     {
-        Point2D _point;
+        HE::Float32 _fX = 0.0f;
+        HE::Float32 _fY = 0.0f;
+        Core::Math::Color _color;
+
+        // Point3D _point;
         HE::Float32 _fSize = 0.0f;
         // 三角形の角度(度)
         HE::Float32 _fAngleDegrees   = 0.0f;
         Core::Math::EAnchor _eAnchor = Core::Math::EAnchor_Left;
+    };
+
+    /// <summary>
+    /// TODO: パーティクルの描画
+    /// </summary>
+    struct CmdParticleDraw
+    {
+        Core::Common::Handle::ValueType handle = 0;
+        HE::Float32 _fX, _fY, _fZ;
     };
 
     /// <summary>
@@ -124,10 +137,11 @@ namespace Render
 
             Cmd2DTextDraw _2DDrawText;
             Cmd2DQuadDraw _2DDrawRect;
-            Cmd2DPointDraw _2DDrawPoint;
-            Cmd2DPointArrayDraw _2DDrawPointCloud;
+            //            Cmd2DPointDraw _2DDrawPoint;
+            //            Cmd2DPointArrayDraw _2DDrawPointCloud;
             Cmd2DCircleDraw _2DDrawCircle;
             Cmd2DTriangleDraw _2DDrawTriangle;
+            CmdParticleDraw _Particle;
 
         } _data;
     };
@@ -135,7 +149,7 @@ namespace Render
     /// <summary>
     /// 2Dテキスト描画
     /// </summary>
-    extern void Command2DTextDraw(const Core::Common::Handle& in_rViewHandle,
+    extern void Command2DTextDraw(const Core::Common::Handle in_renderHandle,
                                   const Core::Math::Vector2& in_rPos,
                                   const Core::Common::StringBase& in_str, const HE::Uint32 in_uSize,
                                   const Core::Math::Color in_color,
@@ -144,32 +158,33 @@ namespace Render
     /// <summary>
     /// 2D矩形描画
     /// </summary>
-    extern void Command2DQuadDraw(const Core::Common::Handle& in_rViewHandle,
+    extern void Command2DQuadDraw(const Core::Common::Handle in_renderHandle,
                                   const Core::Math::Rect2& in_rRect,
                                   const Core::Math::Color in_color);
+    /*
+        /// <summary>
+        /// 2D点描画
+        /// </summary>
+        extern void Command2DPointDraw(const Core::Common::Handle in_renderHandle,
+                                       const Core::Math::Vector2& in_rPos,
+                                       const Core::Math::Color& in_rColor);
 
-    /// <summary>
-    /// 2D点描画
-    /// </summary>
-    extern void Command2DPointDraw(const Core::Common::Handle& in_rViewHandle,
-                                   const Core::Math::Vector2& in_rPos,
-                                   const Core::Math::Color& in_rColor);
-    /// <summary>
-    /// 2D点群描画
-    /// </summary>
-    extern void Command2DPointArrayDraw(const Core::Common::Handle& in_rViewHandle,
-                                        const Point2D* in_aPoint, const HE::Uint32 in_uCount);
-
+        /// <summary>
+        /// 2D点群描画
+        /// </summary>
+        extern void Command2DPointArrayDraw(const Core::Common::Handle in_renderHandle,
+                                            const Point3D* in_aPoint, const HE::Uint32 in_uCount);
+    */
     /// <summary>
     /// 画面クリア
     /// </summary>
-    extern void CommandClsScreen(const Core::Common::Handle& in_rViewHandle,
+    extern void CommandClsScreen(const Core::Common::Handle in_renderHandle,
                                  const Core::Math::Color& in_rColor);
 
     /// <summary>
     /// 2D円の描画
     /// </summary>
-    extern void Command2DCircleDraw(const Core::Common::Handle& in_rViewHandle,
+    extern void Command2DCircleDraw(const Core::Common::Handle in_renderHandle,
                                     const Core::Math::Vector2& in_rPos,
                                     const Core::Math::EAnchor in_eAhchor,
                                     const HE::Float32 in_fSize, const Core::Math::Color& in_rColor);
@@ -177,11 +192,18 @@ namespace Render
     /// <summary>
     /// 2D三角形の描画
     /// </summary>
-    extern void Command2DTriangleDraw(const Core::Common::Handle& in_rViewHandle,
+    extern void Command2DTriangleDraw(const Core::Common::Handle in_renderHandle,
                                       const Core::Math::Vector2& in_rPos,
                                       const Core::Math::EAnchor in_eAhchor,
                                       const HE::Float32 in_fAngleDegress,
                                       const HE::Float32 in_fSize,
                                       const Core::Math::Color& in_rColor);
+
+    /// <summary>
+    /// TODO: パーティクル描画
+    /// </summary>
+    extern void Command2DParticalDraw(const Core::Common::Handle in_renderHandle,
+                                      const Core::Common::Handle in_particlaHandle,
+                                      const Core::Math::Vector2& in_rPos);
 
 }  // namespace Render

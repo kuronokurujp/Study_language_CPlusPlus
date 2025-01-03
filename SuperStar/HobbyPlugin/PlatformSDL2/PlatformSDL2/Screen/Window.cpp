@@ -7,11 +7,11 @@
 namespace PlatformSDL2
 {
     SDL2WindowStrategy::SDL2WindowStrategy(const Platform::WindowConfig& in_rConfig,
-                                           void* in_pGLContext)
+                                           Context in_context)
         : Platform::WindowStrategy(in_rConfig)
     {
         // TODO: 設定は仮
-        this->_pContext = in_pGLContext;
+        this->_context = in_context;
     }
 
     void SDL2WindowStrategy::VBegin()
@@ -30,20 +30,28 @@ namespace PlatformSDL2
         }
 
         // ウィンドウは最初は非表示にしておく
-        this->_pWindow = ::SDL_CreateWindow("", x, y, this->_config._uWidth, this->_config._uHeight,
-                                            SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+        auto pNewWindow =
+            ::SDL_CreateWindow("", x, y, this->_config._uWidth, this->_config._uHeight,
+                               SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+        SDL_GLContext pNewContext = NULL;
 
         // Windowに紐づいているOpenGLのコンテキストを生成
-        if (this->_pContext == NULL)
+        auto [pGLContext, pWindow] = this->_context;
+        if (pGLContext && pWindow)
         {
-            this->_pContext = ::SDL_GL_CreateContext(reinterpret_cast<SDL_Window*>(this->_pWindow));
-            HE_ASSERT(this->_pContext);
+            ::SDL_DestroyWindow(reinterpret_cast<SDL_Window*>(pWindow));
+            ::SDL_GL_MakeCurrent(reinterpret_cast<SDL_Window*>(pNewWindow), pGLContext);
+
+            pNewContext = pGLContext;
         }
         // すでにコンテキストがある場合は再利用コンテキストなので設定
         else
         {
-            ::SDL_GL_MakeCurrent(reinterpret_cast<SDL_Window*>(this->_pWindow), this->_pContext);
+            pNewContext = ::SDL_GL_CreateContext(reinterpret_cast<SDL_Window*>(pNewWindow));
+            HE_ASSERT(pNewContext);
         }
+
+        this->_context = Context(pNewContext, pNewWindow);
 
         // コンテキストが生成されるたびに実行しないといけない
         {
@@ -55,26 +63,41 @@ namespace PlatformSDL2
                             glewGetErrorString(glewResult));
             }
         }
+
+        // フレーム交換の垂直同期を有効にしている
+        // これをしないとフレームずれが起きて表示がぶれることがあった
+        if (::SDL_GL_SetSwapInterval(-1) != 0)
+        {
+            if (::SDL_GL_SetSwapInterval(1) != 0)
+            {
+                HE_LOG_LINE(HE_STR_TEXT("SDL_Error(%d)"), ::SDL_GetError());
+                HE_ASSERT(FALSE);
+            }
+        }
     }
 
     void SDL2WindowStrategy::VEnd()
     {
-        if (this->_pContext)
+        auto [pGLContext, pWindow] = this->_context;
+        if (pGLContext)
         {
-            ::SDL_GL_DeleteContext(this->_pContext);
+            ::SDL_GL_DeleteContext(pGLContext);
         }
 
-        if (this->_pWindow)
+        if (pWindow)
         {
-            ::SDL_DestroyWindow(reinterpret_cast<SDL_Window*>(this->_pWindow));
-            this->_pWindow = NULL;
+            ::SDL_DestroyWindow(reinterpret_cast<SDL_Window*>(pWindow));
         }
+
+        this->_context = Context(NULL, NULL);
     }
 
     void SDL2WindowStrategy::VShow()
     {
-        ::SDL_GL_MakeCurrent(reinterpret_cast<SDL_Window*>(this->_pWindow), this->_pContext);
-        ::SDL_ShowWindow(reinterpret_cast<SDL_Window*>(this->_pWindow));
+        auto [pGLContext, pWindow] = this->_context;
+
+        ::SDL_GL_MakeCurrent(reinterpret_cast<SDL_Window*>(pWindow), pGLContext);
+        ::SDL_ShowWindow(reinterpret_cast<SDL_Window*>(pWindow));
     }
 
     void SDL2WindowStrategy::VBeginRender()
@@ -83,17 +106,18 @@ namespace PlatformSDL2
         ::glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         ::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        /*
-
         // 3D描画開始
-        ::glEnable(GL_DEPTH_TEST);
-        ::glDisable(GL_BLEND);
-        */
+        //::glEnable(GL_DEPTH_TEST);
+        //::glDepthFunc(GL_LEQUAL);
+        //::glDepthRange(0.0, 1.0);  // 深度範囲の設定
+        //::glDisable(GL_BLEND);
     }
 
     void SDL2WindowStrategy::VEndRender()
     {
+        auto [pGLContext, pWindow] = this->_context;
+
         // ウィンドウの描画バッファを切り替える
-        SDL_GL_SwapWindow(reinterpret_cast<SDL_Window*>(this->_pWindow));
+        SDL_GL_SwapWindow(reinterpret_cast<SDL_Window*>(pWindow));
     }
 }  // namespace PlatformSDL2

@@ -51,8 +51,8 @@ namespace Core::Time
             if (0 < uFrameTimeMSec)
             {
                 // 1秒 / フレーム更新したミリ秒時間 = フレーム更新したレート値
-                this->_uFrameRate =
-                    FPS::_fFrameAvgTimeMSec / static_cast<HE::Float32>(uFrameTimeMSec);
+                this->_uFrameRate = static_cast<HE::Uint32>(
+                    FPS::_ffFrameAvgTimeMSec / static_cast<HE::Float64>(uFrameTimeMSec));
             }
             else
             {

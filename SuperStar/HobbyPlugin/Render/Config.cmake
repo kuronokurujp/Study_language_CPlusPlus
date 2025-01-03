@@ -9,6 +9,9 @@ set(RENDER_PLUGIN_TARGET_FILES
 
     RenderModule.cpp
     RenderModule.h
+    
+    Render/Particle/Blob.cpp
+    Render/Particle/Blob.h
 
     Render/Command/CommandBuffer.h
     Render/Command/Command.h

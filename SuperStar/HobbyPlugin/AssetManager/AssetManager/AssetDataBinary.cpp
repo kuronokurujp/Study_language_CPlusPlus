@@ -9,8 +9,8 @@ namespace AssetManager
     {
         // ファイルをバイナル形式でロード
         auto [pData, _uSize] = in_rFile.VLoadBinary(this->_path);
-        this->_pData        = pData;
-        this->_uSize        = _uSize;
+        this->_pData         = pData;
+        this->_uSize         = _uSize;
 
         return (this->_pData != NULL);
     }

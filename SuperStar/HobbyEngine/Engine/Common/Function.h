@@ -10,14 +10,15 @@ namespace Core::Common
     public:
         FunctionObject(std::function<TResult(TArgs...)>&& in_f) : _f(std::move(in_f)) {}
 
-        TResult Call(TArgs&&... args) { return this->_f(std::forward<TArgs>(args)...); }
+        /// <summary>
+        /// 右辺値参照用
+        /// </summary>
+        TResult CallByMove(TArgs&&... args) { return this->_f(std::forward<TArgs>(args)...); }
+        /// <summary>
+        /// 参照用
+        /// </summary>
+        TResult CallByRef(TArgs&... args) { return this->_f(args...); }
 
-        /*
-                std::array<std::string, 1 + sizeof...(TArgs)> signatureNames()
-                {
-                    return {typeid(TResult).name(), typeid(TArgs).name()...};
-                }
-        */
     private:
         std::function<TResult(TArgs...)> _f;
     };

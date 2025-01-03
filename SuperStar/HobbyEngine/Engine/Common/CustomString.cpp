@@ -203,7 +203,7 @@ namespace Core::Common
         return static_cast<HE::Uint32>(::wcslen((this->_szBuff)))
 #else
         HE::Uint32 _uSize = this->Size();
-        HE::Uint32 uLen  = 0;
+        HE::Uint32 uLen   = 0;
 
         HE::Uint32 uOffset = 0;
         HE::Uint32 i       = 0;
@@ -288,7 +288,7 @@ namespace Core::Common
     {
         if (in_szName && this->_uCapacity > 0)
         {
-            HE::Uint32 _uCount    = this->Size();
+            HE::Uint32 _uCount   = this->Size();
             HE::Sint32 iCatCount = static_cast<HE::Sint32>(this->_uCapacity - _uCount - 1);
             HE_ASSERT(0 < iCatCount &&
                       "文字列の長さがバッファサイズを超えて文字列の追加ができない");

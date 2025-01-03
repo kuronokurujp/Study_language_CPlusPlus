@@ -193,12 +193,113 @@ namespace Render
         return std::tuple<Core::Common::Handle, SceneViewBase*>(handle, pScene);
     }
 
+    RenderModule::ParticleBlobObject RenderModule::CreatePrticle(
+        const Core::Common::Handle in_renderHandle)
+    {
+        HE_ASSERT_RETURN_VALUE((ParticleBlobObject(NullHandle, NULL)),
+                               in_renderHandle.Null() == FALSE);
+
+        auto pScene = this->_GetSceneBase(in_renderHandle);
+        HE_ASSERT_RETURN_VALUE((ParticleBlobObject(NullHandle, NULL)),
+                               in_renderHandle.Null() == FALSE);
+
+        // TODO: パーティクル描画ハンドルを生成
+        auto upCreateParticlaHandler =
+            HE_MAKE_CUSTOM_UNIQUE_PTR((Render::Prticle::Blob::CreateFunctionType),
+                                      [this](HE::Uint32 in_uCount)
+                                      {
+                                          auto pPlatform =
+                                              this->GetDependenceModule<Platform::PlatformModule>();
+                                          return pPlatform->VScreen()->VParticalCreate(in_uCount);
+                                      });
+
+        auto upDeleteParticleHandler =
+            HE_MAKE_CUSTOM_UNIQUE_PTR((Render::Prticle::Blob::DeleteFunctionType),
+                                      [this](Core::Common::Handle in_rHandle)
+                                      {
+                                          auto pPlatform =
+                                              this->GetDependenceModule<Platform::PlatformModule>();
+                                          pPlatform->VScreen()->VParticalDelete(in_rHandle);
+                                      });
+
+        auto upPositionHandler = HE_MAKE_CUSTOM_UNIQUE_PTR(
+            (Render::Prticle::Blob::PositionFunctionType),
+            [this](const Core::Common::Handle in_handle,
+                   const Core::Common::ArrayBase<Core::Math::Vector3>& in_arPosition)
+            {
+                auto pPlatform = this->GetDependenceModule<Platform::PlatformModule>();
+                pPlatform->VScreen()->VParticalSetPositions(in_handle, in_arPosition);
+            });
+
+        auto upVelocityHandler = HE_MAKE_CUSTOM_UNIQUE_PTR(
+            (Render::Prticle::Blob::VelocityFunctionType),
+            [this](const Core::Common::Handle in_handle,
+                   const Core::Common::ArrayBase<Core::Math::Vector3>& in_arVelocity)
+            {
+                auto pPlatform = this->GetDependenceModule<Platform::PlatformModule>();
+                pPlatform->VScreen()->VParticalSetVelocitys(in_handle, in_arVelocity);
+            });
+
+        auto [handle, pBlob] = pScene->_runtimePoolPrticleBlob.Alloc<Render::Prticle::Blob>(
+            in_renderHandle, std::move(upCreateParticlaHandler), std::move(upDeleteParticleHandler),
+            std::move(upPositionHandler), std::move(upVelocityHandler));
+        this->_mParticleHandle[handle] = pBlob;
+
+        return ParticleBlobObject(handle, pBlob);
+    }
+
+    void RenderModule::DeletePrticle(Core::Common::Handle& in_rPrticleHandle)
+    {
+        HE_ASSERT_RETURN(in_rPrticleHandle.Null() == FALSE);
+        if (this->_mParticleHandle.empty()) return;
+        if (this->_mParticleHandle.find(in_rPrticleHandle) == this->_mParticleHandle.end()) return;
+
+        auto pBlob = this->_mParticleHandle[in_rPrticleHandle];
+
+        auto pScene = this->_GetSceneBase(pBlob->GetRenderHandle());
+        HE_ASSERT_RETURN(pScene);
+
+        // TODO: 管理から外す
+        this->_mParticleHandle.erase(in_rPrticleHandle);
+
+        pBlob->Release();
+        pScene->_runtimePoolPrticleBlob.Free(in_rPrticleHandle, FALSE);
+    }
+
+    Render::Prticle::Blob& RenderModule::GetPrticle(const Core::Common::Handle in_prticleHandle)
+    {
+        HE_ASSERT(in_prticleHandle.Null() == FALSE);
+
+        auto pBlob = this->_mParticleHandle[in_prticleHandle];
+
+        auto pScene = this->_GetSceneBase(pBlob->GetRenderHandle());
+        HE_ASSERT(pScene);
+
+        return *(pScene->_runtimePoolPrticleBlob.Ref(in_prticleHandle));
+    }
+
     Window* RenderModule::_GetWindow(const Core::Common::Handle& in_rHandle)
     {
         auto pWindow = this->_poolWindow.Ref(in_rHandle);
         HE_ASSERT_RETURN_VALUE(NULL, pWindow);
 
         return pWindow;
+    }
+
+    SceneViewBase* RenderModule::_GetSceneBase(const Core::Common::Handle in_renderHandle)
+    {
+        auto pRenderingContext = this->_poolRenderingContext.Ref(in_renderHandle);
+
+        auto pWindow = this->_GetWindow(pRenderingContext->GetWindowHandle());
+        HE_ASSERT_RETURN_VALUE(NULL, pWindow);
+
+        auto pViewPort = pWindow->_poolViewPortManager.Ref(pRenderingContext->GetViewPortHandle());
+        HE_ASSERT_RETURN_VALUE(NULL, pViewPort);
+
+        auto pScene = pViewPort->GetScene(pRenderingContext->GetSceneHandle());
+        HE_ASSERT_RETURN_VALUE(NULL, pScene);
+
+        return pScene;
     }
 
     Core::Common::Handle RenderModule::_AddScene(const Core::Common::Handle& in_rWindowHandle,
@@ -215,10 +316,10 @@ namespace Render
         return handle;
     }
 
-    HE::Bool RenderModule::PushSceneRenderCommand(const Core::Common::Handle& in_rHandle,
-                                                  Command&& in_rrCommand)
+    HE::Bool RenderModule::PushRenderCommand(const Core::Common::Handle in_renderHandle,
+                                             Command&& in_rrCommand)
     {
-        auto pRenderingContext = this->_poolRenderingContext.Ref(in_rHandle);
+        auto pRenderingContext = this->_poolRenderingContext.Ref(in_renderHandle);
 
         auto pWindow = this->_GetWindow(pRenderingContext->GetWindowHandle());
         HE_ASSERT(pWindow);
@@ -245,6 +346,16 @@ namespace Render
     /// </summary>
     HE::Bool RenderModule::_VRelease()
     {
+        // パーティクルを全削除
+        auto itr = this->_mParticleHandle.begin();
+        while (itr != this->_mParticleHandle.end())
+        {
+            auto handle = itr->first;
+            this->DeletePrticle(handle);
+
+            itr = this->_mParticleHandle.begin();
+        }
+
         // ウィンドウ解放
         this->DeleteAllWindow();
 
