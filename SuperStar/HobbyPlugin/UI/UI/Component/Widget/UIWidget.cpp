@@ -12,7 +12,8 @@ namespace UI
     {
         if (Component::VBegin() == FALSE) return FALSE;
 
-        if (this->_viewHandle.Null()) return FALSE;
+        HE_ASSERT(this->_viewHandle.Null() == FALSE);
+//        if (this->_viewHandle.Null()) return FALSE;
 
         this->_transformHandle = this->_pOwner->AddComponent<Actor::TransformComponent>(
             0, Actor::Component::EPriorty::EPriorty_Main);
