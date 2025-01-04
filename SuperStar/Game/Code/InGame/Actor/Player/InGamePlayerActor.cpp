@@ -132,7 +132,7 @@ namespace InGame
         {
             Core::Math::Vector2 newPos;
             newPos.SetAdd(this->_pos, this->_move);
-            this->_move.Zero();
+            this->_move.Clear();
 
             this->SetPos(newPos);
         }
@@ -151,7 +151,7 @@ namespace InGame
 
     void InGamePlayerActor::Move(const Core::Math::Vector2& in_rMove)
     {
-        this->_move.Zero();
+        this->_move.Clear();
         this->_move.Madd(in_rMove, this->_parameter.speed);
     }
 

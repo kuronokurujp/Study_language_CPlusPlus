@@ -27,7 +27,7 @@ namespace InGame
     private:
         void _Clear()
         {
-            this->_pos.Zero();
+            this->_pos.Clear();
             this->_transformHandle.Clear();
         }
 

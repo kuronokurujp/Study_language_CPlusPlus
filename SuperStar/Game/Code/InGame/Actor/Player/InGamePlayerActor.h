@@ -71,8 +71,8 @@ namespace InGame
     private:
         void _Clear()
         {
-            this->_size.Zero();
-            this->_move.Zero();
+            this->_size.Clear();
+            this->_move.Clear();
         }
 
     private:
