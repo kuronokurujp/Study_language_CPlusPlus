@@ -137,14 +137,14 @@ namespace UI::Builder
             {
                 pData->_eWidgetType = UI::Builder::EWidget_Root;
             }
-            else if (szAttrName == HE_STR_TEXT("w"))
+            else if (szAttrName == HE_STR_TEXT("widget"))
             {
                 pData->_eWidgetType = UI::Builder::EWidget_Widget;
                 auto pWidget        = &pData->_exData._widget;
                 pWidget->_fX        = in_rNode.attribute("x").as_float();
                 pWidget->_fY        = in_rNode.attribute("y").as_float();
             }
-            else if (szAttrName == HE_STR_TEXT("b"))
+            else if (szAttrName == HE_STR_TEXT("btn"))
             {
                 pData->_eWidgetType = UI::Builder::EWidget_Button;
                 auto pBtn           = &pData->_exData.button;
@@ -155,7 +155,7 @@ namespace UI::Builder
                 auto s = in_rNode.attribute("style").value();
                 ParseStyle(&pBtn->_style, s, static_cast<HE::Uint32>(::strlen(s)));
             }
-            else if (szAttrName == HE_STR_TEXT("t"))
+            else if (szAttrName == HE_STR_TEXT("label"))
             {
                 pData->_eWidgetType = UI::Builder::EWidget_Label;
                 auto pLabel         = &pData->_exData._label;
@@ -197,10 +197,12 @@ namespace UI::Builder
                 auto s = in_rNode.attribute("style").value();
                 ParseStyle(&pLabel->_style, s, static_cast<HE::Uint32>(::strlen(s)));
             }
-            else if (szAttrName == HE_STR_TEXT("l"))
+            else if (szAttrName == HE_STR_TEXT("layout"))
             {
                 pData->_eWidgetType = UI::Builder::EWidget_Layout;
                 auto pLayout        = &pData->_exData._layout;
+                pLayout->_fX         = in_rNode.attribute("x").as_float();
+                pLayout->_fY         = in_rNode.attribute("y").as_float();
 
                 auto s = in_rNode.attribute("style").value();
                 ParseStyle(&pLayout->_style, s, static_cast<HE::Uint32>(::strlen(s)));

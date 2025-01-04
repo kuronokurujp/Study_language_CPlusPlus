@@ -75,12 +75,14 @@ namespace UI
     }
 
     const UIWidgetHandlePack UIModule::NewLayer(const Core::Common::StringBase& in_szrName,
+                                                const Core::Math::Vector2& in_rPos,
                                                 const HE::Uint32 in_uSort,
-                                                const Core::Common::Handle& in_rLevelHandle)
+                                                const Core::Common::Handle in_viewHandle,
+                                                const Core::Common::Handle in_levelHandle)
     {
-        auto handlePack = this->NewWidget(in_szrName, in_uSort, in_rLevelHandle);
+        auto handlePack = this->NewWidget(in_szrName, in_uSort, in_levelHandle);
 
-        auto hInputRouter = this->AddComponent<Actor::InputComponent>(handlePack, 0);
+        auto [hInputRouter, pComp] = this->AddComponent<Actor::InputComponent>(handlePack, 0);
         // 入力ルーター設定
         {
             auto pInputStrategy = HE_MAKE_CUSTOM_SHARED_PTR((UI::UIInputRouterStrategy));
@@ -91,7 +93,9 @@ namespace UI
         }
 
         // レイヤーコンポーネントを追加
-        auto hLayer = this->AddComponent<UI::UILayerComponent>(handlePack, 0);
+        auto [hLayer, pLayourComp] = this->AddComponent<UI::UILayerComponent>(handlePack, 0);
+        pLayourComp->SetPos(in_rPos);
+        pLayourComp->SetViewHandle(in_viewHandle);
 
         return handlePack;
     }
@@ -119,15 +123,17 @@ namespace UI
 
         // ルートノードからレイアウトノードを取得
         UI::Builder::Node layoutNode;
-        bRet = asset.OutputNode(&layoutNode, node, "l");
+        bRet = asset.OutputNode(&layoutNode, node, "layout");
         HE_ASSERT(bRet);
         HE_ASSERT(layoutNode._data._eWidgetType == UI::Builder::EWidget_Layout &&
                   "レイアウトノードが存在しない");
 
         // レイアウトを作成
         UIWidgetHandlePack widgetHandlePack =
-            this->NewLayer(Core::Common::FixedString64(layoutNode._data._szId), in_uSort,
-                           in_rLevelHandle);
+            this->NewLayer(Core::Common::FixedString64(layoutNode._data._szId),
+                           Core::Math::Vector2(layoutNode._data._exData._layout._fX,
+                                               layoutNode._data._exData._layout._fY),
+                           in_uSort, in_rViewHandle, in_rLevelHandle);
 
         // レイアウトノード下にあるWidgetを取得
         // MEMO: 要素数が1000を超えるとスタックサイズが足りずにスタックオーバーフローになるので注意
@@ -158,6 +164,7 @@ namespace UI
                     case UI::Builder::EWidget_Widget:
                     {
                         // TODO: 未対応
+                        HE_ASSERT(FALSE);
                         break;
                     }
                     case UI::Builder::EWidget_Label:
@@ -208,7 +215,6 @@ namespace UI
 
                             UI::UIButtonComponent* pBtnComp =
                                 reinterpret_cast<UI::UIButtonComponent*>(pWidgetCmp);
-                            //                                pWidget->GetComponent<UI::UIButtonComponent>(handle);
 
                             auto handler = HE_MAKE_CUSTOM_UNIQUE_PTR(
                                 (UI::UIButtonMessageHandlerDefault), pNodeData->_szId,
@@ -272,7 +278,7 @@ namespace UI
         if (pWidget == NULL) return handlePack;
 
         // ボタンの上に表示するテキストコンポーネント追加と設定
-        auto textHandle = this->AddComponent<UI::UITextComponent>(handlePack, in_uSort + 1);
+        auto [textHandle, pTextComp] = this->AddComponent<UI::UITextComponent>(handlePack, in_uSort + 1);
         {
             UI::UITextComponent* pText = pWidget->GetComponent<UI::UITextComponent>(textHandle);
             pText->SetPos(in_rTextRect.Pos());
@@ -310,7 +316,7 @@ namespace UI
         if (pWidget == NULL) return widgetHandle;
 
         // ボタンコンポーネント追加と設定
-        auto hButton = this->AddComponent<UI::UIButtonComponent>(widgetHandle, in_uSort);
+        auto [hButton, pBtnCmp] = this->AddComponent<UI::UIButtonComponent>(widgetHandle, in_uSort);
         {
             UI::UIButtonComponent* pButton = pWidget->GetComponent<UI::UIButtonComponent>(hButton);
             pButton->SetPos(in_rBtnRect.Pos());

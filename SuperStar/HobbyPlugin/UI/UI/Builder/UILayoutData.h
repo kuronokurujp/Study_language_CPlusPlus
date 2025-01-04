@@ -73,6 +73,7 @@ namespace UI::Builder
 
                 struct Layout
                 {
+                    HE::Float32 _fX, _fY;
                     Style _style;
                 } _layout;
             } _exData;

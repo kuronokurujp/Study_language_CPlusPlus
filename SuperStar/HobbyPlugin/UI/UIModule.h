@@ -77,8 +77,10 @@ namespace UI
         // UIのLayerを作成する
         // 描画ソート機能は未実装
         const UIWidgetHandlePack NewLayer(const Core::Common::StringBase& in_szrName,
+                                          const Core::Math::Vector2& in_rPos,
                                           const HE::Uint32 in_sort,
-                                          const Core::Common::Handle& in_rLevelHandle);
+                                          const Core::Common::Handle in_viewHandle,
+                                          const Core::Common::Handle in_levelHandle);
 
         /// <summary>
         /// テキストラベルWidgetを作成
@@ -113,13 +115,14 @@ namespace UI
 
         // Widgetにコンポーネント追加
         template <class T>
-        Core::Common::Handle AddComponent(const UIWidgetHandlePack& in_rWidgetHandle,
-                                          const HE::Uint32 in_iUpdateOrder)
+        std::tuple<Core::Common::Handle, T*> AddComponent(
+            const UIWidgetHandlePack& in_rWidgetHandle, const HE::Uint32 in_iUpdateOrder)
         {
             auto pActor = this->GetWidget(in_rWidgetHandle);
             // アクターにコンポーネント追加
-            return pActor->AddComponent<T>(in_iUpdateOrder,
-                                           Actor::Component::EPriorty::EPriorty_Main);
+            return pActor
+                ->AddComponentByHandleAndComp<T>(in_iUpdateOrder,
+                                                 Actor::Component::EPriorty::EPriorty_Main);
         }
 
         Widget* GetWidget(const UIWidgetHandlePack&);
