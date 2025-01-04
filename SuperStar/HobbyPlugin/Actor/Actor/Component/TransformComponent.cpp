@@ -21,7 +21,8 @@ namespace Actor
                 auto pTrans = pParentActor->GetComponent<TransformComponent>();
                 if (pTrans == NULL) break;
 
-                pos += pTrans->GetWorldPos();
+                // 親の座標を加算
+                pos += pTrans->_pos;
 
                 // 親アクターに更に親アクターがあれば処理を続ける
                 if (pParentActor->IsChild())
