@@ -53,7 +53,7 @@ namespace UI
     protected:
         void _Clear()
         {
-            this->_pos.Zero();
+            this->_pos.Clear();
             this->_uColor = 0;
             this->_viewHandle.Clear();
             this->_transformHandle.Clear();

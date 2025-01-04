@@ -132,10 +132,10 @@ namespace Core::Math
         HE::Float32 _fX = 0.0f, _fY = 0.0f, _fZ = 0.0f;
 
         // 各要素を1にしてそれ以外の要素を0にしたベクトル
-        static Vector3 UnitX;
-        static Vector3 UnitY;
-        static Vector3 UnitZ;
-        static Vector3 Zero;
-        static Vector3 One;
+        static const Vector3 UnitX;
+        static const Vector3 UnitY;
+        static const Vector3 UnitZ;
+        static const Vector3 Zero;
+        static const Vector3 One;
     };
 }  // namespace Core::Math

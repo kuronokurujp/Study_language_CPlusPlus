@@ -9,7 +9,7 @@ namespace Core::Math
     class Vector2 final
     {
     public:
-        explicit Vector2() { this->Zero(); }
+        explicit Vector2() { this->Clear(); }
 
         // コントラクト
         explicit Vector2(const HE::Float32 in_fX, const HE::Float32 in_fY) : _fX(in_fX), _fY(in_fY)
@@ -24,65 +24,39 @@ namespace Core::Math
         /// <summary>
         /// 0で初期化
         /// </summary>
-        inline void Zero() HE_NOEXCEPT
+        inline void Clear() HE_NOEXCEPT
         {
             this->_fX = 0.f;
             this->_fY = 0.f;
         }
 
-        HE::Bool IsZero() HE_NOEXCEPT
-        {
-            if (this->_fX != 0.0f) return FALSE;
-            if (this->_fY != 0.0f) return FALSE;
-
-            return TRUE;
-        }
+        HE::Bool IsZero() HE_NOEXCEPT;
 
         /// <summary>
         /// スケールしたベクトルを加算
         /// </summary>
-        void Madd(const Vector2& in_rBase, const HE::Float32 in_fScale) HE_NOEXCEPT
-        {
-            this->_fX += (in_rBase._fX * in_fScale);
-            this->_fY += (in_rBase._fY * in_fScale);
-        }
+        void Madd(const Vector2& in_rBase, const HE::Float32 in_fScale) HE_NOEXCEPT;
 
         /// <summary>
         /// Sets the madd.
         /// </summary>
         void SetMadd(const Vector2& in_rOffset, const HE::Float32 in_fScale,
-                     const Vector2& in_rBase) HE_NOEXCEPT
-        {
-            this->_fX = in_rOffset._fX * in_fScale + in_rBase._fX;
-            this->_fY = in_rOffset._fY * in_fScale + in_rBase._fY;
-        }
+                     const Vector2& in_rBase) HE_NOEXCEPT;
 
         /// <summary>
         /// Sets the add.
         /// </summary>
-        void SetAdd(const Vector2& in_rLeft, const Vector2& in_rRight) HE_NOEXCEPT
-        {
-            this->_fX = in_rLeft._fX + in_rRight._fX;
-            this->_fY = in_rLeft._fY + in_rRight._fY;
-        }
+        void SetAdd(const Vector2& in_rLeft, const Vector2& in_rRight) HE_NOEXCEPT;
 
         /// <summary>
         /// Sets the sub.
         /// </summary>
-        void SetSub(const Vector2& in_rLeft, const Vector2& in_rRight) HE_NOEXCEPT
-        {
-            this->_fX = in_rLeft._fX - in_rRight._fX;
-            this->_fY = in_rLeft._fY - in_rRight._fY;
-        }
+        void SetSub(const Vector2& in_rLeft, const Vector2& in_rRight) HE_NOEXCEPT;
 
         /// <summary>
         /// Sets the mul.
         /// </summary>
-        void SetMul(const Vector2& in_rLeft, const Vector2& in_rRight) HE_NOEXCEPT
-        {
-            this->_fX = in_rLeft._fX * in_rRight._fX;
-            this->_fY = in_rLeft._fY * in_rRight._fY;
-        }
+        void SetMul(const Vector2& in_rLeft, const Vector2& in_rRight) HE_NOEXCEPT;
 
         /// <summary>
         /// Sets the specified in value.
@@ -112,27 +86,12 @@ namespace Core::Math
         /// </summary>
         void SetInterporation(const Vector2& in_rBase, const Vector2& in_rULine,
                               const Vector2& in_rVLIne, const HE::Float32 in_fUScale,
-                              const HE::Float32 in_fVScale) HE_NOEXCEPT
-        {
-            // a + u(b - a)
-            this->SetMadd(in_rULine, in_fUScale, in_rBase);
-            // a + u(b - a) + v(c - a)
-            this->Madd(in_rVLIne, in_fVScale);
-        }
+                              const HE::Float32 in_fVScale) HE_NOEXCEPT;
 
         /// <summary>
         /// 正規化
         /// </summary>
-        void Normalize() HE_NOEXCEPT
-        {
-            const HE::Float32 fMagSq = this->_fX * this->_fX + this->_fY * this->_fY;
-            if (fMagSq > 0.f)
-            {
-                const HE::Float32 fNewOverMag = 1.0f / sqrtf(fMagSq);
-                this->_fX *= fNewOverMag;
-                this->_fY *= fNewOverMag;
-            }
-        }
+        void Normalize() HE_NOEXCEPT;
 
         // 演算定義
         // 足し算
@@ -248,5 +207,8 @@ namespace Core::Math
 
         // 頻繁にアクセスする変数にはprivate指定にはしない
         HE::Float32 _fX = 0.0f, _fY = 0.0f;
+
+    public:
+        static const Vector2 Zero;
     };
 }  // namespace Core::Math
