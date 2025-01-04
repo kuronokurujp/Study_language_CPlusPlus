@@ -21,17 +21,13 @@ namespace InGame
                                                      Actor::TransformComponent* in_pTrans)
     {
         // 描画座標取得
-        Core::Math::Rect2 rect;
+        Core::Math::Vector2 pos;
         {
-            Core::Math::Rect2 srcRect;
-            srcRect.SetPosition(0.0f, 0.0f, this->_size._fX, this->_size._fY,
-                                Core::Math::EAnchor_Center);
-            in_pTrans->TransformLocalToWorldRect2D(&rect, srcRect);
+            in_pTrans->TransformLocalToWorldPos2D(&pos, Core::Math::Vector2::Zero);
         }
 
         // 描画コマンド追加
-        // TODO: 三角形の表示に切り替えられるか
-        Render::Command2DQuadDraw(in_rViewHandle, rect, Core::Math::RGB::White);
+        Render::Command2DTriangleDraw(in_rViewHandle, pos, Core::Math::EAnchor_Center, -90,
+                                      this->_size._fX, Core::Math::RGB::White);
     }
-
 }  // namespace InGame
