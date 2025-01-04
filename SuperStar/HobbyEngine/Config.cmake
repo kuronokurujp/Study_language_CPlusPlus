@@ -56,6 +56,7 @@ set(ENGINE_TARGET_FILES
     Engine/Math/Rect2.h
     Engine/Math/Rect2.cpp
     Engine/Math/Vector2.h
+    Engine/Math/Vector2.cpp
     Engine/Math/Vector3.h
     Engine/Math/Vector3.cpp
     Engine/Math/Vector4.h
