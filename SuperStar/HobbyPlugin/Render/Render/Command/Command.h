@@ -161,20 +161,6 @@ namespace Render
     extern void Command2DQuadDraw(const Core::Common::Handle in_renderHandle,
                                   const Core::Math::Rect2& in_rRect,
                                   const Core::Math::Color in_color);
-    /*
-        /// <summary>
-        /// 2D点描画
-        /// </summary>
-        extern void Command2DPointDraw(const Core::Common::Handle in_renderHandle,
-                                       const Core::Math::Vector2& in_rPos,
-                                       const Core::Math::Color& in_rColor);
-
-        /// <summary>
-        /// 2D点群描画
-        /// </summary>
-        extern void Command2DPointArrayDraw(const Core::Common::Handle in_renderHandle,
-                                            const Point3D* in_aPoint, const HE::Uint32 in_uCount);
-    */
     /// <summary>
     /// 画面クリア
     /// </summary>
