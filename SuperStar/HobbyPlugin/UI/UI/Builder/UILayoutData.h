@@ -24,7 +24,7 @@ namespace UI::Builder
         EWidget_Widget,
         EWidget_Label,
         EWidget_Button,
-        EWidget_Layout,
+        EWidget_Layer,
     };
 
     struct Style
@@ -75,7 +75,7 @@ namespace UI::Builder
                 {
                     HE::Float32 _fX, _fY;
                     Style _style;
-                } _layout;
+                } _layer;
             } _exData;
         } _data;
     };

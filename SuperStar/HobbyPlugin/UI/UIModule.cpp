@@ -76,6 +76,8 @@ namespace UI
 
     const UIWidgetHandlePack UIModule::NewLayer(const Core::Common::StringBase& in_szrName,
                                                 const Core::Math::Vector2& in_rPos,
+                                                const Core::Math::Vector2& in_rSize,
+                                                const Core::Math::Color in_color,
                                                 const HE::Uint32 in_uSort,
                                                 const Core::Common::Handle in_viewHandle,
                                                 const Core::Common::Handle in_levelHandle)
@@ -95,6 +97,8 @@ namespace UI
         // レイヤーコンポーネントを追加
         auto [hLayer, pLayourComp] = this->AddComponent<UI::UILayerComponent>(handlePack, 0);
         pLayourComp->SetPos(in_rPos);
+        pLayourComp->SetSize(in_rSize);
+        pLayourComp->SetColor(in_color.c);
         pLayourComp->SetViewHandle(in_viewHandle);
 
         return handlePack;
@@ -122,18 +126,25 @@ namespace UI
         HE_ASSERT(bRet);
 
         // ルートノードからレイアウトノードを取得
-        UI::Builder::Node layoutNode;
-        bRet = asset.OutputNode(&layoutNode, node, "layout");
+        // TODO: レイヤーが複数ある場合の対応がない
+        UI::Builder::Node layerNode;
+        bRet = asset.OutputNode(&layerNode, node, "layer");
         HE_ASSERT(bRet);
-        HE_ASSERT(layoutNode._data._eWidgetType == UI::Builder::EWidget_Layout &&
-                  "レイアウトノードが存在しない");
+        HE_ASSERT(layerNode._data._eWidgetType == UI::Builder::EWidget_Layer &&
+                  "レイヤーノードが存在しない");
 
         // レイアウトを作成
-        UIWidgetHandlePack widgetHandlePack =
-            this->NewLayer(Core::Common::FixedString64(layoutNode._data._szId),
-                           Core::Math::Vector2(layoutNode._data._exData._layout._fX,
-                                               layoutNode._data._exData._layout._fY),
-                           in_uSort, in_rViewHandle, in_rLevelHandle);
+        UIWidgetHandlePack widgetHandlePack;
+        {
+            auto pLayerData = &layerNode._data._exData._layer;
+            Core::Math::Color c{pLayerData->_style._uColor};
+
+            widgetHandlePack =
+                this->NewLayer(Core::Common::FixedString64(layerNode._data._szId),
+                               Core::Math::Vector2(pLayerData->_fX, pLayerData->_fY),
+                               Core::Math::Vector2(pLayerData->_style._fW, pLayerData->_style._fH),
+                               c, in_uSort, in_rViewHandle, in_rLevelHandle);
+        }
 
         // レイアウトノード下にあるWidgetを取得
         // MEMO: 要素数が1000を超えるとスタックサイズが足りずにスタックオーバーフローになるので注意
@@ -141,7 +152,7 @@ namespace UI
 
         HE::Uint32 sort = 0;
         Core::Common::FixedStack<UI::Builder::Node, 64> sNodeChildren;
-        asset.OutputNodeChildren(&sNodeChildren, layoutNode);
+        asset.OutputNodeChildren(&sNodeChildren, layerNode);
 
         Core::Common::FixedStack<UI::Builder::Node, 16> sTmpNodeChildren;
         while (sNodeChildren.Empty() == FALSE)
@@ -258,7 +269,7 @@ namespace UI
         }
 
         return widgetHandlePack;
-    }
+    }  // namespace UI
 
     const UIWidgetHandlePack UIModule::NewLabelWidget(
         const Core::Common::StringBase& in_szrName, const HE::Uint32 in_uSort,
@@ -278,17 +289,19 @@ namespace UI
         if (pWidget == NULL) return handlePack;
 
         // ボタンの上に表示するテキストコンポーネント追加と設定
-        auto [textHandle, pTextComp] = this->AddComponent<UI::UITextComponent>(handlePack, in_uSort + 1);
+        auto [textHandle, pTextComp] =
+            this->AddComponent<UI::UITextComponent>(handlePack, in_uSort + 1);
         {
             UI::UITextComponent* pText = pWidget->GetComponent<UI::UITextComponent>(textHandle);
             pText->SetPos(in_rTextRect.Pos());
             pText->SetViewHandle(in_rViewHandle);
             pText->SetText(in_szText);
 
-            Core::Math::Rect2 rect;
-            rect.SetPosition(0, 0, in_rTextRect.Width(), in_rTextRect.Height(),
-                             in_rTextRect._eAnchor);
-            pText->SetRect(rect);
+            // Core::Math::Rect2 rect;
+            // rect.SetPosition(0, 0, in_rTextRect.Width(), in_rTextRect.Height(),
+            //                 in_rTextRect._eAnchor);
+            // pText->SetRect(rect);
+            pText->SetSize(Core::Math::Vector2(in_rTextRect.Width(), in_rTextRect.Height()));
             pText->SetColor(in_uTextColor);
             pText->SetLocGroupName(in_szLocGroupName);
             pText->SetAnchor(in_rTextRect._eAnchor);
@@ -321,8 +334,9 @@ namespace UI
             UI::UIButtonComponent* pButton = pWidget->GetComponent<UI::UIButtonComponent>(hButton);
             pButton->SetPos(in_rBtnRect.Pos());
             pButton->SetViewHandle(in_rViewHandle);
-            pButton->SetWidth(in_rBtnRect.Width());
-            pButton->SetHeight(in_rBtnRect.Height());
+            pButton->SetSize(Core::Math::Vector2(in_rBtnRect.Width(), in_rBtnRect.Height()));
+            //            pButton->SetWidth(in_rBtnRect.Width());
+            //            pButton->SetHeight(in_rBtnRect.Height());
             pButton->SetColor(in_uBtnColor);
             pButton->SetAnchor(in_rBtnRect._eAnchor);
         }

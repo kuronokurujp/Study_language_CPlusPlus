@@ -13,7 +13,7 @@ namespace UI
         if (Component::VBegin() == FALSE) return FALSE;
 
         HE_ASSERT(this->_viewHandle.Null() == FALSE);
-//        if (this->_viewHandle.Null()) return FALSE;
+        //        if (this->_viewHandle.Null()) return FALSE;
 
         this->_transformHandle = this->_pOwner->AddComponent<Actor::TransformComponent>(
             0, Actor::Component::EPriorty::EPriorty_Main);
@@ -36,9 +36,9 @@ namespace UI
         return TRUE;
     }
 
-    void UIWidgetComponent::SetPos(const Core::Math::Vector2 in_pos)
+    void UIWidgetComponent::SetPos(const Core::Math::Vector2& in_rPos)
     {
-        this->_pos = in_pos;
+        this->_pos = in_rPos;
 
         if (this->_transformHandle.Null()) return;
 
@@ -47,6 +47,11 @@ namespace UI
         {
             pTrans->SetPos(Core::Math::Vector3(this->_pos));
         }
+    }
+
+    void UIWidgetComponent::SetSize(const Core::Math::Vector2& in_rSize)
+    {
+        this->_size = in_rSize;
     }
 
     Actor::TransformComponent* UIWidgetComponent::GetTransformComponent()

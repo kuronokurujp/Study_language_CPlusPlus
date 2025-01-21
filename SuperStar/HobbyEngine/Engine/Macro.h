@@ -9,6 +9,25 @@
 #include "Str.h"
 #include "Type.h"
 
+// 文字列から数値に変換
+#define HE_STR_TO_UINT32(__x__) std::stoul((__x__))
+#define HE_STR_TO_FLOAT32(__x__) std::stof((__x__))
+// 16進数文字列を数値に変換
+#define HE_STRHEX_TO_UINT32(__x__) std::stoul((__x__), NULL, 16)
+
+// 引数に設定した32bit変数のバイト並びを反転して書き換え
+#define HE_SWAP_BYTE_32BIT(__x__)                    \
+    {                                                \
+        HE::Uint32 uNewValue = 0;                    \
+        uNewValue += (((__x__) & 0xff000000) >> 24); \
+        uNewValue += (((__x__) & 0x00ff0000) >> 8);  \
+        uNewValue += (((__x__) & 0x0000ff00) << 8);  \
+        uNewValue += (((__x__) & 0x000000ff) << 24); \
+                                                     \
+        (__x__) = uNewValue;                         \
+    }                                                \
+    while (0)
+
 // 配列の要素数
 // 配列のポイントでは利用できない
 #define HE_ARRAY_NUM(_array_) (sizeof((_array_)) / sizeof(((_array_)[0])))
@@ -139,6 +158,7 @@ typename std::enable_if<std::is_integral<T>::value, T>::type HE_LOOP_IN_RANGE(T 
 // TODO: ログはプラットフォーム毎に用意するのがいいかも
 // リリース時には無効化
 // #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
+
 #if defined(HE_WIN)
 
 #define HE_LOG_MSG_SIZE (2046)

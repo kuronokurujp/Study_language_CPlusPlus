@@ -91,8 +91,8 @@ namespace UI
             this->_pushHandler = std::move(in_spHandler);
         }
 
-        void SetWidth(const HE::Float32 in_fW) { this->_fWidth = in_fW; }
-        void SetHeight(const HE::Float32 in_fH) { this->_fHeight = in_fH; }
+        // void SetWidth(const HE::Float32 in_fW) { this->_fWidth = in_fW; }
+        // void SetHeight(const HE::Float32 in_fH) { this->_fHeight = in_fH; }
         void SetAnchor(const Core::Math::EAnchor in_eAnchor) { this->_eAnchor = in_eAnchor; }
 
         /// <summary>
@@ -106,15 +106,15 @@ namespace UI
             UIWidgetComponent::_Clear();
 
             this->_pushHandler.release();
-            this->_fWidth  = 0.0f;
-            this->_fHeight = 0.0f;
+            // this->_fWidth  = 0.0f;
+            // this->_fHeight = 0.0f;
             this->_eAnchor = Core::Math::EAnchor_Left;
         }
 
     private:
         Core::Memory::UniquePtr<UIButtonMessageHandler> _pushHandler;
-        HE::Float32 _fWidth          = 0.0f;
-        HE::Float32 _fHeight         = 0.0f;
+        // HE::Float32 _fWidth          = 0.0f;
+        // HE::Float32 _fHeight         = 0.0f;
         Core::Math::EAnchor _eAnchor = Core::Math::EAnchor_Left;
     };
 }  // namespace UI

@@ -41,7 +41,8 @@ namespace UI
         virtual void VOnTouch(const EnhancedInput::InputData::Item::Touch& in_rTouch) {}
         virtual void VOnKey(const EnhancedInput::InputData::Item::Key& in_rKeyboard) {}
 
-        void SetPos(const Core::Math::Vector2 in_pos);
+        void SetPos(const Core::Math::Vector2&);
+        void SetSize(const Core::Math::Vector2&);
         void SetColor(const HE::Uint32 in_color) { this->_uColor = in_color; }
         void SetViewHandle(const Core::Common::Handle& in_rHandle)
         {
@@ -54,6 +55,7 @@ namespace UI
         void _Clear()
         {
             this->_pos.Clear();
+            this->_size.Clear();
             this->_uColor = 0;
             this->_viewHandle.Clear();
             this->_transformHandle.Clear();
@@ -61,6 +63,7 @@ namespace UI
 
     protected:
         Core::Math::Vector2 _pos;
+        Core::Math::Vector2 _size;
         HE::Uint32 _uColor = 0;
         Core::Common::Handle _viewHandle;
         Core::Common::Handle _transformHandle;

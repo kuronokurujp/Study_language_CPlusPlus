@@ -38,7 +38,7 @@ namespace UI
         UIWidgetComponent::VUpdate(in_fDeltaTime);
 
         Core::Math::Rect2 srcRect;
-        srcRect.SetPosition(0.0f, 0.0f, this->_fWidth, this->_fHeight, this->_eAnchor);
+        srcRect.SetPosition(0.0f, 0.0f, this->_size._fX, this->_size._fY, this->_eAnchor);
 
         Core::Math::Rect2 rect;
 
@@ -55,7 +55,7 @@ namespace UI
     {
         Core::Math::Rect2 rect;
         Core::Math::Rect2 orgRect;
-        orgRect.SetPosition(0.0f, 0.0f, this->_fWidth, this->_fHeight, this->_eAnchor);
+        orgRect.SetPosition(0.0f, 0.0f, this->_size._fX, this->_size._fY, this->_eAnchor);
 
         auto pTrans = this->GetTransformComponent();
         HE_ASSERT(pTrans);

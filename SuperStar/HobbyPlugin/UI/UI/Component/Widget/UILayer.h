@@ -15,5 +15,10 @@ namespace UI
 
     public:
         UILayerComponent() : UIWidgetComponent() {}
+
+        /// <summary>
+        /// コンポーネントの更新
+        /// </summary>
+        void VUpdate(const HE::Float32) override;
     };
 }  // namespace UI

@@ -78,6 +78,8 @@ namespace UI
         // 描画ソート機能は未実装
         const UIWidgetHandlePack NewLayer(const Core::Common::StringBase& in_szrName,
                                           const Core::Math::Vector2& in_rPos,
+                                          const Core::Math::Vector2& in_rSize,
+                                          const Core::Math::Color in_color,
                                           const HE::Uint32 in_sort,
                                           const Core::Common::Handle in_viewHandle,
                                           const Core::Common::Handle in_levelHandle);

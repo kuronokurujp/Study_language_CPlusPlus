@@ -88,11 +88,11 @@ namespace UI::Builder
 
                     if (::strcmp(szKey, "w") == 0)
                     {
-                        out->_fW = static_cast<HE::Float32>(::atof(pValue));
+                        out->_fW = HE_STR_TO_FLOAT32(pValue);  // std::stof(pValue);
                     }
                     else if (::strcmp(szKey, "h") == 0)
                     {
-                        out->_fH = static_cast<HE::Float32>(::atoi(pValue));
+                        out->_fH = HE_STR_TO_FLOAT32(pValue);  // std::stof(pValue);
                     }
                     else if (::strcmp(szKey, "color") == 0)
                     {
@@ -100,18 +100,29 @@ namespace UI::Builder
                         ::strncpy_s(szColorName, HE_ARRAY_NUM(szColorName), pValue,
                                     HE_ARRAY_NUM(szColorName));
                         // TODO: キーワードと色名の対応ハッシュテーブルを作る
+                        HE::Bool bColorName = FALSE;
                         for (HE::Uint32 i = 0; i < HE_ARRAY_NUM(s_aColorTable); ++i)
                         {
                             if (::strcmp(s_aColorTable[i].szName, szColorName) == 0)
                             {
                                 out->_uColor = s_aColorTable[i].rgba.c;
+                                bColorName   = TRUE;
                                 break;
                             }
+                        }
+
+                        if (bColorName == FALSE)
+                        {
+                            // TODO: カラー名がないので16進数数字と判断して数値に変換
+                            out->_uColor = HE_STRHEX_TO_UINT32(szColorName);
+#ifdef HE_LITTLE_ENDIAN
+                            HE_SWAP_BYTE_32BIT(out->_uColor);
+#endif
                         }
                     }
                     else if (::strcmp(szKey, "size") == 0)
                     {
-                        out->_uSize = static_cast<HE::Uint32>(::atoi(pValue));
+                        out->_uSize = HE_STR_TO_UINT32(pValue);  // std::stoul(pValue);
                     }
                 }
 
@@ -197,15 +208,15 @@ namespace UI::Builder
                 auto s = in_rNode.attribute("style").value();
                 ParseStyle(&pLabel->_style, s, static_cast<HE::Uint32>(::strlen(s)));
             }
-            else if (szAttrName == HE_STR_TEXT("layout"))
+            else if (szAttrName == HE_STR_TEXT("layer"))
             {
-                pData->_eWidgetType = UI::Builder::EWidget_Layout;
-                auto pLayout        = &pData->_exData._layout;
-                pLayout->_fX         = in_rNode.attribute("x").as_float();
-                pLayout->_fY         = in_rNode.attribute("y").as_float();
+                pData->_eWidgetType = UI::Builder::EWidget_Layer;
+                auto pLayer         = &pData->_exData._layer;
+                pLayer->_fX         = in_rNode.attribute("x").as_float();
+                pLayer->_fY         = in_rNode.attribute("y").as_float();
 
                 auto s = in_rNode.attribute("style").value();
-                ParseStyle(&pLayout->_style, s, static_cast<HE::Uint32>(::strlen(s)));
+                ParseStyle(&pLayer->_style, s, static_cast<HE::Uint32>(::strlen(s)));
             }
 
             Core::Common::FixedString1024 szIdName(in_rNode.attribute("id").value());

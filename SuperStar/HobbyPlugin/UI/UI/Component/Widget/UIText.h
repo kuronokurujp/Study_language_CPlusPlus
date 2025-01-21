@@ -48,7 +48,7 @@ namespace UI
         /// <summary>
         /// テキストの描画矩形を設定
         /// </summary>
-        inline void SetRect(const Core::Math::Rect2& in_rRect) { this->_rect = in_rRect; }
+        // inline void SetRect(const Core::Math::Rect2& in_rRect) { this->_rect = in_rRect; }
 
         /// <summary>
         /// ローカライズグループ名を設定
@@ -71,7 +71,7 @@ namespace UI
             this->_szText.Clear();
             this->_szDrawText.Clear();
             this->_szLocGroup.Clear();
-            this->_rect.Clear();
+            // this->_rect.Clear();
             this->_eAnchor = Core::Math::EAnchor_Left;
         }
 
@@ -79,7 +79,7 @@ namespace UI
         Core::Common::FixedString1024 _szText;
         Core::Common::FixedString1024 _szDrawText;
         Core::Common::FixedString128 _szLocGroup;
-        Core::Math::Rect2 _rect;
+        // Core::Math::Rect2 _rect;
         Core::Math::EAnchor _eAnchor = Core::Math::EAnchor_Left;
         HE::Uint32 _uFontSize        = 32;
     };

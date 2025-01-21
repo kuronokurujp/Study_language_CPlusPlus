@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "Engine/Core.h"
-
 #include "MathCore.h"
 #include "Vector2.h"
 
