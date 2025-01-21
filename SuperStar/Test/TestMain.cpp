@@ -111,13 +111,24 @@ int main(int argc, char* const argv[])
 
 // Luaモジュールテスト
 #include "LuaTest/LuaModuleTest.hpp"
+
+// AssetManagerモジュールテスト
+#include "AssetManagerTest/AssetManagerModuleTest.hpp"
+
+// ローカライズモジュールテスト
+#include "LocalizationTest/LocalizationModuleTest.hpp"
+
 // イベントテスト
 #include "TestCode/Event/TestEvent.hpp"
 
+// GUIテスト
+// SDL2のテスト
+// #include "PlatformSDL2Test/PlatformSDL2ModuleTest.hpp"
 // ゲーム用のテスト一覧
 
 // Lambdaテストコード
 #include "EngineTest/Common/TestLambda.hpp"
+
 // ゲーム用アセットのテスト
 // ゲームプロジェクトはアプリプロジェクトでコードの実態を入れ込むためにcppファイルもインクルードしないといけない
 #include "TestCode/Asset/TestAsset.hpp"
