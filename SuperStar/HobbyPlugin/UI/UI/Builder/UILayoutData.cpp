@@ -15,7 +15,6 @@ namespace UI::Builder
     /// </summary>
     namespace Local
     {
-        constexpr HE::Char s_treeNodeDelimita = HE_STR_TEXT('.');
         constexpr HE::Char s_locGroupDelimita = HE_STR_TEXT('.');
 
         /// <summary>
@@ -47,12 +46,13 @@ namespace UI::Builder
                                                    StyleColor("magenta", Core::Math::RGB::Magenta),
                                                    StyleColor("ornage", Core::Math::RGB::Orange)};
 
-        static const EAnchor GetPosAnchor(const pugi::xml_node& in_rNode)
+        static const EAnchor GetPosAnchor(AssetManager::AbstractTreeNode& in_rNode)
         {
-            const pugi::char_t* s = in_rNode.attribute("anchor").as_string();
-            if (s == NULL) return EAnchor_Left;
+            in_rNode.VOutputString(&Core::Common::g_szTempFixedString1024,
+                                   HE_STR_U8_TEXT("anchor"));
+            if (Core::Common::g_szTempFixedString1024.Empty()) return EAnchor_Left;
 
-            if (::strcmp(s, "center") == 0)
+            if (Core::Common::g_szTempFixedString1024.Find(HE_STR_TEXT("center")) == 0)
             {
                 return EPosAnchor_Center;
             }
@@ -60,19 +60,18 @@ namespace UI::Builder
             return EAnchor_Left;
         }
 
-        static void ParseStyle(Style* out, const HE::UTF8* in_szName, const HE::Uint32 in_uSize)
+        static void ParseStyle(Style* out, const Core::Common::StringBase& in_szStyle)
         {
             static HE::UTF8 buff[1024] = {0};
-
-            HE_ASSERT(in_uSize < HE_ARRAY_SIZE(buff));
+            HE_ASSERT(in_szStyle.Size() < HE_ARRAY_SIZE(buff));
             {
                 out->_fH     = 0.0f;
                 out->_fW     = 0.0f;
                 out->_uColor = 0;
                 out->_uSize  = 32;
             }
+            in_szStyle.OutputUTF8(buff, HE_ARRAY_NUM(buff));
 
-            ::memcpy_s(buff, HE_ARRAY_SIZE(buff), in_szName, in_uSize);
             HE::UTF8* pRestartToken = NULL;
             HE::UTF8* pToken        = ::strtok_s(buff, ";", &pRestartToken);
 
@@ -88,11 +87,11 @@ namespace UI::Builder
 
                     if (::strcmp(szKey, "w") == 0)
                     {
-                        out->_fW = HE_STR_TO_FLOAT32(pValue);  // std::stof(pValue);
+                        out->_fW = HE_STR_TO_FLOAT32(pValue);
                     }
                     else if (::strcmp(szKey, "h") == 0)
                     {
-                        out->_fH = HE_STR_TO_FLOAT32(pValue);  // std::stof(pValue);
+                        out->_fH = HE_STR_TO_FLOAT32(pValue);
                     }
                     else if (::strcmp(szKey, "color") == 0)
                     {
@@ -122,7 +121,7 @@ namespace UI::Builder
                     }
                     else if (::strcmp(szKey, "size") == 0)
                     {
-                        out->_uSize = HE_STR_TO_UINT32(pValue);  // std::stoul(pValue);
+                        out->_uSize = HE_STR_TO_UINT32(pValue);
                     }
                 }
 
@@ -130,60 +129,54 @@ namespace UI::Builder
             }
         }
 
-        static void ApplyNode(Node* out, const pugi::xml_node& in_rNode)
+        static void ApplyNode(Node* out, AssetManager::AbstractTreeNode& in_rNode)
         {
             HE_ASSERT(out);
             ::memset(out, 0, sizeof(Node));
-
-            // サードパーティライブラリのノードポインタを保存
-            out->_pNode = in_rNode.internal_object();
 
             Node::Data* pData = &out->_data;
 
             // TODO: ノードから反映する情報を抜き出す
             pData->_eWidgetType = UI::Builder::EWidget_None;
 
-            Core::Common::FixedString128 szAttrName = in_rNode.name();
-            if (szAttrName == HE_STR_TEXT("ui"))
+            Core::Common::FixedString128 szAttrName = in_rNode.Name();
+            if (szAttrName == HE_STR_U8_TEXT("ui"))
             {
                 pData->_eWidgetType = UI::Builder::EWidget_Root;
             }
-            else if (szAttrName == HE_STR_TEXT("widget"))
+            else if (szAttrName == HE_STR_U8_TEXT("widget"))
             {
                 pData->_eWidgetType = UI::Builder::EWidget_Widget;
                 auto pWidget        = &pData->_exData._widget;
-                pWidget->_fX        = in_rNode.attribute("x").as_float();
-                pWidget->_fY        = in_rNode.attribute("y").as_float();
+                pWidget->_fX        = in_rNode.VGetFloat32({HE_STR_U8_TEXT("x")});
+                pWidget->_fY        = in_rNode.VGetFloat32({HE_STR_U8_TEXT("y")});
             }
-            else if (szAttrName == HE_STR_TEXT("btn"))
+            else if (szAttrName == HE_STR_U8_TEXT("btn"))
             {
                 pData->_eWidgetType = UI::Builder::EWidget_Button;
                 auto pBtn           = &pData->_exData.button;
-                pBtn->_fX           = in_rNode.attribute("x").as_float();
-                pBtn->_fY           = in_rNode.attribute("y").as_float();
+                pBtn->_fX           = in_rNode.VGetFloat32({HE_STR_U8_TEXT("x")});
+                pBtn->_fY           = in_rNode.VGetFloat32({HE_STR_U8_TEXT("y")});
                 pBtn->_eAnchor      = GetPosAnchor(in_rNode);
 
-                auto s = in_rNode.attribute("style").value();
-                ParseStyle(&pBtn->_style, s, static_cast<HE::Uint32>(::strlen(s)));
+                in_rNode.VOutputString(&Core::Common::g_szTempFixedString1024,
+                                       HE_STR_U8_TEXT("style"));
+                ParseStyle(&pBtn->_style, Core::Common::g_szTempFixedString1024);
             }
-            else if (szAttrName == HE_STR_TEXT("label"))
+            else if (szAttrName == HE_STR_U8_TEXT("label"))
             {
                 pData->_eWidgetType = UI::Builder::EWidget_Label;
                 auto pLabel         = &pData->_exData._label;
-                pLabel->_fX         = in_rNode.attribute("x").as_float();
-                pLabel->_fY         = in_rNode.attribute("y").as_float();
+                pLabel->_fX         = in_rNode.VGetFloat32({HE_STR_U8_TEXT("x")});
+                pLabel->_fY         = in_rNode.VGetFloat32({HE_STR_U8_TEXT("y")});
                 pLabel->_eAnchor    = GetPosAnchor(in_rNode);
 
                 // ローカライズテキストか
-                if (in_rNode.attribute("loc").as_bool())
+                pLabel->bLoc = (in_rNode.VGetUInt32({HE_STR_U8_TEXT("loc")}) != 0);
+                in_rNode.VOutputString(&Core::Common::g_szTempFixedString1024,
+                                       HE_STR_U8_TEXT("text"));
+                if (0 < Core::Common::g_szTempFixedString1024.Length())
                 {
-                    pLabel->bLoc = TRUE;
-                }
-
-                auto t = in_rNode.attribute("text").value();
-                if (0 < ::strlen(t))
-                {
-                    Core::Common::g_szTempFixedString1024 = t;
                     if (pLabel->bLoc)
                     {
                         Core::Common::FixedArray<Core::Common::FixedString1024, 3> aSplitName;
@@ -205,69 +198,107 @@ namespace UI::Builder
                     }
                 }
 
-                auto s = in_rNode.attribute("style").value();
-                ParseStyle(&pLabel->_style, s, static_cast<HE::Uint32>(::strlen(s)));
+                in_rNode.VOutputString(&Core::Common::g_szTempFixedString1024,
+                                       HE_STR_U8_TEXT("style"));
+                ParseStyle(&pLabel->_style, Core::Common::g_szTempFixedString1024);
             }
-            else if (szAttrName == HE_STR_TEXT("layer"))
+            else if (szAttrName == HE_STR_U8_TEXT("layer"))
             {
                 pData->_eWidgetType = UI::Builder::EWidget_Layer;
                 auto pLayer         = &pData->_exData._layer;
-                pLayer->_fX         = in_rNode.attribute("x").as_float();
-                pLayer->_fY         = in_rNode.attribute("y").as_float();
+                pLayer->_fX         = in_rNode.VGetFloat32({HE_STR_U8_TEXT("x")});
+                pLayer->_fY         = in_rNode.VGetFloat32({HE_STR_U8_TEXT("y")});
 
-                auto s = in_rNode.attribute("style").value();
-                ParseStyle(&pLayer->_style, s, static_cast<HE::Uint32>(::strlen(s)));
+                in_rNode.VOutputString(&Core::Common::g_szTempFixedString1024,
+                                       HE_STR_U8_TEXT("style"));
+                ParseStyle(&pLayer->_style, Core::Common::g_szTempFixedString1024);
             }
 
-            Core::Common::FixedString1024 szIdName(in_rNode.attribute("id").value());
-            HE_STR_ERRNO e = HE_STR_CPY_S(pData->_szId, HE_ARRAY_NUM(pData->_szId), szIdName.Str(),
-                                          szIdName.Size());
+            in_rNode.VOutputString(&Core::Common::g_szTempFixedString1024, HE_STR_U8_TEXT("id"));
+            auto* szIdName = &Core::Common::g_szTempFixedString1024;
+            HE_STR_ERRNO e = HE_STR_CPY_S(pData->_szId, HE_ARRAY_NUM(pData->_szId), szIdName->Str(),
+                                          szIdName->Size());
             HE_ASSERT(HE_STR_SUCCESS(e) && "文字列のコピーでエラー");
         }
     }  // namespace Local
 
-    HE::Bool UILayoutData::OutputNodeByRootPos(Node* out, const HE::UTF8* in_szName)
+    HE::Bool UILayoutData::OutputNode(Node* out,
+                                      const std::initializer_list<const HE::UTF8*>& in_aName)
     {
         HE_ASSERT(out);
+        auto rrLibNode = this->VGetNodeByName(in_aName);
 
-        Core::Common::FixedString256 nodeName(in_szName);
-        HE::Uint64 ulTargetNodeHash = nodeName.Hash();
-
-        auto libNode = this->_doc.child(in_szName);
-        HE_ASSERT(libNode.empty() == FALSE && "ノードがない");
-
-        Local::ApplyNode(out, libNode);
+        Local::ApplyNode(out, *rrLibNode);
 
         return TRUE;
     }
 
-    HE::Bool UILayoutData::OutputNode(Node* out, const Node& in_rParentNode,
-                                      const HE::UTF8* in_szName)
+    void UILayoutData::RecursiveOperationByNode(
+        const std::initializer_list<const HE::UTF8*>& in_aName,
+        std::function<void(const Node&, const HE::Uint32, const HE::Bool)> in_result)
     {
-        HE_ASSERT(out);
-        HE_ASSERT(in_rParentNode._pNode);
-
-        pugi::xml_node libNode(in_rParentNode._pNode);
-        libNode = libNode.child(in_szName);
-
-        Local::ApplyNode(out, libNode);
-
-        return TRUE;
-    }
-
-    void UILayoutData::OutputNodeChildren(Core::Common::StackBase<Node>* out,
-                                          const Node& in_rParentNode)
-    {
-        HE_ASSERT(out);
-
-        pugi::xml_node libNode(in_rParentNode._pNode);
+        HE::Sint32 sRootLevel = 0;
+        Node out;
+        HE::Uint32 uSort = 0;
+        HE::Bool bRoot   = TRUE;
+        Core::Common::FixedStack<AssetManager::InterfaceTreeData::NodeSharedPtr, 128> sStack;
+        while (1)
         {
-            for (auto b = libNode.begin(); b != libNode.end(); ++b)
+            auto spParentNode = this->VGetNodeByLevel(in_aName, sRootLevel);
+            if (spParentNode->IsNone()) break;
+
+            Local::ApplyNode(&out, *spParentNode);
+            in_result(out, uSort, bRoot);
+            bRoot = FALSE;
+
+            // ノードの下に全ての入れ子を再帰処理で取得して処理する
+            HE::Sint32 sChildLevel = 0;
+            auto spChildNode       = this->VGetNodeByLevel(*spParentNode, sChildLevel);
+            if (spChildNode->IsNone() == FALSE)
             {
-                Node node;
-                Local::ApplyNode(&node, *b);
-                out->PushBack(node);
+                spParentNode = spChildNode;
+
+                ++uSort;
+
+                while (spParentNode->IsNone() == FALSE)
+                {
+                    Local::ApplyNode(&out, *spParentNode);
+                    in_result(out, uSort, bRoot);
+
+                    auto spNextNode = this->VGetNodeByLevel(*spParentNode, sChildLevel);
+                    sChildLevel     = spNextNode->GetLevel() + 1;
+
+                    if (spNextNode->IsNone())
+                    {
+                        // 一つ上の階層のノードがあれば階層を一つ前に戻す
+                        if (0 < sStack.Size())
+                        {
+                            spParentNode = *sStack.PushBack();
+                            sChildLevel  = spParentNode->GetLevel() + 1;
+
+                            --uSort;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // 現在の階層のノードを保存
+                        sStack.PushBack(spParentNode);
+                        // 階層を下へ移動
+                        spParentNode = spNextNode;
+
+                        sChildLevel = 0;
+                        ++uSort;
+                    }
+                }
             }
+
+            ++sRootLevel;
+            uSort = 0;
+            bRoot = TRUE;
         }
     }
 

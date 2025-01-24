@@ -7,7 +7,8 @@ namespace Game::Asset
         if (AssetManager::AssetDataJson::_VLoad(in_rFileSystem) == FALSE) return FALSE;
 
         // バージョン値を取得
-        this->_version = this->VGetUInt32({"version"});
+        auto spNode    = this->VGetNodeByName({"version"});
+        this->_version = spNode->VGetUInt32();
 
         return TRUE;
     }
@@ -20,25 +21,30 @@ namespace Game::Asset
     HE::Uint32 ParamaterAssetData::GetUInt32ByIdData(const HE::UTF8* in_pIdName,
                                                      const HE::UTF8* in_pFieldName)
     {
-        return this->VGetUInt32({"data", in_pIdName, in_pFieldName});
+        auto spNode = this->VGetNodeByName({"data", in_pIdName, in_pFieldName});
+        return spNode->VGetUInt32();
     }
 
     HE::Sint32 ParamaterAssetData::GetSInt32ByIdData(const HE::UTF8* in_pIdName,
                                                      const HE::UTF8* in_pFieldName)
     {
-        return this->VGetSInt32({"data", in_pIdName, in_pFieldName});
+        auto spNode = this->VGetNodeByName({"data", in_pIdName, in_pFieldName});
+        return spNode->VGetSInt32();
     }
 
     HE::Float32 ParamaterAssetData::GetFloat32ByIdData(const HE::UTF8* in_pIdName,
                                                        const HE::UTF8* in_pFieldName)
     {
-        return this->VGetFloat32({"data", in_pIdName, in_pFieldName});
+        auto spNode = this->VGetNodeByName({"data", in_pIdName, in_pFieldName});
+        return spNode->VGetFloat32();
     }
 
-    Core::Common::FixedString1024 ParamaterAssetData::GetCharByIdData(const HE::UTF8* in_pIdName,
-                                                                      const HE::UTF8* in_pFieldName)
+    void ParamaterAssetData::OutputStringByIdData(Core::Common::StringBase* out,
+                                                  const HE::UTF8* in_pIdName,
+                                                  const HE::UTF8* in_pFieldName)
     {
-        return this->VGetChar({"data", in_pIdName, in_pFieldName});
+        auto spNode = this->VGetNodeByName({"data", in_pIdName, in_pFieldName});
+        spNode->VOutputString(out);
     }
 
     HE::Bool ParamaterAssetData::IsId(const HE::UTF8* in_pIdName)

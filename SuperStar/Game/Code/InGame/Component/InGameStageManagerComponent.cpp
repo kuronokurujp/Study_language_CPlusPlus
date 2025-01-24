@@ -145,12 +145,13 @@ namespace InGame
             const auto fPosY = rParamaterAssetData.GetFloat32ByIdData(szTimelineNo, "pos_y");
 
             HE::UTF8 szIdName[32] = {};
-            rParamaterAssetData.GetCharByIdData(szTimelineNo, "parameter_id")
-                .OutputUTF8(szIdName, HE_ARRAY_NUM(szIdName));
+            rParamaterAssetData.OutputStringByIdData(&Core::Common::g_szTempFixedString1024,
+                                                     szTimelineNo, "parameter_id");
+            Core::Common::g_szTempFixedString1024.OutputUTF8(szIdName, HE_ARRAY_NUM(szIdName));
 
             // イベント実行
-            Core::Common::g_szTempFixedString1024 =
-                rParamaterAssetData.GetCharByIdData(szTimelineNo, "event");
+            rParamaterAssetData.OutputStringByIdData(&Core::Common::g_szTempFixedString1024,
+                                                     szTimelineNo, "event");
             if (Core::Common::g_szTempFixedString1024 == HE_STR_TEXT("put_player"))
             {
                 // 自機を作成

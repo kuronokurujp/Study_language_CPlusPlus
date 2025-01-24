@@ -3,113 +3,226 @@
 // 依存モジュール
 #include "Engine/Platform/PlatformFile.h"
 
+// サードパーティーのjsonライブラリ
+#include "AssetManager/ThirdParty/simidjson/simdjson.h"
+
 namespace AssetManager
 {
     namespace Local
     {
-        static HE::Bool OutputValueBySimdJson(
-            simdjson::fallback::ondemand::value* out, simdjson::ondemand::document& in_rDoc,
-            const std::initializer_list<const HE::UTF8*>& in_rTokens)
+        /// <summary>
+        /// ノード
+        /// </summary>
+        class JsonNode : public AbstractTreeNode
         {
-            HE_ASSERT(out);
-            HE_ASSERT(0 < in_rTokens.size());
-
-            try
+        public:
+            JsonNode(const HE::UTF8* in_szKey, simdjson::dom::element& in_rValue,
+                     const HE::Sint32 in_sLevel)
+                : AbstractTreeNode(in_szKey, in_sLevel), _value(in_rValue)
             {
-                auto itr = in_rTokens.begin();
+            }
 
-                auto v     = in_rDoc[*itr];
-                auto error = v.error();
-                if (error != simdjson::error_code::SUCCESS)
+            void* VGetSource() override { return &this->_value; }
+
+            HE::Uint32 VGetUInt32(const HE::UTF8* in_szName = NULL) override
+            {
+                simdjson::dom::element element = this->_value;
+                if (in_szName != NULL)
                 {
-                    HE_PG_LOG_LINE(HE_STR_TEXT("error(%d): Token(%s)"), error, *itr);
-                    return FALSE;
+                    element = this->_value[in_szName];
                 }
 
-                // 複数トークンでの取得
-                ++itr;
-                for (; itr != in_rTokens.end(); ++itr)
+                HE_ASSERT(element.is_number());
+                return static_cast<HE::Uint32>(element.get_int64().value_unsafe());
+            }
+
+            HE::Sint32 VGetSInt32(const HE::UTF8* in_szName = NULL) override
+            {
+                return static_cast<HE::Sint32>(this->VGetUInt32(in_szName));
+            }
+
+            HE::Float32 VGetFloat32(const HE::UTF8* in_szName = NULL) override
+            {
+                simdjson::dom::element element = this->_value;
+                if (in_szName != NULL)
                 {
-                    v     = v[*itr];
-                    error = v.error();
-                    if (error != simdjson::error_code::SUCCESS)
+                    element = this->_value[in_szName];
+                }
+
+                return static_cast<HE::Float32>(element.get_double().value_unsafe());
+            }
+
+            void VOutputString(Core::Common::StringBase* out,
+                               const HE::UTF8* in_szName = NULL) override
+
+            {
+                simdjson::dom::element element = this->_value;
+                if (in_szName != NULL)
+                {
+                    element = this->_value[in_szName];
+                }
+
+                auto val = element.get_string();
+                if (val.error() == FALSE)
+                {
+                    // unsafeの方が高速なのだが, 文字列の中にゴミの値が入っていた
+                    *out = val.value().data();
+                }
+                else
+                {
+                    out->Clear();
+                }
+            }
+
+        public:
+            simdjson::dom::element _value;
+        };
+
+        static std::tuple<const Core::Common::FixedString128, simdjson::dom::element, HE::Sint32>
+        GetValueBySimdJson(simdjson::dom::element& in_rDoc,
+                           const std::initializer_list<const HE::UTF8*>& in_rTokens)
+        {
+            HE_ASSERT(0 < in_rTokens.size());
+
+            HE::Sint32 sLevel = AbstractTreeNode::sNoneLevel;
+            simdjson::simdjson_result<simdjson::dom::element> result;
+            simdjson::dom::element element;
+            try
+            {
+                auto v = in_rDoc.get_object();
+
+                const HE::UTF8* szKey = *in_rTokens.begin();
+                for (auto itr = in_rTokens.begin(); itr != in_rTokens.end(); ++itr)
+                {
+                    result     = v[*itr];
+                    auto error = result.error();
+                    if (error == simdjson::error_code::SUCCESS)
                     {
+                        szKey   = *itr;
+                        element = result.value();
+                        sLevel  = 0;
+
+                        v = element.get_object();
+                    }
+                    else
+                    {
+                        sLevel = AbstractTreeNode::sNoneLevel;
                         HE_PG_LOG_LINE(HE_STR_TEXT("error(%d): Token(%s)"), error, *itr);
-                        return FALSE;
+                        break;
                     }
                 }
 
-                // 要素を出力
-                v.get(*out);
-
-                return TRUE;
+                return std::tuple<const Core::Common::FixedString128, simdjson::dom::element,
+                                  HE::Sint32>(szKey, element, sLevel);
             }
             catch (const simdjson::simdjson_error& e)
             {
+                sLevel = AbstractTreeNode::sNoneLevel;
                 HE_PG_LOG_LINE(HE_STR_TEXT("json要素がない: %s"), e.what());
             }
 
-            return FALSE;
+            return std::tuple<const Core::Common::FixedString128, simdjson::dom::element,
+                              HE::Sint32>(NULL, element, AbstractTreeNode::sNoneLevel);
         }
     }  // namespace Local
 
-    HE::Uint32 AssetDataJson::VGetUInt32(const std::initializer_list<const HE::UTF8*>& in_rTokens)
+    InterfaceTreeData::NodeSharedPtr AssetDataJson::VGetNodeByName(
+        const std::initializer_list<const HE::UTF8*>& in_aName)
     {
-        simdjson::fallback::ondemand::value val;
-        if (Local::OutputValueBySimdJson(&val,
-                                         *(reinterpret_cast<simdjson::ondemand::document*>(
-                                             this->_pDoc)),
-                                         in_rTokens) == FALSE)
-            return 0;
+        auto pJson   = reinterpret_cast<simdjson::padded_string*>(this->_pJson);
+        auto pParser = reinterpret_cast<simdjson::dom::parser*>(this->_pParser);
+        simdjson::simdjson_result<simdjson::dom::element> dom = pParser->parse(*pJson);
 
-        HE_ASSERT(val.is_integer());
-        return static_cast<HE::Uint32>(val.get_int64().value_unsafe());
+        auto [szKey, value, sLevel] = Local::GetValueBySimdJson(dom.value(), in_aName);
+
+        return HE_MAKE_CUSTOM_SHARED_PTR((Local::JsonNode), szKey.Str(), value, sLevel);
     }
 
-    HE::Sint32 AssetDataJson::VGetSInt32(const std::initializer_list<const HE::UTF8*>& in_rTokens)
+    InterfaceTreeData::NodeSharedPtr AssetDataJson::VGetNodeByName(
+        AbstractTreeNode& in_rCurrentNode, const std::initializer_list<const HE::UTF8*>& in_aName)
     {
-        return static_cast<HE::Sint32>(this->VGetUInt32(in_rTokens));
+        auto pElement = reinterpret_cast<simdjson::dom::element*>(in_rCurrentNode.VGetSource());
+
+        auto szKey        = *in_aName.begin();
+        auto currentPath  = *pElement;
+        HE::Sint32 sLevel = AbstractTreeNode::sNoneLevel;
+
+        for (auto it = in_aName.begin(); it != in_aName.end(); ++it)
+        {
+            auto checkPath = currentPath[*it].value();
+            if (checkPath.type() != simdjson::dom::element_type::NULL_VALUE)
+            {
+                currentPath = checkPath;
+                szKey       = *it;
+                sLevel      = 0;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return HE_MAKE_CUSTOM_SHARED_PTR((Local::JsonNode), szKey, currentPath, sLevel);
     }
 
-    HE::Float32 AssetDataJson::VGetFloat32(const std::initializer_list<const HE::UTF8*>& in_rTokens)
+    InterfaceTreeData::NodeSharedPtr AssetDataJson::VGetNodeByLevel(
+        const std::initializer_list<const HE::UTF8*>& in_aName, const HE::Sint32 in_uLevel)
     {
-        simdjson::fallback::ondemand::value val;
-        if (Local::OutputValueBySimdJson(&val,
-                                         *(reinterpret_cast<simdjson::ondemand::document*>(
-                                             this->_pDoc)),
-                                         in_rTokens) == FALSE)
-            return 0;
+        auto pJson   = reinterpret_cast<simdjson::padded_string*>(this->_pJson);
+        auto pParser = reinterpret_cast<simdjson::dom::parser*>(this->_pParser);
+        simdjson::simdjson_result<simdjson::dom::element> dom = pParser->parse(*pJson);
 
-        return static_cast<HE::Float32>(val.get_double().value_unsafe());
+        auto [szKey, val, sLevel] = Local::GetValueBySimdJson(dom.value(), in_aName);
+
+        Local::JsonNode node(szKey.Str(), val, sLevel);
+        return this->VGetNodeByLevel(node, in_uLevel);
     }
 
-    Core::Common::FixedString1024 AssetDataJson::VGetChar(
-        const std::initializer_list<const HE::UTF8*>& in_rTokens)
+    InterfaceTreeData::NodeSharedPtr AssetDataJson::VGetNodeByLevel(
+        AbstractTreeNode& in_rCurrentNode, const HE::Sint32 in_uLevel)
     {
-        Core::Common::FixedString1024 str;
+        if (in_rCurrentNode.IsNone())
+        {
+            simdjson::dom::element element;
+            return HE_MAKE_CUSTOM_SHARED_PTR((Local::JsonNode), "", element,
+                                             AbstractTreeNode::sNoneLevel);
+        }
 
-        simdjson::fallback::ondemand::value val;
-        if (Local::OutputValueBySimdJson(&val,
-                                         *(reinterpret_cast<simdjson::ondemand::document*>(
-                                             this->_pDoc)),
-                                         in_rTokens) == FALSE)
-            return str;
+        auto pNodeSource = reinterpret_cast<simdjson::dom::element*>(in_rCurrentNode.VGetSource());
 
-        HE_ASSERT(val.is_string());
-        // unsafeの方が高速なのだが, 文字列の中にゴミの値が入っていた
-        str = val.get_string().value();
+        HE::Sint32 sLevel = AbstractTreeNode::sNoneLevel;
 
-        return str;
+        std::string_view key;
+        simdjson::dom::element value;
+
+        for (auto& field : pNodeSource->get_object())
+        {
+            if (in_uLevel <= sLevel) break;
+
+            key   = field.key;
+            value = field.value;
+
+            ++sLevel;
+        }
+
+        // レベル外のノードはなし
+        if (sLevel < in_uLevel)
+        {
+            sLevel = AbstractTreeNode::sNoneLevel;
+        }
+
+        return HE_MAKE_CUSTOM_SHARED_PTR((Local::JsonNode), key.data(), value, sLevel);
     }
 
     HE::Bool AssetDataJson::IsToken(const std::initializer_list<const HE::UTF8*>& in_rTokens)
     {
-        simdjson::fallback::ondemand::value val;
-        if (Local::OutputValueBySimdJson(&val,
-                                         *(reinterpret_cast<simdjson::ondemand::document*>(
-                                             this->_pDoc)),
-                                         in_rTokens) == FALSE)
-            return FALSE;
+        auto pJson   = reinterpret_cast<simdjson::padded_string*>(this->_pJson);
+        auto pParser = reinterpret_cast<simdjson::dom::parser*>(this->_pParser);
+        simdjson::simdjson_result<simdjson::dom::element> dom = pParser->parse(*pJson);
+
+        auto [szKey, val, sLevel] = Local::GetValueBySimdJson(dom.value(), in_rTokens);
+
+        if (sLevel == AbstractTreeNode::sNoneLevel) return FALSE;
 
         return TRUE;
     }
@@ -125,22 +238,17 @@ namespace AssetManager
             // 展開時にjsonを展開するためのメモリ確保をする
             HE_ASSERT(simdjson::validate_utf8(pText, uSize));
 
-            this->_json   = HE_MAKE_CUSTOM_UNIQUE_PTR((simdjson::padded_string), pText, uSize);
-            this->_parser = HE_MAKE_CUSTOM_UNIQUE_PTR((simdjson::ondemand::parser), (uSize * 2));
+            this->_pJson   = HE_NEW_MEM(simdjson::padded_string, 0)(pText, uSize);
+            this->_pParser = HE_NEW_MEM(simdjson::dom::parser, 0)(uSize * 2);
             {
-                this->_pDoc = HE_NEW_MEM(simdjson::ondemand::document, 0);
-                simdjson::ondemand::document* pDoc =
-                    reinterpret_cast<simdjson::ondemand::document*>(this->_pDoc);
-
-                auto resultCode = this->_parser->iterate(*this->_json).get(*pDoc);
-                if (resultCode != simdjson::error_code::SUCCESS)
+                auto pJson = reinterpret_cast<simdjson::padded_string*>(this->_pJson);
+                if (pJson->length() <= 0)
                 {
-                    HE_PG_LOG_LINE(HE_STR_TEXT("%s ファイルエラー: %d"), this->_path.Str(),
-                                   resultCode);
+                    bRet = FALSE;
+
+                    HE_PG_LOG_LINE(HE_STR_TEXT("%s ファイルエラー"), this->_path.Str());
                     HE_LOG_LINE(HE_STR_TEXT("エラーのjson内容"));
                     HE_LOG_LINE(HE_STR_TEXT("%s"), pText);
-
-                    bRet = FALSE;
                 }
             }
         }
@@ -156,10 +264,8 @@ namespace AssetManager
 
     void AssetDataJson::_VUnload()
     {
-        HE_SAFE_DELETE_UNIQUE_PTR(this->_json);
-        HE_SAFE_DELETE_UNIQUE_PTR(this->_parser);
-
-        HE_SAFE_DELETE_MEM(this->_pDoc);
+        HE_SAFE_DELETE_MEM(this->_pParser);
+        HE_SAFE_DELETE_MEM(this->_pJson);
     }
 
 }  // namespace AssetManager

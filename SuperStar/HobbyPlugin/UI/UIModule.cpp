@@ -115,60 +115,53 @@ namespace UI
         auto pAssetManagerModule = this->GetDependenceModule<AssetManager::AssetManagerModule>();
         HE_ASSERT(pAssetManagerModule);
 
-        auto pLevelModule = this->GetDependenceModule<Level::LevelModule>();
-        HE_ASSERT(pLevelModule);
-
         auto& asset = pAssetManagerModule->GetAsset<UI::Builder::UILayoutData>(in_rAssetHandle);
 
         // ルートノードを取得
         UI::Builder::Node node;
-        auto bRet = asset.OutputNodeByRootPos(&node, "ui");
+        auto bRet = asset.OutputNode(&node, {HE_STR_U8_TEXT("ui")});
         HE_ASSERT(bRet);
 
         // ルートノードからレイアウトノードを取得
         // TODO: レイヤーが複数ある場合の対応がない
         UI::Builder::Node layerNode;
-        bRet = asset.OutputNode(&layerNode, node, "layer");
+        bRet = asset.OutputNode(&layerNode, {HE_STR_U8_TEXT("ui"), HE_STR_U8_TEXT("layer")});
         HE_ASSERT(bRet);
         HE_ASSERT(layerNode._data._eWidgetType == UI::Builder::EWidget_Layer &&
                   "レイヤーノードが存在しない");
 
         // レイアウトを作成
-        UIWidgetHandlePack widgetHandlePack;
+        UIWidgetHandlePack rootLayerHandle;
         {
             auto pLayerData = &layerNode._data._exData._layer;
             Core::Math::Color c{pLayerData->_style._uColor};
 
-            widgetHandlePack =
+            rootLayerHandle =
                 this->NewLayer(Core::Common::FixedString64(layerNode._data._szId),
                                Core::Math::Vector2(pLayerData->_fX, pLayerData->_fY),
                                Core::Math::Vector2(pLayerData->_style._fW, pLayerData->_style._fH),
                                c, in_uSort, in_rViewHandle, in_rLevelHandle);
         }
 
-        // レイアウトノード下にあるWidgetを取得
-        // MEMO: 要素数が1000を超えるとスタックサイズが足りずにスタックオーバーフローになるので注意
-        Core::Common::FixedStack<UI::Builder::Node, 16> stack;
-
-        HE::Uint32 sort = 0;
-        Core::Common::FixedStack<UI::Builder::Node, 64> sNodeChildren;
-        asset.OutputNodeChildren(&sNodeChildren, layerNode);
-
-        Core::Common::FixedStack<UI::Builder::Node, 16> sTmpNodeChildren;
-        while (sNodeChildren.Empty() == FALSE)
-        {
-            auto hParentWidget = widgetHandlePack;
-
-            // 再帰処理をしている
-            stack.PushBack(sNodeChildren.PopBack());
-            while (stack.Empty() == FALSE)
+        UIWidgetHandlePack parentHandle;
+        asset.RecursiveOperationByNode(
+            {HE_STR_U8_TEXT("ui"), HE_STR_U8_TEXT("layer")},
+            [this, in_rViewHandle, in_rLevelHandle, &parentHandle,
+             rootLayerHandle](const UI::Builder::Node& in_rWidgetData, HE::Uint32 in_uSort,
+                              const HE::Bool in_bRoot)
             {
-                auto widgetNode                       = stack.PopBack();
-                const auto pNodeData                  = &widgetNode._data;
-                const UI::Builder::EWidget widgetType = pNodeData->_eWidgetType;
+                if (in_bRoot)
+                {
+                    parentHandle = rootLayerHandle;
+                }
+
+                auto pLevelModule = this->GetDependenceModule<Level::LevelModule>();
+                HE_ASSERT(pLevelModule);
+
+                const auto pNodeData = &in_rWidgetData._data;
                 // TODO: 関数テーブルにしてswitch文を消す方向にするかも
                 // 今は種類が少ないからいいが, 数が膨大になるとまずい
-                switch (widgetType)
+                switch (pNodeData->_eWidgetType)
                 {
                     case UI::Builder::EWidget_None:
                         break;
@@ -188,14 +181,13 @@ namespace UI
                                          Local::mPosAnthorToRect2Anchor[pLabel->_eAnchor]);
 
                         auto h = this->NewLabelWidget(Core::Common::FixedString64(pNodeData->_szId),
-                                                      sort, pLabel->szLoc, pLabel->szText,
+                                                      in_uSort, pLabel->szLoc, pLabel->szText,
                                                       pStyle->_uSize, rect, pStyle->_uColor,
                                                       in_rViewHandle, in_rLevelHandle);
 
-                        this->AddChildWidget(hParentWidget, h);
-                        hParentWidget = h;
+                        this->AddChildWidget(parentHandle, h);
+                        parentHandle = h;
 
-                        sort += 1;
                         break;
                     }
                     case UI::Builder::EWidget_Button:
@@ -209,27 +201,27 @@ namespace UI
                                          Local::mPosAnthorToRect2Anchor[pButton->_eAnchor]);
                         auto h =
                             this->NewButtonWidget(Core::Common::FixedString64(pNodeData->_szId),
-                                                  sort, rect, pStyle->_uColor, in_rViewHandle,
+                                                  in_uSort, rect, pStyle->_uColor, in_rViewHandle,
                                                   in_rLevelHandle);
 
                         // ボタンを押した時のイベントを設定
                         {
                             Actor::Object* pWidget = NULL;
-                            pWidget = pLevelModule->GetLevel(widgetHandlePack._levelHandle)
+                            pWidget = pLevelModule->GetLevel(parentHandle._levelHandle)
                                           .GetActor<Actor::Object>(h._widgetHandle);
                             HE_ASSERT(pWidget);
 
-                            auto [widgetHandle, pWidgetCmp] =
+                            auto [btnWidgetHandle, pWidgetCmp] =
                                 pWidget->GetComponentHandleAndComponent(
                                     &UI::UIButtonComponent::CLASS_RTTI);
-                            HE_ASSERT(widgetHandle.Null() == FALSE);
+                            HE_ASSERT(btnWidgetHandle.Null() == FALSE);
 
                             UI::UIButtonComponent* pBtnComp =
                                 reinterpret_cast<UI::UIButtonComponent*>(pWidgetCmp);
 
                             auto handler = HE_MAKE_CUSTOM_UNIQUE_PTR(
                                 (UI::UIButtonMessageHandlerDefault), pNodeData->_szId,
-                                [this, &widgetHandlePack](Core::Common::StringBase& in_msg)
+                                [this, parentHandle](Core::Common::StringBase& in_msg)
                                 {
                                     auto pLevelModule =
                                         this->GetDependenceModule<Level::LevelModule>();
@@ -237,7 +229,7 @@ namespace UI
 
                                     // ボタン入力をレベルのコンポーネントに通知
                                     auto [handle, c] =
-                                        pLevelModule->GetLevel(widgetHandlePack._levelHandle)
+                                        pLevelModule->GetLevel(parentHandle._levelHandle)
                                             .GetComponentHandleAndComponent(
                                                 &Level::LevelUserInputReceiveComponent::CLASS_RTTI);
                                     if (handle.Null() == FALSE)
@@ -251,24 +243,15 @@ namespace UI
                             pBtnComp->SetPushHandler(std::move(handler));
                         }
 
-                        this->AddChildWidget(hParentWidget, h);
-                        hParentWidget = h;
+                        this->AddChildWidget(parentHandle, h);
+                        parentHandle = h;
 
-                        sort += 1;
                         break;
                     }
                 }
+            });
 
-                sTmpNodeChildren.Clear();
-                asset.OutputNodeChildren(&sTmpNodeChildren, widgetNode);
-                while (sTmpNodeChildren.Empty() == FALSE)
-                {
-                    stack.PushBack(sTmpNodeChildren.PopBack());
-                }
-            }
-        }
-
-        return widgetHandlePack;
+        return rootLayerHandle;
     }  // namespace UI
 
     const UIWidgetHandlePack UIModule::NewLabelWidget(
@@ -297,10 +280,6 @@ namespace UI
             pText->SetViewHandle(in_rViewHandle);
             pText->SetText(in_szText);
 
-            // Core::Math::Rect2 rect;
-            // rect.SetPosition(0, 0, in_rTextRect.Width(), in_rTextRect.Height(),
-            //                 in_rTextRect._eAnchor);
-            // pText->SetRect(rect);
             pText->SetSize(Core::Math::Vector2(in_rTextRect.Width(), in_rTextRect.Height()));
             pText->SetColor(in_uTextColor);
             pText->SetLocGroupName(in_szLocGroupName);
@@ -335,8 +314,6 @@ namespace UI
             pButton->SetPos(in_rBtnRect.Pos());
             pButton->SetViewHandle(in_rViewHandle);
             pButton->SetSize(Core::Math::Vector2(in_rBtnRect.Width(), in_rBtnRect.Height()));
-            //            pButton->SetWidth(in_rBtnRect.Width());
-            //            pButton->SetHeight(in_rBtnRect.Height());
             pButton->SetColor(in_uBtnColor);
             pButton->SetAnchor(in_rBtnRect._eAnchor);
         }

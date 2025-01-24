@@ -327,12 +327,16 @@ namespace Core::Common
         // win版では文字列はwchar / charの二つの型がある
         FixedString<TCapacity>& operator=(const HE::UTF8* in_szName)
         {
-            // Win版のみHE::UTF8型がchar型なので切り替える
+            if (in_szName)
+            {
+                // Win版のみHE::UTF8型がchar型なので切り替える
 #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
-            this->_ConvUTF8toWide(in_szName, TCapacity);
+                this->_ConvUTF8toWide(in_szName, TCapacity);
 #else
-            this->_Copy(in_szName, HE_STR_SIZE(in_szName));
+                this->_Copy(in_szName, HE_STR_SIZE(in_szName));
 #endif
+            }
+
             return *this;
         }
 

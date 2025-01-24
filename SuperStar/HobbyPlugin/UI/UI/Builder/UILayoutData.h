@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 // UILayoutのデータファイルからUILayoutを構築するデータを生成
+#include <functional>
+
 #include "Engine/Common/CustomMap.h"
 #include "Engine/Common/CustomStack.h"
 #include "Engine/Common/CustomString.h"
@@ -36,9 +38,6 @@ namespace UI::Builder
 
     struct Node
     {
-        // サードパーティのxmlライブラリのノードポインタ
-        pugi::xml_node_struct* _pNode = NULL;
-
         /// <summary>
         /// エンジン用のデータ
         /// </summary>
@@ -92,18 +91,15 @@ namespace UI::Builder
         UILayoutData() : AssetManager::AssetDataXml() {}
 
         /// <summary>
-        /// 親ルート下にあるノードを名前で取得
-        /// </summary>
-        HE::Bool OutputNodeByRootPos(Node* out, const HE::UTF8* in_szName);
-
-        /// <summary>
         /// 指定したノード下にあるノードを名前で取得
         /// </summary>
-        HE::Bool OutputNode(Node* out, const Node& in_rParentNode, const HE::UTF8* in_szName);
+        HE::Bool OutputNode(Node* out, const std::initializer_list<const HE::UTF8*>& in_aName);
 
         /// <summary>
-        /// 指定したノード下にあるノード群を取得
+        /// 再帰処理をノードの全入れ子のパラメータを呼び出す
         /// </summary>
-        void OutputNodeChildren(Core::Common::StackBase<Node>* out, const Node& in_rParentNode);
+        void RecursiveOperationByNode(
+            const std::initializer_list<const HE::UTF8*>& in_aName,
+            std::function<void(const Node&, const HE::Uint32, const HE::Bool)> in_result);
     };
 }  // namespace UI::Builder

@@ -127,51 +127,56 @@ namespace Localization
         const HE::Bool bRet = AssetManager::AssetDataToml::_VLoad(in_rFileSystem);
         HE_ASSERT(bRet);
 
-        auto rootNode = this->GetRootNode();
+        // データがあるカレントディレクトリ名を取得
+        {
+            auto spCurrendDirNode =
+                this->VGetNodeByName({HE_STR_U8_TEXT("config"), HE_STR_U8_TEXT("current_dir")});
+            spCurrendDirNode->VOutputString(&Core::Common::g_szTempFixedString128);
+        }
 
-        // コンフィグデータからデータパスのディレクトリ名を取得
-        rootNode.GetNode(HE_STR_TEXT("config"), HE_STR_TEXT("current_dir"))
-            .OutputString(&Core::Common::g_szTempFixedString1024);
-
-        Core::File::Path dataRootPath(Core::Common::g_szTempFixedString1024.Str());
-
-        // Locateデータ構築
-        AssetManager::AssetDataToml::Node locateNode = rootNode.GetNode(HE_STR_TEXT("locate"));
-
-        AssetManager::AssetDataToml::ToolNodeMapType mLocateNode;
-        AssetManager::AssetDataToml::ToolNodeMapType mGroupNode;
-
-        locateNode.OutputNodeMap(&mLocateNode, HE_STR_EMPTY);
+        Core::File::Path dataRootPath(Core::Common::g_szTempFixedString128.Str());
 
         Core::Common::FixedString128 locateStr;
-        for (auto it = mLocateNode.Begin(); it != mLocateNode.End(); ++it)
+        HE::Sint32 sLocateLevel = 0;
+
+        Core::Common::FixedMap<Core::Common::FixedString128, LocateData, 32> mData;
+        while (1)
         {
-            locateStr = it->_key.Str();
+            auto spLocateNode = this->VGetNodeByLevel({HE_STR_U8_TEXT("locate")}, sLocateLevel);
+            if (spLocateNode->IsNone()) break;
+
+            ++sLocateLevel;
+
+            // 言語名
+            locateStr = spLocateNode->Name();
             locateStr.ToUpper();
 
-            Core::Common::FixedMap<Core::Common::FixedString128, LocateData, 32> mData;
-
-            mGroupNode.Clear();
-            it->_data.OutputNodeMap(&mGroupNode, HE_STR_EMPTY);
-
-            for (auto groupIt = mGroupNode.Begin(); groupIt != mGroupNode.End(); ++groupIt)
+            HE::Sint32 sGroupLevel = 0;
+            while (1)
             {
+                auto spGroupNode =
+                    this->VGetNodeByLevel({HE_STR_U8_TEXT("locate"), spLocateNode->Name()},
+                                          sGroupLevel);
+                if (spGroupNode->IsNone()) break;
+
+                ++sGroupLevel;
+
                 // ファイルパス連結する
                 Core::File::Path path(dataRootPath);
                 path += Core::File::Path(locateStr.Str());
 
-                groupIt->_data.GetNode(HE_STR_TEXT("json"))
-                    .OutputString(&Core::Common::g_szTempFixedString1024);
-                path += Core::File::Path(Core::Common::g_szTempFixedString1024.Str());
+                spGroupNode->VOutputString(&Core::Common::g_szTempFixedString512,
+                                           HE_STR_U8_TEXT("json"));
+                path += Core::File::Path(Core::Common::g_szTempFixedString512.Str());
 
                 LocateData _data(path);
                 HE_LOG_LINE(HE_STR_TEXT("%s"), _data._textFilePath.Str());
 
-                const Core::Common::FixedString128 szGroupName(groupIt->_key.Str());
-                mData.Add(szGroupName, _data);
+                mData.Add(spGroupNode->Name(), _data);
             }
 
             this->_locateDataMap.Add(locateStr, mData);
+            mData.Clear();
         }
 
         return TRUE;
@@ -188,12 +193,14 @@ namespace Localization
 
     const HE::Uint32 LocateAssetData::GetTextSize(const HE::UTF8* in_szKey)
     {
-        return this->VGetUInt32({in_szKey, "size"});
+        auto spNode = this->VGetNodeByName({in_szKey, HE_STR_U8_TEXT("size")});
+        return spNode->VGetUInt32();
     }
 
     const HE::Uint32 LocateAssetData::GetTextColor(const HE::UTF8* in_szKey)
     {
-        return this->VGetUInt32({in_szKey, "color"});
+        auto spNode = this->VGetNodeByName({in_szKey, HE_STR_U8_TEXT("color")});
+        return spNode->VGetUInt32();
     }
 
     const Core::Common::FixedString1024& LocateAssetData::GetText(const HE::UTF8* in_szKey)
@@ -201,8 +208,11 @@ namespace Localization
         // キャッシュしているテキストがなければデータからテキストを取る
         if (this->_textBuffMap.Contains(in_szKey) == FALSE)
         {
-            Core::Common::FixedString1024 value = this->VGetChar({in_szKey, "items", "0", "text"});
-            this->_textBuffMap.Add(in_szKey, value);
+            auto spNode = this->VGetNodeByName(
+                {in_szKey, HE_STR_U8_TEXT("items"), HE_STR_U8_TEXT("0"), HE_STR_U8_TEXT("text")});
+
+            spNode->VOutputString(&Core::Common::g_szTempFixedString1024);
+            this->_textBuffMap.Add(in_szKey, Core::Common::g_szTempFixedString1024);
         }
 
         return this->_textBuffMap[in_szKey];

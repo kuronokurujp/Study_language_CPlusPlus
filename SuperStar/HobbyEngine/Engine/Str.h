@@ -59,11 +59,14 @@
 // HE::UTF8を標準テキスト型に
 #define HE_STR_TEXT(t) u8##t
 #define HE_STR_EMPTY u8""
-
 // 1文字を小文字に変える
 #define HE_CHAR_LOWWER(c) ::tolower(c)
 
 #endif
+
+// HE::UTF8の文字列を記述する時のマクロ
+// 必ずUTF8の文字列を使う時に利用
+#define HE_STR_U8_TEXT(t) u8##t
 
 #define HE_STR_ERRNO errno_t
 #define HE_STR_SUCCESS(e) e == 0 ? TRUE : FALSE
