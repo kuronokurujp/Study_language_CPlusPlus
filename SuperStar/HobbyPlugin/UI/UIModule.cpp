@@ -144,7 +144,7 @@ namespace UI
         }
 
         UIWidgetHandlePack parentHandle;
-        asset.RecursiveOperationByNode(
+        asset.DoSearchHierarchyNode(
             {HE_STR_U8_TEXT("ui"), HE_STR_U8_TEXT("layer")},
             [this, in_rViewHandle, in_rLevelHandle, &parentHandle,
              rootLayerHandle](const UI::Builder::Node& in_rWidgetData, HE::Uint32 in_uSort,

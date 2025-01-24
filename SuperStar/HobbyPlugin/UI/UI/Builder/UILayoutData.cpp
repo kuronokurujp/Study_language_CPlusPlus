@@ -233,7 +233,7 @@ namespace UI::Builder
         return TRUE;
     }
 
-    void UILayoutData::RecursiveOperationByNode(
+    void UILayoutData::DoSearchHierarchyNode(
         const std::initializer_list<const HE::UTF8*>& in_aName,
         std::function<void(const Node&, const HE::Uint32, const HE::Bool)> in_result)
     {

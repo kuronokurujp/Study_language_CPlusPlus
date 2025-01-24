@@ -98,7 +98,7 @@ namespace UI::Builder
         /// <summary>
         /// 再帰処理をノードの全入れ子のパラメータを呼び出す
         /// </summary>
-        void RecursiveOperationByNode(
+        void DoSearchHierarchyNode(
             const std::initializer_list<const HE::UTF8*>& in_aName,
             std::function<void(const Node&, const HE::Uint32, const HE::Bool)> in_result);
     };
