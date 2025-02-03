@@ -363,10 +363,17 @@ namespace Core::Common
 
             T* pData = &this->_aData[uIndex];
 
-            // 共有ポインタであればresetをして解放する
+            // 共有ポインタであればresetをして解放
             if constexpr (IsShaderPtrByTemplateType<T>::value)
             {
                 pData->reset();
+                pData = NULL;
+            }
+
+            // ユニークポインタであれば解放
+            if constexpr (IsUniquePtrByTemplateType<T>::value)
+            {
+                HE_SAFE_DELETE_UNIQUE_PTR((*pData));
                 pData = NULL;
             }
 
