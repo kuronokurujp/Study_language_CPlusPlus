@@ -70,9 +70,6 @@ set(TARGET_FILES
 	Code/InGame/Bullet/InGameBulletNormal.h
 	Code/InGame/Bullet/InGameBulletNormal.cpp
 	
-	Code/InGame/InGameActorSystem.h
-	Code/InGame/InGameActorSystem.cpp
-	Code/InGame/InGameActorCommon.h
 	Code/InGame/InGameTag.h
 	
 	Code/InGame/Event/InGameEventCharacter.h
