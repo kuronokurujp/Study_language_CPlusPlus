@@ -24,11 +24,11 @@ TEST_CASE("Test Paramater Asset Load")
             CHECK(rAsset.Version() == 1);
             HE_LOG_LINE(HE_STR_TEXT("バージョン: %d"), rAsset.Version());
 
-            auto uHp = rAsset.GetUInt32ByIdData("player_default", "hp");
+            auto uHp = rAsset.GetUInt32ByName("player_default", "hp");
             CHECK(uHp == 3);
             HE_LOG_LINE(HE_STR_TEXT("HP: %d"), uHp);
 
-            auto fMoveSpeed = rAsset.GetFloat32ByIdData("player_default", "move_speed");
+            auto fMoveSpeed = rAsset.GetFloat32ByName("player_default", "move_speed");
             CHECK(fMoveSpeed == 7.0f);
             HE_LOG_LINE(HE_STR_TEXT("MoveSpeed: %f"), fMoveSpeed);
 
