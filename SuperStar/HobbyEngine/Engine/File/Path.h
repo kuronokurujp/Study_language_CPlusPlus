@@ -52,8 +52,8 @@ namespace Core::File
             (
                 [this](const auto& arg)
                 {
-                    Core::Common::g_szTempFixedString1024 = arg;
-                    this->_Append(Core::Common::g_szTempFixedString1024);
+                    Path::s_szTempFixedString1024 = arg;
+                    this->_Append(Path::s_szTempFixedString1024);
                 }(in_TArgs),
                 ...);
 
@@ -73,6 +73,8 @@ namespace Core::File
         void _Append(const Core::Common::StringBase& in_szPath);
 
     private:
+        static inline Core::Common::FixedString1024 s_szTempFixedString1024;
+
         Core::Common::FixedString256 _szPath;
     };
 
