@@ -74,15 +74,50 @@ namespace Core::Math
     }
 
     /// <summary>
-    /// Ins the side rect.
+    /// 引数の矩形が中にあるかどうか.
     /// </summary>
     HE::Bool Rect2::InSideRect(const Rect2& in_rOrderRect) const
     {
         const Vector2& rPos  = this->Pos();
         const Vector2& rLine = Vector2::Sub(rPos, in_rOrderRect.Pos());
 
-        const HE::Float32 fW = this->WidthHalf() + in_rOrderRect.WidthHalf();
-        const HE::Float32 fH = this->HeightHalf() + in_rOrderRect.HeightHalf();
+        HE::Float32 fSelfW = 0.0f, fSelfH = 0.0f;
+
+        switch (this->_eAnchor)
+        {
+            case EAnchor::EAnchor_Center:
+            {
+                fSelfW = this->WidthHalf();
+                fSelfH = this->HeightHalf();
+                break;
+            }
+            case EAnchor::EAnchor_Left:
+            {
+                fSelfW = this->Width();
+                fSelfH = this->Height();
+                break;
+            }
+        }
+
+        HE::Float32 fOrderW = 0.0f, fOrderH = 0.0f;
+        switch (in_rOrderRect._eAnchor)
+        {
+            case EAnchor::EAnchor_Center:
+            {
+                fOrderW = in_rOrderRect.WidthHalf();
+                fOrderH = in_rOrderRect.HeightHalf();
+                break;
+            }
+            case EAnchor::EAnchor_Left:
+            {
+                fOrderW = in_rOrderRect.Width();
+                fOrderH = in_rOrderRect.Height();
+                break;
+            }
+        }
+
+        const HE::Float32 fW = fSelfW + fOrderW;
+        const HE::Float32 fH = fSelfH + fOrderH;
 
         if (fW < fabs(rLine._fX)) return FALSE;
         if (fH < fabs(rLine._fY)) return FALSE;

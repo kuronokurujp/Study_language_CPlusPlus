@@ -48,7 +48,7 @@ namespace Core::Math
         inline HE::Float32 HeightHalf() const HE_NOEXCEPT { return (this->Height() * 0.5f); }
 
         /// <summary>
-        /// Ins the side rect.
+        /// 引数の矩形が中にあるかどうか.
         /// </summary>
         HE::Bool InSideRect(const Rect2& in_rOrderRect) const;
 
