@@ -14,6 +14,7 @@ namespace Core::Common
         HE_ASSERT(this->Null());
         HE_ASSERT(in_uIndex <= EMax_Index);
 
+        // TODO: 絶対枯渇しない方法を考える必要はあるだろうか?
         ++s_uMagicNumber;
 
         // インデックスとマジックナンバーを割り当て
