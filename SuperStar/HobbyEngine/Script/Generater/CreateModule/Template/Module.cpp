@@ -5,7 +5,7 @@ namespace __MODULE_NAME__
     /// <summary>
     /// モジュール初期化
     /// </summary>
-    Bool __MODULE_NAME__Module::_VStart()
+    HE::Bool __MODULE_NAME__Module::_VStart()
     {
         return TRUE;
     }
@@ -13,7 +13,7 @@ namespace __MODULE_NAME__
     /// <summary>
     /// インスタンス破棄時に呼ばれる
     /// </summary>
-    Bool __MODULE_NAME__Module::_VRelease()
+    HE::Bool __MODULE_NAME__Module::_VRelease()
     {
         return TRUE;
     }

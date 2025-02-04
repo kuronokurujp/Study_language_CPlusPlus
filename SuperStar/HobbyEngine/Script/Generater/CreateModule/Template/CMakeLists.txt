@@ -24,7 +24,7 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH})
 
     # SDL2のパッケージを探す
     # find_package(インストールしたパッケージ名 REQUIRED CONFIG)
-    
+
     # プラグインをリンク
     # target_link_libraries(${__MODULE_UPPER_NAME___PLUGIN_NAME} 
     #     PRIVATE
