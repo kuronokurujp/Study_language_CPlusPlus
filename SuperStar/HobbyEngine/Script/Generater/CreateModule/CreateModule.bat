@@ -95,7 +95,8 @@ rename "%DEST_MODULEDIR%\%ORG_MODULE_H_FILENAME%" "%REPLACE_MODULE_H_FILENAME%"
 echo コピーしたモジュールを指定したフォルダに移動します。
 move "%DEST_MODULEDIR%" "%INPUT_MODULE_DIR_FULLPATH%"
 
-echo 新規モジュール作成が成功しました
+echo "%INPUT_MODULE_DIR_FULLPATH%"に新規モジュール"%INPUT_MODULENAME%"を作成しました
+echo 新規モジュール作成が完了しました。
 pause
 exit /b 0
 
