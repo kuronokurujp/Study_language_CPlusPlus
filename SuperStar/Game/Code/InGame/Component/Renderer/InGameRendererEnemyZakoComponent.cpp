@@ -5,7 +5,7 @@
 
 namespace InGame
 {
-    void InGameRendererEnemyZakoComponent::SetSize(const Core::Math::Vector2& in_rSize)
+    void InGameRendererEnemyZakoComponent::VSetSize(const Core::Math::Vector2& in_rSize)
     {
         this->_size = in_rSize;
     }

@@ -1,7 +1,10 @@
 ﻿#pragma once
 
-#include "Engine/Common/CustomMap.h"
+#include "Common.h"
 #include "InGame/Event/InGameEventCharacter.h"
+
+// エンジン
+#include "Engine/Common/CustomMap.h"
 
 // 最小エンジンのインクルード
 #include "Engine/MiniEngine.h"
@@ -9,6 +12,11 @@
 // 利用モジュール
 #include "EventModule.h"
 #include "LevelModule.h"
+
+namespace Lua
+{
+    struct LuaFuncData;
+}
 
 namespace InGame
 {
@@ -28,7 +36,8 @@ namespace InGame
             const Core::Common::Handle& in_rViewHandle,
             const Core::Common::Handle& in_rPlayerParamaterAssetHandle,
             const Core::Common::Handle& in_rEnemyParamterAssetHandle,
-            const Core::Common::Handle& in_rStageTimelineParamaterAssetHandle);
+            const Core::Common::Handle& in_rStageTimelineParamaterAssetHandle,
+            Core::Memory::SharedPtr<Game::GameAssetMap> in_spGameAssetMap);
         virtual ~InGameStageManagerComponent() = default;
 
         /// <summary>
@@ -63,7 +72,11 @@ namespace InGame
         /// </summary>
         // HE::Bool VHandleEvent(Event::EventDataInterfacePtr const& in_rEventData) override final;
 
+        const Core::Common::Handle& GetPlayerHandle() const { return this->_playerHandle; }
+
     private:
+        void _HandleLuaEvent(const Lua::LuaFuncData&);
+
         HE::Bool _HandleCharacterEvent(Event::EventDataInterfacePtr const&);
 
         /*
@@ -94,29 +107,19 @@ namespace InGame
         //	クリア
         void _Clear();
 
+        /// <summary>
+        /// イベントから敵を生成
+        /// </summary>
+        void _CreateEnemey(EventCharacterPutEnemy*);
+
     private:
         Core::Common::Handle _viewHandle;
         Core::Common::Handle _playerParamaterAssetHandle;
         Core::Common::Handle _enemyParamaterAssetHandle;
         Core::Common::Handle _stageTimelineParamaterAssetHandle;
         Core::Common::Handle _playerHandle;
+        Core::Memory::SharedPtr<Game::GameAssetMap> _spGameAssetMap;
 
-        /*
-                void _CreateStageEvent(lua_State* in_pLuaState) {}
-
-                //	変数
-                int m_StageIndex;
-                int m_W;
-                int m_MapXPos;
-                int m_Speed;
-                int m_ScrollEndXPos;
-                int m_State;
-                bool m_bClearPoint;
-                unsigned m_ClearPointNum;
-                int m_BossHandle;
-
-                std::vector<class C_EnemyActorBase*> m_aMapSettingEnemyList;
-                */
         Core::Common::Handle _characterEventHandle;
 
         Core::Common::FixedMap<HE::Uint32, Core::Common::Handle, 256> _mEnemyMap;

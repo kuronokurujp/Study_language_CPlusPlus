@@ -41,6 +41,25 @@ namespace AssetManager
         p->_VUnload();
     }
 
+    const Core::Common::Handle AssetManagerModule::GetAssetHandle(
+        const Core::File::Path& in_rFilePath)
+    {
+        auto pPlatformModule = this->GetDependenceModule<Platform::PlatformModule>();
+        HE_ASSERT(pPlatformModule);
+
+        // TODO: 一つ一つチェックするので処理速度は遅い
+        auto mAsset = this->_poolAssetDataManager.GetUserDataList();
+        for (auto itr = mAsset->begin(); itr != mAsset->end(); ++itr)
+        {
+            if (HE_STR_CMP(itr->second->_path.Str(), in_rFilePath.Str()) == 0)
+            {
+                return itr->first;
+            }
+        }
+
+        return NullHandle;
+    }
+
     HE::Bool AssetManagerModule::_Load(AssetDataBase* out)
     {
         auto pPlatformModule = this->GetDependenceModule<Platform::PlatformModule>();

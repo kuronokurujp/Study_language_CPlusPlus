@@ -42,14 +42,14 @@ namespace InGame
     {
     public:
         EventCharacterMove(const HE::Float32 in_fTimeStamp, const EObjectTag in_eTag,
-                           const HE::Uint32 in_uId, const Core::Math::Vector2& in_rMove);
+                           const HE::Uint64 in_uuHandle, const Core::Math::Vector2& in_rMove);
 
         static inline HE::Uint32 EventTypeHash() { return s_uEventTypeHash; }
 
     public:
         Core::Math::Vector2 _move;
-        EObjectTag _eTag = EObjectTag::EObjectTag_None;
-        HE::Uint32 _uId  = 0;
+        HE::Uint64 _uuHandle = 0;
+        EObjectTag _eTag     = EObjectTag::EObjectTag_None;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterMove");
@@ -63,13 +63,13 @@ namespace InGame
     {
     public:
         EventCharacterAttack(const HE::Float32 in_fTimeStamp, const EObjectTag in_eTag,
-                             const HE::Uint32 in_uId);
+                             const HE::Uint64 in_uuHandle);
 
         static inline HE::Uint32 EventTypeHash() { return s_uEventTypeHash; }
 
     public:
-        EObjectTag _eTag = EObjectTag::EObjectTag_None;
-        HE::Uint32 _uId  = 0;
+        EObjectTag _eTag     = EObjectTag::EObjectTag_None;
+        HE::Uint64 _uuHandle = 0;
 
     private:
         static inline Event::EventTypeStr s_szEventType = HE_STR_TEXT("CharacterAttack");

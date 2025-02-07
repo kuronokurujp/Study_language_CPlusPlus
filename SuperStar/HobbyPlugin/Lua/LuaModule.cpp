@@ -88,10 +88,19 @@ namespace Lua
             {
                 case LUA_TNUMBER:
                 {
-                    pArgData->eValType = ELuaFuncArgType_Float32;
+                    if (lua_isinteger(in_pLuaState, i))
+                    {
+                        pArgData->eValType     = ELuaFuncArgType_Uint64;
+                        const HE::Uint64 uuVal = lua_tointeger(in_pLuaState, i);
+                        pArgData->_data.uuVal  = uuVal;
+                    }
+                    else
+                    {
+                        pArgData->eValType     = ELuaFuncArgType_Float32;
+                        const HE::Float32 fVal = lua_tonumber(in_pLuaState, i);
+                        pArgData->_data.fVal   = fVal;
+                    }
 
-                    const HE::Float32 fVal = lua_tonumber(in_pLuaState, i);
-                    pArgData->_data.fVal   = fVal;
                     break;
                 }
                 case LUA_TSTRING:
@@ -334,11 +343,11 @@ namespace Lua
         lua_State* pLuaState = reinterpret_cast<lua_State*>(pLuaObject->pLuaState);
         HE_ASSERT(pLuaState);
 
-        // Luaスクリプトをが呼ぶ関数名を生成
-        // State名を先頭につける
+        // Luaスクリプトを呼ぶ関数名を生成
+        //        // State名を先頭につける
         Core::Common::g_szTempFixedString1024.Clear();
-        Core::Common::g_szTempFixedString1024 += pLuaObject->szName;
-        Core::Common::g_szTempFixedString1024 += HE_STR_TEXT("_");
+        //        Core::Common::g_szTempFixedString1024 += pLuaObject->szName;
+        //        Core::Common::g_szTempFixedString1024 += HE_STR_TEXT("_");
         Core::Common::g_szTempFixedString1024 += in_pFuncName;
 
         // Luaスクリプトが呼び出した関数を受け取るようにする
@@ -346,13 +355,13 @@ namespace Lua
                                      &_LuaScriptCallFunc);
     }
 
-    HE::Bool LuaModule::SetEventFunctionByLuaFunc(
-        Core::Memory::SharedPtr<Core::Common::FunctionObject<void, LuaFuncData&>> in_spFunc)
+    const Core::Common::Handle LuaModule::AddListenerLuaFunc(ListenLuaFuncEventUniqutPtr in_spFunc)
     {
-        auto a = reinterpret_cast<std::uintptr_t>(in_spFunc.get());
-        this->_mScriptFuncAction.Add(a, in_spFunc);
+        // TODO: 削除する手段を返さないとだめ
+        auto [handle, spFunc] = this->_poolListenLuaFuncEvent.Alloc();
+        *spFunc               = std::move(in_spFunc);
 
-        return TRUE;
+        return handle;
     }
 
     /// <summary>
@@ -361,10 +370,8 @@ namespace Lua
     HE::Bool LuaModule::_VStart()
     {
         HE_ASSERT(this->_mUseLuaObject.Empty());
-        this->_mScriptFuncAction.Clear();
 
         s_sLuaFuncResultData.Clear();
-
         return TRUE;
     }
 
@@ -381,12 +388,12 @@ namespace Lua
         HE_ASSERT(this->_mUseLuaObject.Empty());
 
         // 参照先をNULLにしないとメモリが残る
-        for (auto itr = this->_mScriptFuncAction.Begin(); itr != this->_mScriptFuncAction.End();
-             ++itr)
+        auto scriptFuncActionMap = this->_poolListenLuaFuncEvent.GetUseDataMap();
+        for (auto itr = scriptFuncActionMap.Begin(); itr != scriptFuncActionMap.End(); ++itr)
         {
-            itr->_data = NULL;
+            Core::Common::Handle handle = itr->_key;
+            this->_poolListenLuaFuncEvent.Free(handle);
         }
-        this->_mScriptFuncAction.Clear();
 
         s_sLuaFuncResultData.Clear();
 
@@ -403,34 +410,10 @@ namespace Lua
             // TODO: 関数結果を受け取る
             // HE_LOG_LINE(HE_STR_TEXT("Lua関数は%s関数を呼んだ"), rData.szFuncName);
 
-            for (auto itr = this->_mScriptFuncAction.Begin(); itr != this->_mScriptFuncAction.End();
-                 ++itr)
+            auto scriptFuncActionMap = this->_poolListenLuaFuncEvent.GetUseDataMap();
+            for (auto itr = scriptFuncActionMap.Begin(); itr != scriptFuncActionMap.End(); ++itr)
             {
-                if (1 < itr->_data.use_count())
-                {
-                    itr->_data->CallByMove(rData);
-                }
-                else
-                {
-                    DeleterFreeMemory* pDeleter = std::get_deleter<DeleterFreeMemory>(itr->_data);
-                    if (pDeleter)
-                    {
-#ifdef HE_ENGINE_DEBUG
-
-                        HE_LOG_LINE(
-                            HE_STR_TEXT(
-                                "参照カウント数が1以下で参照が危険なので削除: File(%s) / Line(%d)"),
-                            pDeleter->szFilename, pDeleter->uLine);
-#endif
-                    }
-                    else
-                    {
-                        HE_LOG_LINE(HE_STR_TEXT("参照カウント数が1以下で参照が危険なので削除"));
-                    }
-
-                    this->_mScriptFuncAction.Erase(itr);
-                    itr->_data = NULL;
-                }
+                itr->_data->get()->CallByMove(rData);
             }
         }
     }
@@ -462,13 +445,21 @@ namespace Lua
         lua_pushinteger(pLuaState, static_cast<lua_Integer>(in_uValue));
     }
 
-    // HE::HE::Float32
+    // HE::Float32
     void LuaModule::_LuaStackPushValue(void* in_pLuaState, const HE::Float32 in_fValue)
     {
         lua_State* pLuaState = reinterpret_cast<lua_State*>(in_pLuaState);
         HE_ASSERT(pLuaState);
 
         lua_pushnumber(pLuaState, static_cast<lua_Number>(in_fValue));
+    }
+
+    void LuaModule::_LuaStackPushValue(void* in_pLuaState, const HE::Uint64 in_uuValue)
+    {
+        lua_State* pLuaState = reinterpret_cast<lua_State*>(in_pLuaState);
+        HE_ASSERT(pLuaState);
+
+        lua_pushnumber(pLuaState, static_cast<lua_Integer>(in_uuValue));
     }
 
     // HE::Bool型をプッシュ

@@ -57,6 +57,11 @@ namespace AssetManager
 
         void Unload(const Core::Common::Handle&);
 
+        /// <summary>
+        /// ファイルパスからアセットハンドルを取得
+        /// </summary>
+        const Core::Common::Handle GetAssetHandle(const Core::File::Path& in_rFilePath);
+
         template <class T>
         typename std::enable_if<std::is_base_of<AssetDataBase, T>::value, T&>::type GetAsset(
             const Core::Common::Handle& in_rHandle)

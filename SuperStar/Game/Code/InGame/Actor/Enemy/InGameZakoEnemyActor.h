@@ -31,15 +31,23 @@ namespace InGame
         };
 
     public:
-        InGameEnemyZakoActor(const Parameter& in_rParameter);
+        InGameEnemyZakoActor(const Core::Common::Handle in_luaObject,
+                             const Parameter& in_rParameter);
 
         HE::Bool VBegin() override final;
+        HE::Bool VEnd() override final;
 
         void VUpdate(const HE::Float32 in_fDt) override final;
 
         void SetSize(const Core::Math::Vector2& in_rSize);
 
-        HE::Bool Damage(const HE::Sint32 in_sDamage);
+        void Move(const Core::Math::Vector2& in_rMove)
+        {
+            this->_move.Clear();
+            this->_move.Madd(in_rMove, this->_parameter.speed);
+        }
+
+        void Damage(const HE::Sint32 in_sDamage);
 
         // virtual bool update(void);
         // virtual void draw(void);
@@ -69,6 +77,9 @@ namespace InGame
                 */
     private:
         Core::Math::Vector2 _size;
+        Core::Common::Handle _luaObjectHandle;
         Parameter _parameter;
+        HE::Bool _bScreenInSide = TRUE;
+        Core::Math::Vector2 _move;
     };
 }  // namespace InGame

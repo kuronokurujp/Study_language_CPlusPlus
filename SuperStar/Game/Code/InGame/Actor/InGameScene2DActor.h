@@ -23,16 +23,18 @@ namespace InGame
         HE::Bool VBegin() override;
 
         void SetPos(const Core::Math::Vector2&);
+        void SetDir(const Core::Math::Vector2&);
 
     private:
         void _Clear()
         {
             this->_pos.Clear();
+            this->_dir.Clear();
             this->_transformHandle.Clear();
         }
 
     protected:
-        Core::Math::Vector2 _pos;
+        Core::Math::Vector2 _pos, _dir;
         Core::Common::Handle _transformHandle;
     };
 

@@ -24,10 +24,17 @@ namespace Actor
         /// </summary>
         const Core::Math::Vector3 GetWorldPos();
 
+        inline const Core::Math::Vector3& GetDir() const { return this->_dir; }
+
         /// <summary>
-        /// Sets the position.
+        /// 座標設定
         /// </summary>
         inline void SetPos(const Core::Math::Vector3& in_rPosition) { this->_pos = in_rPosition; }
+
+        /// <summary>
+        /// 方向設定
+        /// </summary>
+        inline void SetDir(const Core::Math::Vector3& in_rDirection) { this->_dir = in_rDirection; }
 
         // 座標変換一覧
         void TransformLocalToWorldPos2D(Core::Math::Vector2* out,
@@ -45,11 +52,13 @@ namespace Actor
         void _Clear()
         {
             this->_pos.Clear();
+            this->_dir.Clear();
             this->_scale.Clear();
         }
 
     private:
         Core::Math::Vector3 _pos;
+        Core::Math::Vector3 _dir;
         Core::Math::Vector3 _scale;
         Core::Math::Quaternion _rotation;
 

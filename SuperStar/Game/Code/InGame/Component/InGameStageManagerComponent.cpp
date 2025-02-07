@@ -1,6 +1,5 @@
 ﻿#include "InGameStageManagerComponent.h"
 
-#include "Engine/Engine.h"
 #include "InGame/Actor/Enemy/InGameZakoEnemyActor.h"
 #include "InGame/Actor/Player/InGamePlayerActor.h"
 #include "InGame/Component/Renderer/InGameRendererEnemyZakoComponent.h"
@@ -11,42 +10,22 @@
 
 // ゲームキャラクター用のイベント
 #include "InGame/Event/InGameEventCharacter.h"
-/*
-#include "actor/boss/BossStage1.h"
-#include "actor/enemy/Snake.h"
-#include "actor/enemy/Split.h"
-#include "actor/enemy/Zako.h"
-#include "actor/player/Player.h"
-#include "event/data/Stage.h"
-#include "game/GameSystem.h"
-#include "scripting/LuaStateManager.h"
-#include "system/System.h"
-*/
+
+// エンジン
+#include "Engine/Engine.h"
+
 // 利用モジュール
 #include "AssetManagerModule.h"
+#include "LuaModule.h"
 
 namespace InGame
 {
-    /*
-        static const char* s_pStageManagerScriptName[] = {
-            "./resource/script/stage/stage01.lua",
-        };
-
-        static const char* s_pPlayerKeyGuideText = "a: SHOT d/s: NEXT SHOT TYPE";
-
-    */
-    //	受け取るイベントリスト
-    /*
-    InGameStageManagerComponent::_EVENT_FUNC InGameStageManagerComponent::m_aEventFuncList[] = {
-        {"RequestStageManagerCreate", &InGameStageManagerComponent::_CreateStageEvent},
-    };
-    */
-
     InGameStageManagerComponent::InGameStageManagerComponent(
         const Core::Common::Handle& in_rViewHandle,
         const Core::Common::Handle& in_rPlayerParamaterAssetHandle,
         const Core::Common::Handle& in_rEnemyParamterAssetHandle,
-        const Core::Common::Handle& in_rStageTimelineParamaterAssetHandle)
+        const Core::Common::Handle& in_rStageTimelineParamaterAssetHandle,
+        Core::Memory::SharedPtr<Game::GameAssetMap> in_spGameAssetMap)
         : Level::LevelBaseComponent()
     {
         this->_Clear();
@@ -55,6 +34,7 @@ namespace InGame
         this->_playerParamaterAssetHandle        = in_rPlayerParamaterAssetHandle;
         this->_enemyParamaterAssetHandle         = in_rEnemyParamterAssetHandle;
         this->_stageTimelineParamaterAssetHandle = in_rStageTimelineParamaterAssetHandle;
+        this->_spGameAssetMap                    = in_spGameAssetMap;
     }
 
     HE::Bool InGameStageManagerComponent::VBegin()
@@ -84,6 +64,18 @@ namespace InGame
             }
         }
 
+        // TODO: Luaスクリプトからの関数受け取り
+        {
+            auto pModule = HE_ENGINE.ModuleManager().Get<Lua::LuaModule>();
+            auto f =
+                HE_MAKE_CUSTOM_UNIQUE_PTR((Core::Common::FunctionObject<void, Lua::LuaFuncData&>),
+                                          [this](Lua::LuaFuncData& in_rLuaFuncData)
+                                          { this->_HandleLuaEvent(in_rLuaFuncData); });
+
+            // Luaスクリプトから呼び出した関数を受け取れるようにする
+            pModule->AddListenerLuaFunc(std::move(f));
+        }
+
         return TRUE;
     }
 
@@ -103,6 +95,7 @@ namespace InGame
             this->RemoveActor(&itr->_data);
         }
         this->_mEnemyMap.Clear();
+        this->_spGameAssetMap.reset();
 
         return LevelBaseComponent::VEnd();
     }
@@ -123,7 +116,7 @@ namespace InGame
         HE::UTF8 szTimelineNo[32] = {0};
         while (this->_bTimeline)
         {
-            Core::Common::g_szTempFixedString16.operator=(this->_uTimelineNo);
+            Core::Common::g_szTempFixedString16 = this->_uTimelineNo;
             Core::Common::g_szTempFixedString16.OutputUTF8(szTimelineNo,
                                                            HE_ARRAY_NUM(szTimelineNo));
 
@@ -135,23 +128,23 @@ namespace InGame
             }
 
             const HE::Float32 fPeroid =
-                rParamaterAssetData.GetFloat32ByIdData(szTimelineNo, "peroid_sec");
+                rParamaterAssetData.GetFloat32ByName(szTimelineNo, "peroid_sec");
             if (this->_fTime < fPeroid)
             {
                 break;
             }
 
-            const auto fPosX = rParamaterAssetData.GetFloat32ByIdData(szTimelineNo, "pos_x");
-            const auto fPosY = rParamaterAssetData.GetFloat32ByIdData(szTimelineNo, "pos_y");
+            const auto fPosX = rParamaterAssetData.GetFloat32ByName(szTimelineNo, "pos_x");
+            const auto fPosY = rParamaterAssetData.GetFloat32ByName(szTimelineNo, "pos_y");
 
             HE::UTF8 szIdName[32] = {};
-            rParamaterAssetData.OutputStringByIdData(&Core::Common::g_szTempFixedString1024,
-                                                     szTimelineNo, "parameter_id");
+            rParamaterAssetData.OutputStringByName(&Core::Common::g_szTempFixedString1024,
+                                                   szTimelineNo, "parameter_id");
             Core::Common::g_szTempFixedString1024.OutputUTF8(szIdName, HE_ARRAY_NUM(szIdName));
 
             // イベント実行
-            rParamaterAssetData.OutputStringByIdData(&Core::Common::g_szTempFixedString1024,
-                                                     szTimelineNo, "event");
+            rParamaterAssetData.OutputStringByName(&Core::Common::g_szTempFixedString1024,
+                                                   szTimelineNo, "event");
             if (Core::Common::g_szTempFixedString1024 == HE_STR_TEXT("put_player"))
             {
                 // 自機を作成
@@ -180,6 +173,51 @@ namespace InGame
         }
     }
 
+    void InGameStageManagerComponent::_HandleLuaEvent(const Lua::LuaFuncData& in_rLuaData)
+    {
+        // TODO: Luaスクリプトの関数を受け取る
+        auto szFuncName = in_rLuaData.szFuncName;
+
+        auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
+
+        if (HE_STR_CMP(szFuncName, HE_STR_TEXT("EnemyEvent_Position")) == 0)
+        {
+            return;
+        }
+
+        if (HE_STR_CMP(szFuncName, HE_STR_TEXT("EnemyEvent_Move")) == 0)
+        {
+            HE_ASSERT(in_rLuaData.uArgCount == 3);
+
+            HE_ASSERT(in_rLuaData.aArg[0].eValType == Lua::ELuaFuncArgType_Uint64);
+            Core::Common::Handle handle = in_rLuaData.aArg[0]._data.uuVal;
+
+            HE_ASSERT(in_rLuaData.aArg[1].eValType == Lua::ELuaFuncArgType_Float32);
+            auto fX = in_rLuaData.aArg[1]._data.fVal;
+
+            HE_ASSERT(in_rLuaData.aArg[2].eValType == Lua::ELuaFuncArgType_Float32);
+            auto fY = in_rLuaData.aArg[2]._data.fVal;
+
+            Core::Math::Vector2 move(fX, fY);
+            move.Normalize();
+            auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterMove), 0,
+                                                     InGame::EObjectTag_Enemy, handle, move);
+            pEventModule->QueueEvent(spEvent);
+
+            return;
+        }
+
+        if (HE_STR_CMP(szFuncName, HE_STR_TEXT("EnemyEvent_Die")) == 0)
+        {
+            return;
+        }
+
+        if (HE_STR_CMP(szFuncName, HE_STR_TEXT("EnemyEvent_Damage")) == 0)
+        {
+            return;
+        }
+    }
+
     HE::Bool InGameStageManagerComponent::_HandleCharacterEvent(
         Event::EventDataInterfacePtr const& in_spEventData)
     {
@@ -192,19 +230,31 @@ namespace InGame
             auto pEvent = reinterpret_cast<EventCharacterMove*>(in_spEventData.get());
             HE_ASSERT(pEvent != NULL);
 
+            Core::Common::Handle handle = pEvent->_uuHandle;
+            HE_ASSERT(handle.Null() == FALSE);
+
             switch (pEvent->_eTag)
             {
                 case EObjectTag_Player:
                 {
-                    if (this->_playerHandle.Null() == FALSE)
+                    auto pPlayer = this->GetActor<InGamePlayerActor>(handle);
+                    if (pPlayer) pPlayer->Move(pEvent->_move);
+
+                    break;
+                }
+
+                // TODO: 敵の移動
+                case EObjectTag_Enemy:
+                {
+                    auto pEnemy = this->GetActor<InGameEnemyZakoActor>(handle);
+                    if (pEnemy)
                     {
-                        auto pPlayer = this->GetActor<InGamePlayerActor>(this->_playerHandle);
-                        pPlayer->Move(pEvent->_move);
+                        pEnemy->Move(pEvent->_move);
                     }
 
                     break;
                 }
-                // TODO: 敵の移動
+
                 default:
                     break;
             }
@@ -215,15 +265,15 @@ namespace InGame
             auto pEvent = reinterpret_cast<EventCharacterAttack*>(in_spEventData.get());
             HE_ASSERT(pEvent != NULL);
 
+            Core::Common::Handle handle = pEvent->_uuHandle;
+            HE_ASSERT(handle.Null() == FALSE);
+
             switch (pEvent->_eTag)
             {
                 case EObjectTag_Player:
                 {
-                    if (this->_playerHandle.Null() == FALSE)
-                    {
-                        auto pPlayer = this->GetActor<InGamePlayerActor>(this->_playerHandle);
-                        pPlayer->Shot();
-                    }
+                    auto pPlayer = this->GetActor<InGamePlayerActor>(handle);
+                    if (pPlayer) pPlayer->Shot();
 
                     break;
                 }
@@ -238,46 +288,8 @@ namespace InGame
             auto pEvent = reinterpret_cast<EventCharacterPutEnemy*>(in_spEventData.get());
             HE_ASSERT(pEvent != NULL);
 
-            // タグに応じた敵を生成する
-            switch (pEvent->_eEnemyTag)
-            {
-                case EEnemyTag::EEnemyTag_Zako:
-                {
-                    auto& rParamaterAssetData = HE_ENGINE.ModuleManager()
-                                                    .Get<AssetManager::AssetManagerModule>()
-                                                    ->GetAsset<Game::Asset::ParamaterAssetData>(
-                                                        this->_enemyParamaterAssetHandle);
-
-                    // TODO: パラメータ設定
-                    HE::UTF8 szIdName[32] = {0};
-                    pEvent->_szIdName.OutputUTF8(szIdName, HE_ARRAY_NUM(szIdName));
-
-                    InGameEnemyZakoActor::Parameter parameter;
-                    parameter.ulife = rParamaterAssetData.GetSInt32ByIdData(szIdName, "hp");
-                    parameter.speed =
-                        rParamaterAssetData.GetFloat32ByIdData(szIdName, "move_speed");
-
-                    auto [actorHandle, pActor] =
-                        this->AddActorByHandleAndActor<InGameEnemyZakoActor>(parameter);
-                    auto [compHandle, pComp] =
-                        pActor->AddComponentByHandleAndComp<InGameRendererEnemyZakoComponent>(
-                            0, Actor::Component::EPriorty::EPriorty_Main);
-                    pComp->SetViewHandle(this->_viewHandle);
-
-                    const Core::Math::Vector2
-                        size(rParamaterAssetData.GetFloat32ByIdData(szIdName, "size_x"),
-                             rParamaterAssetData.GetFloat32ByIdData(szIdName, "size_y"));
-                    pActor->SetSize(size);
-                    pActor->SetPos(pEvent->_pos);
-
-                    this->_mEnemyMap.Add(pEvent->_uId, actorHandle);
-
-                    break;
-                }
-
-                default:
-                    break;
-            }
+            // イベントに応じた敵を生成
+            this->_CreateEnemey(pEvent);
         }
         // プレイヤー生成
         else if (uEventHash == EventCharacterPutPlayer::EventTypeHash())
@@ -291,7 +303,7 @@ namespace InGame
                 this->RemoveActor(&this->_playerParamaterAssetHandle);
             }
 
-            const HE::UTF8* szParamaterIdName = "player_default";
+            const HE::UTF8* szParamaterIdName = HE_STR_U8_TEXT("player_default");
 
             auto& rParamaterAssetData =
                 HE_ENGINE.ModuleManager()
@@ -302,12 +314,13 @@ namespace InGame
             InGamePlayerActor::Parameter playerParamater;
             {
                 playerParamater.ulife =
-                    rParamaterAssetData.GetSInt32ByIdData(szParamaterIdName, "hp");
+                    rParamaterAssetData.GetSInt32ByName(szParamaterIdName, HE_STR_U8_TEXT("hp"));
                 playerParamater.speed =
-                    rParamaterAssetData.GetFloat32ByIdData(szParamaterIdName, "move_speed");
+                    rParamaterAssetData.GetFloat32ByName(szParamaterIdName,
+                                                         HE_STR_U8_TEXT("move_speed"));
                 playerParamater.fInvincibleTimeSec =
-                    rParamaterAssetData.GetFloat32ByIdData(szParamaterIdName,
-                                                           "invincible_time_sec");
+                    rParamaterAssetData.GetFloat32ByName(szParamaterIdName,
+                                                         HE_STR_U8_TEXT("invincible_time_sec"));
             }
             this->_playerHandle = this->AddActor<InGamePlayerActor>(playerParamater);
 
@@ -351,11 +364,7 @@ namespace InGame
                     auto pEnemy = this->GetActor<InGameEnemyZakoActor>(pEvent->_ulHandle);
                     if (pEnemy)
                     {
-                        if (pEnemy->Damage(pEvent->_sDamage))
-                        {
-                            // TODO: 死亡
-                            pEnemy->Kill();
-                        }
+                        pEnemy->Damage(pEvent->_sDamage);
                     }
 
                     break;
@@ -683,4 +692,79 @@ namespace InGame
         this->_uTimelineNo = 0;
         this->_uEnemyId    = 0;
     }
+
+    void InGameStageManagerComponent::_CreateEnemey(EventCharacterPutEnemy* in_pEvent)
+    {
+        HE::UTF8 szIdName[32] = {0};
+        in_pEvent->_szIdName.OutputUTF8(szIdName, HE_ARRAY_NUM(szIdName));
+
+        switch (in_pEvent->_eEnemyTag)
+        {
+            case EEnemyTag::EEnemyTag_Zako:
+            {
+                auto& rParamaterAssetData = HE_ENGINE.ModuleManager()
+                                                .Get<AssetManager::AssetManagerModule>()
+                                                ->GetAsset<Game::Asset::ParamaterAssetData>(
+                                                    this->_enemyParamaterAssetHandle);
+
+                // TODO: パラメータ設定
+                InGameEnemyZakoActor::Parameter parameter;
+                parameter.ulife =
+                    rParamaterAssetData.GetSInt32ByName(szIdName, HE_STR_U8_TEXT("hp"));
+                parameter.speed =
+                    rParamaterAssetData.GetFloat32ByName(szIdName, HE_STR_U8_TEXT("move_speed"));
+
+                // TODO: Luaスクリプトテキストをロードして渡す
+                Core::Common::Handle luaScriptHandle;
+                {
+                    // Luaデータ名を取得
+                    rParamaterAssetData.OutputStringByName(&Core::Common::g_szTempFixedString1024,
+                                                           szIdName, HE_STR_TEXT("lua_file_name"));
+                    auto handleItr =
+                        this->_spGameAssetMap->FindKey(Core::Common::g_szTempFixedString1024);
+                    HE_ASSERT(handleItr.IsValid());
+
+                    auto& rLuaScriptTextAsset =
+                        HE_ENGINE.ModuleManager()
+                            .Get<AssetManager::AssetManagerModule>()
+                            ->GetAsset<AssetManager::AssetDataText>(handleItr->_data);
+
+                    // TODO:
+                    // アクター内でLuaスクリプトを処理するオブジェクトを作成してLuaスクリプトでオブジェクト制御する
+                    auto pModule = HE_ENGINE.ModuleManager().Get<Lua::LuaModule>();
+
+                    luaScriptHandle = pModule->CreateLuaObject(HE_STR_TEXT("EnemyEvent"));
+                    pModule->LoadScriptText(luaScriptHandle, rLuaScriptTextAsset.Text());
+
+                    // TODO: Luaスクリプトで呼び出す関数を登録
+                    pModule->RegistScriptFunc(luaScriptHandle, HE_STR_TEXT("EnemyEvent_Position"));
+                    pModule->RegistScriptFunc(luaScriptHandle, HE_STR_TEXT("EnemyEvent_Move"));
+                    pModule->RegistScriptFunc(luaScriptHandle, HE_STR_TEXT("EnemyEvent_Die"));
+                    pModule->RegistScriptFunc(luaScriptHandle, HE_STR_TEXT("EnemyEvent_Damage"));
+                }
+
+                auto [enemyHandle, pEnemy] =
+                    this->AddActorByHandleAndActor<InGameEnemyZakoActor>(luaScriptHandle,
+                                                                         parameter);
+                auto [compHandle, pComp] =
+                    pEnemy->AddComponentByHandleAndComp<InGameRendererEnemyZakoComponent>(
+                        0, Actor::Component::EPriorty::EPriorty_Main);
+                pComp->SetViewHandle(this->_viewHandle);
+
+                const Core::Math::Vector2
+                    size(rParamaterAssetData.GetFloat32ByName(szIdName, HE_STR_U8_TEXT("size_x")),
+                         rParamaterAssetData.GetFloat32ByName(szIdName, HE_STR_U8_TEXT("size_y")));
+                pEnemy->SetSize(size);
+                pEnemy->SetPos(in_pEvent->_pos);
+
+                this->_mEnemyMap.Add(in_pEvent->_uId, enemyHandle);
+
+                break;
+            }
+
+            default:
+                break;
+        }
+    }
+
 }  // namespace InGame

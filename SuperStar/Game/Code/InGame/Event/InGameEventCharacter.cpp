@@ -3,20 +3,20 @@
 namespace InGame
 {
     EventCharacterMove::EventCharacterMove(const HE::Float32 in_fTimeStamp,
-                                           const EObjectTag in_eTag, const HE::Uint32 in_uId,
+                                           const EObjectTag in_eTag, const HE::Uint64 in_uuHandle,
                                            const Core::Math::Vector2& in_rMove)
         : Event::BaseEventData(INGAME_CHARACTER_EVENT_TYPE_NAME, s_szEventType, in_fTimeStamp),
           _move(in_rMove),
           _eTag(in_eTag),
-          _uId(in_uId)
+          _uuHandle(in_uuHandle)
     {
     }
 
     EventCharacterAttack::EventCharacterAttack(const HE::Float32 in_fTimeStamp,
-                                               const EObjectTag in_eTag, const HE::Uint32 in_uId)
+                                               const EObjectTag in_eTag, const HE::Uint64 in_uuHandle)
         : Event::BaseEventData(INGAME_CHARACTER_EVENT_TYPE_NAME, s_szEventType, in_fTimeStamp),
           _eTag(in_eTag),
-          _uId(in_uId)
+          _uuHandle(in_uuHandle)
 
     {
     }

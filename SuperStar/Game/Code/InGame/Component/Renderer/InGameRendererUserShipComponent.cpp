@@ -12,7 +12,7 @@ namespace InGame
         this->SetViewHandle(in_rViewHandle);
     }
 
-    void InGameRendererUserShipComponent::SetSize(const Core::Math::Vector2& in_rSize)
+    void InGameRendererUserShipComponent::VSetSize(const Core::Math::Vector2& in_rSize)
     {
         this->_size = in_rSize;
     }

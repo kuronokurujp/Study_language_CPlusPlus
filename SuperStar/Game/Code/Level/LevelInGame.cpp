@@ -52,6 +52,8 @@ namespace Level
         const HE::Bool bRet = Node::VBegin();
         HE_ASSERT(bRet);
 
+        this->_spGameAsset = HE_MAKE_CUSTOM_SHARED_PTR((Game::GameAssetMap));
+
         auto pAssetManagerModule =
             HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
 
@@ -59,31 +61,81 @@ namespace Level
         // ステージのタイムラインアセットロード
         Core::Common::Handle stageTimelineParamaterAssetHandle;
         {
-            const auto szParamaterAssetName = HE_STR_TEXT("StageTimelineParamater");
+            constexpr auto szParamaterAssetName = HE_STR_TEXT("StageTimelineParamater");
             stageTimelineParamaterAssetHandle =
                 pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
                     szParamaterAssetName,
                     Core::File::Path(HE_STR_TEXT("Paramater/Stage_Timeline_01.json")));
-            this->_mGameAsset.Add(szParamaterAssetName, stageTimelineParamaterAssetHandle);
+            this->_spGameAsset->Add(szParamaterAssetName, stageTimelineParamaterAssetHandle);
         }
 
         // プレイヤーのアセットロード
         Core::Common::Handle playerParamaterAssetHandle;
         {
-            const auto szPlayerParamaterAssetName = HE_STR_TEXT("PlayerParamater");
-            playerParamaterAssetHandle = pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
-                szPlayerParamaterAssetName, Core::File::Path(HE_STR_TEXT("Paramater/Player.json")));
-            this->_mGameAsset.Add(szPlayerParamaterAssetName, playerParamaterAssetHandle);
+            // パラメータ
+            {
+                constexpr auto szPlayerParamaterAssetName = HE_STR_TEXT("PlayerParamater");
+                playerParamaterAssetHandle =
+                    pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
+                        szPlayerParamaterAssetName,
+                        Core::File::Path(HE_STR_TEXT("Paramater/Player.json")));
+                this->_spGameAsset->Add(szPlayerParamaterAssetName, playerParamaterAssetHandle);
+            }
         }
 
         // 敵のアセットロード
         Core::Common::Handle enemyParamaterAssetHandle;
         {
-            const auto szEnemeyParamaterAssetName = HE_STR_TEXT("EnemyParamater");
-            enemyParamaterAssetHandle = pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
-                szEnemeyParamaterAssetName, Core::File::Path(HE_STR_TEXT("Paramater/Enemy.json")));
+            // パラメータ
+            {
+                constexpr auto szEnemeyParamaterAssetName = HE_STR_TEXT("EnemyParamater");
+                enemyParamaterAssetHandle =
+                    pAssetManagerModule->Load<Game::Asset::ParamaterAssetData>(
+                        szEnemeyParamaterAssetName,
+                        Core::File::Path(HE_STR_TEXT("Paramater/Enemy.json")));
 
-            this->_mGameAsset.Add(szEnemeyParamaterAssetName, enemyParamaterAssetHandle);
+                this->_spGameAsset->Add(szEnemeyParamaterAssetName, enemyParamaterAssetHandle);
+            }
+
+            // TODO: 使用するLuaスクリプトテキストファイルをロード
+            {
+                Game::Asset::ParamaterAssetData& rParamAsset =
+                    pAssetManagerModule->GetAsset<Game::Asset::ParamaterAssetData>(
+                        enemyParamaterAssetHandle);
+
+                HE::Uint32 uIndex = 0;
+                while (rParamAsset.IsIndex(uIndex))
+                {
+                    rParamAsset.OutputStringByIndex(&Core::Common::g_szTempFixedString128, uIndex,
+                                                    HE_STR_U8_TEXT("lua_file_name"));
+
+                    Core::Common::g_szTempFixedString1024 = Core::Common::g_szTempFixedString128;
+                    Core::Common::g_szTempFixedString1024 += HE_STR_TEXT(".lua");
+                    Core::File::Path path(HE_STR_TEXT("Lua"), HE_STR_TEXT("Enemy"),
+                                          Core::Common::g_szTempFixedString1024.Str());
+
+                    // TODO: Luaスクリプトファイルをテキストとしてロード
+                    // すでにロードしているならそれを使う
+                    auto handle = pAssetManagerModule->GetAssetHandle(path);
+                    if (handle.Null())
+                    {
+                        handle = pAssetManagerModule->Load<AssetManager::AssetDataText>(
+                            Core::Common::g_szTempFixedString1024.Str(), path);
+
+                        this->_spGameAsset->Add(Core::Common::g_szTempFixedString128, handle);
+                    }
+
+                    ++uIndex;
+                }
+            }
+        }
+
+        // TODO: エフェクトロード
+        {
+        }
+
+        // サウンドロード
+        {
         }
 
         // ユーザー共通入力割り当て設定
@@ -165,12 +217,13 @@ namespace Level
         }
 
         // インゲームのステージコンポーネント追加
+        // オブジェクトのイベント通知などステージに特化したコンポーネント
         {
             auto [handle, pComp] =
                 this->AddComponentByHandleAndComp<InGame::InGameStageManagerComponent>(
                     0, Actor::Component::EPriorty::EPriorty_Main, Game::g_scene2DHandle,
                     playerParamaterAssetHandle, enemyParamaterAssetHandle,
-                    stageTimelineParamaterAssetHandle);
+                    stageTimelineParamaterAssetHandle, this->_spGameAsset);
             this->_stageManagerComponentHandle = handle;
         }
 
@@ -190,6 +243,8 @@ namespace Level
             auto pInputModule = HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();
             pInputModule->RemoveCommonMappingAction(Local::mInputActionByPlay);
         }
+
+        this->_spGameAsset.reset();
 
         return Node::VEnd();
     }
@@ -239,17 +294,31 @@ namespace Level
 
         if (in_pInputMap->Contains(Local::szInputShot))
         {
-            auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterAttack), 0,
-                                                     InGame::EObjectTag_Player, 0);
-            pEventModule->QueueEvent(spEvent);
+            auto pStageComponent = this->GetComponent<InGame::InGameStageManagerComponent>(
+                this->_stageManagerComponentHandle);
+
+            auto rHandle = pStageComponent->GetPlayerHandle();
+            if (rHandle.Null() == FALSE)
+            {
+                auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterAttack), 0,
+                                                         InGame::EObjectTag_Player, rHandle);
+                pEventModule->QueueEvent(spEvent);
+            }
         }
 
         if (move.IsZero() == FALSE)
         {
-            move.Normalize();
-            auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterMove), 0,
-                                                     InGame::EObjectTag_Player, 0, move);
-            pEventModule->QueueEvent(spEvent);
+            auto pStageComponent = this->GetComponent<InGame::InGameStageManagerComponent>(
+                this->_stageManagerComponentHandle);
+
+            auto rHandle = pStageComponent->GetPlayerHandle();
+            if (rHandle.Null() == FALSE)
+            {
+                move.Normalize();
+                auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterMove), 0,
+                                                         InGame::EObjectTag_Player, rHandle, move);
+                pEventModule->QueueEvent(spEvent);
+            }
         }
     }
 

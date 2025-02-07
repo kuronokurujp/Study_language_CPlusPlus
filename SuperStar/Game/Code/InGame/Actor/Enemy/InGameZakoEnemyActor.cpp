@@ -4,29 +4,17 @@
 #include "InGame/Component/Renderer/InGameRendererEnemyZakoComponent.h"
 #include "InGame/InGameTag.h"
 
-/*
-#include "actor/ActorCommon.h"
-#include "actor/shot/Manager.h"
-#include "event/data/EnemyZako.h"
-#include "game/GameSystem.h"
-#include "scripting/LuaStateManager.h"
-#include "system/System.h"
-#include "tips/Collsion.h"
-#include "tips/Primitive.h"
-*/
+// エンジン
+#include "Engine/Engine.h"
+
+// モジュール
+#include "LuaModule.h"
 
 namespace InGame
 {
-    /*
-        //	変数
-        static const char* s_aEnemyZakoScriptFileName[C_EnemyActorBase::TYPE_MAX] = {
-            "./resource/script/enemy/zako.lua",
-            "./resource/script/enemy/zako_knight.lua",
-        };
-    */
-
-    InGameEnemyZakoActor::InGameEnemyZakoActor(const Parameter& in_rParameter)
-        : InGameScene2DActor(), _parameter(in_rParameter)
+    InGameEnemyZakoActor::InGameEnemyZakoActor(const Core::Common::Handle in_luaObjectHandle,
+                                               const Parameter& in_rParameter)
+        : InGameScene2DActor(), _luaObjectHandle(in_luaObjectHandle), _parameter(in_rParameter)
     {
         this->_Clear();
     }
@@ -47,16 +35,78 @@ namespace InGame
             pComponent->SetMetaData(this->Handle());
         }
 
-        // TODO: Luaスクリプトで敵の挙動制御をする
+        // Luaスクリプトで敵の挙動制御をする
+        {
+            auto pTrans = this->GetComponent<Actor::TransformComponent>(this->_transformHandle);
+            HE_ASSERT(pTrans);
+
+            auto pos  = pTrans->GetWorldPos();
+            auto rDir = pTrans->GetDir();
+
+            auto pModule = HE_ENGINE.ModuleManager().Get<Lua::LuaModule>();
+            (pModule->CallScriptFunc(this->_luaObjectHandle, HE_STR_TEXT("EnemyEvent_Init"),
+                                     this->Handle(), pos._fX, pos._fY, rDir._fX, rDir._fY,
+                                     this->_parameter.speed));
+        }
+
+        this->_bScreenInSide = TRUE;
 
         return TRUE;
+    }
+
+    HE::Bool InGameEnemyZakoActor::VEnd()
+    {
+        auto bRet = InGameScene2DActor::VEnd();
+        // Luaスクリプトの終了通知
+        {
+            auto pModule = HE_ENGINE.ModuleManager().Get<Lua::LuaModule>();
+            (pModule->CallScriptFunc(this->_luaObjectHandle, HE_STR_TEXT("EnemyEvent_End"),
+                                     this->Handle()));
+
+            // Luaスクリプトを削除
+            pModule->ReleaseLuaObject(this->_luaObjectHandle);
+        }
+
+        return bRet;
     }
 
     void InGameEnemyZakoActor::VUpdate(const HE::Float32 in_fDt)
     {
         InGameScene2DActor::VUpdate(in_fDt);
 
-        // TODO: 画面外かどうかチェック
+        // 移動情報による座標更新
+        {
+            Core::Math::Vector2 newPos;
+            newPos.SetAdd(this->_pos, this->_move);
+            this->_move.Clear();
+
+            this->SetPos(newPos);
+        }
+
+        auto pModule = HE_ENGINE.ModuleManager().Get<Lua::LuaModule>();
+        // Luaスクリプトの更新
+        {
+            pModule->CallScriptFunc(this->_luaObjectHandle, HE_STR_TEXT("EnemyEvent_Update"),
+                                    this->Handle(), in_fDt);
+        }
+
+        // 画面外かどうかチェック
+        if (this->_bScreenInSide)
+        {
+            auto pRendererComponent = this->GetComponent<InGameRendererEnemyZakoComponent>();
+            if (pRendererComponent && (pRendererComponent->IsScreenIn()))
+            {
+                // 画面内
+            }
+            else
+            {
+                // 画面外
+                this->_bScreenInSide = FALSE;
+                // 画面外の処理になったらどうするか個々のキャラによって異なる
+                pModule->CallScriptFunc(this->_luaObjectHandle, HE_STR_TEXT("EnemyEvent_ScreenOut"),
+                                        this->Handle());
+            }
+        }
     }
 
     void InGameEnemyZakoActor::SetSize(const Core::Math::Vector2& in_rSize)
@@ -65,16 +115,17 @@ namespace InGame
         auto pRendererComponent = this->GetComponent<InGameRendererEnemyZakoComponent>();
         if (pRendererComponent)
         {
-            pRendererComponent->SetSize(in_rSize);
+            pRendererComponent->VSetSize(in_rSize);
         }
     }
 
-    HE::Bool InGameEnemyZakoActor::Damage(const HE::Sint32 in_sDamage)
+    void InGameEnemyZakoActor::Damage(const HE::Sint32 in_sDamage)
     {
-        this->_parameter.ulife -= in_sDamage;
-        if (this->_parameter.ulife <= 0) return TRUE;
+        auto pModule = HE_ENGINE.ModuleManager().Get<Lua::LuaModule>();
+        HE_ASSERT(pModule);
 
-        return FALSE;
+        pModule->CallScriptFunc(this->_luaObjectHandle, HE_STR_TEXT("EnemyEvent_Damage"),
+                                this->Handle(), in_sDamage);
     }
 
     void InGameEnemyZakoActor::_Clear()
@@ -82,198 +133,6 @@ namespace InGame
     }
 
 #if 0
-    /*
-            @brief	初期化
-    */
-    bool C_EnemyActorZako::init(const int in_Handle)
-    {
-        C_EnemyActorBase::init(in_Handle);
-
-        //	初回スクリプト実行
-        EnemyZakoInitParamEventData eventData(in_Handle);
-        LuaStateManager::DoFile(s_aEnemyZakoScriptFileName[m_eAblityType], "Init", &eventData);
-
-        return true;
-    }
-
-    /*
-            @brief	更新
-    */
-    bool C_EnemyActorZako::update(void)
-    {
-        C_EnemyActorBase::update();
-
-        //	画面外かどうかチェック
-        {
-            INTERSECT_RECT2D_DATA_ST rect(m_pos.x, m_pos.y, m_size * 2.f, m_size * 2.f);
-            if (IsScreenOutScreen2D(rect) == true)
-            {
-                //	画面外なら消滅する。
-                VDie();
-            }
-        }
-
-        return true;
-    }
-
-    //	データ通知
-    void C_EnemyActorZako::VOnCallbackSendMessage(const int in_DataType, void* in_pData)
-    {
-        switch (in_DataType)
-        {
-            case eACTOR_SEND_MESS_HIT_SHOT:
-            {
-                HIT_SHOT_SEND_DATA_ST* pData = (HIT_SHOT_SEND_DATA_ST*)(in_pData);
-                if (pData != NULL)
-                {
-                    //	自機からの弾の場合はダメージを受ける
-                    if (pData->proprety == ShotManagerActor::PLAER_PROPERTY)
-                    {
-                        printf("弾があたった～\n");
-
-                        m_Hp -= 1;
-                        if (m_Hp <= 0)
-                        {
-                            //	死亡
-                            VDie();
-                        }
-                        else
-                        {
-                            //	ダメージ演出
-                        }
-
-                        // 弾を消す
-                        if (pData->pShotEmit != NULL)
-                        {
-                            pData->pShotEmit->Delete(pData->bulletIndex);
-                        }
-                    }
-                }
-
-                break;
-            }
-        }
-    }
-
-    /*
-            @brief	他アクターチェック
-    */
-    void C_EnemyActorZako::_VOnCallbackOtherActorData(C_PaketSendActor* in_pOtherActor)
-    {
-        //	RTTI判定衝突用のアクターかチェック
-        if (in_pOtherActor->VGetRttiId() != C_ColisionActor::RTTI_ID)
-        {
-            return;
-        }
-
-        C_ColisionActor* pCollisionActor = NULL;
-        pCollisionActor                  = (C_ColisionActor*)in_pOtherActor;
-
-        //	衝突判定
-        INTERSECT_RECT2D_DATA_ST chr01(pCollisionActor->GetPos().x, pCollisionActor->GetPos().y,
-                                       pCollisionActor->GetSize(), pCollisionActor->GetSize());
-        INTERSECT_RECT2D_DATA_ST chr02(GetPos().x, GetPos().y, GetSize(), GetSize());
-        if (isIntersectedRect2D(chr01, chr02) == true)
-        {
-            //	接触した
-            in_pOtherActor->VOnCallbackSendMessage(eACTOR_SEND_MESS_HIT_ENEMY, NULL);
-        }
-    }
-
-    /*
-            @brief	スクリプトで通知したデータを受け取る
-    */
-    void C_EnemyActorZako::_VOnCallbackScriptEvent(lua_State* in_pLuaState)
-    {
-        //	スクリプトからデータを復元
-        if (in_pLuaState == NULL)
-        {
-            return;
-        }
-
-        //	データタイプを取得
-        const char* pEventTypeName = lua_tostring(in_pLuaState, 1);
-        if (pEventTypeName == NULL)
-        {
-            return;
-        }
-
-        //	初期パラメータ
-        if (strncmp(pEventTypeName, "RequestEnemyZakoInitParam", strlen(pEventTypeName)) == 0)
-        {
-            //	Luaからコードデータへ変更
-            EnemyZakoInitParamEventData eventData(VGetHandle());
-            if (eventData.VBuildLuaEventData(in_pLuaState) == false)
-            {
-                return;
-            }
-
-            if (GetTypeNameToIndex(eventData.m_pTypeName) != m_eAblityType)
-            {
-                return;
-            }
-
-            //	ステートを決める
-            _SetState(eventData.m_StateName);
-
-            m_Hp           = eventData.m_Hp;
-            m_Speed        = eventData.m_Speed;
-            m_NextStateCnt = eventData.m_NextStateCnt;
-            if (m_pos.x == -1.f)
-            {
-                m_pos.x = eventData.m_pos.x;
-            }
-            if (m_pos.y == -1.f)
-            {
-                m_pos.y = eventData.m_pos.y;
-            }
-
-            m_DirVec.x = cos(eventData.m_Angle * ANGLE_TO_RADIAN);
-            m_DirVec.y = sin(eventData.m_Angle * ANGLE_TO_RADIAN);
-            m_Point    = eventData.m_Point;
-        }
-        else if (strncmp(pEventTypeName, "RequestEnemyZakoAtkAct", strlen(pEventTypeName)) == 0)
-        {
-        }
-        else if (strncmp(pEventTypeName, "RequestEnemyZakoNormalAct", strlen(pEventTypeName)) == 0)
-        {
-        }
-        else if (strncmp(pEventTypeName, "RequestEnemyZakoEscapeAct", strlen(pEventTypeName)) == 0)
-        {
-            EnemyZakoEscapeParamEventData eventData(VGetHandle());
-            if (eventData.VBuildLuaEventData(in_pLuaState) == false)
-            {
-                return;
-            }
-
-            if (GetTypeNameToIndex(eventData.m_pTypeName) != m_eAblityType)
-            {
-                return;
-            }
-
-            //	スタックを戻す
-            lua_pop(in_pLuaState, lua_gettop(in_pLuaState) + 1);
-
-            _SetState(_ESCAPE_ACT);
-
-            m_Speed    = eventData.m_Speed;
-            m_DirVec.x = cos(eventData.m_Angle * ANGLE_TO_RADIAN);
-            m_DirVec.y = sin(eventData.m_Angle * ANGLE_TO_RADIAN);
-        }
-    }
-
-    /*
-            @brief	変数クリア
-    */
-    void C_EnemyActorZako::_Clear()
-    {
-        m_Hp           = 0;
-        m_NextStateCnt = 0;
-        m_Speed        = 0.f;
-
-        m_pos = Vec3(-1.f, -1.f, 0.f);
-    }
-
     /*
             @brief	アクション通常
     */

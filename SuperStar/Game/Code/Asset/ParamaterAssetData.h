@@ -19,13 +19,20 @@ namespace Game::Asset
         inline HE::Uint32 Version() const { return this->_version; }
 
         // パラメータの取得
-        HE::Uint32 GetUInt32ByIdData(const HE::UTF8* in_pIdName, const HE::UTF8* in_pFieldName);
-        HE::Sint32 GetSInt32ByIdData(const HE::UTF8* in_pIdName, const HE::UTF8* in_pFieldName);
-        HE::Float32 GetFloat32ByIdData(const HE::UTF8* in_pIdName, const HE::UTF8* in_pFieldName);
-        void OutputStringByIdData(Core::Common::StringBase* out, const HE::UTF8* in_pIdName,
-                                  const HE::UTF8* in_pFieldName);
+        HE::Uint32 GetUInt32ByName(const HE::UTF8* in_pIdName, const HE::UTF8* in_pFieldName);
+        HE::Sint32 GetSInt32ByName(const HE::UTF8* in_pIdName, const HE::UTF8* in_pFieldName);
+        HE::Float32 GetFloat32ByName(const HE::UTF8* in_pIdName, const HE::UTF8* in_pFieldName);
+        void OutputStringByName(Core::Common::StringBase* out, const HE::UTF8* in_pIdName,
+                                const HE::UTF8* in_pFieldName);
 
-        HE::Bool IsId(const HE::UTF8* in_pIdName);
+        HE::Uint32 GetUInt32ByIndex(const HE::Uint32, const HE::UTF8*);
+        HE::Sint32 GetSInt32ByIndex(const HE::Uint32, const HE::UTF8*);
+        HE::Float32 GetFloat32ByIndex(const HE::Uint32, const HE::UTF8*);
+        void OutputStringByIndex(Core::Common::StringBase* out, const HE::Uint32, const HE::UTF8*);
+        void OutputIdByIndex(Core::Common::StringBase* out, const HE::Uint32);
+
+        HE::Bool IsId(const HE::UTF8*);
+        HE::Bool IsIndex(const HE::Uint32);
 
     protected:
         virtual HE::Bool _VLoad(::Platform::FileInterface&) override final;

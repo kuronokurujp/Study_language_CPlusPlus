@@ -32,6 +32,15 @@ namespace InGame
         /// </summary>
         void VUpdate(const HE::Float32 in_fDt) override final;
 
+        virtual void VSetSize(const Core::Math::Vector2&) = 0;
+        virtual const Core::Math::Vector2& VGetSize() const = 0;
+
+        /// <summary>
+        /// TODO: 画面内かどうか
+        /// </summary>
+        /// <returns></returns>
+        HE::Bool IsScreenIn();
+
     protected:
         virtual void _VRenderer(const Core::Common::Handle& in_rViewHandle,
                                 class Actor::TransformComponent*) = 0;

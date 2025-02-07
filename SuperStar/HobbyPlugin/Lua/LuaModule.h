@@ -14,6 +14,7 @@ namespace Lua
     enum ELuaFuncArgType
     {
         ELuaFuncArgType_Float32 = 0,
+        ELuaFuncArgType_Uint64,
         ELuaFuncArgType_Str
     };
 
@@ -24,6 +25,7 @@ namespace Lua
         union
         {
             HE::Float32 fVal;
+            HE::Uint64 uuVal;
             HE::Char szText[128];
         } _data;
     };
@@ -57,6 +59,10 @@ namespace Lua
         };
 
     public:
+        using ListenLuaFuncEventUniqutPtr =
+            Core::Memory::UniquePtr<Core::Common::FunctionObject<void, LuaFuncData&>>;
+
+    public:
         LuaModule() : ModuleBase(ModuleName()) {}
 
         /// <summary>
@@ -83,14 +89,13 @@ namespace Lua
         template <typename... TArgs>
         HE::Bool CallScriptFunc(const Core::Common::Handle&, const HE::Char*, TArgs... args);
 
-        // TODO: c++側がキャッチできる関数を登録
+        // Luaスクリプトで呼び出せる関数を登録
         HE::Bool RegistScriptFunc(const Core::Common::Handle&, const HE::Char*);
 
         /// <summary>
-        /// 登録した関数をLuaスクリプトで実行を受け取る関数を設定
+        /// Luaスクリプトでした関数を受け取るリスナー追加
         /// </summary>
-        HE::Bool SetEventFunctionByLuaFunc(
-            Core::Memory::SharedPtr<Core::Common::FunctionObject<void, LuaFuncData&>>);
+        const Core::Common::Handle AddListenerLuaFunc(ListenLuaFuncEventUniqutPtr);
 
     protected:
         /// <summary>
@@ -128,8 +133,11 @@ namespace Lua
         // Uint32型をプッシュ
         void _LuaStackPushValue(void*, const HE::Uint32);
 
-        // HE::HE::Float32
+        // HE::Float32
         void _LuaStackPushValue(void*, const HE::Float32);
+
+        // HE::Uint64
+        void _LuaStackPushValue(void*, const HE::Uint64);
 
         // HE::Bool型をプッシュ
         void _LuaStackPushValue(void*, const HE::Bool);
@@ -148,10 +156,13 @@ namespace Lua
         Core::Common::FixedPoolManager<LuaObject, 128> _luaObjectPool;
         Core::Common::FixedMap<void*, Core::Common::Handle, 128> _mUseLuaObject;
 
+        Core::Common::FixedPoolManager<ListenLuaFuncEventUniqutPtr, 128> _poolListenLuaFuncEvent;
+        /*
         Core::Common::FixedMap<
-            std::uintptr_t,
+            Core::Common::Handle,
             Core::Memory::SharedPtr<Core::Common::FunctionObject<void, LuaFuncData&>>, 128>
             _mScriptFuncAction;
+            */
     };
 
     /// <summary>

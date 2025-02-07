@@ -20,8 +20,9 @@ namespace InGame
             HE_ASSERT((this->_transformHandle.Null() == FALSE) &&
                       "トランスフォームコンポーネントの追加失敗");
 
-            // 事前に設定していた座標をトランスフォームコンポーネントに設定
+            // 事前に設定していた座標/方向をトランスフォームコンポーネントに設定
             this->SetPos(this->_pos);
+            this->SetDir(this->_dir);
         }
 
         return TRUE;
@@ -38,6 +39,19 @@ namespace InGame
         HE_ASSERT(pTrans);
 
         pTrans->SetPos(Core::Math::Vector3(this->_pos));
+    }
+
+    void InGameScene2DActor::SetDir(const Core::Math::Vector2& in_rDir)
+    {
+        this->_dir = in_rDir;
+
+        if (this->_transformHandle.Null()) return;
+
+        // 事前に設定していた座標をトランスフォームコンポーネントに設定
+        auto pTrans = this->GetComponent<Actor::TransformComponent>(this->_transformHandle);
+        HE_ASSERT(pTrans);
+
+        pTrans->SetDir(Core::Math::Vector3(this->_dir));
     }
 
 }  // namespace InGame

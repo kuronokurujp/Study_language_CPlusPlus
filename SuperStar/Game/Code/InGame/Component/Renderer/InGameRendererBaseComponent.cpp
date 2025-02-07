@@ -1,5 +1,7 @@
 ﻿#include "InGameRendererBaseComponent.h"
 
+#include "Engine/Engine.h"
+
 // 利用するモジュール一覧
 #include "RenderModule.h"
 
@@ -37,6 +39,31 @@ namespace InGame
             this->Owner()->GetComponent<Actor::TransformComponent>(this->_transformHandle);
         HE_ASSERT(pTrans);
         this->_VRenderer(this->_viewHandle, pTrans);
+    }
+
+    HE::Bool InGameRendererBaseComponent::IsScreenIn()
+    {
+        auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
+        auto pViewport     = pRenderModule->GetViewPort(this->_viewHandle);
+
+        auto pTrans =
+            this->Owner()->GetComponent<Actor::TransformComponent>(this->_transformHandle);
+        HE_ASSERT(pTrans);
+
+        auto rSize = this->VGetSize();
+        auto pos   = pTrans->GetWorldPos();
+
+        // 描画の矩形を生成
+        Core::Math::Rect2 renderRect;
+        renderRect.SetPosition(pos._fX, pos._fY, rSize._fX, rSize._fY, Core::Math::EAnchor_Center);
+
+        // ビューポートの矩形を生成
+        Core::Math::Rect2 viewportRect;
+        viewportRect.SetPosition(0, 0, pViewport->Width(), pViewport->Height(),
+                                 Core::Math::EAnchor_Left);
+
+        // ビューポートの矩形が描画の矩形に納まっていれば画面内とする
+        return (viewportRect.InSideRect(renderRect));
     }
 
 }  // namespace InGame

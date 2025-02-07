@@ -6,21 +6,24 @@
             "move_speed": 1.0,
             "size_x": 32.0,
             "size_y": 32.0,
-            "point": 10
+            "point": 10,
+            "lua_file_name": "Zako_001"
         },
         "zako": {
             "hp": 1,
             "move_speed": 2.0,
             "size_x": 32.0,
             "size_y": 32.0,
-            "point": 15
+            "point": 15,
+            "lua_file_name": "Zako_001"
         },
         "zako_02": {
             "hp": 2,
             "move_speed": 1.0,
             "size_x": 32.0,
             "size_y": 32.0,
-            "point": 12
+            "point": 12,
+            "lua_file_name": "Zako_001"
         }
     }
 }

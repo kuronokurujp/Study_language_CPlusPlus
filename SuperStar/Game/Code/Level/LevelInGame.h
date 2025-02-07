@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+#include "Common.h"
+
+// エンジン
 #include "Engine/Common/CustomMap.h"
 #include "Engine/MiniEngine.h"
 
@@ -31,6 +34,6 @@ namespace Level
         Core::Common::Handle _systemComponentHandle;
         Core::Common::Handle _stageManagerComponentHandle;
 
-        Core::Common::FixedMap<Core::Common::FixedString128, Core::Common::Handle, 64> _mGameAsset;
+        Core::Memory::SharedPtr<Game::GameAssetMap> _spGameAsset;
     };
 }  // namespace Level
