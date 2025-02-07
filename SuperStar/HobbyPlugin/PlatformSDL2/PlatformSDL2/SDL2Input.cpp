@@ -129,7 +129,6 @@ namespace PlatformSDL2
         {
             for (HE::Uint32 i = 0; i < Platform::EKeyboard::EKeyboard_MAX; ++i)
             {
-                // this->_state._keyboard._aCurrState[i] = CheckHitKey(s_iaKeyMaps[i]);
             }
 
             ::memset(this->_state._keyboard._aPrevState, Platform::EInputState::EInputState_NONE,
@@ -138,46 +137,17 @@ namespace PlatformSDL2
 
         // タッチ入力初期化
         {
-            int x = 0;
-            int y = 0;
-            // GetMousePoint(&x, &y);
+            int x                        = 0;
+            int y                        = 0;
             this->_state._touch._pos._fX = static_cast<HE::Float32>(x);
             this->_state._touch._pos._fY = static_cast<HE::Float32>(y);
 
-            // this->_uCurrButton = GetMouseInput();
             this->_uPrevButton = Platform::EInputState::EInputState_NONE;
         }
     }
 
     void Input::VUpdate(const HE::Float32 in_fDeltaTime)
     {
-        SDL_Event eventData;
-        SDL_zero(eventData);
-
-        // SDLシステム内で発生したイベントはすべてキューに積まれている
-        // キューに積まれたイベントを取得して分岐処理している
-        while (::SDL_PollEvent(&eventData))
-        {
-            switch (eventData.type)
-            {
-                // アプリ全体の終了イベント
-                // ウィンドウが一つのみならウィンドウの×ボタンをクリックすると呼ばれる
-                // でもウィンドウが複数あるとよばれない
-                case SDL_QUIT:
-                {
-                    this->_bQuit = TRUE;
-                    break;
-                }
-                case SDL_WINDOWEVENT:
-                {
-                    // TODO: ウィンドウが複数時の処理が必要
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-
         // キーボード入力取得
         const ::Uint8* pKeyboardState = ::SDL_GetKeyboardState(nullptr);
 

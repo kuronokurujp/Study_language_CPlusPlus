@@ -142,11 +142,37 @@ namespace PlatformSDL2
     void PlatformSDL2Module::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
     {
         // 入力更新
-        this->_spInput->VUpdate(in_fDeltaTime);
-        if (this->_bQuit == FALSE)
+
+        SDL_Event eventData;
+        SDL_zero(eventData);
+
+        // SDLシステム内で発生したイベントはすべてキューに積まれている
+        // キューに積まれたイベントを取得して分岐処理している
+        while (::SDL_PollEvent(&eventData))
         {
-            this->_bQuit = this->_spInput->VIsQuit();
+            // TODO: 入力結果を他モジュールに通知
+
+            switch (eventData.type)
+            {
+                // アプリ全体の終了イベント
+                // ウィンドウが一つのみならウィンドウの×ボタンをクリックすると呼ばれる
+                // でもウィンドウが複数あるとよばれない
+                case SDL_QUIT:
+                {
+                    this->_bQuit = TRUE;
+                    break;
+                }
+                case SDL_WINDOWEVENT:
+                {
+                    // TODO: ウィンドウが複数時の処理が必要
+                    break;
+                }
+                default:
+                    break;
+            }
         }
+
+        if (this->_bQuit == FALSE) this->_spInput->VUpdate(in_fDeltaTime);
     }
 
 }  // namespace PlatformSDL2
