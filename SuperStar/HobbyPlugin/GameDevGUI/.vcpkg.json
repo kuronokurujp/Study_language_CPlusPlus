@@ -1,0 +1,16 @@
+{
+    "name": "game-dev-gui",
+    "version": "1.0.0",
+    "dependencies": [
+        {
+            "name": "imgui",
+            "features": ["opengl3-binding", "sdl2-binding"]
+        }
+    ],
+    "overrides": [
+        {
+            "name": "imgui",
+            "version": "1.91.8"
+        }
+    ]
+}

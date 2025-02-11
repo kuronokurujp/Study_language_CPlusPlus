@@ -45,7 +45,7 @@ namespace Level
         this->_spLevelManager->BeforeUpdate(in_fDt);
     }
 
-    void LevelModule::_Update(const HE::Float32 in_fDt)
+    void LevelModule::_VUpdate(const HE::Float32 in_fDt)
     {
         // インプット入力対象に入力結果を送信
         auto pEnhancedInputModule = this->GetDependenceModule<EnhancedInput::EnhancedInputModule>();

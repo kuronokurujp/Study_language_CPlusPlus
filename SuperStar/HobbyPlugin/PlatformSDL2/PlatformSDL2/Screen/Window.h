@@ -14,18 +14,23 @@ namespace PlatformSDL2
         using Context = std::tuple<void*, void*>;
 
     public:
-        SDL2WindowStrategy(const Platform::WindowConfig& in_rConfig, Context in_pContext);
+        SDL2WindowStrategy(const Core::Common::Handle in_handle, const Platform::WindowConfig& in_rConfig, Context in_pContext);
 
         void VBegin() override final;
         void VEnd() override final;
+        void VUpdate(const HE::Float32) override final;
 
         void VShow() override final;
 
         void VBeginRender() override final;
         void VEndRender() override final;
 
+#ifdef HE_USE_SDL2
+        virtual void* GetWindowBySDL2() const;
+        virtual void* GetContentBySDL2() const;
+#endif
+
     private:
-        // void* _pWindow = NULL;
         Context _context;
     };
 

@@ -123,6 +123,7 @@ namespace PlatformSDL2
     HE::Bool PlatformSDL2Module::_VRelease()
     {
         // TODO: 各機能の解放
+        this->_spInput->VRelease();
         this->_spFont->VRelease();
         this->_spScreen->VRelease();
 
@@ -141,38 +142,13 @@ namespace PlatformSDL2
 
     void PlatformSDL2Module::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
     {
-        // 入力更新
-
-        SDL_Event eventData;
-        SDL_zero(eventData);
-
-        // SDLシステム内で発生したイベントはすべてキューに積まれている
-        // キューに積まれたイベントを取得して分岐処理している
-        while (::SDL_PollEvent(&eventData))
+        if (this->_bQuit == FALSE)
         {
-            // TODO: 入力結果を他モジュールに通知
-
-            switch (eventData.type)
+            if (this->_spInput->VUpdate(in_fDeltaTime) == FALSE)
             {
-                // アプリ全体の終了イベント
-                // ウィンドウが一つのみならウィンドウの×ボタンをクリックすると呼ばれる
-                // でもウィンドウが複数あるとよばれない
-                case SDL_QUIT:
-                {
-                    this->_bQuit = TRUE;
-                    break;
-                }
-                case SDL_WINDOWEVENT:
-                {
-                    // TODO: ウィンドウが複数時の処理が必要
-                    break;
-                }
-                default:
-                    break;
+                this->_bQuit = TRUE;
             }
         }
-
-        if (this->_bQuit == FALSE) this->_spInput->VUpdate(in_fDeltaTime);
     }
 
 }  // namespace PlatformSDL2

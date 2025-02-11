@@ -157,7 +157,7 @@ namespace Module
         /// <summary>
         /// モジュール更新
         /// </summary>
-        virtual void _Update(const HE::Float32 in_fDeltaTime) {}
+        virtual void _VUpdate(const HE::Float32 in_fDeltaTime) {}
 
         /// <summary>
         /// モジュール後更新

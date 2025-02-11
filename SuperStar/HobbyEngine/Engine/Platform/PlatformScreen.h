@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <functional>
+
 #include "Engine/Common/Handle.h"
 #include "Engine/Math/Math.h"
 #include "Engine/MiniEngine.h"
@@ -27,21 +29,41 @@ namespace Platform
     class WindowStrategy
     {
     public:
-        WindowStrategy(const WindowConfig&);
+        using OnBeginRenderCallback  = std::function<void()>;
+        using OnEndRenderCallback    = std::function<void()>;
+        using OnUpdateRenderCallback = std::function<void(const HE::Float32)>;
 
-        virtual void VRelease() {}
+    public:
+        WindowStrategy(const Core::Common::Handle, const WindowConfig&);
+        virtual void VRelease();
 
-        virtual void VShow()  = 0;
-        virtual void VBegin() = 0;
-        virtual void VEnd()   = 0;
+        virtual void VShow()                    = 0;
+
+        virtual void VBegin()                   = 0;
+        virtual void VEnd()                     = 0;
+        virtual void VUpdate(const HE::Float32) = 0;
 
         virtual void VBeginRender() = 0;
         virtual void VEndRender()   = 0;
 
+        inline const Core::Common::Handle GetHandle() const { return this->_handle; }
         inline const WindowConfig& GetConfig() const { return this->_config; }
 
+        void AddBeginRenderCallback(OnBeginRenderCallback);
+        void AddEndRenderCallback(OnEndRenderCallback);
+        void AddUpdateRenderCallback(OnUpdateRenderCallback);
+
+#ifdef HE_USE_SDL2
+        virtual void* GetWindowBySDL2() const  = 0;
+        virtual void* GetContentBySDL2() const = 0;
+#endif
+
     protected:
+        Core::Common::Handle _handle;
         WindowConfig _config;
+        OnBeginRenderCallback _onBeginCallback  = NULL;
+        OnEndRenderCallback _onEndCallback      = NULL;
+        OnUpdateRenderCallback _onUpdteCallback = NULL;
     };
 
     /// <summary>
@@ -81,10 +103,10 @@ namespace Platform
     {
     public:
         virtual ~ScreenInterface() = default;
-        virtual void VRelease()    = 0;
+        virtual void VRelease()        = 0;
 
         virtual Core::Memory::UniquePtr<WindowStrategy> VCreateWindowStrategy(
-            const WindowConfig&) = 0;
+            const Core::Common::Handle, const WindowConfig&) = 0;
 
         virtual Core::Memory::UniquePtr<ViewPortStrategy> VCreateViewPortStrategy(
             const ViewPortConfig&) = 0;

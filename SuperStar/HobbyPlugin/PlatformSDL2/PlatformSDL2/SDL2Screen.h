@@ -24,7 +24,7 @@ namespace PlatformSDL2
         /// プラットフォーム固有のウィンドウ生成などをする
         /// </summary>
         Core::Memory::UniquePtr<Platform::WindowStrategy> VCreateWindowStrategy(
-            const Platform::WindowConfig&) override final;
+            const Core::Common::Handle, const Platform::WindowConfig&) override final;
 
         /// <summary>
         /// ビューポートロジックを生成

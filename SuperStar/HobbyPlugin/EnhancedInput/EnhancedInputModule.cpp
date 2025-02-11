@@ -60,7 +60,7 @@ namespace EnhancedInput
     {
     }
 
-    void EnhancedInputModule::_Update(const HE::Float32 in_fDeltaTime)
+    void EnhancedInputModule::_VUpdate(const HE::Float32 in_fDeltaTime)
     {
         this->_mInputAction.Clear();
 

@@ -6,9 +6,10 @@
 
 namespace PlatformSDL2
 {
-    SDL2WindowStrategy::SDL2WindowStrategy(const Platform::WindowConfig& in_rConfig,
+    SDL2WindowStrategy::SDL2WindowStrategy(const Core::Common::Handle in_handle,
+                                           const Platform::WindowConfig& in_rConfig,
                                            Context in_context)
-        : Platform::WindowStrategy(in_rConfig)
+        : Platform::WindowStrategy(in_handle, in_rConfig)
     {
         // TODO: 設定は仮
         this->_context = in_context;
@@ -92,6 +93,11 @@ namespace PlatformSDL2
         this->_context = Context(NULL, NULL);
     }
 
+    void SDL2WindowStrategy::VUpdate(const HE::Float32 in_fDt)
+    {
+        if (this->_onUpdteCallback) this->_onUpdteCallback(in_fDt);
+    }
+
     void SDL2WindowStrategy::VShow()
     {
         auto [pGLContext, pWindow] = this->_context;
@@ -102,6 +108,8 @@ namespace PlatformSDL2
 
     void SDL2WindowStrategy::VBeginRender()
     {
+        if (this->_onBeginCallback) this->_onBeginCallback();
+
         // カラーバッファをクリアする
         ::glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         ::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -117,7 +125,24 @@ namespace PlatformSDL2
     {
         auto [pGLContext, pWindow] = this->_context;
 
+        if (this->_onEndCallback) this->_onEndCallback();
+
         // ウィンドウの描画バッファを切り替える
         SDL_GL_SwapWindow(reinterpret_cast<SDL_Window*>(pWindow));
     }
+
+#ifdef HE_USE_SDL2
+    void* SDL2WindowStrategy::GetWindowBySDL2() const
+    {
+        auto [pGLContext, pWindow] = this->_context;
+        return pWindow;
+    }
+
+    void* SDL2WindowStrategy::GetContentBySDL2() const
+    {
+        auto [pGLContext, pWindow] = this->_context;
+        return pGLContext;
+    }
+#endif
+
 }  // namespace PlatformSDL2

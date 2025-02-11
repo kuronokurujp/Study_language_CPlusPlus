@@ -13,6 +13,11 @@ namespace Render
         Core::Memory::UniquePtr<Platform::SceneStrategyInterface> in_upSt)
     {
         this->_upSt = std::move(in_upSt);
+        if (this->_upSt->VBegin() == FALSE)
+        {
+            return FALSE;
+        }
+
         return TRUE;
     }
 
@@ -30,10 +35,12 @@ namespace Render
 
     void SceneViewBase::_End()
     {
+        this->_upSt->VEnd();
     }
 
-    void SceneViewBase::_Update(const HE::Float32)
+    void SceneViewBase::_Update(const HE::Float32 in_fDt)
     {
+        this->_upSt->VUpdate(in_fDt);
     }
 
     void SceneViewBase::_BeginRender()

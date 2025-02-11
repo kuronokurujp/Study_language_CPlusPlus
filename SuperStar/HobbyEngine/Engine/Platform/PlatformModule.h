@@ -29,6 +29,11 @@ namespace Platform
         PlatformModule() : ModuleBase(ModuleName(), Module::ELayer_App) {}
         virtual ~PlatformModule() = default;
 
+#ifdef HE_USE_SDL2
+        virtual HE::UTF8* GetOpenGLVersionNameBySDL2() = 0;
+#endif
+
+
         /// <summary>
         /// やめる状態になっているか
         /// </summary>
@@ -78,10 +83,5 @@ namespace Platform
         /// 前更新
         /// </summary>
         virtual void _VBeforeUpdate(const HE::Float32 in_fDeltaTime) override = 0;
-
-        /// <summary>
-        /// 更新
-        /// </summary>
-        virtual void _Update(const HE::Float32 in_fDeltaTime) override {}
     };
 }  // namespace Platform

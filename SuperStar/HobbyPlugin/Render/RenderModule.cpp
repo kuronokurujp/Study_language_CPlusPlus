@@ -2,9 +2,14 @@
 
 #include "Engine/Platform/PlatformModule.h"
 
+#ifdef HE_ENGINE_DEBUG
+
+#include "GameDevGUIModule.h"
+
+#endif
+
 namespace Render
 {
-
     void RenderingContext::Setup(const Core::Common::Handle& in_ulWindowHash,
                                  const Core::Common::Handle& in_ulViewPortHash,
                                  const Core::Common::Handle& in_ulSceneHash)
@@ -28,6 +33,9 @@ namespace Render
     {
         // 依存モジュール
         this->_AppendDependenceModule<Platform::PlatformModule>();
+#ifdef HE_ENGINE_DEBUG
+        this->_AppendDependenceModule<GameDevGUI::GameDevGUIModule>();
+#endif
     }
 
     const Core::Common::Handle RenderModule::NewWindow(const HE::Uint32 in_w, const HE::Uint32 in_h)
@@ -46,9 +54,28 @@ namespace Render
         }
 
         auto pPlatform  = this->GetDependenceModule<Platform::PlatformModule>();
-        auto upStrategy = pPlatform->VScreen()->VCreateWindowStrategy(platformWindowConfig);
+        auto upStrategy = pPlatform->VScreen()->VCreateWindowStrategy(handle, platformWindowConfig);
 
-        if (pWindow->Init(std::move(upStrategy)) == FALSE)
+        if (pWindow->Init(
+                std::move(upStrategy),
+                // ウィンドウ作成
+                [this](Platform::WindowStrategy* in_pSt)
+                {
+#ifdef HE_ENGINE_DEBUG
+                    auto pGameDevGUIModule =
+                        this->GetDependenceModule<GameDevGUI::GameDevGUIModule>();
+                    if (pGameDevGUIModule) pGameDevGUIModule->CreateFrame(in_pSt);
+#endif
+                },
+                // ウィンドウ破棄
+                [this](Platform::WindowStrategy* in_pSt)
+                {
+#ifdef HE_ENGINE_DEBUG
+                    auto pGameDevGUIModule =
+                        this->GetDependenceModule<GameDevGUI::GameDevGUIModule>();
+                    if (pGameDevGUIModule) pGameDevGUIModule->DestoryFrame(in_pSt);
+#endif
+                }) == FALSE)
         {
             this->_poolWindow.Free(handle);
             return NullHandle;
@@ -147,7 +174,7 @@ namespace Render
         auto pViewPort = pWindow->_poolViewPortManager.Ref(pRenderingContext->GetViewPortHandle());
         HE_ASSERT_RETURN_VALUE(NULL, pViewPort);
 
-        return pViewPort;  //->GetConfig();
+        return pViewPort;
     }
 
     std::tuple<Core::Common::Handle, SceneViewBase*> RenderModule::AddSceneViewUI(
@@ -376,7 +403,7 @@ namespace Render
         }
     }
 
-    void RenderModule::_Update(const HE::Float32 in_fDeltaTime)
+    void RenderModule::_VUpdate(const HE::Float32 in_fDeltaTime)
     {
         // ウィンドウを更新
         auto mWindow = this->_poolWindow.GetUseDataMap();

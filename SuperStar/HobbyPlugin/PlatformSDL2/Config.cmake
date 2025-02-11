@@ -1,6 +1,8 @@
 # プロジェクト全体で利用する基本となる文字コードをUTF8にする
 # SDL2はwchar_t型を使わないから
 set(CACHE_CHARACTER_CODE_UTF8_FLAG 1 CACHE STRING "" FORCE)
+# プラットフォーム名
+set(CACHE_PLATFORM_TYPE HE_USE_SDL2 CACHE STRING "" FORCE)
 
 set(PLATFORMSDL2_PLUGIN_NAME HobbyEnginePlugin_PlatformSDL2)
 # プロジェクトに登録するファイル群

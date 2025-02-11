@@ -123,7 +123,7 @@ namespace PlatformSDL2
         };
     }
 
-    void Input::VInit()
+    Input::Input()
     {
         // キー入力初期化
         {
@@ -146,8 +146,46 @@ namespace PlatformSDL2
         }
     }
 
-    void Input::VUpdate(const HE::Float32 in_fDeltaTime)
+    void Input::VRelease()
     {
+        this->_onInputCallback = NULL;
+    }
+
+    HE::Bool Input::VUpdate(const HE::Float32 in_fDeltaTime)
+    {
+        // 入力更新
+        HE::Bool bQuit = FALSE;
+
+        SDL_Event eventData;
+        SDL_zero(eventData);
+
+        // SDLシステム内で発生したイベントはすべてキューに積まれている
+        // キューに積まれたイベントを取得して分岐処理している
+        while (::SDL_PollEvent(&eventData))
+        {
+            switch (eventData.type)
+            {
+                // アプリ全体の終了イベント
+                // ウィンドウが一つのみならウィンドウの×ボタンをクリックすると呼ばれる
+                // でもウィンドウが複数あるとよばれない
+                case SDL_QUIT:
+                {
+                    bQuit = TRUE;
+                    break;
+                }
+                case SDL_WINDOWEVENT:
+                {
+                    // TODO: ウィンドウが複数時の処理が必要
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            // 入力結果を他モジュールに通知
+            if (this->_onInputCallback) this->_onInputCallback(reinterpret_cast<void*>(&eventData));
+        }
+
         // キーボード入力取得
         const ::Uint8* pKeyboardState = ::SDL_GetKeyboardState(nullptr);
 
@@ -194,5 +232,13 @@ namespace PlatformSDL2
             if (this->_uCurrButton & SDL_BUTTON_MMASK)
                 this->_state._touch._uCurrTouchState |= Platform::EInputMouseType_Middle;
         }
+
+        return (bQuit == FALSE);
     }
+
+    void Input::SetInputEventCallback(OnInputCallback in_callback)
+    {
+        this->_onInputCallback = std::move(in_callback);
+    }
+
 }  // namespace PlatformSDL2

@@ -10,3 +10,10 @@ option(RENDER_PLUGIN_BUILD_SHARED_LIBS "build shared library" OFF)
 
 # プラグイン共通ビルド処理.
 common_build_plugin(${RENDER_PLUGIN_NAME} "${RENDER_PLUGIN_TARGET_FILES}" "$CACHE{CACHE_ENGINE_INCLUDE_CODE}" ${RENDER_PLUGIN_BUILD_SHARED_LIBS})
+
+target_include_directories(${RENDER_PLUGIN_NAME} 
+    PRIVATE
+        # プラグインに依存しているプラグインコード
+        # ライブラリのリンクはプロジェクトのCMakeLists.txtでやっている
+        ${CMAKE_CURRENT_SOURCE_DIR}/../GameDevGUI/
+)

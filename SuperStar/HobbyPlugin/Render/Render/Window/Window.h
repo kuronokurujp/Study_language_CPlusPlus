@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <functional>
+
 #include "./ViewPort.h"
 #include "Engine/Common/PoolManager.h"
 #include "Engine/MiniEngine.h"
@@ -21,6 +23,10 @@ namespace Render
         friend class RenderModule;
 
     public:
+        using OnBeginCallback = std::function<void(Platform::WindowStrategy*)>;
+        using OnEndCallback   = std::function<void(Platform::WindowStrategy*)>;
+
+    public:
         Core::Common::Handle AddViewPort(Core::Memory::UniquePtr<Platform::ViewPortStrategy>);
         HE::Bool RemoveViewPort(Core::Common::Handle&);
 
@@ -30,7 +36,8 @@ namespace Render
         void Show();
 
     private:
-        HE::Bool Init(Core::Memory::UniquePtr<Platform::WindowStrategy>);
+        HE::Bool Init(Core::Memory::UniquePtr<Platform::WindowStrategy>, OnBeginCallback,
+                      OnEndCallback);
         void Release();
 
         void _Begin();
@@ -46,6 +53,8 @@ namespace Render
 
         HE::Bool _bShow  = FALSE;
         HE::Bool _bReady = FALSE;
+        OnBeginCallback _onBeginCallback;
+        OnEndCallback _onEndCallback;
     };
 
 }  // namespace Render

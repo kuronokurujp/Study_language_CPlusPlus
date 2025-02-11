@@ -137,18 +137,18 @@ namespace Module
     {
         for (HE::Uint32 i = 0; i < this->_vLogicModule.Size(); ++i)
         {
-            this->_vLogicModule[i]->_Update(in_fDeltaTime);
+            this->_vLogicModule[i]->_VUpdate(in_fDeltaTime);
         }
 
         for (HE::Uint32 i = 0; i < this->_vViewModule.Size(); ++i)
         {
-            this->_vViewModule[i]->_Update(in_fDeltaTime);
+            this->_vViewModule[i]->_VUpdate(in_fDeltaTime);
         }
 
         // ロジックとビューのモジュール更新結果を元にアプリモジュールは更新される
         for (HE::Uint32 i = 0; i < this->_vAppModule.Size(); ++i)
         {
-            this->_vAppModule[i]->_Update(in_fDeltaTime);
+            this->_vAppModule[i]->_VUpdate(in_fDeltaTime);
         }
     }
 

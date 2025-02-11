@@ -16,6 +16,10 @@ namespace PlatformSDL2
     public:
         PlatformSDL2Module();
 
+#ifdef HE_USE_SDL2
+        HE::UTF8* GetOpenGLVersionNameBySDL2() override final { return HE_STR_U8_TEXT("#version 330 core"); }
+#endif
+
         /// <summary>
         /// やめる状態になっているか
         /// </summary>

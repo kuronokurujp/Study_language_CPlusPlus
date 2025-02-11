@@ -134,7 +134,7 @@ namespace Render
         /// <summary>
         /// モジュール更新
         /// </summary>
-        void _Update(const HE::Float32) override final;
+        void _VUpdate(const HE::Float32) override final;
 
         /// <summary>
         /// モジュール後更新

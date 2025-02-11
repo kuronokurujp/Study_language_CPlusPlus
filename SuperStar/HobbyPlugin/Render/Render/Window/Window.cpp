@@ -175,8 +175,12 @@ namespace Render
         this->_bShow = TRUE;
     }
 
-    HE::Bool Window::Init(Core::Memory::UniquePtr<Platform::WindowStrategy> in_upConfig)
+    HE::Bool Window::Init(Core::Memory::UniquePtr<Platform::WindowStrategy> in_upConfig,
+                          OnBeginCallback in_beginCallback, OnEndCallback in_endCallback)
     {
+        this->_onBeginCallback = std::move(in_beginCallback);
+        this->_onEndCallback   = std::move(in_endCallback);
+
         this->_upStrategy = std::move(in_upConfig);
 
         auto rWindowConfig = this->_upStrategy->GetConfig();
@@ -190,16 +194,21 @@ namespace Render
 
     void Window::Release()
     {
-        this->_upStrategy->VRelease();
+        this->_onBeginCallback = NULL;
+        this->_onEndCallback   = NULL;
         this->_poolViewPortManager.ReleasePool([](ViewPort* in_pViewPort)
                                                { in_pViewPort->Release(); });
 
+        this->_upStrategy->VRelease();
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upStrategy);
     }
 
     void Window::_Begin()
     {
         this->_upStrategy->VBegin();
+        // TODO: ウィンドウを開いたのを通知
+        if (this->_onBeginCallback) this->_onBeginCallback(this->_upStrategy.get());
+
         if (this->_bShow)
         {
             this->_upStrategy->VShow();
@@ -209,6 +218,8 @@ namespace Render
 
     void Window::_End()
     {
+        if (this->_onEndCallback) this->_onEndCallback(this->_upStrategy.get());
+
         this->_upStrategy->VEnd();
 
         {
@@ -224,6 +235,8 @@ namespace Render
 
     void Window::_Update(const HE::Float32 in_fDt)
     {
+        this->_upStrategy->VUpdate(in_fDt);
+
         // ビューポート処理
         auto m = this->_poolViewPortManager.GetUserDataList();
         if (m)
