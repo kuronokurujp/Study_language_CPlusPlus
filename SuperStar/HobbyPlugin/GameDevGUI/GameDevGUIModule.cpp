@@ -11,60 +11,78 @@
 
 #endif
 
+#include "RenderModule.h"
+
 namespace GameDevGUI
 {
-    void GameDevGUIModule::CreateFrame(Platform::WindowStrategy* in_pSt)
+    GameDevGUIModule::GameDevGUIModule() : ModuleBase(ModuleName())
+    {
+        // 依存モジュール
+        this->_AppendDependenceModule<Render::RenderModule>();
+    }
+
+    void GameDevGUIModule::NewGUI(const Core::Common::Handle in_handle)
     {
         // TODO: ウィンドウとコンテキストを取得
 #ifdef HE_USE_SDL2
-        SDL_Window* pWindow = reinterpret_cast<SDL_Window*>(in_pSt->GetWindowBySDL2());
-        void* pContext      = in_pSt->GetContentBySDL2();
+        auto pRenderModule = this->GetDependenceModule<Render::RenderModule>();
+        auto pRenderWindow = pRenderModule->GetWindow(in_handle);
+
+        SDL_Window* pWindow = reinterpret_cast<SDL_Window*>(pRenderWindow->GetWindowBySDL2());
+        void* pContext      = pRenderWindow->GetContentBySDL2();
 
         IMGUI_CHECKVERSION();
 
-        auto pImgGuiContext = ::ImGui::CreateContext();
-        ImGuiIO& io         = ImGui::GetIO();
+        auto pImGuiContext = ::ImGui::CreateContext();
+        ImGuiIO& io        = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
         ImGui::StyleColorsDark();
 
         ::ImGui_ImplSDL2_InitForOpenGL(pWindow, pContext);
 
+        // TODO: OpenGL名取得はwindowクラスに持った方がいいかな?
         auto pPlatformModule = HE_ENGINE.PlatformModule();
         ::ImGui_ImplOpenGL3_Init(pPlatformModule->GetOpenGLVersionNameBySDL2());
 
         // ウィンドウの描画開始と終了のコールバック
-        in_pSt->AddBeginRenderCallback([this]() { ImGui::Render(); });
-        in_pSt->AddEndRenderCallback([this]()
-                                     { ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); });
-        in_pSt->AddUpdateRenderCallback(
-            [pImgGuiContext](const HE::Float32 in_fDt)
+        pRenderWindow->AddBeginRenderCallback(
+            [this, pImGuiContext]()
             {
                 // ImGuiのコンテキストを変更
-                ::ImGui::SetCurrentContext(pImgGuiContext);
+                ::ImGui::SetCurrentContext(pImGuiContext);
 
                 ::ImGui_ImplOpenGL3_NewFrame();
                 ::ImGui_ImplSDL2_NewFrame();
 
                 ::ImGui::NewFrame();
+
+                // TODO: GUI処理を記述する
+                //::ImGui::Button("test");
             });
-        this->_mImGui.Add(in_pSt->GetHandle(), pImgGuiContext);
+        pRenderWindow->AddEndRenderCallback(
+            [this]()
+            {
+                ImGui::Render();
+                ::ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            });
+        this->_mImGui.Add(in_handle, pImGuiContext);
 #endif
     }
 
-    void GameDevGUIModule::DestoryFrame(const Platform::WindowStrategy* in_pSt)
+    void GameDevGUIModule::DestoryGUI(const Core::Common::Handle in_handle)
     {
         // TODO: 作成したフレームを破棄
 #ifdef HE_USE_SDL2
         ::ImGuiContext* pImgGuiContext =
-            reinterpret_cast<::ImGuiContext*>(this->_mImGui.FindKey(in_pSt->GetHandle())->_data);
+            reinterpret_cast<::ImGuiContext*>(this->_mImGui.FindKey(in_handle)->_data);
         if (pImgGuiContext == NULL) return;
 
         ::ImGui_ImplOpenGL3_Shutdown();
         ::ImGui_ImplSDL2_Shutdown();
         ::ImGui::DestroyContext(pImgGuiContext);
 
-        this->_mImGui.Erase(in_pSt->GetHandle());
+        this->_mImGui.Erase(in_handle);
 #endif
     }
 

@@ -33,3 +33,10 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH})
 else()
     message(STATUS "Non VcpkgDir ${VCPKG_DIR_PATH}")
 endif()
+
+target_include_directories(${GAMEDEVGUI_PLUGIN_NAME} 
+    PRIVATE
+        # プラグインに依存しているプラグインコード
+        # ライブラリのリンクはプロジェクトのCMakeLists.txtでやっている
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Render/
+)

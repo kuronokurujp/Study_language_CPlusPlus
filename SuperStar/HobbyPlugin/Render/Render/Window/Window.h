@@ -23,8 +23,8 @@ namespace Render
         friend class RenderModule;
 
     public:
-        using OnBeginCallback = std::function<void(Platform::WindowStrategy*)>;
-        using OnEndCallback   = std::function<void(Platform::WindowStrategy*)>;
+        using OnRenderBeginCallback = std::function<void()>;
+        using OnRenderEndCallback   = std::function<void()>;
 
     public:
         Core::Common::Handle AddViewPort(Core::Memory::UniquePtr<Platform::ViewPortStrategy>);
@@ -35,9 +35,19 @@ namespace Render
         /// </summary>
         void Show();
 
+        // レンダリング関連のイベント
+        // TODO: 追加という名前になっているが, 現在は一つしか追加できない
+        // 後々追加に変更対応
+        void AddBeginRenderCallback(OnRenderBeginCallback);
+        void AddEndRenderCallback(OnRenderEndCallback);
+
+#ifdef HE_USE_SDL2
+        void* GetWindowBySDL2() const;
+        void* GetContentBySDL2() const;
+#endif
+
     private:
-        HE::Bool Init(Core::Memory::UniquePtr<Platform::WindowStrategy>, OnBeginCallback,
-                      OnEndCallback);
+        HE::Bool Init(Core::Memory::UniquePtr<Platform::WindowStrategy>);
         void Release();
 
         void _Begin();
@@ -53,8 +63,9 @@ namespace Render
 
         HE::Bool _bShow  = FALSE;
         HE::Bool _bReady = FALSE;
-        OnBeginCallback _onBeginCallback;
-        OnEndCallback _onEndCallback;
+
+        OnRenderBeginCallback _onRenderBegin = NULL;
+        OnRenderEndCallback _onRenderEnd     = NULL;
     };
 
 }  // namespace Render

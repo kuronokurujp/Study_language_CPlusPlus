@@ -2,12 +2,6 @@
 
 #include "Engine/Platform/PlatformModule.h"
 
-#ifdef HE_ENGINE_DEBUG
-
-#include "GameDevGUIModule.h"
-
-#endif
-
 namespace Render
 {
     void RenderingContext::Setup(const Core::Common::Handle& in_ulWindowHash,
@@ -33,9 +27,6 @@ namespace Render
     {
         // 依存モジュール
         this->_AppendDependenceModule<Platform::PlatformModule>();
-#ifdef HE_ENGINE_DEBUG
-        this->_AppendDependenceModule<GameDevGUI::GameDevGUIModule>();
-#endif
     }
 
     const Core::Common::Handle RenderModule::NewWindow(const HE::Uint32 in_w, const HE::Uint32 in_h)
@@ -56,26 +47,7 @@ namespace Render
         auto pPlatform  = this->GetDependenceModule<Platform::PlatformModule>();
         auto upStrategy = pPlatform->VScreen()->VCreateWindowStrategy(handle, platformWindowConfig);
 
-        if (pWindow->Init(
-                std::move(upStrategy),
-                // ウィンドウ作成
-                [this](Platform::WindowStrategy* in_pSt)
-                {
-#ifdef HE_ENGINE_DEBUG
-                    auto pGameDevGUIModule =
-                        this->GetDependenceModule<GameDevGUI::GameDevGUIModule>();
-                    if (pGameDevGUIModule) pGameDevGUIModule->CreateFrame(in_pSt);
-#endif
-                },
-                // ウィンドウ破棄
-                [this](Platform::WindowStrategy* in_pSt)
-                {
-#ifdef HE_ENGINE_DEBUG
-                    auto pGameDevGUIModule =
-                        this->GetDependenceModule<GameDevGUI::GameDevGUIModule>();
-                    if (pGameDevGUIModule) pGameDevGUIModule->DestoryFrame(in_pSt);
-#endif
-                }) == FALSE)
+        if (pWindow->Init(std::move(upStrategy)) == FALSE)
         {
             this->_poolWindow.Free(handle);
             return NullHandle;
@@ -96,6 +68,9 @@ namespace Render
         auto pWindow = this->_poolWindow.Ref(in_rHandle);
         HE_ASSERT(pWindow &&
                   "ウィンドウがないということは別の箇所でRemoveされているので意図していない");
+
+        if (this->_onEndWindow) this->_onEndWindow(in_rHandle);
+
         pWindow->_End();
         pWindow->Release();
 
@@ -113,16 +88,24 @@ namespace Render
         }
     }
 
-    void RenderModule::ShowWindow(const Core::Common::Handle& in_rHandle)
+    void RenderModule::ShowWindow(const Core::Common::Handle in_rHandle)
     {
-        auto pWindow = this->_GetWindow(in_rHandle);
+        auto pWindow = this->GetWindow(in_rHandle);
         pWindow->Show();
     }
 
-    const Core::Common::Handle RenderModule::AddViewPort(
-        const Core::Common::Handle& in_rWindowHandle, const HE::Uint32 in_w, const HE::Uint32 in_h)
+    Window* RenderModule::GetWindow(const Core::Common::Handle in_rHandle)
     {
-        auto pWindow = this->_GetWindow(in_rWindowHandle);
+        auto pWindow = this->_poolWindow.Ref(in_rHandle);
+        HE_ASSERT_RETURN_VALUE(NULL, pWindow);
+
+        return pWindow;
+    }
+
+    const Core::Common::Handle RenderModule::AddViewPort(
+        const Core::Common::Handle in_rWindowHandle, const HE::Uint32 in_w, const HE::Uint32 in_h)
+    {
+        auto pWindow = this->GetWindow(in_rWindowHandle);
 
         // ビューポートの縦横サイズを調整
         // ウィンドウサイズを超えないようにする
@@ -157,18 +140,18 @@ namespace Render
         return pWindow->AddViewPort(std::move(upStrategy));
     }
 
-    HE::Bool RenderModule::RemoveViewPort(const Core::Common::Handle& in_rWindowHandle,
+    HE::Bool RenderModule::RemoveViewPort(const Core::Common::Handle in_rWindowHandle,
                                           Core::Common::Handle& in_rViewPortHandle)
     {
-        auto pWindow = this->_GetWindow(in_rWindowHandle);
+        auto pWindow = this->GetWindow(in_rWindowHandle);
         return pWindow->RemoveViewPort(in_rViewPortHandle);
     }
 
-    const ViewPort* RenderModule::GetViewPort(const Core::Common::Handle& in_rHandle)
+    const ViewPort* RenderModule::GetViewPort(const Core::Common::Handle in_rHandle)
     {
         auto pRenderingContext = this->_poolRenderingContext.Ref(in_rHandle);
 
-        auto pWindow = this->_GetWindow(pRenderingContext->GetWindowHandle());
+        auto pWindow = this->GetWindow(pRenderingContext->GetWindowHandle());
         HE_ASSERT_RETURN_VALUE(NULL, pWindow);
 
         auto pViewPort = pWindow->_poolViewPortManager.Ref(pRenderingContext->GetViewPortHandle());
@@ -178,9 +161,9 @@ namespace Render
     }
 
     std::tuple<Core::Common::Handle, SceneViewBase*> RenderModule::AddSceneViewUI(
-        const Core::Common::Handle& in_rWindowsHandle, const Core::Common::Handle& in_rViewPortHash)
+        const Core::Common::Handle in_rWindowsHandle, const Core::Common::Handle in_rViewPortHash)
     {
-        auto pWindow   = this->_GetWindow(in_rWindowsHandle);
+        auto pWindow   = this->GetWindow(in_rWindowsHandle);
         auto pViewPort = pWindow->_poolViewPortManager.Ref(in_rViewPortHash);
 
         // TODO: プラットフォームからシーンを取得して渡す
@@ -200,9 +183,9 @@ namespace Render
     }
 
     std::tuple<Core::Common::Handle, SceneViewBase*> RenderModule::AddSceneView2D(
-        const Core::Common::Handle& in_rWindowsHandle, const Core::Common::Handle& in_rViewPortHash)
+        const Core::Common::Handle in_rWindowsHandle, const Core::Common::Handle in_rViewPortHash)
     {
-        auto pWindow   = this->_GetWindow(in_rWindowsHandle);
+        auto pWindow   = this->GetWindow(in_rWindowsHandle);
         auto pViewPort = pWindow->_poolViewPortManager.Ref(in_rViewPortHash);
 
         auto pPlatform  = this->GetDependenceModule<Platform::PlatformModule>();
@@ -305,19 +288,11 @@ namespace Render
         return *(pScene->_runtimePoolPrticleBlob.Ref(in_prticleHandle));
     }
 
-    Window* RenderModule::_GetWindow(const Core::Common::Handle& in_rHandle)
-    {
-        auto pWindow = this->_poolWindow.Ref(in_rHandle);
-        HE_ASSERT_RETURN_VALUE(NULL, pWindow);
-
-        return pWindow;
-    }
-
     SceneViewBase* RenderModule::_GetSceneBase(const Core::Common::Handle in_renderHandle)
     {
         auto pRenderingContext = this->_poolRenderingContext.Ref(in_renderHandle);
 
-        auto pWindow = this->_GetWindow(pRenderingContext->GetWindowHandle());
+        auto pWindow = this->GetWindow(pRenderingContext->GetWindowHandle());
         HE_ASSERT_RETURN_VALUE(NULL, pWindow);
 
         auto pViewPort = pWindow->_poolViewPortManager.Ref(pRenderingContext->GetViewPortHandle());
@@ -348,7 +323,7 @@ namespace Render
     {
         auto pRenderingContext = this->_poolRenderingContext.Ref(in_renderHandle);
 
-        auto pWindow = this->_GetWindow(pRenderingContext->GetWindowHandle());
+        auto pWindow = this->GetWindow(pRenderingContext->GetWindowHandle());
         HE_ASSERT(pWindow);
 
         auto pViewPort = pWindow->_poolViewPortManager.Ref(pRenderingContext->GetViewPortHandle());
@@ -358,6 +333,16 @@ namespace Render
         HE_ASSERT(pScene);
 
         return pScene->_PushCommand(std::move(in_rrCommand));
+    }
+
+    void RenderModule::AddEventBeginWindow(OnCallbackBeginWindow on)
+    {
+        this->_onBeginWindow = on;
+    }
+
+    void RenderModule::AddEventEndWindow(OnCallbackEndWindow on)
+    {
+        this->_onEndWindow = on;
     }
 
     /// <summary>
@@ -373,6 +358,9 @@ namespace Render
     /// </summary>
     HE::Bool RenderModule::_VRelease()
     {
+        this->_onBeginWindow = NULL;
+        this->_onEndWindow   = NULL;
+
         // パーティクルを全削除
         auto itr = this->_mParticleHandle.begin();
         while (itr != this->_mParticleHandle.end())
@@ -399,6 +387,7 @@ namespace Render
             if (pWindow)
             {
                 pWindow->_Begin();
+                if (this->_onBeginWindow) this->_onBeginWindow(handle);
             }
         }
     }

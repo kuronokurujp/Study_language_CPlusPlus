@@ -41,60 +41,6 @@ namespace Render
                     break;
                 }
 
-#if 0
-                // 点群描画
-                case Render::ECmdType_2DPointArrayDraw:
-                {
-                    // データ置換
-                    const Render::Cmd2DPointArrayDraw* pCmdPoint2DCloud =
-                        &in_pCommand->_data._2DDrawPointCloud;
-                    HE_ASSERT(0 < pCmdPoint2DCloud->_uCount && "点群の点が一つもないのはだめ");
-
-                    if (0 < pCmdPoint2DCloud->_uCount)
-                    {
-                        /*
-                            const HE::Uint32 num =
-                                HE_MIN(pCmdPoint2DCloud->uCount, s_u2DPointCount);
-                                */
-                        /*
-                        std::transform(pCmdPoint2DCloud->aPoint,
-                        pCmdPoint2DCloud->aPoint + num, s_a2DPoint,
-                                       [](const Render::Point2D& src)
-                                       {
-                                           const auto& rColor = src.color;
-                                           const auto uColor =
-                                               ::GetColor(rColor.c32.r, rColor.c32.g,
-                                                          rColor.c32.b);
-                                           return ::POINTDATA{static_cast<int>(src.fX),
-                                                              static_cast<int>(src.fY),
-                        uColor, 0};
-
-                                       });
-
-                        // 点の集合を描画する
-                        ::DrawPixelSet(s_a2DPoint, num);
-                                       */
-                    }
-                    break;
-                }
-
-                // 点描画
-                case Render::ECmdType_2DPointDraw:
-                {
-                    const Render::Cmd2DPointDraw* pCmdPoint2D = &in_pCommand->_data._2DDrawPoint;
-
-                    const Render::Point3D* pPoint2D = &pCmdPoint2D->_point;
-                    const auto& rColor              = pPoint2D->_color;
-                    /*
-                    const auto uColor = ::GetColor(rColor.c32.r, rColor.c32.g,
-                    rColor.c32.b);
-                    ::DrawPixel(static_cast<int>(pPoint2D->fX),
-                    static_cast<int>(pPoint2D->fY), uColor);
-                                */
-
-                    break;
-                }
-#endif
                 // 2次元の円描画
                 case Render::ECmdType_2DCircleDraw:
                 {
@@ -131,7 +77,7 @@ namespace Render
                     break;
                 }
 
-                // TODO: パーティクル描画
+                // 2Dパーティクル描画
                 case Render::ECmdType_2DParticalDraw:
                 {
                     const auto pCmd = &in_pCommand->_data._Particle;
@@ -175,12 +121,30 @@ namespace Render
         this->_bShow = TRUE;
     }
 
-    HE::Bool Window::Init(Core::Memory::UniquePtr<Platform::WindowStrategy> in_upConfig,
-                          OnBeginCallback in_beginCallback, OnEndCallback in_endCallback)
+    void Window::AddBeginRenderCallback(OnRenderBeginCallback in_callback)
     {
-        this->_onBeginCallback = std::move(in_beginCallback);
-        this->_onEndCallback   = std::move(in_endCallback);
+        this->_onRenderBegin = std::move(in_callback);
+    }
 
+    void Window::AddEndRenderCallback(OnRenderEndCallback in_callback)
+    {
+        this->_onRenderEnd = std::move(in_callback);
+    }
+
+#ifdef HE_USE_SDL2
+    void* Window::GetWindowBySDL2() const
+    {
+        return this->_upStrategy->VGetWindowBySDL2();
+    }
+
+    void* Window::GetContentBySDL2() const
+    {
+        return this->_upStrategy->VGetContentBySDL2();
+    }
+#endif
+
+    HE::Bool Window::Init(Core::Memory::UniquePtr<Platform::WindowStrategy> in_upConfig)
+    {
         this->_upStrategy = std::move(in_upConfig);
 
         auto rWindowConfig = this->_upStrategy->GetConfig();
@@ -194,8 +158,9 @@ namespace Render
 
     void Window::Release()
     {
-        this->_onBeginCallback = NULL;
-        this->_onEndCallback   = NULL;
+        this->_onRenderBegin = NULL;
+        this->_onRenderEnd   = NULL;
+
         this->_poolViewPortManager.ReleasePool([](ViewPort* in_pViewPort)
                                                { in_pViewPort->Release(); });
 
@@ -206,8 +171,6 @@ namespace Render
     void Window::_Begin()
     {
         this->_upStrategy->VBegin();
-        // TODO: ウィンドウを開いたのを通知
-        if (this->_onBeginCallback) this->_onBeginCallback(this->_upStrategy.get());
 
         if (this->_bShow)
         {
@@ -218,8 +181,6 @@ namespace Render
 
     void Window::_End()
     {
-        if (this->_onEndCallback) this->_onEndCallback(this->_upStrategy.get());
-
         this->_upStrategy->VEnd();
 
         {
@@ -235,8 +196,6 @@ namespace Render
 
     void Window::_Update(const HE::Float32 in_fDt)
     {
-        this->_upStrategy->VUpdate(in_fDt);
-
         // ビューポート処理
         auto m = this->_poolViewPortManager.GetUserDataList();
         if (m)
@@ -266,6 +225,7 @@ namespace Render
         auto pPlatformScreen = pPlatformModule->VScreen();
 
         this->_upStrategy->VBeginRender();
+        if (this->_onRenderBegin) this->_onRenderBegin();
 
         // ビューポート処理
         auto m = this->_poolViewPortManager.GetUserDataList();
@@ -306,6 +266,8 @@ namespace Render
                 pViewPort->_EndRender();
             }
         }
+
+        if (this->_onRenderEnd) this->_onRenderEnd();
         this->_upStrategy->VEndRender();
     }
 

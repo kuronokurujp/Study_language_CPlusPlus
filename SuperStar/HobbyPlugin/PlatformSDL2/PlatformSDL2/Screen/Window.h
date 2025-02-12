@@ -18,7 +18,6 @@ namespace PlatformSDL2
 
         void VBegin() override final;
         void VEnd() override final;
-        void VUpdate(const HE::Float32) override final;
 
         void VShow() override final;
 
@@ -26,8 +25,8 @@ namespace PlatformSDL2
         void VEndRender() override final;
 
 #ifdef HE_USE_SDL2
-        virtual void* GetWindowBySDL2() const;
-        virtual void* GetContentBySDL2() const;
+        virtual void* VGetWindowBySDL2() const;
+        virtual void* VGetContentBySDL2() const;
 #endif
 
     private:

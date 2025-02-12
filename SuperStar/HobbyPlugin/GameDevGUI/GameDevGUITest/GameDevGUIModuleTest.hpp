@@ -22,7 +22,24 @@ TEST_CASE("GameDevGUI Test Open / Close")
 
             if (uStep == 0)
             {
+                auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
+                pRenderModule->AddEventBeginWindow(
+                    [](const Core::Common::Handle in_handle)
+                    {
+                        auto pGameDevGUIModule =
+                            HE_ENGINE.ModuleManager().Get<GameDevGUI::GameDevGUIModule>();
+                        pGameDevGUIModule->NewGUI(in_handle);
+                    });
+                pRenderModule->AddEventEndWindow(
+                    [](const Core::Common::Handle in_handle)
+                    {
+                        auto pGameDevGUIModule =
+                            HE_ENGINE.ModuleManager().Get<GameDevGUI::GameDevGUIModule>();
+                        pGameDevGUIModule->DestoryGUI(in_handle);
+                    });
+
                 ++uStep;
+
                 return FALSE;
             }
             else if (uStep == 1)

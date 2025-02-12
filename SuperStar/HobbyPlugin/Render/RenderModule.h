@@ -48,6 +48,9 @@ namespace Render
         using WindowHandleKeyMap = Core::Common::FixedMap<HE::Uint64, Core::Common::Handle, 32>;
         using ParticleBlobObject = std::tuple<Core::Common::Handle, Render::Prticle::Blob*>;
 
+        using OnCallbackBeginWindow = std::function<void(Core::Common::Handle)>;
+        using OnCallbackEndWindow   = std::function<void(Core::Common::Handle)>;
+
     public:
         RenderModule();
 
@@ -65,35 +68,40 @@ namespace Render
         /// <summary>
         /// ウィンドウ表示
         /// </summary>
-        void ShowWindow(const Core::Common::Handle&);
+        void ShowWindow(const Core::Common::Handle);
+
+        /// <summary>
+        /// ウィンドウ取得
+        /// </summary>
+        Window* GetWindow(const Core::Common::Handle);
 
         /// <summary>
         /// ビューポート追加
         /// </summary>
-        const Core::Common::Handle AddViewPort(const Core::Common::Handle&, const HE::Uint32 in_w,
+        const Core::Common::Handle AddViewPort(const Core::Common::Handle, const HE::Uint32 in_w,
                                                const HE::Uint32 in_h);
 
         /// <summary>
         /// ビューポート外す
         /// </summary>
-        HE::Bool RemoveViewPort(const Core::Common::Handle& in_rWindowHandle,
+        HE::Bool RemoveViewPort(const Core::Common::Handle in_rWindowHandle,
                                 Core::Common::Handle& in_rViewPortHandle);
 
-        const ViewPort* GetViewPort(const Core::Common::Handle&);
+        const ViewPort* GetViewPort(const Core::Common::Handle);
 
         /// <summary>
         /// UI用シーン追加
         /// </summary>
         std::tuple<Core::Common::Handle, SceneViewBase*> AddSceneViewUI(
-            const Core::Common::Handle& in_rWindowsHandle,
-            const Core::Common::Handle& in_rViewPortHash);
+            const Core::Common::Handle in_rWindowsHandle,
+            const Core::Common::Handle in_rViewPortHash);
 
         /// <summary>
         /// 2D用シーン追加
         /// </summary>
         std::tuple<Core::Common::Handle, SceneViewBase*> AddSceneView2D(
-            const Core::Common::Handle& in_rWindowsHandle,
-            const Core::Common::Handle& in_rViewPortHash);
+            const Core::Common::Handle in_rWindowsHandle,
+            const Core::Common::Handle in_rViewPortHash);
 
         /// <summary>
         /// TODO: パーティクルの塊オブジェクト生成
@@ -114,6 +122,12 @@ namespace Render
         /// レンダリングするコマンド追加
         /// </summary>
         HE::Bool PushRenderCommand(const Core::Common::Handle, Command&&);
+
+        // ウィンドウイベント関連
+        // TODO: 追加という名前になっているが, 現在は一つしか追加できない
+        // 後々追加に変更対応
+        void AddEventBeginWindow(OnCallbackBeginWindow);
+        void AddEventEndWindow(OnCallbackEndWindow);
 
     protected:
         /// <summary>
@@ -142,7 +156,6 @@ namespace Render
         void _VLateUpdate(const HE::Float32) override final;
 
     private:
-        Window* _GetWindow(const Core::Common::Handle&);
         SceneViewBase* _GetSceneBase(const Core::Common::Handle);
 
         Core::Common::Handle _AddScene(const Core::Common::Handle& in_rWindowHandle,
@@ -156,6 +169,9 @@ namespace Render
         Core::Common::FixedStack<Core::Common::Handle, 32> _sStandupWindow;
         // TODO: 自前のを作ったら差し替える
         std::unordered_map<Core::Common::Handle, Render::Prticle::Blob*> _mParticleHandle;
+
+        OnCallbackBeginWindow _onBeginWindow = NULL;
+        OnCallbackEndWindow _onEndWindow     = NULL;
     };
 
 }  // namespace Render

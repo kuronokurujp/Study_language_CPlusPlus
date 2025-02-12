@@ -3,7 +3,6 @@
 #include "Engine/Common/CustomMap.h"
 #include "Engine/MiniEngine.h"
 #include "Engine/Module/Module.h"
-#include "Engine/Platform/PlatformModule.h"
 
 // モジュールのヘッダーファイルは全てインクルードする
 namespace GameDevGUI
@@ -16,17 +15,17 @@ namespace GameDevGUI
         HE_MODULE_GENRATE_DECLARATION(GameDevGUIModule);
 
     public:
-        GameDevGUIModule() : ModuleBase(ModuleName()) {}
+        GameDevGUIModule();
 
         /// <summary>
-        /// TODO: フレームを新規作成
+        /// GUIを新規作成
         /// </summary>
-        void CreateFrame(Platform::WindowStrategy*);
+        void NewGUI(const Core::Common::Handle);
 
         /// <summary>
-        /// TODO: フレームを破棄
+        /// GUIを破棄
         /// </summary>
-        void DestoryFrame(const Platform::WindowStrategy*);
+        void DestoryGUI(const Core::Common::Handle);
 
     protected:
         /// <summary>
