@@ -6,8 +6,9 @@ REM cpp/h/hppファイルのコード整理を一括で行うバッチファイ�
 setlocal
 
 REM エンジンにあるコード整理を行うスクリプトを起動
-call .\HobbyEngine\Script\CodeCleanup\CodeCleanup.bat .\
-pause & exit /b %errorlevel%
+call .\HobbyEngine\Script\CodeCleanup\CodeCleanup.bat .\HobbyEngine
+call .\HobbyEngine\Script\CodeCleanup\CodeCleanup.bat .\HobbyPlugin
+call .\HobbyEngine\Script\CodeCleanup\CodeCleanup.bat .\Game
 
 endlocal
 

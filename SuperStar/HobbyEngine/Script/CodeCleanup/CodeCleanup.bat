@@ -18,8 +18,8 @@ echo The environment variable "%CLANG_TIDY_PATH%" exists.
 echo Its value is: %CLANG_FORMAT_PATH%
 echo Its value is: %CLANG_TIDY_PATH%
 
-REM プロジェクトのルートディレクトリを設定
-set "PROJECT_ROOT=%~dp1"
+REM 引数のディレクトリ内をチェック
+set "PROJECT_ROOT=%1"
 echo Project Root Path "%PROJECT_ROOT%"
 
 REM プロジェクトのルートディレクトリがあるか
