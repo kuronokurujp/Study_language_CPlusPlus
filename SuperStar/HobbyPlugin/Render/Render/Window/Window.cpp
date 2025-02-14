@@ -91,6 +91,14 @@ namespace Render
         }
     }  // namespace Local
 
+    void Window::SetPos(const HE::Uint32 in_uX, const HE::Uint32 in_uY)
+    {
+        this->_uX = in_uX;
+        this->_uY = in_uY;
+
+        if (this->_bReady) this->_upStrategy->VSetPos(this->_uX, this->_uY);
+    }
+
     Core::Common::Handle Window::AddViewPort(
         Core::Memory::UniquePtr<Platform::ViewPortStrategy> in_upStg)
     {
@@ -121,14 +129,20 @@ namespace Render
         this->_bShow = TRUE;
     }
 
-    void Window::AddBeginRenderCallback(OnRenderBeginCallback in_callback)
+    void Window::SetBeginRenderCallback(OnRenderBeginCallback in_callback)
     {
-        this->_onRenderBegin = std::move(in_callback);
+        if (in_callback)
+            this->_onRenderBegin = std::move(in_callback);
+        else
+            this->_onRenderBegin = NULL;
     }
 
-    void Window::AddEndRenderCallback(OnRenderEndCallback in_callback)
+    void Window::SetEndRenderCallback(OnRenderEndCallback in_callback)
     {
-        this->_onRenderEnd = std::move(in_callback);
+        if (in_callback)
+            this->_onRenderEnd = std::move(in_callback);
+        else
+            this->_onRenderEnd = NULL;
     }
 
 #ifdef HE_USE_SDL2
@@ -143,15 +157,19 @@ namespace Render
     }
 #endif
 
-    HE::Bool Window::Init(Core::Memory::UniquePtr<Platform::WindowStrategy> in_upConfig)
+    HE::Bool Window::Init(Core::Memory::UniquePtr<Platform::WindowStrategy> in_upConfig,
+                          OnBeginCallback in_beginCallback, OnEndCallback in_endCallback)
     {
         this->_upStrategy = std::move(in_upConfig);
 
         auto rWindowConfig = this->_upStrategy->GetConfig();
-        HE_ASSERT(0 < rWindowConfig.uViewPortCount);
+        HE_ASSERT(0 < rWindowConfig._uViewPortCount);
 
         this->_poolViewPortManager.ReleasePool();
-        this->_poolViewPortManager.ReservePool(rWindowConfig.uViewPortCount);
+        this->_poolViewPortManager.ReservePool(rWindowConfig._uViewPortCount);
+
+        if (in_beginCallback) this->_onBegin = std::move(in_beginCallback);
+        if (in_endCallback) this->_onEnd = std::move(in_endCallback);
 
         return TRUE;
     }
@@ -160,6 +178,8 @@ namespace Render
     {
         this->_onRenderBegin = NULL;
         this->_onRenderEnd   = NULL;
+        this->_onBegin       = NULL;
+        this->_onEnd         = NULL;
 
         this->_poolViewPortManager.ReleasePool([](ViewPort* in_pViewPort)
                                                { in_pViewPort->Release(); });
@@ -171,6 +191,13 @@ namespace Render
     void Window::_Begin()
     {
         this->_upStrategy->VBegin();
+        if (this->_onBegin) this->_onBegin(this->_upStrategy->GetHandle());
+
+        this->_upStrategy->VActive();
+
+        // ウィンドウ座標値があれば設定する
+        if (this->_uX != HE::uInvalidUint32 && this->_uY != HE::uInvalidUint32)
+            this->_upStrategy->VSetPos(this->_uX, this->_uY);
 
         if (this->_bShow)
         {
@@ -181,6 +208,10 @@ namespace Render
 
     void Window::_End()
     {
+        this->_upStrategy->VActive();
+
+        if (this->_onEnd) this->_onEnd(this->_upStrategy->GetHandle());
+
         this->_upStrategy->VEnd();
 
         {
@@ -196,6 +227,8 @@ namespace Render
 
     void Window::_Update(const HE::Float32 in_fDt)
     {
+        this->_upStrategy->VActive();
+
         // ビューポート処理
         auto m = this->_poolViewPortManager.GetUserDataList();
         if (m)
@@ -219,6 +252,8 @@ namespace Render
 
     void Window::_Render()
     {
+        this->_upStrategy->VActive();
+
         auto pPlatformModule = HE_ENGINE.PlatformModule();
         HE_ASSERT(pPlatformModule);
 

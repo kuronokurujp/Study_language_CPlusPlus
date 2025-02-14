@@ -9,6 +9,7 @@ namespace GameDevGUI
 {
     /// <summary>
     /// GameDevGUIアクター用の追加モジュール
+    /// ImGUIは単一ウィンドウのみでしか対応できないので複数ウィンドウにUIを出す事は出来ない
     /// </summary>
     class GameDevGUIModule final : public Module::ModuleBase
     {
@@ -25,7 +26,9 @@ namespace GameDevGUI
         /// <summary>
         /// GUIを破棄
         /// </summary>
-        void DestoryGUI(const Core::Common::Handle);
+        void DestoryGUI();
+
+        // TODO: レイヤーの生成
 
     protected:
         /// <summary>
@@ -43,8 +46,7 @@ namespace GameDevGUI
         void _VUpdate(const HE::Float32 in_fDeltaTime) override final;
 
     private:
-#ifdef HE_USE_SDL2
-        Core::Common::FixedMap<Core::Common::Handle, void*, 32> _mImGui;
-#endif
+        void* _pImGuiContext = NULL;
+        Core::Common::Handle _windowHandle;
     };
 }  // namespace GameDevGUI

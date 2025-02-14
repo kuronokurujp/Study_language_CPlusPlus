@@ -415,9 +415,9 @@ namespace PlatformSDL2
     Core::Memory::UniquePtr<Platform::WindowStrategy> Screen::VCreateWindowStrategy(
         const Core::Common::Handle in_handle, const Platform::WindowConfig& in_rConfig)
     {
-        auto spSt              = HE_MAKE_CUSTOM_UNIQUE_PTR((SDL2WindowStrategy), in_handle, in_rConfig,
-                                                           SDL2WindowStrategy::Context(Local::s_pShareContext,
-                                                                                       Local::s_pDummyWindow));
+        auto spSt = HE_MAKE_CUSTOM_UNIQUE_PTR((SDL2WindowStrategy), in_handle, in_rConfig,
+                                              SDL2WindowStrategy::Context(Local::s_pShareContext,
+                                                                          Local::s_pDummyWindow));
         Local::s_pDummyWindow  = NULL;
         Local::s_pShareContext = NULL;
 

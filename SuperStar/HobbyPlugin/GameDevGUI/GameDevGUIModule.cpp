@@ -23,13 +23,7 @@ namespace GameDevGUI
 
     void GameDevGUIModule::NewGUI(const Core::Common::Handle in_handle)
     {
-        // TODO: ウィンドウとコンテキストを取得
-#ifdef HE_USE_SDL2
-        auto pRenderModule = this->GetDependenceModule<Render::RenderModule>();
-        auto pRenderWindow = pRenderModule->GetWindow(in_handle);
-
-        SDL_Window* pWindow = reinterpret_cast<SDL_Window*>(pRenderWindow->GetWindowBySDL2());
-        void* pContext      = pRenderWindow->GetContentBySDL2();
+        if (this->_pImGuiContext) this->DestoryGUI();
 
         IMGUI_CHECKVERSION();
 
@@ -39,14 +33,21 @@ namespace GameDevGUI
 
         ImGui::StyleColorsDark();
 
-        ::ImGui_ImplSDL2_InitForOpenGL(pWindow, pContext);
+        // SDL2用のImGUI初期化
+#ifdef HE_USE_SDL2
+        auto pRenderModule = this->GetDependenceModule<Render::RenderModule>();
+        auto pRenderWindow = pRenderModule->GetWindow(in_handle);
 
+        SDL_Window* pWindow = reinterpret_cast<SDL_Window*>(pRenderWindow->GetWindowBySDL2());
+        void* pContext      = pRenderWindow->GetContentBySDL2();
+
+        ::ImGui_ImplSDL2_InitForOpenGL(pWindow, pContext);
         // TODO: OpenGL名取得はwindowクラスに持った方がいいかな?
         auto pPlatformModule = HE_ENGINE.PlatformModule();
         ::ImGui_ImplOpenGL3_Init(pPlatformModule->GetOpenGLVersionNameBySDL2());
 
         // ウィンドウの描画開始と終了のコールバック
-        pRenderWindow->AddBeginRenderCallback(
+        pRenderWindow->SetBeginRenderCallback(
             [this, pImGuiContext]()
             {
                 // ImGuiのコンテキストを変更
@@ -60,30 +61,39 @@ namespace GameDevGUI
                 // TODO: GUI処理を記述する
                 //::ImGui::Button("test");
             });
-        pRenderWindow->AddEndRenderCallback(
+        pRenderWindow->SetEndRenderCallback(
             [this]()
             {
                 ImGui::Render();
                 ::ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
             });
-        this->_mImGui.Add(in_handle, pImGuiContext);
 #endif
+
+        this->_pImGuiContext = pImGuiContext;
+        this->_windowHandle  = in_handle;
     }
 
-    void GameDevGUIModule::DestoryGUI(const Core::Common::Handle in_handle)
+    void GameDevGUIModule::DestoryGUI()
     {
-        // TODO: 作成したフレームを破棄
-#ifdef HE_USE_SDL2
-        ::ImGuiContext* pImgGuiContext =
-            reinterpret_cast<::ImGuiContext*>(this->_mImGui.FindKey(in_handle)->_data);
-        if (pImgGuiContext == NULL) return;
+        // 作成したフレームを破棄
 
+        if (this->_pImGuiContext == NULL) return;
+
+        auto pRenderModule = this->GetDependenceModule<Render::RenderModule>();
+        auto pRenderWindow = pRenderModule->GetWindow(this->_windowHandle);
+        pRenderWindow->SetBeginRenderCallback(NULL);
+        pRenderWindow->SetEndRenderCallback(NULL);
+
+        ::ImGuiContext* pImgGuiContext = reinterpret_cast<::ImGuiContext*>(this->_pImGuiContext);
+
+#ifdef HE_USE_SDL2
         ::ImGui_ImplOpenGL3_Shutdown();
         ::ImGui_ImplSDL2_Shutdown();
+#endif
         ::ImGui::DestroyContext(pImgGuiContext);
 
-        this->_mImGui.Erase(in_handle);
-#endif
+        this->_pImGuiContext = NULL;
+        this->_windowHandle.Clear();
     }
 
     /// <summary>
@@ -91,19 +101,19 @@ namespace GameDevGUI
     /// </summary>
     HE::Bool GameDevGUIModule::_VStart()
     {
-#ifdef HE_USE_SDL2
-        this->_mImGui.Clear();
+        this->_pImGuiContext = NULL;
+
         auto pPlatformModule = HE_ENGINE.PlatformModule();
         pPlatformModule->VInput()->SetInputEventCallback(
             [this](void* in_pEvent)
             {
+                if (this->_pImGuiContext == NULL) return;
+#ifdef HE_USE_SDL2
                 SDL_Event* pEvent = reinterpret_cast<SDL_Event*>(in_pEvent);
-                for (auto it = this->_mImGui.Begin(); it != this->_mImGui.End(); ++it)
-                {
-                    ImGui_ImplSDL2_ProcessEvent(pEvent);
-                }
-            });
+                ImGui_ImplSDL2_ProcessEvent(pEvent);
 #endif
+            });
+
         return TRUE;
     }
 
@@ -112,6 +122,8 @@ namespace GameDevGUI
     /// </summary>
     HE::Bool GameDevGUIModule::_VRelease()
     {
+        this->DestoryGUI();
+
         return TRUE;
     }
 

@@ -29,7 +29,10 @@ namespace Render
         this->_AppendDependenceModule<Platform::PlatformModule>();
     }
 
-    const Core::Common::Handle RenderModule::NewWindow(const HE::Uint32 in_w, const HE::Uint32 in_h)
+    const Core::Common::Handle RenderModule::NewWindow(const HE::Uint32 in_w, const HE::Uint32 in_h,
+                                                       const HE::Bool in_bMain,
+                                                       Window::OnBeginCallback in_beginCallback,
+                                                       Window::OnEndCallback in_endCallback)
     {
         auto [handle, pWindow] = this->_poolWindow.Alloc();
         if (handle.Null()) return NullHandle;
@@ -39,20 +42,20 @@ namespace Render
 
         Platform::WindowConfig platformWindowConfig;
         {
-            platformWindowConfig._uWidth        = in_w;
-            platformWindowConfig._uHeight       = in_h;
-            platformWindowConfig.uViewPortCount = 1;
+            platformWindowConfig._uWidth         = in_w;
+            platformWindowConfig._uHeight        = in_h;
+            platformWindowConfig._uViewPortCount = 1;
+            platformWindowConfig._bMain          = in_bMain;
         }
 
         auto pPlatform  = this->GetDependenceModule<Platform::PlatformModule>();
         auto upStrategy = pPlatform->VScreen()->VCreateWindowStrategy(handle, platformWindowConfig);
 
-        if (pWindow->Init(std::move(upStrategy)) == FALSE)
+        if (pWindow->Init(std::move(upStrategy), in_beginCallback, in_endCallback) == FALSE)
         {
             this->_poolWindow.Free(handle);
             return NullHandle;
         }
-
         this->_sStandupWindow.PushBack(handle);
 
         return handle;
@@ -68,8 +71,6 @@ namespace Render
         auto pWindow = this->_poolWindow.Ref(in_rHandle);
         HE_ASSERT(pWindow &&
                   "ウィンドウがないということは別の箇所でRemoveされているので意図していない");
-
-        if (this->_onEndWindow) this->_onEndWindow(in_rHandle);
 
         pWindow->_End();
         pWindow->Release();
@@ -335,16 +336,6 @@ namespace Render
         return pScene->_PushCommand(std::move(in_rrCommand));
     }
 
-    void RenderModule::AddEventBeginWindow(OnCallbackBeginWindow on)
-    {
-        this->_onBeginWindow = on;
-    }
-
-    void RenderModule::AddEventEndWindow(OnCallbackEndWindow on)
-    {
-        this->_onEndWindow = on;
-    }
-
     /// <summary>
     /// モジュール初期化
     /// </summary>
@@ -358,9 +349,6 @@ namespace Render
     /// </summary>
     HE::Bool RenderModule::_VRelease()
     {
-        this->_onBeginWindow = NULL;
-        this->_onEndWindow   = NULL;
-
         // パーティクルを全削除
         auto itr = this->_mParticleHandle.begin();
         while (itr != this->_mParticleHandle.end())
@@ -387,7 +375,6 @@ namespace Render
             if (pWindow)
             {
                 pWindow->_Begin();
-                if (this->_onBeginWindow) this->_onBeginWindow(handle);
             }
         }
     }

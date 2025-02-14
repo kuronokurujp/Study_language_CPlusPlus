@@ -48,16 +48,16 @@ namespace Render
         using WindowHandleKeyMap = Core::Common::FixedMap<HE::Uint64, Core::Common::Handle, 32>;
         using ParticleBlobObject = std::tuple<Core::Common::Handle, Render::Prticle::Blob*>;
 
-        using OnCallbackBeginWindow = std::function<void(Core::Common::Handle)>;
-        using OnCallbackEndWindow   = std::function<void(Core::Common::Handle)>;
-
     public:
         RenderModule();
 
         /// <summary>
         /// ウィンドウ生成
         /// </summary>
-        const Core::Common::Handle NewWindow(const HE::Uint32 in_w, const HE::Uint32 in_h);
+        const Core::Common::Handle NewWindow(const HE::Uint32 in_w, const HE::Uint32 in_h,
+                                             const HE::Bool in_bMain,
+                                             Window::OnBeginCallback = NULL,
+                                             Window::OnEndCallback   = NULL);
 
         /// <summary>
         /// ウィンドウ破棄
@@ -123,12 +123,6 @@ namespace Render
         /// </summary>
         HE::Bool PushRenderCommand(const Core::Common::Handle, Command&&);
 
-        // ウィンドウイベント関連
-        // TODO: 追加という名前になっているが, 現在は一つしか追加できない
-        // 後々追加に変更対応
-        void AddEventBeginWindow(OnCallbackBeginWindow);
-        void AddEventEndWindow(OnCallbackEndWindow);
-
     protected:
         /// <summary>
         /// モジュール初期化
@@ -169,9 +163,6 @@ namespace Render
         Core::Common::FixedStack<Core::Common::Handle, 32> _sStandupWindow;
         // TODO: 自前のを作ったら差し替える
         std::unordered_map<Core::Common::Handle, Render::Prticle::Blob*> _mParticleHandle;
-
-        OnCallbackBeginWindow _onBeginWindow = NULL;
-        OnCallbackEndWindow _onEndWindow     = NULL;
     };
 
 }  // namespace Render

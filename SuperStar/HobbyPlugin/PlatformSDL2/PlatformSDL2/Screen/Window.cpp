@@ -38,6 +38,7 @@ namespace PlatformSDL2
 
         // Windowに紐づいているOpenGLのコンテキストを生成
         auto [pGLContext, pWindow] = this->_context;
+        // すでにコンテキストがある場合は再利用コンテキストなので設定
         if (pGLContext && pWindow)
         {
             ::SDL_DestroyWindow(reinterpret_cast<SDL_Window*>(pWindow));
@@ -45,7 +46,7 @@ namespace PlatformSDL2
 
             pNewContext = pGLContext;
         }
-        // すでにコンテキストがある場合は再利用コンテキストなので設定
+        // コンテキストを新規作成
         else
         {
             pNewContext = ::SDL_GL_CreateContext(reinterpret_cast<SDL_Window*>(pNewWindow));
@@ -75,6 +76,9 @@ namespace PlatformSDL2
                 HE_ASSERT(FALSE);
             }
         }
+
+        // 設定データをウィンドウと紐づける
+        ::SDL_SetWindowData(pNewWindow, HE_STR_U8_TEXT("UserData"), &this->_config);
     }
 
     void SDL2WindowStrategy::VEnd()
@@ -93,16 +97,29 @@ namespace PlatformSDL2
         this->_context = Context(NULL, NULL);
     }
 
+    void SDL2WindowStrategy::VSetPos(const HE::Uint32 in_uX, const HE::Uint32 in_uY)
+    {
+        auto [pGLContext, pWindow] = this->_context;
+        ::SDL_SetWindowPosition(reinterpret_cast<SDL_Window*>(pWindow), in_uX, in_uY);
+    }
+
+    void SDL2WindowStrategy::VActive()
+    {
+        auto [pGLContext, pWindow] = this->_context;
+        ::SDL_GL_MakeCurrent(reinterpret_cast<SDL_Window*>(pWindow), pGLContext);
+    }
+
     void SDL2WindowStrategy::VShow()
     {
         auto [pGLContext, pWindow] = this->_context;
 
-        ::SDL_GL_MakeCurrent(reinterpret_cast<SDL_Window*>(pWindow), pGLContext);
         ::SDL_ShowWindow(reinterpret_cast<SDL_Window*>(pWindow));
     }
 
     void SDL2WindowStrategy::VBeginRender()
     {
+        auto [pGLContext, pWindow] = this->_context;
+
         // カラーバッファをクリアする
         ::glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         ::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

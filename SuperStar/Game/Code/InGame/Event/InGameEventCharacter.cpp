@@ -13,7 +13,8 @@ namespace InGame
     }
 
     EventCharacterAttack::EventCharacterAttack(const HE::Float32 in_fTimeStamp,
-                                               const EObjectTag in_eTag, const HE::Uint64 in_uuHandle)
+                                               const EObjectTag in_eTag,
+                                               const HE::Uint64 in_uuHandle)
         : Event::BaseEventData(INGAME_CHARACTER_EVENT_TYPE_NAME, s_szEventType, in_fTimeStamp),
           _eTag(in_eTag),
           _uuHandle(in_uuHandle)

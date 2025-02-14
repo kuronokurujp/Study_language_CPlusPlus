@@ -33,7 +33,6 @@ namespace Platform
         virtual HE::UTF8* GetOpenGLVersionNameBySDL2() = 0;
 #endif
 
-
         /// <summary>
         /// やめる状態になっているか
         /// </summary>

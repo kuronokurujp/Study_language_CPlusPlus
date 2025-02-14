@@ -12,9 +12,10 @@ namespace Platform
 {
     struct WindowConfig
     {
-        HE::Uint32 _uWidth        = 0;
-        HE::Uint32 _uHeight       = 0;
-        HE::Uint32 uViewPortCount = 0;
+        HE::Uint32 _uWidth         = 0;
+        HE::Uint32 _uHeight        = 0;
+        HE::Uint32 _uViewPortCount = 0;
+        HE::Bool _bMain            = FALSE;
     };
 
     struct ViewPortConfig
@@ -32,7 +33,10 @@ namespace Platform
         WindowStrategy(const Core::Common::Handle, const WindowConfig&);
         virtual void VRelease();
 
-        virtual void VShow() = 0;
+        virtual void VSetPos(const HE::Uint32 in_uX, const HE::Uint32 in_uY) = 0;
+
+        virtual void VActive() = 0;
+        virtual void VShow()   = 0;
 
         virtual void VBegin() = 0;
         virtual void VEnd()   = 0;

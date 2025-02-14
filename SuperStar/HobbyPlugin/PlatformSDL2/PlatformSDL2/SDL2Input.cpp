@@ -1,5 +1,6 @@
 ﻿#include "SDL2Input.h"
 
+#include "Engine/Platform/PlatformScreen.h"
 #include "SDL2/SDL.h"
 
 // DxLib用の入力システムの実装
@@ -175,11 +176,28 @@ namespace PlatformSDL2
                 }
                 case SDL_WINDOWEVENT:
                 {
-                    // TODO: ウィンドウが複数時の処理が必要
-                    break;
+                    // ウィンドウが複数時の処理
+                    switch (eventData.window.event)
+                    {
+                        case SDL_WINDOWEVENT_CLOSE:
+                        {
+                            auto pWindow       = ::SDL_GetWindowFromID(eventData.window.windowID);
+                            auto pWindowConfig = reinterpret_cast<Platform::WindowConfig*>(
+                                ::SDL_GetWindowData(pWindow, HE_STR_U8_TEXT("UserData")));
+                            if (pWindowConfig)
+                            {
+                                if (pWindowConfig->_bMain)
+                                {
+                                    bQuit = TRUE;
+                                }
+                            }
+                            break;
+                        }
+                    }
+
+                    default:
+                        break;
                 }
-                default:
-                    break;
             }
 
             // 入力結果を他モジュールに通知

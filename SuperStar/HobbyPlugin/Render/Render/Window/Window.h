@@ -26,20 +26,32 @@ namespace Render
         using OnRenderBeginCallback = std::function<void()>;
         using OnRenderEndCallback   = std::function<void()>;
 
+        using OnBeginCallback = std::function<void(Core::Common::Handle)>;
+        using OnEndCallback   = std::function<void(Core::Common::Handle)>;
+
     public:
+        /// <summary>
+        /// ウィンドウ座標指定
+        /// </summary>
+        void SetPos(const HE::Uint32 in_uX, const HE::Uint32 in_uY);
+
+        // ビューポート関連
         Core::Common::Handle AddViewPort(Core::Memory::UniquePtr<Platform::ViewPortStrategy>);
         HE::Bool RemoveViewPort(Core::Common::Handle&);
+
+        /// <summary>
+        /// 利用準備完了しているか
+        /// </summary>
+        const HE::Bool IsReady() const { return this->_bReady; }
 
         /// <summary>
         /// ウィンドウ表示
         /// </summary>
         void Show();
 
-        // レンダリング関連のイベント
-        // TODO: 追加という名前になっているが, 現在は一つしか追加できない
-        // 後々追加に変更対応
-        void AddBeginRenderCallback(OnRenderBeginCallback);
-        void AddEndRenderCallback(OnRenderEndCallback);
+        // イベント関連
+        void SetBeginRenderCallback(OnRenderBeginCallback);
+        void SetEndRenderCallback(OnRenderEndCallback);
 
 #ifdef HE_USE_SDL2
         void* GetWindowBySDL2() const;
@@ -47,7 +59,8 @@ namespace Render
 #endif
 
     private:
-        HE::Bool Init(Core::Memory::UniquePtr<Platform::WindowStrategy>);
+        HE::Bool Init(Core::Memory::UniquePtr<Platform::WindowStrategy>, OnBeginCallback,
+                      OnEndCallback);
         void Release();
 
         void _Begin();
@@ -63,9 +76,12 @@ namespace Render
 
         HE::Bool _bShow  = FALSE;
         HE::Bool _bReady = FALSE;
+        HE::Uint32 _uX, _uY = HE::uInvalidUint32;
 
         OnRenderBeginCallback _onRenderBegin = NULL;
         OnRenderEndCallback _onRenderEnd     = NULL;
+        OnBeginCallback _onBegin             = NULL;
+        OnEndCallback _onEnd                 = NULL;
     };
 
 }  // namespace Render

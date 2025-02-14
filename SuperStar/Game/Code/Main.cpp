@@ -22,6 +22,9 @@
 // 最初に実行するレベルをインクルード
 #include "Level/LevelLauncher.h"
 
+// デバッグGUI
+#include "GameDevGUIModule.h"
+
 #else
 #include "Level/LevelTitle.h"
 #endif
@@ -115,7 +118,7 @@ HE::Bool WinGameMain::_VStart()
     {
         // TODO: 外部設定が必要かも
         // ゲームウィンドウを生成
-        windowHandle = pRenderModule->NewWindow(640, 480);
+        windowHandle = pRenderModule->NewWindow(640, 480, TRUE);
 
         // TODO: 画面に表示するビューポート
         // ゲームウィンドウで利用するビューポートを追加
@@ -169,6 +172,12 @@ HE::Bool WinGameMain::_VRegistEngineModule()
     HE_ENGINE.AddModule<EnhancedInput::EnhancedInputModule>();
     HE_ENGINE.AddModule<Event::EventModule>();
     HE_ENGINE.AddModule<Lua::LuaModule>();
+
+#ifdef HE_ENGINE_DEBUG
+
+    HE_ENGINE.AddModule<GameDevGUI::GameDevGUIModule>();
+
+#endif
 
     return TRUE;
 }

@@ -10,8 +10,10 @@ namespace RuntimeDebug
     class RuntimeDebugModule final : public Module::ModuleBase
     {
         HE_MODULE_GENRATE_DECLARATION(RuntimeDebugModule);
+
     public:
         RuntimeDebugModule() : ModuleBase(ModuleName()) {}
+
     protected:
         /// <summary>
         /// モジュール初期化
