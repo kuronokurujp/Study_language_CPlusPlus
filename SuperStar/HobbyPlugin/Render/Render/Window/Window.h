@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <functional>
-
 #include "./ViewPort.h"
 #include "Engine/Common/PoolManager.h"
 #include "Engine/MiniEngine.h"
@@ -23,13 +21,6 @@ namespace Render
         friend class RenderModule;
 
     public:
-        using OnRenderBeginCallback = std::function<void()>;
-        using OnRenderEndCallback   = std::function<void()>;
-
-        using OnBeginCallback = std::function<void(Core::Common::Handle)>;
-        using OnEndCallback   = std::function<void(Core::Common::Handle)>;
-
-    public:
         /// <summary>
         /// ウィンドウ座標指定
         /// </summary>
@@ -49,18 +40,8 @@ namespace Render
         /// </summary>
         void Show();
 
-        // イベント関連
-        void SetBeginRenderCallback(OnRenderBeginCallback);
-        void SetEndRenderCallback(OnRenderEndCallback);
-
-#ifdef HE_USE_SDL2
-        void* GetWindowBySDL2() const;
-        void* GetContentBySDL2() const;
-#endif
-
     private:
-        HE::Bool Init(Core::Memory::UniquePtr<Platform::WindowStrategy>, OnBeginCallback,
-                      OnEndCallback);
+        HE::Bool Init(Core::Memory::UniquePtr<Platform::WindowStrategy>);
         void Release();
 
         void _Begin();
@@ -77,11 +58,6 @@ namespace Render
         HE::Bool _bShow  = FALSE;
         HE::Bool _bReady = FALSE;
         HE::Uint32 _uX, _uY = HE::uInvalidUint32;
-
-        OnRenderBeginCallback _onRenderBegin = NULL;
-        OnRenderEndCallback _onRenderEnd     = NULL;
-        OnBeginCallback _onBegin             = NULL;
-        OnEndCallback _onEnd                 = NULL;
     };
 
 }  // namespace Render

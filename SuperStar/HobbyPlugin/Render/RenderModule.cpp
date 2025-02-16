@@ -29,29 +29,14 @@ namespace Render
         this->_AppendDependenceModule<Platform::PlatformModule>();
     }
 
-    const Core::Common::Handle RenderModule::NewWindow(const HE::Uint32 in_w, const HE::Uint32 in_h,
-                                                       const HE::Bool in_bMain,
-                                                       Window::OnBeginCallback in_beginCallback,
-                                                       Window::OnEndCallback in_endCallback)
+    const Core::Common::Handle RenderModule::NewWindow(
+        OnFactoryWindowStrategyCallback in_onFactoryStrategyCallback)
     {
         auto [handle, pWindow] = this->_poolWindow.Alloc();
         if (handle.Null()) return NullHandle;
 
-        // TODO: プラットフォームからウィンドウストラテジーを生成して渡す
-        // 作成したウィンドウのセットアップ
-
-        Platform::WindowConfig platformWindowConfig;
-        {
-            platformWindowConfig._uWidth         = in_w;
-            platformWindowConfig._uHeight        = in_h;
-            platformWindowConfig._uViewPortCount = 1;
-            platformWindowConfig._bMain          = in_bMain;
-        }
-
-        auto pPlatform  = this->GetDependenceModule<Platform::PlatformModule>();
-        auto upStrategy = pPlatform->VScreen()->VCreateWindowStrategy(handle, platformWindowConfig);
-
-        if (pWindow->Init(std::move(upStrategy), in_beginCallback, in_endCallback) == FALSE)
+        auto upStrategy = in_onFactoryStrategyCallback(handle);
+        if (pWindow->Init(std::move(upStrategy)) == FALSE)
         {
             this->_poolWindow.Free(handle);
             return NullHandle;
@@ -161,40 +146,19 @@ namespace Render
         return pViewPort;
     }
 
-    std::tuple<Core::Common::Handle, SceneViewBase*> RenderModule::AddSceneViewUI(
-        const Core::Common::Handle in_rWindowsHandle, const Core::Common::Handle in_rViewPortHash)
+    std::tuple<Core::Common::Handle, SceneViewBase*> RenderModule::AddSceneView(
+        const Core::Common::Handle in_rWindowsHandle, const Core::Common::Handle in_rViewPortHash,
+        OnFactorySceneViewStrategyCallback in_callback)
     {
         auto pWindow   = this->GetWindow(in_rWindowsHandle);
         auto pViewPort = pWindow->_poolViewPortManager.Ref(in_rViewPortHash);
 
-        // TODO: プラットフォームからシーンを取得して渡す
-        auto pPlatform  = this->GetDependenceModule<Platform::PlatformModule>();
-        auto upStrategy = pPlatform->VScreen()->VCreateSceneUIStrategy();
-
+        // コールバックからシーンのストラテジーを取得して渡す
+        // 利用者側が任意でシーン内容を選択できるようにするため
+        auto upStrategy            = in_callback();
         auto [sceneHandle, pScene] = pViewPort->AddSceneView(std::move(upStrategy));
 
         Core::Common::Handle handle =
-            this->_AddScene(in_rWindowsHandle, in_rViewPortHash, sceneHandle);
-        if (handle == NullHandle)
-        {
-            pViewPort->RemoveScene(sceneHandle);
-        }
-
-        return std::tuple<Core::Common::Handle, SceneViewBase*>(handle, pScene);
-    }
-
-    std::tuple<Core::Common::Handle, SceneViewBase*> RenderModule::AddSceneView2D(
-        const Core::Common::Handle in_rWindowsHandle, const Core::Common::Handle in_rViewPortHash)
-    {
-        auto pWindow   = this->GetWindow(in_rWindowsHandle);
-        auto pViewPort = pWindow->_poolViewPortManager.Ref(in_rViewPortHash);
-
-        auto pPlatform  = this->GetDependenceModule<Platform::PlatformModule>();
-        auto upStrategy = pPlatform->VScreen()->VCreateScene2DStrategy();
-
-        auto [sceneHandle, pScene] = pViewPort->AddSceneView(std::move(upStrategy));
-
-        const Core::Common::Handle& handle =
             this->_AddScene(in_rWindowsHandle, in_rViewPortHash, sceneHandle);
         if (handle == NullHandle)
         {

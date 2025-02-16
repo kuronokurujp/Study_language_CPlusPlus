@@ -118,7 +118,20 @@ HE::Bool WinGameMain::_VStart()
     {
         // TODO: 外部設定が必要かも
         // ゲームウィンドウを生成
-        windowHandle = pRenderModule->NewWindow(640, 480, TRUE);
+        windowHandle = pRenderModule->NewWindow(
+            [](Core::Common::Handle in_handle)
+            {
+                Platform::WindowConfig platformWindowConfig;
+                {
+                    platformWindowConfig._uWidth         = 640;  // in_w;
+                    platformWindowConfig._uHeight        = 480;  // in_h;
+                    platformWindowConfig._uViewPortCount = 1;
+                    platformWindowConfig._bMain          = TRUE;  // in_bMain;
+                }
+                auto pPlatformModule = HE_ENGINE.PlatformModule();
+                return pPlatformModule->VScreen()->VCreateWindowStrategy(in_handle,
+                                                                         platformWindowConfig);
+            });  // 640, 480, TRUE);
 
         // TODO: 画面に表示するビューポート
         // ゲームウィンドウで利用するビューポートを追加
@@ -129,13 +142,27 @@ HE::Bool WinGameMain::_VStart()
     {
         // 2Dのゲームシーンを追加
         auto [scene2DHandle, p2DScene] =
-            pRenderModule->AddSceneView2D(windowHandle, viewPortHandle);
+            pRenderModule->AddSceneView(windowHandle, viewPortHandle,
+                                        []()
+                                        {
+                                            auto pPlatformModule = HE_ENGINE.PlatformModule();
+
+                                            return pPlatformModule->VScreen()
+                                                ->VCreateScene2DStrategy();
+                                        });
         HE_ASSERT(scene2DHandle.Null() == FALSE);
         Game::g_scene2DHandle = scene2DHandle;
 
         // UIのゲームシーンを追加
         auto [sceneUIHandle, pUIScene] =
-            pRenderModule->AddSceneViewUI(windowHandle, viewPortHandle);
+            pRenderModule->AddSceneView(windowHandle, viewPortHandle,
+                                        []()
+                                        {
+                                            auto pPlatformModule = HE_ENGINE.PlatformModule();
+
+                                            return pPlatformModule->VScreen()
+                                                ->VCreateSceneUIStrategy();
+                                        });
 
         HE_ASSERT(sceneUIHandle.Null() == FALSE);
         Game::g_sceneUIHandle = sceneUIHandle;

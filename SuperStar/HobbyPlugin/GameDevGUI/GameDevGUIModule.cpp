@@ -1,5 +1,7 @@
 ﻿#include "GameDevGUIModule.h"
 
+#include "./GameDevGUI/Screen/Scene.h"
+#include "./GameDevGUI/Screen/Window.h"
 #include "Engine/Engine.h"
 #include "Engine/Platform/PlatformModule.h"
 #include "imgui.h"
@@ -21,79 +23,28 @@ namespace GameDevGUI
         this->_AppendDependenceModule<Render::RenderModule>();
     }
 
-    void GameDevGUIModule::NewGUI(const Core::Common::Handle in_handle)
+    Core::Memory::UniquePtr<Platform::WindowStrategy> GameDevGUIModule::CreateWindowStrategy(
+        const Core::Common::Handle in_handle, const Platform::WindowConfig& in_rConfig)
     {
-        if (this->_pImGuiContext) this->DestoryGUI();
-
-        IMGUI_CHECKVERSION();
-
-        auto pImGuiContext = ::ImGui::CreateContext();
-        ImGuiIO& io        = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-
-        ImGui::StyleColorsDark();
-
-        // SDL2用のImGUI初期化
-#ifdef HE_USE_SDL2
-        auto pRenderModule = this->GetDependenceModule<Render::RenderModule>();
-        auto pRenderWindow = pRenderModule->GetWindow(in_handle);
-
-        SDL_Window* pWindow = reinterpret_cast<SDL_Window*>(pRenderWindow->GetWindowBySDL2());
-        void* pContext      = pRenderWindow->GetContentBySDL2();
-
-        ::ImGui_ImplSDL2_InitForOpenGL(pWindow, pContext);
-        // TODO: OpenGL名取得はwindowクラスに持った方がいいかな?
+        // TODO: ImGUI用のを作成
         auto pPlatformModule = HE_ENGINE.PlatformModule();
-        ::ImGui_ImplOpenGL3_Init(pPlatformModule->GetOpenGLVersionNameBySDL2());
 
-        // ウィンドウの描画開始と終了のコールバック
-        pRenderWindow->SetBeginRenderCallback(
-            [this, pImGuiContext]()
-            {
-                // ImGuiのコンテキストを変更
-                ::ImGui::SetCurrentContext(pImGuiContext);
+        auto upSt = HE_MAKE_CUSTOM_UNIQUE_PTR((GameDevGUIWindowStrategy),
+                                              pPlatformModule->VScreen()
+                                                  ->VCreateWindowStrategy(in_handle, in_rConfig));
 
-                ::ImGui_ImplOpenGL3_NewFrame();
-                ::ImGui_ImplSDL2_NewFrame();
-
-                ::ImGui::NewFrame();
-
-                // TODO: GUI処理を記述する
-                //::ImGui::Button("test");
-            });
-        pRenderWindow->SetEndRenderCallback(
-            [this]()
-            {
-                ImGui::Render();
-                ::ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-            });
-#endif
-
-        this->_pImGuiContext = pImGuiContext;
-        this->_windowHandle  = in_handle;
+        return std::move(upSt);
     }
 
-    void GameDevGUIModule::DestoryGUI()
+    Core::Memory::UniquePtr<Platform::SceneStrategyInterface>
+    GameDevGUIModule::CreateSceneStrategy()
     {
-        // 作成したフレームを破棄
+        auto pPlatformModule = HE_ENGINE.PlatformModule();
 
-        if (this->_pImGuiContext == NULL) return;
-
-        auto pRenderModule = this->GetDependenceModule<Render::RenderModule>();
-        auto pRenderWindow = pRenderModule->GetWindow(this->_windowHandle);
-        pRenderWindow->SetBeginRenderCallback(NULL);
-        pRenderWindow->SetEndRenderCallback(NULL);
-
-        ::ImGuiContext* pImgGuiContext = reinterpret_cast<::ImGuiContext*>(this->_pImGuiContext);
-
-#ifdef HE_USE_SDL2
-        ::ImGui_ImplOpenGL3_Shutdown();
-        ::ImGui_ImplSDL2_Shutdown();
-#endif
-        ::ImGui::DestroyContext(pImgGuiContext);
-
-        this->_pImGuiContext = NULL;
-        this->_windowHandle.Clear();
+        // TODO: ImGUI用のを作成
+        auto upSt = HE_MAKE_CUSTOM_UNIQUE_PTR((GameDevGUISceneStrategy),
+                                              pPlatformModule->VScreen()->VCreateSceneUIStrategy());
+        return std::move(upSt);
     }
 
     /// <summary>
@@ -122,8 +73,6 @@ namespace GameDevGUI
     /// </summary>
     HE::Bool GameDevGUIModule::_VRelease()
     {
-        this->DestoryGUI();
-
         return TRUE;
     }
 

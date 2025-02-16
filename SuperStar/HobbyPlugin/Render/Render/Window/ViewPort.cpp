@@ -5,11 +5,12 @@
 namespace Render
 {
     std::tuple<Core::Common::Handle, SceneViewBase*> ViewPort::AddSceneView(
-        Core::Memory::UniquePtr<Platform::SceneStrategyInterface> in_upStorategy)
+        Core::Memory::UniquePtr<Platform::SceneStrategyInterface> in_upSt)
     {
         auto [handle, pScene] = this->_poolSceneManager.Alloc<SceneViewBase>();
+        pScene->Init(std::move(in_upSt));
 
-        pScene->_Begin(std::move(in_upStorategy));
+        if (this->_bRun) pScene->_Begin();
 
         return std::tuple<Core::Common::Handle, SceneViewBase*>(handle, pScene);
     }
@@ -42,6 +43,8 @@ namespace Render
     HE::Bool ViewPort::Init(Core::Memory::UniquePtr<Platform::ViewPortStrategy> in_upStg,
                             const HE::Uint32 in_uSceneCount)
     {
+        this->_bRun = FALSE;
+
         this->_upStrategy = std::move(in_upStg);
 
         this->_poolSceneManager.ReleasePool();
@@ -52,12 +55,25 @@ namespace Render
 
     void ViewPort::Release()
     {
+        this->_bRun = FALSE;
+
         this->_poolSceneManager.ReleasePool([](SceneViewBase* in_pScene) { in_pScene->Release(); });
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upStrategy);
     }
 
     void ViewPort::_Begin()
     {
+        this->_bRun = TRUE;
+        {
+            auto m = this->_poolSceneManager.GetUserDataList();
+            if (m)
+            {
+                for (auto itr = m->begin(); itr != m->end(); ++itr)
+                {
+                    itr->second->_Begin();
+                }
+            }
+        }
     }
 
     void ViewPort::_End()
@@ -72,6 +88,7 @@ namespace Render
                 }
             }
         }
+        this->_bRun = FALSE;
     }
 
     void ViewPort::_BeginRender()

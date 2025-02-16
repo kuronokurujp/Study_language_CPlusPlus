@@ -32,6 +32,8 @@ namespace Render
         const HE::Uint32 Width() const;
         const HE::Uint32 Height() const;
 
+        const HE::Bool IsRunning() const { return this->_bRun; }
+
     private:
         void _Begin();
         void _End();
@@ -42,6 +44,8 @@ namespace Render
     private:
         Core::Common::RuntimePoolManager<SceneViewBase> _poolSceneManager;
         Core::Memory::UniquePtr<Platform::ViewPortStrategy> _upStrategy;
+
+        HE::Bool _bRun = FALSE;
     };
 
 }  // namespace Render

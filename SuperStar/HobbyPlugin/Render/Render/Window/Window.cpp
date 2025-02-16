@@ -129,36 +129,7 @@ namespace Render
         this->_bShow = TRUE;
     }
 
-    void Window::SetBeginRenderCallback(OnRenderBeginCallback in_callback)
-    {
-        if (in_callback)
-            this->_onRenderBegin = std::move(in_callback);
-        else
-            this->_onRenderBegin = NULL;
-    }
-
-    void Window::SetEndRenderCallback(OnRenderEndCallback in_callback)
-    {
-        if (in_callback)
-            this->_onRenderEnd = std::move(in_callback);
-        else
-            this->_onRenderEnd = NULL;
-    }
-
-#ifdef HE_USE_SDL2
-    void* Window::GetWindowBySDL2() const
-    {
-        return this->_upStrategy->VGetWindowBySDL2();
-    }
-
-    void* Window::GetContentBySDL2() const
-    {
-        return this->_upStrategy->VGetContentBySDL2();
-    }
-#endif
-
-    HE::Bool Window::Init(Core::Memory::UniquePtr<Platform::WindowStrategy> in_upConfig,
-                          OnBeginCallback in_beginCallback, OnEndCallback in_endCallback)
+    HE::Bool Window::Init(Core::Memory::UniquePtr<Platform::WindowStrategy> in_upConfig)
     {
         this->_upStrategy = std::move(in_upConfig);
 
@@ -168,19 +139,11 @@ namespace Render
         this->_poolViewPortManager.ReleasePool();
         this->_poolViewPortManager.ReservePool(rWindowConfig._uViewPortCount);
 
-        if (in_beginCallback) this->_onBegin = std::move(in_beginCallback);
-        if (in_endCallback) this->_onEnd = std::move(in_endCallback);
-
         return TRUE;
     }
 
     void Window::Release()
     {
-        this->_onRenderBegin = NULL;
-        this->_onRenderEnd   = NULL;
-        this->_onBegin       = NULL;
-        this->_onEnd         = NULL;
-
         this->_poolViewPortManager.ReleasePool([](ViewPort* in_pViewPort)
                                                { in_pViewPort->Release(); });
 
@@ -191,7 +154,6 @@ namespace Render
     void Window::_Begin()
     {
         this->_upStrategy->VBegin();
-        if (this->_onBegin) this->_onBegin(this->_upStrategy->GetHandle());
 
         this->_upStrategy->VActive();
 
@@ -209,8 +171,6 @@ namespace Render
     void Window::_End()
     {
         this->_upStrategy->VActive();
-
-        if (this->_onEnd) this->_onEnd(this->_upStrategy->GetHandle());
 
         this->_upStrategy->VEnd();
 
@@ -260,7 +220,6 @@ namespace Render
         auto pPlatformScreen = pPlatformModule->VScreen();
 
         this->_upStrategy->VBeginRender();
-        if (this->_onRenderBegin) this->_onRenderBegin();
 
         // ビューポート処理
         auto m = this->_poolViewPortManager.GetUserDataList();
@@ -302,7 +261,6 @@ namespace Render
             }
         }
 
-        if (this->_onRenderEnd) this->_onRenderEnd();
         this->_upStrategy->VEndRender();
     }
 

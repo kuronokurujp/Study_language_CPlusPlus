@@ -7,4 +7,9 @@ set(GAMEDEVGUI_PLUGIN_TARGET_FILES
     README.md
     GameDevGUIModule.cpp
     GameDevGUIModule.h
+    
+    GameDevGUI/Screen/Scene.cpp
+    GameDevGUI/Screen/Scene.h
+    GameDevGUI/Screen/Window.cpp
+    GameDevGUI/Screen/Window.h
 )

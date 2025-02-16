@@ -22,37 +22,27 @@ TEST_CASE("GameDevGUI Test Open / Close")
 
             if (uStep == 0)
             {
-                /*
-                    auto pRenderModule = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
-                    pRenderModule->AddEventBeginWindow(
-                        [](const Core::Common::Handle in_handle)
-                        {
-                            auto pGameDevGUIModule =
-                                HE_ENGINE.ModuleManager().Get<GameDevGUI::GameDevGUIModule>();
-                            pGameDevGUIModule->NewGUI(in_handle);
-                        });
-                    pRenderModule->AddEventEndWindow(
-                        [](const Core::Common::Handle in_handle)
-                        {
-                            auto pGameDevGUIModule =
-                                HE_ENGINE.ModuleManager().Get<GameDevGUI::GameDevGUIModule>();
-                            pGameDevGUIModule->DestoryGUI(in_handle);
-                        });
-                        */
-
-                ++uStep;
-
-                return FALSE;
-            }
-            else if (uStep == 1)
-            {
                 // メインウィンドウ
                 {
                     Core::Common::Handle windowHandle;
                     Core::Common::Handle viewPortHandle;
                     {
                         // ゲームウィンドウを生成
-                        windowHandle = pRenderModule->NewWindow(640, 480, TRUE);
+                        windowHandle = pRenderModule->NewWindow(
+                            [](const Core::Common::Handle in_handle)
+                            {
+                                Platform::WindowConfig platformWindowConfig;
+                                {
+                                    platformWindowConfig._uWidth         = 640;
+                                    platformWindowConfig._uHeight        = 480;
+                                    platformWindowConfig._uViewPortCount = 1;
+                                    platformWindowConfig._bMain          = TRUE;
+                                }
+
+                                auto pPlatformModule = HE_ENGINE.PlatformModule();
+                                return pPlatformModule->VScreen()
+                                    ->VCreateWindowStrategy(in_handle, platformWindowConfig);
+                            });
 
                         // 画面に表示するビューポート
                         // ゲームウィンドウで利用するビューポートを追加
@@ -61,48 +51,62 @@ TEST_CASE("GameDevGUI Test Open / Close")
 
                     // UIのゲームシーンを追加
                     {
-                        auto [handle, pScene] =
-                            pRenderModule->AddSceneViewUI(windowHandle, viewPortHandle);
+                        auto [handle, pScene] = pRenderModule->AddSceneView(
+                            windowHandle, viewPortHandle,
+                            // UI用のストラテジーを生成
+                            []()
+                            {
+                                auto pPlatformModule = HE_ENGINE.PlatformModule();
+                                return pPlatformModule->VScreen()->VCreateSceneUIStrategy();
+                            });
                         sceneHandle = handle;
                     }
                     // ゲームウィンドウを表示
                     pRenderModule->ShowWindow(windowHandle);
                 }
 
-                // TODO: サブウィンドウ(ImGUI用)
+                // サブウィンドウ(ImGUI用)
                 {
                     Core::Common::Handle windowHandle;
                     Core::Common::Handle viewPortHandle;
                     {
                         // デバッグウィンドウを生成
                         windowHandle = pRenderModule->NewWindow(
-                            320, 240, FALSE,
-                            [](Core::Common::Handle in_handle)
+                            [](const Core::Common::Handle in_handle)
                             {
+                                Platform::WindowConfig platformWindowConfig;
+                                {
+                                    platformWindowConfig._uWidth         = 320;
+                                    platformWindowConfig._uHeight        = 240;
+                                    platformWindowConfig._uViewPortCount = 1;
+                                    platformWindowConfig._bMain          = FALSE;
+                                }
+
                                 auto pGameDevGUIModule =
                                     HE_ENGINE.ModuleManager().Get<GameDevGUI::GameDevGUIModule>();
-                                pGameDevGUIModule->NewGUI(in_handle);
-                            },
-                            [](Core::Common::Handle in_handle)
-                            {
-                                auto pGameDevGUIModule =
-                                    HE_ENGINE.ModuleManager().Get<GameDevGUI::GameDevGUIModule>();
-                                pGameDevGUIModule->DestoryGUI();
+                                return pGameDevGUIModule
+                                    ->CreateWindowStrategy(in_handle, platformWindowConfig);
                             });
 
                         // 画面に表示するビューポート
                         // ゲームウィンドウで利用するビューポートを追加
-                        viewPortHandle = pRenderModule->AddViewPort(windowHandle, 32, 240);
+                        viewPortHandle = pRenderModule->AddViewPort(windowHandle, 320, 240);
 
                         // ウィンドウ座標設定
                         auto pWindow = pRenderModule->GetWindow(windowHandle);
                         pWindow->SetPos(0, 32);
                     }
 
-                    // UIのゲームシーンを追加
+                    // GameDevUIのゲームシーンを追加
                     {
-                        auto [handle, pScene] =
-                            pRenderModule->AddSceneViewUI(windowHandle, viewPortHandle);
+                        auto [handle, pScene] = pRenderModule->AddSceneView(
+                            windowHandle, viewPortHandle,
+                            []()
+                            {
+                                auto pGameDevGUIModule =
+                                    HE_ENGINE.ModuleManager().Get<GameDevGUI::GameDevGUIModule>();
+                                return pGameDevGUIModule->CreateSceneStrategy();
+                            });
                         sceneHandle = handle;
                     }
                     // ゲームウィンドウを表示
@@ -113,7 +117,7 @@ TEST_CASE("GameDevGUI Test Open / Close")
 
                 return FALSE;
             }
-            else if (uStep == 2)
+            else if (uStep == 1)
             {
                 // ウィンドウが閉じたら終了
 

@@ -32,12 +32,14 @@ namespace Render
     public:
         SceneViewBase();
         virtual ~SceneViewBase() = default;
+
+        HE::Bool Init(Core::Memory::UniquePtr<Platform::SceneStrategyInterface>);
         void Release();
 
         const Render::Prticle::Blob& GetPrticle(const Core::Common::Handle);
 
     protected:
-        HE::Bool _Begin(Core::Memory::UniquePtr<Platform::SceneStrategyInterface>);
+        void _Begin();
         void _End();
         void _Update(const HE::Float32);
 

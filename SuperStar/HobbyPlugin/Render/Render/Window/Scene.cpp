@@ -9,15 +9,9 @@ namespace Render
         this->_runtimePoolPrticleBlob.ReservePool(1024);
     }
 
-    HE::Bool SceneViewBase::_Begin(
-        Core::Memory::UniquePtr<Platform::SceneStrategyInterface> in_upSt)
+    HE::Bool SceneViewBase::Init(Core::Memory::UniquePtr<Platform::SceneStrategyInterface> in_upSt)
     {
         this->_upSt = std::move(in_upSt);
-        if (this->_upSt->VBegin() == FALSE)
-        {
-            return FALSE;
-        }
-
         return TRUE;
     }
 
@@ -29,8 +23,14 @@ namespace Render
 
     const Render::Prticle::Blob& SceneViewBase::GetPrticle(const Core::Common::Handle in_handle)
     {
-        // TODO: return ステートメントをここに挿入します
         return *(this->_runtimePoolPrticleBlob.Ref(in_handle));
+    }
+
+    void SceneViewBase::_Begin()
+    {
+        if (this->_upSt->VBegin() == FALSE)
+        {
+        }
     }
 
     void SceneViewBase::_End()
@@ -73,14 +73,6 @@ namespace Render
             // 矩形描画
             case ECmdType_2DQuadDraw:
                 break;
-                /*
-            // 点描画
-            case ECmdType_2DPointDraw:
-                break;
-            // 点群描画
-            case ECmdType_2DPointArrayDraw:
-                break;
-                */
             // 円の描画
             case ECmdType_2DCircleDraw:
                 break;

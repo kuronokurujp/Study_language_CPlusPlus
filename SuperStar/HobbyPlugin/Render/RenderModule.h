@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <functional>
+
 #include "Engine/Module/Module.h"
 
 // モジュールのヘッダーファイルは全てインクルードする
@@ -48,17 +50,20 @@ namespace Render
         using WindowHandleKeyMap = Core::Common::FixedMap<HE::Uint64, Core::Common::Handle, 32>;
         using ParticleBlobObject = std::tuple<Core::Common::Handle, Render::Prticle::Blob*>;
 
+        using OnFactoryWindowStrategyCallback =
+            std::function<Core::Memory::UniquePtr<Platform::WindowStrategy>(
+                const Core::Common::Handle)>;
+
+        using OnFactorySceneViewStrategyCallback =
+            std::function<Core::Memory::UniquePtr<Platform::SceneStrategyInterface>()>;
+
     public:
         RenderModule();
 
         /// <summary>
         /// ウィンドウ生成
         /// </summary>
-        const Core::Common::Handle NewWindow(const HE::Uint32 in_w, const HE::Uint32 in_h,
-                                             const HE::Bool in_bMain,
-                                             Window::OnBeginCallback = NULL,
-                                             Window::OnEndCallback   = NULL);
-
+        const Core::Common::Handle NewWindow(OnFactoryWindowStrategyCallback);
         /// <summary>
         /// ウィンドウ破棄
         /// </summary>
@@ -90,26 +95,19 @@ namespace Render
         const ViewPort* GetViewPort(const Core::Common::Handle);
 
         /// <summary>
-        /// UI用シーン追加
+        /// シーン追加
         /// </summary>
-        std::tuple<Core::Common::Handle, SceneViewBase*> AddSceneViewUI(
+        std::tuple<Core::Common::Handle, SceneViewBase*> AddSceneView(
             const Core::Common::Handle in_rWindowsHandle,
-            const Core::Common::Handle in_rViewPortHash);
+            const Core::Common::Handle in_rViewPortHash, OnFactorySceneViewStrategyCallback);
 
         /// <summary>
-        /// 2D用シーン追加
-        /// </summary>
-        std::tuple<Core::Common::Handle, SceneViewBase*> AddSceneView2D(
-            const Core::Common::Handle in_rWindowsHandle,
-            const Core::Common::Handle in_rViewPortHash);
-
-        /// <summary>
-        /// TODO: パーティクルの塊オブジェクト生成
+        /// パーティクルの塊オブジェクト生成
         /// </summary>
         ParticleBlobObject CreatePrticle(const Core::Common::Handle);
 
         /// <summary>
-        /// TODO: 生成したパーティクルを削除
+        /// 生成したパーティクルを削除
         /// </summary>
         void DeletePrticle(Core::Common::Handle&);
 

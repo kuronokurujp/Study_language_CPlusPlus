@@ -3,6 +3,7 @@
 #include "Engine/Common/CustomMap.h"
 #include "Engine/MiniEngine.h"
 #include "Engine/Module/Module.h"
+#include "Engine/Platform/PlatformScreen.h"
 
 // モジュールのヘッダーファイルは全てインクルードする
 namespace GameDevGUI
@@ -19,16 +20,15 @@ namespace GameDevGUI
         GameDevGUIModule();
 
         /// <summary>
-        /// GUIを新規作成
+        /// ImGUI用のウィンドウ戦略を作成
         /// </summary>
-        void NewGUI(const Core::Common::Handle);
+        Core::Memory::UniquePtr<Platform::WindowStrategy> CreateWindowStrategy(
+            const Core::Common::Handle, const Platform::WindowConfig&);
 
         /// <summary>
-        /// GUIを破棄
+        /// ImGUI用のシーン戦略を作成
         /// </summary>
-        void DestoryGUI();
-
-        // TODO: レイヤーの生成
+        Core::Memory::UniquePtr<Platform::SceneStrategyInterface> CreateSceneStrategy();
 
     protected:
         /// <summary>
