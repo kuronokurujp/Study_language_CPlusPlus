@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "Engine/Common/PoolManager.h"
+
 // SDL2の入力システム
 #include "Engine/Platform/PlatformInput.h"
 
@@ -14,14 +16,16 @@ namespace PlatformSDL2
         Input();
         void VRelease() override final;
 
-        HE::Bool VUpdate(const HE::Float32 in_fDeltaTime) override final;
+        void VUpdate(const HE::Float32) override final;
 
-        virtual void SetInputEventCallback(OnInputCallback);
+        // Inputオブジェクト
+        // マウスやキーボードなどの入力情報はオブジェクトに含まれている
+        virtual const Core::Common::Handle VCreateObject() override final;
+        virtual void VReleaseObject(Core::Common::Handle&) override final;
+
+        virtual Platform::InputObject& GetObj(const Core::Common::Handle) override final;
 
     private:
-        HE::Uint32 _uCurrButton = 0;
-        HE::Uint32 _uPrevButton = 0;
-
-        OnInputCallback _onInputCallback = NULL;
+        Core::Common::RuntimePoolManager<Platform::InputObject> _poolInputObject;
     };
 }  // namespace PlatformSDL2

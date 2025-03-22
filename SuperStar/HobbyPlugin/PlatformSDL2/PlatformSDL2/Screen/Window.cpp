@@ -1,5 +1,8 @@
 ﻿#include "Window.h"
 
+#include "Engine/Engine.h"
+#include "Engine/Platform/PlatformModule.h"
+
 // パッケージ
 #include "GL/glew.h"
 #include "SDL2/SDL.h"
@@ -52,6 +55,7 @@ namespace PlatformSDL2
             pNewContext = ::SDL_GL_CreateContext(reinterpret_cast<SDL_Window*>(pNewWindow));
             HE_ASSERT(pNewContext);
         }
+        this->_windowID = ::SDL_GetWindowID(pNewWindow);
 
         this->_context = Context(pNewContext, pNewWindow);
 
@@ -77,8 +81,49 @@ namespace PlatformSDL2
             }
         }
 
-        // 設定データをウィンドウと紐づける
-        ::SDL_SetWindowData(pNewWindow, HE_STR_U8_TEXT("UserData"), &this->_config);
+        // メインウィンドウの場合は入力によってゲーム終了させる
+        if (this->_config._bMain)
+        {
+            // 入力イベントを取得
+            auto& pInputObj =
+                HE_ENGINE.PlatformModule()->VInput()->GetObj(this->_config._inputHandle);
+            pInputObj.SetEventCallback(
+                [this](void* in_pEvent)
+                {
+                    const SDL_Event* pSDLEvent = reinterpret_cast<const SDL_Event*>(in_pEvent);
+                    HE_ASSERT(pSDLEvent);
+                    switch (pSDLEvent->type)
+                    {
+                        // アプリ全体の終了イベント
+                        // ウィンドウが一つのみならウィンドウの×ボタンをクリックすると呼ばれる
+                        // でもウィンドウが複数あるとよばれない
+                        case SDL_QUIT:
+                        {
+                            this->_bClose = TRUE;
+                            break;
+                        }
+                        case SDL_WINDOWEVENT:
+                        {
+                            // ウィンドウが複数時の処理
+                            switch (pSDLEvent->window.event)
+                            {
+                                case SDL_WINDOWEVENT_CLOSE:
+                                {
+                                    if (pSDLEvent->window.windowID == this->_windowID)
+                                        this->_bClose = TRUE;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    // メインウィンドウ終了はエンジンの終了
+                    if (this->_bClose)
+                    {
+                        HE_ENGINE.Quit();
+                    }
+                });
+        }
     }
 
     void SDL2WindowStrategy::VEnd()
@@ -94,7 +139,12 @@ namespace PlatformSDL2
             ::SDL_DestroyWindow(reinterpret_cast<SDL_Window*>(pWindow));
         }
 
-        this->_context = Context(NULL, NULL);
+        this->_context  = Context(NULL, NULL);
+        this->_windowID = 0;
+    }
+
+    void SDL2WindowStrategy::VUpdate(const HE::Float32 in_dt)
+    {
     }
 
     void SDL2WindowStrategy::VSetPos(const HE::Uint32 in_uX, const HE::Uint32 in_uY)

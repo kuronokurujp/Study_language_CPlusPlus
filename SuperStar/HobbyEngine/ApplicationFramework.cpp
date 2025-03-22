@@ -19,7 +19,7 @@ HE::Bool ApplicationEngineFramework::Init(const HE::Bool in_bDebug)
     HE_ASSERT(bInitRet && "初期化に失敗");
     if (bInitRet == FALSE) return FALSE;
 
-    return HE::Bool();
+    return TRUE;
 }
 
 void ApplicationEngineFramework::Release()
@@ -33,24 +33,25 @@ void ApplicationEngineFramework::Running()
 {
     this->_VLoad();
 
+    // TODO: 非同期処理にしたい
     this->_VStart();
 
     // ゲームループ
     HE::Float32 fDelta = 0.0f;
-    while (HE_ENGINE.IsAppQuit() == FALSE)
+    while (HE_ENGINE.IsQuit() == FALSE)
     {
         // 前処理
         fDelta = HE_ENGINE.GetDeltaTimeSec();
-        if (HE_ENGINE.BeforeUpdateLoop(fDelta) == FALSE) break;
+        HE_ENGINE.BeforeUpdateLoop(fDelta);
+        if (HE_ENGINE.IsQuit()) break;
 
-        if (HE_ENGINE.WaitFrameLoop() == FALSE)
-        {
-            break;
-        }
+        HE_ENGINE.WaitFrameLoop();
+        if (HE_ENGINE.IsQuit()) break;
 
-        if (HE_ENGINE.MainUpdateLoop(fDelta) == FALSE) break;
+        HE_ENGINE.MainUpdateLoop(fDelta);
+        if (HE_ENGINE.IsQuit()) break;
 
-        if (HE_ENGINE.LateUpdateLoop(fDelta) == FALSE) break;
+        HE_ENGINE.LateUpdateLoop(fDelta);
     }
 
     this->_VEnd();

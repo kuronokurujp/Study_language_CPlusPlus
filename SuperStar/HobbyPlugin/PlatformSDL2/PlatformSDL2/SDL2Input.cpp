@@ -122,141 +122,143 @@ namespace PlatformSDL2
             SDL_SCANCODE_8,
             SDL_SCANCODE_9,
         };
-    }
+
+        class InputObject : public Platform::InputObject
+        {
+        public:
+            InputObject() : Platform::InputObject()
+            {
+                // キー入力初期化
+                {
+                    for (HE::Uint32 i = 0; i < Platform::EKeyboard::EKeyboard_MAX; ++i)
+                    {
+                    }
+
+                    ::memset(this->_keyboard._aPrevState, Platform::EInputState::EInputState_NONE,
+                             HE_ARRAY_SIZE(this->_keyboard._aPrevState));
+                }
+
+                // タッチ入力初期化
+                {
+                    int x                 = 0;
+                    int y                 = 0;
+                    this->_touch._pos._fX = static_cast<HE::Float32>(x);
+                    this->_touch._pos._fY = static_cast<HE::Float32>(y);
+
+                    this->_uPrevButton = Platform::EInputState::EInputState_NONE;
+                }
+            }
+
+            void Update()
+            {
+                // キーボード入力取得
+                const ::Uint8* pKeyboardState = ::SDL_GetKeyboardState(nullptr);
+
+                // キー入力の処理
+                {
+                    for (HE::Uint32 i = 0; i < Platform::EKeyboard::EKeyboard_MAX; ++i)
+                    {
+                        // キーの前情報を設定
+                        this->_keyboard._aPrevState[i] = this->_keyboard._aCurrState[i];
+
+                        // キーの新しい情報を設定
+                        this->_keyboard._aCurrState[i] = 0;
+                        if (pKeyboardState[Local::aGameKeyMap[i]])
+                            this->_keyboard._aCurrState[i] = 1;
+                    }
+                }
+
+                // タッチ入力
+                {
+                    int x                = 0;
+                    int y                = 0;
+                    ::Uint32 mouseButton = ::SDL_GetMouseState(&x, &y);
+
+                    this->_touch._pos._fX = static_cast<HE::Float32>(x);
+                    this->_touch._pos._fY = static_cast<HE::Float32>(y);
+
+                    this->_uPrevButton = this->_touch._uCurrTouchState;
+                    this->_uCurrButton = mouseButton;
+
+                    this->_touch._uPrevTouchState = 0;
+                    this->_touch._uCurrTouchState = 0;
+
+                    if (this->_uPrevButton & SDL_BUTTON_LMASK)
+                        this->_touch._uPrevTouchState |= Platform::EInputMouseType_Left;
+                    if (this->_uPrevButton & SDL_BUTTON_RMASK)
+                        this->_touch._uPrevTouchState |= Platform::EInputMouseType_Right;
+                    if (this->_uPrevButton & SDL_BUTTON_MMASK)
+                        this->_touch._uPrevTouchState |= Platform::EInputMouseType_Middle;
+
+                    if (this->_uCurrButton & SDL_BUTTON_LMASK)
+                        this->_touch._uCurrTouchState |= Platform::EInputMouseType_Left;
+                    if (this->_uCurrButton & SDL_BUTTON_RMASK)
+                        this->_touch._uCurrTouchState |= Platform::EInputMouseType_Right;
+                    if (this->_uCurrButton & SDL_BUTTON_MMASK)
+                        this->_touch._uCurrTouchState |= Platform::EInputMouseType_Middle;
+                }
+            }
+
+        private:
+            HE::Uint32 _uCurrButton = 0;
+            HE::Uint32 _uPrevButton = 0;
+        };
+    }  // namespace Local
 
     Input::Input()
     {
-        // キー入力初期化
-        {
-            for (HE::Uint32 i = 0; i < Platform::EKeyboard::EKeyboard_MAX; ++i)
-            {
-            }
-
-            ::memset(this->_state._keyboard._aPrevState, Platform::EInputState::EInputState_NONE,
-                     HE_ARRAY_SIZE(this->_state._keyboard._aPrevState));
-        }
-
-        // タッチ入力初期化
-        {
-            int x                        = 0;
-            int y                        = 0;
-            this->_state._touch._pos._fX = static_cast<HE::Float32>(x);
-            this->_state._touch._pos._fY = static_cast<HE::Float32>(y);
-
-            this->_uPrevButton = Platform::EInputState::EInputState_NONE;
-        }
+        this->_poolInputObject.ReservePool(32);
     }
 
     void Input::VRelease()
     {
-        this->_onInputCallback = NULL;
+        this->_poolInputObject.ReleasePool();
     }
 
-    HE::Bool Input::VUpdate(const HE::Float32 in_fDeltaTime)
+    void Input::VUpdate(const HE::Float32 in_fDeltaTime)
     {
-        // 入力更新
-        HE::Bool bQuit = FALSE;
-
         SDL_Event eventData;
         SDL_zero(eventData);
 
         // SDLシステム内で発生したイベントはすべてキューに積まれている
         // キューに積まれたイベントを取得して分岐処理している
+
+        auto map = this->_poolInputObject.GetUserDataList();
         while (::SDL_PollEvent(&eventData))
         {
-            switch (eventData.type)
-            {
-                // アプリ全体の終了イベント
-                // ウィンドウが一つのみならウィンドウの×ボタンをクリックすると呼ばれる
-                // でもウィンドウが複数あるとよばれない
-                case SDL_QUIT:
-                {
-                    bQuit = TRUE;
-                    break;
-                }
-                case SDL_WINDOWEVENT:
-                {
-                    // ウィンドウが複数時の処理
-                    switch (eventData.window.event)
-                    {
-                        case SDL_WINDOWEVENT_CLOSE:
-                        {
-                            auto pWindow       = ::SDL_GetWindowFromID(eventData.window.windowID);
-                            auto pWindowConfig = reinterpret_cast<Platform::WindowConfig*>(
-                                ::SDL_GetWindowData(pWindow, HE_STR_U8_TEXT("UserData")));
-                            if (pWindowConfig)
-                            {
-                                if (pWindowConfig->_bMain)
-                                {
-                                    bQuit = TRUE;
-                                }
-                            }
-                            break;
-                        }
-                    }
-
-                    default:
-                        break;
-                }
-            }
-
             // 入力結果を他モジュールに通知
-            if (this->_onInputCallback) this->_onInputCallback(reinterpret_cast<void*>(&eventData));
-        }
-
-        // キーボード入力取得
-        const ::Uint8* pKeyboardState = ::SDL_GetKeyboardState(nullptr);
-
-        // キー入力の処理
-        {
-            for (HE::Uint32 i = 0; i < Platform::EKeyboard::EKeyboard_MAX; ++i)
             {
-                // キーの前情報を設定
-                this->_state._keyboard._aPrevState[i] = this->_state._keyboard._aCurrState[i];
-
-                // キーの新しい情報を設定
-                this->_state._keyboard._aCurrState[i] = 0;
-                if (pKeyboardState[Local::aGameKeyMap[i]])
-                    this->_state._keyboard._aCurrState[i] = 1;
+                for (auto it = map->begin(); it != map->end(); ++it)
+                {
+                    it->second->Event(reinterpret_cast<void*>(&eventData));
+                }
             }
         }
 
-        // タッチ入力
+        // 入力更新　
+        for (auto it = map->begin(); it != map->end(); ++it)
         {
-            int x                = 0;
-            int y                = 0;
-            ::Uint32 mouseButton = ::SDL_GetMouseState(&x, &y);
-
-            this->_state._touch._pos._fX = static_cast<HE::Float32>(x);
-            this->_state._touch._pos._fY = static_cast<HE::Float32>(y);
-
-            this->_uPrevButton = this->_state._touch._uCurrTouchState;
-            this->_uCurrButton = mouseButton;
-
-            this->_state._touch._uPrevTouchState = 0;
-            this->_state._touch._uCurrTouchState = 0;
-
-            if (this->_uPrevButton & SDL_BUTTON_LMASK)
-                this->_state._touch._uPrevTouchState |= Platform::EInputMouseType_Left;
-            if (this->_uPrevButton & SDL_BUTTON_RMASK)
-                this->_state._touch._uPrevTouchState |= Platform::EInputMouseType_Right;
-            if (this->_uPrevButton & SDL_BUTTON_MMASK)
-                this->_state._touch._uPrevTouchState |= Platform::EInputMouseType_Middle;
-
-            if (this->_uCurrButton & SDL_BUTTON_LMASK)
-                this->_state._touch._uCurrTouchState |= Platform::EInputMouseType_Left;
-            if (this->_uCurrButton & SDL_BUTTON_RMASK)
-                this->_state._touch._uCurrTouchState |= Platform::EInputMouseType_Right;
-            if (this->_uCurrButton & SDL_BUTTON_MMASK)
-                this->_state._touch._uCurrTouchState |= Platform::EInputMouseType_Middle;
+            Local::InputObject* pObj = reinterpret_cast<Local::InputObject*>(it->second);
+            pObj->Update();
         }
-
-        return (bQuit == FALSE);
     }
 
-    void Input::SetInputEventCallback(OnInputCallback in_callback)
+    const Core::Common::Handle Input::VCreateObject()
     {
-        this->_onInputCallback = std::move(in_callback);
+        auto [handle, obj] = this->_poolInputObject.Alloc<Local::InputObject>();
+
+        return handle;
+    }
+
+    void Input::VReleaseObject(Core::Common::Handle& in_rHandle)
+    {
+        this->_poolInputObject.Free(in_rHandle, TRUE);
+    }
+
+    Platform::InputObject& Input::GetObj(const Core::Common::Handle in_handle)
+    {
+        auto pObj = reinterpret_cast<Local::InputObject*>(this->_poolInputObject.Ref(in_handle));
+        return *pObj;
     }
 
 }  // namespace PlatformSDL2

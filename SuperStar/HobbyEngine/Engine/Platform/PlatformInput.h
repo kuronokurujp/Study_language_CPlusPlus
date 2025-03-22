@@ -2,11 +2,12 @@
 
 #include <functional>
 
-// プラットフォームのインプットシステムインターフェイス
+#include "Engine/Common/Handle.h"
 #include "Engine/Core.h"
 #include "Engine/Math/Math.h"
 #include "Engine/Type.h"
 
+// プラットフォームのインプットシステムインターフェイス
 namespace Platform
 {
     // キーボードの各キーコード
@@ -293,12 +294,33 @@ namespace Platform
     };
 
     /// <summary>
-    /// キーやタッチなどの入力状態
+    /// キーやタッチなどの入力オブジェクト
     /// </summary>
-    struct InputState
+    class InputObject
     {
+    public:
+        using OnEventCallback = std::function<void(void*)>;
+
+    public:
+        virtual ~InputObject() { this->_onEventCallback = NULL; }
+
+        const KeyboardInput& Keyboard() const { return this->_keyboard; }
+        const TouchInput& Touch() const { return this->_touch; }
+
+        void Event(void* in_pEvent)
+        {
+            if (this->_onEventCallback) this->_onEventCallback(in_pEvent);
+        }
+
+        void SetEventCallback(OnEventCallback in_callback)
+        {
+            this->_onEventCallback = std::move(in_callback);
+        }
+
+    protected:
         KeyboardInput _keyboard;
         TouchInput _touch;
+        OnEventCallback _onEventCallback = NULL;
     };
 
     /// <summary>
@@ -308,19 +330,16 @@ namespace Platform
     class InputInterface
     {
     public:
-        using OnInputCallback = std::function<void(void*)>;
-
-    public:
         virtual ~InputInterface() = default;
 
-        virtual void VRelease()                                   = 0;
-        virtual HE::Bool VUpdate(const HE::Float32 in_fDeltaTime) = 0;
+        virtual void VRelease()                 = 0;
+        virtual void VUpdate(const HE::Float32) = 0;
 
-        virtual void SetInputEventCallback(OnInputCallback) = 0;
+        // Inputオブジェクトを作成
+        // オブジェクトにはマウスやキーボードなどの入力情報がある
+        virtual const Core::Common::Handle VCreateObject() = 0;
+        virtual void VReleaseObject(Core::Common::Handle&) = 0;
 
-        const InputState& GetState() const { return this->_state; }
-
-    protected:
-        InputState _state;
+        virtual InputObject& GetObj(const Core::Common::Handle) = 0;
     };
 }  // namespace Platform

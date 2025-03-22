@@ -490,11 +490,16 @@ namespace PlatformSDL2
         pParticleMesh->SetVelocitys(in_rVelocitys);
     }
 
+    Platform::ScreenRenderInterface* Screen::VGetDrawInterface()
+    {
+        return this;
+    }
+
     void Screen::V2DDrawPartical(const Platform::ViewPortConfig& in_rViewConfig,
                                  const Core::Common::Handle in_rParticleHandle,
                                  const Core::Math::Vector3& in_rPos)
     {
-        // TODO: 事前に生成したパーティクル用のメッシュを使って描画
+        // 事前に生成したパーティクル用のメッシュを使って描画
         auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
 
         auto pParticleMesh = pPool->Ref(in_rParticleHandle);

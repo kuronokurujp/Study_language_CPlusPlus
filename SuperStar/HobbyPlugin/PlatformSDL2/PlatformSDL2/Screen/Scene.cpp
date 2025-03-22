@@ -2,9 +2,15 @@
 
 #include "./Draw/Material.h"
 #include "./Draw/Mesh.h"
-#include "Engine/Math/Math.h"
+
+// SDL2関連
 #include "GL/glew.h"
 #include "SDL2/SDL.h"
+
+// エンジン関連
+#include "Engine/Engine.h"
+#include "Engine/Math/Math.h"
+#include "Engine/Platform/PlatformModule.h"
 
 namespace PlatformSDL2
 {
@@ -34,5 +40,15 @@ namespace PlatformSDL2
 
     void SDL2SceneStrategy2D::VEndRender()
     {
+    }
+
+    Platform::ScreenRenderInterface* SDL2SceneStrategy2D::VGetPlatformScreenDraw()
+    {
+        // TODO:
+        // スクリーンのプラットフォームは動的に切り替えたいのでストラテジー側から取得できるように変える
+        auto pPlatformModule = HE_ENGINE.PlatformModule();
+        HE_ASSERT(pPlatformModule);
+
+        return pPlatformModule->VScreen()->VGetDrawInterface();
     }
 }  // namespace PlatformSDL2

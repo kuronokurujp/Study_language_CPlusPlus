@@ -23,8 +23,6 @@ HE::Bool Engine::Init()
 
     HE_LOG_LINE(HE_STR_TEXT("エンジンの前準備"));
 
-    this->_bInit = TRUE;
-
     this->_memoryManager.Setup();
 
     // メモリ管理
@@ -37,6 +35,9 @@ HE::Bool Engine::Init()
         HE_ASSERT(0 && "カスタムメモリの初期化に失敗");
         return FALSE;
     }
+
+    this->_bQuit = FALSE;
+    this->_bInit = TRUE;
 
     // メモリページ確保
     // TODO: 確保量は適当にしている
@@ -63,7 +64,7 @@ HE::Bool Engine::Init()
     this->_upModuleManager = HE_MAKE_CUSTOM_UNIQUE_PTR((Module::ModuleManager));
 
     // 成功
-    return TRUE;
+    return this->_bInit;
 }
 
 /// <summary>
@@ -96,7 +97,7 @@ HE::Bool Engine::Start()
     this->_bStart = TRUE;
 
     // 成功
-    return TRUE;
+    return this->_bStart;
 }
 
 HE::Bool Engine::VRelease()
@@ -124,72 +125,64 @@ HE::Bool Engine::VRelease()
 
     this->_bInit  = FALSE;
     this->_bStart = FALSE;
+    this->_bQuit  = FALSE;
 
     return TRUE;
 }
 
-HE::Bool Engine::BeforeUpdateLoop(const HE::Float32 in_fDt)
+void Engine::BeforeUpdateLoop(const HE::Float32 in_fDt)
 {
     this->_upModuleManager->BeforeUpdate(in_fDt);
-
-    return (this->IsAppQuit() == FALSE);
 }
 
-HE::Bool Engine::WaitFrameLoop()
+void Engine::WaitFrameLoop()
 {
     auto pPlatform = this->PlatformModule();
-    if (pPlatform == NULL) return TRUE;
+    if (pPlatform == NULL) return;
 
-    if (this->_spFPS != NULL)
+    if (this->_spFPS == NULL) return;
+
+    HE::Uint64 ulBeginMSec = this->_spFPS->GetLastTimeMSec();
+
+    // 固定フレームモード
+    if (this->_spFPS->IsFixedMode())
     {
-        HE::Uint64 ulBeginMSec = this->_spFPS->GetLastTimeMSec();
-
-        // 固定フレームモード
-        if (this->_spFPS->IsFixedMode())
+        // 指定したFPSまで待機
+        do
         {
-            // 指定したFPSまで待機
-            do
+            if (this->_spFPS->IsWaitFrameFixedMode(pPlatform->VTime()))
             {
-                if (this->_spFPS->IsWaitFrameFixedMode(pPlatform->VTime()))
-                {
-                    // TODO: 待機中は何か処理をした方がいい?
-                    pPlatform->VTime()->VSleepMSec(1);
-                }
-                else
-                {
-                    this->_spFPS->UpdateTime(pPlatform->VTime());
-                    break;
-                }
-            } while (TRUE);
-        }
-        else
-        {
-            this->_spFPS->UpdateTime(pPlatform->VTime());
-        }
-
-        HE::Uint64 ulEndMSec = this->_spFPS->GetLastTimeMSec();
+                // TODO: 待機中は何か処理をした方がいい?
+                pPlatform->VTime()->VSleepMSec(1);
+            }
+            else
+            {
+                this->_spFPS->UpdateTime(pPlatform->VTime());
+                break;
+            }
+        } while (TRUE);
+    }
+    else
+    {
+        this->_spFPS->UpdateTime(pPlatform->VTime());
     }
 
-    return (pPlatform->VIsQuit() == FALSE);
+    HE::Uint64 ulEndMSec = this->_spFPS->GetLastTimeMSec();
 }
 
-HE::Bool Engine::MainUpdateLoop(const HE::Float32 in_fDt)
+void Engine::MainUpdateLoop(const HE::Float32 in_fDt)
 {
     // モジュール更新
     HE_ASSERT(this->_upModuleManager);
 
     this->_upModuleManager->Update(in_fDt);
-
-    return (this->IsAppQuit() == FALSE);
 }
 
-HE::Bool Engine::LateUpdateLoop(const HE::Float32 in_fDt)
+void Engine::LateUpdateLoop(const HE::Float32 in_fDt)
 {
     HE_ASSERT(this->_upModuleManager);
 
     this->_upModuleManager->LateUpdate(in_fDt);
-
-    return (this->IsAppQuit() == FALSE);
 }
 
 HE::Float32 Engine::GetDeltaTimeSec()
@@ -208,13 +201,14 @@ HE::Uint32 Engine::GetFPS()
     return this->_spFPS->GetFrameRate();
 }
 
-HE::Bool Engine::IsAppQuit()
+const HE::Bool Engine::IsQuit()
 {
-    // プラットフォームがない場合は閉じれない
-    auto pPlatform = this->PlatformModule();
-    if (pPlatform == NULL) return FALSE;
+    return this->_bQuit;
+}
 
-    return pPlatform->VIsQuit();
+void Engine::Quit()
+{
+    this->_bQuit = TRUE;
 }
 
 Platform::PlatformModule* Engine::PlatformModule()

@@ -59,49 +59,6 @@ namespace Render
         pModule->PushRenderCommand(in_renderHandle, std::move(cmd));
     }
 
-    /*
-        void Command2DPointDraw(const Core::Common::Handle in_renderHandle,
-                                const Core::Math::Vector2& in_rPos, const Core::Math::Color&
-       in_rColor)
-        {
-            HE_ASSERT(in_renderHandle.Null() == FALSE);
-            // 必要なコマンド情報を作る
-            Command cmd;
-            {
-                cmd._uType                  = ECmdType_2DPointDraw;
-                Cmd2DPointDraw* pCmdPoint2D = &cmd._data._2DDrawPoint;
-                HE_STATIC_ASSERT(sizeof(cmd._data._2DDrawPoint) <= sizeof(cmd._data._ulaWork));
-
-                Point3D* pPoint2D = &pCmdPoint2D->_point;
-                pPoint2D->_fX     = in_rPos._fX;
-                pPoint2D->_fY     = in_rPos._fY;
-                pPoint2D->_color  = in_rColor;
-            }
-
-            auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
-            pModule->PushRenderCommand(in_renderHandle, std::move(cmd));
-        }
-
-        void Command2DPointArrayDraw(const Core::Common::Handle& in_rViewHandle,
-                                     const Point3D* in_aPoint, const HE::Uint32 in_uCount)
-        {
-            // 点群描画コマンドを作る
-            HE_ASSERT(in_rViewHandle.Null() == FALSE);
-            // 必要なコマンド情報を作る
-            Command cmd;
-            {
-                cmd._uType                = ECmdType_2DPointArrayDraw;
-                Cmd2DPointArrayDraw* pCmd = &cmd._data._2DDrawPointCloud;
-                HE_STATIC_ASSERT(sizeof(cmd._data._2DDrawPointCloud) <= sizeof(cmd._data._ulaWork));
-                // 引数のポインタをそのまま使用している
-                pCmd->_aPoint = in_aPoint;
-                pCmd->_uCount = in_uCount;
-            }
-            auto pModule = HE_ENGINE.ModuleManager().Get<RenderModule>();
-            pModule->PushRenderCommand(in_rViewHandle, std::move(cmd));
-        }
-    */
-
     void CommandClsScreen(const Core::Common::Handle in_renderHandle,
                           const Core::Math::Color& in_rColor)
     {
@@ -144,7 +101,7 @@ namespace Render
     }
 
     /// <summary>
-    /// TODO: 三角形の2D描画
+    /// 三角形の2D描画
     /// </summary>
     void Command2DTriangleDraw(const Core::Common::Handle in_renderHandle,
                                const Core::Math::Vector2& in_rPos,
@@ -178,7 +135,7 @@ namespace Render
                                const Core::Common::Handle in_particlaHandle,
                                const Core::Math::Vector2& in_rPos)
     {
-        // TODO: 実装する
+        // 実装する
         HE_ASSERT(in_particlaHandle.Null() == FALSE);
 
         // 必要なコマンド情報を作る

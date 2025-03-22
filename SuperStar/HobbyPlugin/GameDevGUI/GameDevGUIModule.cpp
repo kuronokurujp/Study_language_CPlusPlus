@@ -26,7 +26,7 @@ namespace GameDevGUI
     Core::Memory::UniquePtr<Platform::WindowStrategy> GameDevGUIModule::CreateWindowStrategy(
         const Core::Common::Handle in_handle, const Platform::WindowConfig& in_rConfig)
     {
-        // TODO: ImGUI用のを作成
+        // ImGUI用のを作成
         auto pPlatformModule = HE_ENGINE.PlatformModule();
 
         auto upSt = HE_MAKE_CUSTOM_UNIQUE_PTR((GameDevGUIWindowStrategy),
@@ -41,7 +41,7 @@ namespace GameDevGUI
     {
         auto pPlatformModule = HE_ENGINE.PlatformModule();
 
-        // TODO: ImGUI用のを作成
+        // ImGUI用のプラットフォームのスクリーンを作成
         auto upSt = HE_MAKE_CUSTOM_UNIQUE_PTR((GameDevGUISceneStrategy),
                                               pPlatformModule->VScreen()->VCreateSceneUIStrategy());
         return std::move(upSt);
@@ -52,19 +52,6 @@ namespace GameDevGUI
     /// </summary>
     HE::Bool GameDevGUIModule::_VStart()
     {
-        this->_pImGuiContext = NULL;
-
-        auto pPlatformModule = HE_ENGINE.PlatformModule();
-        pPlatformModule->VInput()->SetInputEventCallback(
-            [this](void* in_pEvent)
-            {
-                if (this->_pImGuiContext == NULL) return;
-#ifdef HE_USE_SDL2
-                SDL_Event* pEvent = reinterpret_cast<SDL_Event*>(in_pEvent);
-                ImGui_ImplSDL2_ProcessEvent(pEvent);
-#endif
-            });
-
         return TRUE;
     }
 

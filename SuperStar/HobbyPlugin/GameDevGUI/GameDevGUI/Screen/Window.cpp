@@ -43,6 +43,17 @@ namespace GameDevGUI
         // TODO: OpenGL名取得はwindowクラスに持った方がいいかな?
         auto pPlatformModule = HE_ENGINE.PlatformModule();
         ::ImGui_ImplOpenGL3_Init(pPlatformModule->GetOpenGLVersionNameBySDL2());
+
+        // 入力イベントを取得
+        auto& pInputObj = HE_ENGINE.PlatformModule()->VInput()->GetObj(this->_config._inputHandle);
+        pInputObj.SetEventCallback(
+            [](void* in_pEvent)
+            {
+                const SDL_Event* pSDLEvent = reinterpret_cast<const SDL_Event*>(in_pEvent);
+                HE_ASSERT(pSDLEvent);
+                ::ImGui_ImplSDL2_ProcessEvent(pSDLEvent);
+            });
+
 #endif
         this->_pImGuiContext = pImGuiContext;
     }
@@ -60,6 +71,11 @@ namespace GameDevGUI
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upSt);
 
         this->_pImGuiContext = NULL;
+    }
+
+    void GameDevGUIWindowStrategy::VUpdate(const HE::Float32 in_dt)
+    {
+        this->_upSt->VUpdate(in_dt);
     }
 
     void GameDevGUIWindowStrategy::VSetPos(const HE::Uint32 in_uX, const HE::Uint32 in_uY)

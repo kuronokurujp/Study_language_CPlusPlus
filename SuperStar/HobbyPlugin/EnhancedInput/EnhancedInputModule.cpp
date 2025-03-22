@@ -73,7 +73,8 @@ namespace EnhancedInput
         // 入力処理をする
         if (this->_mMappingAction.Empty()) return;
 
-        auto& inputState = pInput->GetState();
+        // 扱う入力オブジェクトを取得
+        auto& rInputObj = pInput->GetObj(this->_inputHandle);
 
         // 登録した入力アクションが発生しているかチェック
         for (auto it = this->_mMappingAction.Begin(); it != this->_mMappingAction.End(); ++it)
@@ -82,7 +83,7 @@ namespace EnhancedInput
             for (HE::Uint32 i = 0; i < it->_data.aKeyboardKeys.Size(); ++i)
             {
                 const auto eKey = it->_data.aKeyboardKeys[i];
-                if (inputState._keyboard.GetKeyState(eKey))
+                if (rInputObj.Keyboard().GetKeyState(eKey))
                 {
                     InputData inputData;
                     inputData.eType              = EInputType_Keyboard;
@@ -95,10 +96,10 @@ namespace EnhancedInput
             for (HE::Uint32 i = 0; i < it->_data.aTouchs.Size(); ++i)
             {
                 const auto eTouch      = it->_data.aTouchs[i];
-                const auto eTouchState = inputState._touch.GetTouchState(it->_data.aTouchs[i]);
+                const auto eTouchState = rInputObj.Touch().GetTouchState(it->_data.aTouchs[i]);
                 if (eTouchState == Platform::EInputState::EInputState_PRESSED)
                 {
-                    const auto pos = inputState._touch.GetWorldPos();
+                    const auto pos = rInputObj.Touch().GetWorldPos();
 
                     InputData inputData;
                     inputData.eType            = EInputType_Touch;

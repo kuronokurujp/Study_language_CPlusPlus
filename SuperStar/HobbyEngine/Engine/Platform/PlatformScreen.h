@@ -16,6 +16,7 @@ namespace Platform
         HE::Uint32 _uHeight        = 0;
         HE::Uint32 _uViewPortCount = 0;
         HE::Bool _bMain            = FALSE;
+        Core::Common::Handle _inputHandle;
     };
 
     struct ViewPortConfig
@@ -38,15 +39,18 @@ namespace Platform
         virtual void VActive() = 0;
         virtual void VShow()   = 0;
 
-        virtual void VBegin() = 0;
-        virtual void VEnd()   = 0;
+        virtual void VBegin()                         = 0;
+        virtual void VEnd()                           = 0;
+        virtual void VUpdate(const HE::Float32 in_dt) = 0;
 
         virtual void VBeginRender() = 0;
         virtual void VEndRender()   = 0;
 
+        virtual const HE::Bool IsClose() const { return this->_bClose; }
+
 #ifdef HE_USE_SDL2
-        virtual void* VGetWindowBySDL2() const  = 0;
-        virtual void* VGetContentBySDL2() const = 0;
+        virtual void* VGetWindowBySDL2() const { return NULL; }
+        virtual void* VGetContentBySDL2() const { return NULL; }
 #endif
 
         inline const Core::Common::Handle GetHandle() const { return this->_handle; }
@@ -55,6 +59,7 @@ namespace Platform
     protected:
         Core::Common::Handle _handle;
         WindowConfig _config;
+        HE::Bool _bClose = FALSE;
     };
 
     /// <summary>
@@ -75,7 +80,7 @@ namespace Platform
     };
 
     /// <summary>
-    /// 描画シーンのロジックインターフェイス
+    /// シーンのロジックインターフェイス
     /// </summary>
     class SceneStrategyInterface
     {
@@ -88,38 +93,20 @@ namespace Platform
         virtual void VUpdate(const HE::Float32) = 0;
         virtual void VBeginRender()             = 0;
         virtual void VEndRender()               = 0;
-    };
-
-    class ScreenInterface
-    {
-    public:
-        virtual ~ScreenInterface() = default;
-        virtual void VRelease()    = 0;
-
-        virtual Core::Memory::UniquePtr<WindowStrategy> VCreateWindowStrategy(
-            const Core::Common::Handle, const WindowConfig&) = 0;
-
-        virtual Core::Memory::UniquePtr<ViewPortStrategy> VCreateViewPortStrategy(
-            const ViewPortConfig&) = 0;
-
-        virtual Core::Memory::UniquePtr<SceneStrategyInterface> VCreateSceneUIStrategy() = 0;
-        virtual Core::Memory::UniquePtr<SceneStrategyInterface> VCreateScene2DStrategy() = 0;
-
-        // TODO: パーティクルの生成
-        // 描画は戻り値のハンドルを指定
-        // 事前に生成しておく必要がある
-        virtual Core::Common::Handle VParticalCreate(const HE::Uint32 in_uCount) = 0;
 
         /// <summary>
-        /// TODO: 生成したパーティクルを削除
+        /// シーンを描画するプラットフォームのインスタンス
         /// </summary>
-        virtual void VParticalDelete(Core::Common::Handle) = 0;
+        /// <returns></returns>
+        virtual class ScreenRenderInterface* VGetPlatformScreenDraw() { return NULL; }
+    };
 
-        virtual void VParticalSetPositions(const Core::Common::Handle,
-                                           const Core::Common::ArrayBase<Core::Math::Vector3>&) = 0;
-        virtual void VParticalSetVelocitys(const Core::Common::Handle,
-                                           const Core::Common::ArrayBase<Core::Math::Vector3>&) = 0;
-
+    /// <summary>
+    /// シーンレンダリングのインターフェイス
+    /// </summary>
+    class ScreenRenderInterface
+    {
+    public:
         /// <summary>
         /// 画面を色クリア
         /// </summary>
@@ -162,4 +149,38 @@ namespace Platform
                                      const HE::Float32 in_rAngleDegress, const HE::Float32 in_fSize,
                                      const Core::Math::Color) = 0;
     };
+
+    class ScreenInterface
+    {
+    public:
+        virtual ~ScreenInterface() = default;
+        virtual void VRelease()    = 0;
+
+        virtual Core::Memory::UniquePtr<WindowStrategy> VCreateWindowStrategy(
+            const Core::Common::Handle, const WindowConfig&) = 0;
+
+        virtual Core::Memory::UniquePtr<ViewPortStrategy> VCreateViewPortStrategy(
+            const ViewPortConfig&) = 0;
+
+        virtual Core::Memory::UniquePtr<SceneStrategyInterface> VCreateSceneUIStrategy() = 0;
+        virtual Core::Memory::UniquePtr<SceneStrategyInterface> VCreateScene2DStrategy() = 0;
+
+        // TODO: パーティクルの生成
+        // 描画は戻り値のハンドルを指定
+        // 事前に生成しておく必要がある
+        virtual Core::Common::Handle VParticalCreate(const HE::Uint32 in_uCount) = 0;
+
+        /// <summary>
+        /// TODO: 生成したパーティクルを削除
+        /// </summary>
+        virtual void VParticalDelete(Core::Common::Handle) = 0;
+
+        virtual void VParticalSetPositions(const Core::Common::Handle,
+                                           const Core::Common::ArrayBase<Core::Math::Vector3>&) = 0;
+        virtual void VParticalSetVelocitys(const Core::Common::Handle,
+                                           const Core::Common::ArrayBase<Core::Math::Vector3>&) = 0;
+
+        virtual ScreenRenderInterface* VGetDrawInterface() = 0;
+    };
+
 }  // namespace Platform

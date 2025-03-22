@@ -8,6 +8,7 @@
 
 namespace Render
 {
+#if 0
     namespace Local
     {
         static void RenderCommand(const Render::Command* in_pCommand,
@@ -90,6 +91,12 @@ namespace Render
             }
         }
     }  // namespace Local
+#endif
+
+    const Platform::WindowConfig* Window::GetConfig()
+    {
+        return &this->_upStrategy->GetConfig();
+    }
 
     void Window::SetPos(const HE::Uint32 in_uX, const HE::Uint32 in_uY)
     {
@@ -129,6 +136,11 @@ namespace Render
         this->_bShow = TRUE;
     }
 
+    const HE::Bool Window::IsClose() const
+    {
+        return this->_upStrategy->IsClose();
+    }
+
     HE::Bool Window::Init(Core::Memory::UniquePtr<Platform::WindowStrategy> in_upConfig)
     {
         this->_upStrategy = std::move(in_upConfig);
@@ -144,6 +156,10 @@ namespace Render
 
     void Window::Release()
     {
+        // TODO: ウィンドウが持っている入力オブジェクトを削除
+        auto inputHandle = this->_upStrategy->GetConfig()._inputHandle;
+        HE_ENGINE.PlatformModule()->VInput()->VReleaseObject(inputHandle);
+
         this->_poolViewPortManager.ReleasePool([](ViewPort* in_pViewPort)
                                                { in_pViewPort->Release(); });
 
@@ -188,6 +204,7 @@ namespace Render
     void Window::_Update(const HE::Float32 in_fDt)
     {
         this->_upStrategy->VActive();
+        this->_upStrategy->VUpdate(in_fDt);
 
         // ビューポート処理
         auto m = this->_poolViewPortManager.GetUserDataList();
@@ -213,11 +230,6 @@ namespace Render
     void Window::_Render()
     {
         this->_upStrategy->VActive();
-
-        auto pPlatformModule = HE_ENGINE.PlatformModule();
-        HE_ASSERT(pPlatformModule);
-
-        auto pPlatformScreen = pPlatformModule->VScreen();
 
         this->_upStrategy->VBeginRender();
 
@@ -245,6 +257,7 @@ namespace Render
                     itrScene->second->_BeginRender();
 
                     // ビュー毎に描画コマンド処理
+                    /*
                     const Render::Command* pCommand = itrScene->second->_commandBuff.PopBack();
                     while (pCommand != NULL)
                     {
@@ -253,6 +266,8 @@ namespace Render
 
                         pCommand = itrScene->second->_commandBuff.PopBack();
                     }
+                    */
+                    itrScene->second->_Render(viewPortConfig);
 
                     itrScene->second->_EndRender();
                 }

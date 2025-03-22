@@ -34,11 +34,6 @@ namespace Platform
 #endif
 
         /// <summary>
-        /// やめる状態になっているか
-        /// </summary>
-        virtual HE::Bool VIsQuit() = 0;
-
-        /// <summary>
         /// 時間関連の処理
         /// </summary>
         virtual Core::Memory::SharedPtr<Platform::TimeInterface> VTime() = 0;

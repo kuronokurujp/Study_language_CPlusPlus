@@ -15,6 +15,7 @@ namespace GameDevGUI
 
         void VBegin() override final;
         void VEnd() override final;
+        void VUpdate(const HE::Float32 in_dt) override final;
 
         void VSetPos(const HE::Uint32 in_uX, const HE::Uint32 in_uY) override final;
 
@@ -23,11 +24,6 @@ namespace GameDevGUI
 
         void VBeginRender() override final;
         void VEndRender() override final;
-
-#ifdef HE_USE_SDL2
-        virtual void* VGetWindowBySDL2() const { return NULL; }
-        virtual void* VGetContentBySDL2() const { return NULL; }
-#endif
 
     private:
         Core::Memory::UniquePtr<Platform::WindowStrategy> _upSt;

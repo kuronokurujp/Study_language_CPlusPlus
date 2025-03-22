@@ -96,6 +96,14 @@ namespace EnhancedInput
         EnhancedInputModule();
 
         /// <summary>
+        /// 入力を扱うハンドル
+        /// </summary>
+        void SetInputHandle(const Core::Common::Handle in_handle)
+        {
+            this->_inputHandle = in_handle;
+        }
+
+        /// <summary>
         /// 共通利用のアクションをマッピングデータを設定
         /// </summary>
         /// <param name="in_mrTable"></param>
@@ -139,6 +147,8 @@ namespace EnhancedInput
         /// マッピングしたアクションの入力リスト
         /// </summary>
         InputMap _mInputAction;
+
+        Core::Common::Handle _inputHandle;
     };
 
 }  // namespace EnhancedInput

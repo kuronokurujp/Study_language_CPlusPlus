@@ -142,13 +142,7 @@ namespace PlatformSDL2
 
     void PlatformSDL2Module::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
     {
-        if (this->_bQuit == FALSE)
-        {
-            if (this->_spInput->VUpdate(in_fDeltaTime) == FALSE)
-            {
-                this->_bQuit = TRUE;
-            }
-        }
+        this->_spInput->VUpdate(in_fDeltaTime);
     }
 
 }  // namespace PlatformSDL2

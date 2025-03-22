@@ -116,22 +116,25 @@ HE::Bool WinGameMain::_VStart()
     Core::Common::Handle windowHandle;
     Core::Common::Handle viewPortHandle;
     {
-        // TODO: 外部設定が必要かも
         // ゲームウィンドウを生成
         windowHandle = pRenderModule->NewWindow(
             [](Core::Common::Handle in_handle)
             {
+                // ウィンドウを作るための設定
+                auto pPlatformModule = HE_ENGINE.PlatformModule();
+                auto inputHandle     = pPlatformModule->VInput()->VCreateObject();
+
                 Platform::WindowConfig platformWindowConfig;
                 {
-                    platformWindowConfig._uWidth         = 640;  // in_w;
-                    platformWindowConfig._uHeight        = 480;  // in_h;
+                    platformWindowConfig._uWidth         = 640;
+                    platformWindowConfig._uHeight        = 480;
                     platformWindowConfig._uViewPortCount = 1;
-                    platformWindowConfig._bMain          = TRUE;  // in_bMain;
+                    platformWindowConfig._bMain          = TRUE;
+                    platformWindowConfig._inputHandle    = inputHandle;
                 }
-                auto pPlatformModule = HE_ENGINE.PlatformModule();
                 return pPlatformModule->VScreen()->VCreateWindowStrategy(in_handle,
                                                                          platformWindowConfig);
-            });  // 640, 480, TRUE);
+            });
 
         // TODO: 画面に表示するビューポート
         // ゲームウィンドウで利用するビューポートを追加
@@ -169,6 +172,15 @@ HE::Bool WinGameMain::_VStart()
 
         // ゲームウィンドウを表示
         pRenderModule->ShowWindow(windowHandle);
+    }
+
+    // TODO: ウィンドウの入力を拡張インプットを設定
+    {
+        auto pEnhancedInputModule =
+            HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();
+
+        auto* pMainWindow = pRenderModule->GetWindow(windowHandle);
+        pEnhancedInputModule->SetInputHandle(pMainWindow->GetConfig()->_inputHandle);
     }
 
     auto pLevelModule = HE_ENGINE.ModuleManager().Get<Level::LevelModule>();

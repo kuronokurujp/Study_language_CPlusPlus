@@ -95,8 +95,7 @@ namespace Core::Common
         }
 
         /// <summary>
-        /// Allocで割り当てたメモリを解放している
-        /// Freeメソッド以外の方法でメモリ解放をするとエラーになる
+        /// Allocで割り当てたメモリを全て解放している
         /// </summary>
         void ReleasePool(std::function<void(T*)> in_releleseObjFunc = NULL)
         {

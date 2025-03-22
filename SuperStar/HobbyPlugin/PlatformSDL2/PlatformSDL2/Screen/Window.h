@@ -19,6 +19,7 @@ namespace PlatformSDL2
 
         void VBegin() override final;
         void VEnd() override final;
+        void VUpdate(const HE::Float32 in_dt) override final;
 
         void VSetPos(const HE::Uint32 in_uX, const HE::Uint32 in_uY) override final;
 
@@ -35,6 +36,7 @@ namespace PlatformSDL2
 
     private:
         Context _context;
+        HE::Uint32 _windowID = 0;
     };
 
 }  // namespace PlatformSDL2

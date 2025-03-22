@@ -12,12 +12,17 @@ namespace PlatformSDL2
     // 前方宣言
     class PlatformSDL2Module;
 
-    class Screen final : public Platform::ScreenInterface
+    class Screen final : public Platform::ScreenInterface, public Platform::ScreenRenderInterface
     {
     public:
         // このクラスはModule下にあるのでこのクラスが生きている間はModuleは必ず存在しているのを保障している
         Screen(PlatformSDL2::PlatformSDL2Module*);
         void VRelease() override final;
+
+        /// <summary>
+        /// スクリーン描画インターフェイス
+        /// </summary>
+        ScreenRenderInterface* VGetDrawInterface() override final;
 
         /// <summary>
         /// ウィンドウロジックを生成
@@ -60,6 +65,7 @@ namespace PlatformSDL2
         void VParticalSetVelocitys(
             const Core::Common::Handle,
             const Core::Common::ArrayBase<Core::Math::Vector3>&) override final;
+
 
         /// <summary>
         /// 画面を色クリア

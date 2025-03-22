@@ -8,7 +8,8 @@
 namespace Platform
 {
     class SceneStrategyInterface;
-}
+    struct ViewPortConfig;
+}  // namespace Platform
 
 namespace Render::Prticle
 {
@@ -45,6 +46,7 @@ namespace Render
 
         void _BeginRender();
         void _EndRender();
+        void _Render(const Platform::ViewPortConfig&);
 
         // 描画コマンドを追加
         // コマンドデータは呼び出し元のものにするためにstd::move()で渡す

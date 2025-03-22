@@ -1,5 +1,6 @@
 ﻿#include "Scene.h"
 
+#include "./Render/Particle/Blob.h"
 #include "Engine/Platform/PlatformModule.h"
 
 namespace Render
@@ -51,6 +52,97 @@ namespace Render
     void SceneViewBase::_EndRender()
     {
         this->_upSt->VEndRender();
+    }
+
+    void SceneViewBase::_Render(const Platform::ViewPortConfig& in_rViewPortConfig)
+    {
+        // 戦略からプラットフォームを取得してレンダリング
+        auto pPlatformScreen = this->_upSt->VGetPlatformScreenDraw();
+        if (pPlatformScreen == NULL)
+            return;
+
+        // ビュー毎に描画コマンド処理
+        const Render::Command* pCommand = this->_commandBuff.PopBack();
+        while (pCommand != NULL)
+        {
+            // コマンドに応じた描画処理をする
+            switch (pCommand->_uType)
+            {
+                // 画面クリア
+                case Render::ECmdType_ClsScreen:
+                {
+                    const Render::CmdClsScreen* pClsScreen = &pCommand->_data._clsScree;
+                    const auto& rColor                     = pClsScreen->_color;
+
+                    pPlatformScreen->VCls(rColor.c32.r, rColor.c32.b, rColor.c32.g);
+                    break;
+                }
+
+                // 矩形を描画
+                case Render::ECmdType_2DQuadDraw:
+                {
+                    const Render::Cmd2DQuadDraw* pRect2D = &pCommand->_data._2DDrawRect;
+
+                    Core::Math::Rect2 r;
+                    r.SetRect(pRect2D->_fLeftX, pRect2D->_fRightX, pRect2D->_fLeftY,
+                              pRect2D->_fRightY, Core::Math::EAnchor::EAnchor_Left);
+
+                    pPlatformScreen->V2DDrawQuad(in_rViewPortConfig, r, pRect2D->_color);
+                    break;
+                }
+
+                // 2次元の円描画
+                case Render::ECmdType_2DCircleDraw:
+                {
+                    const Render::Cmd2DCircleDraw* pCmd = &pCommand->_data._2DDrawCircle;
+
+                    pPlatformScreen->V2DDrawCircle(in_rViewPortConfig,
+                                                   Core::Math::Vector2(pCmd->_fX, pCmd->_fY),
+                                                   pCmd->_eAnchor, pCmd->_fSize, pCmd->_color);
+                    break;
+                }
+
+                // 2Dテキストを描画
+                case Render::ECmdType_2DTextDraw:
+                {
+                    const Render::Cmd2DTextDraw* pCmd = &pCommand->_data._2DDrawText;
+
+                    pPlatformScreen->V2DDrawText(in_rViewPortConfig,
+                                                 Core::Math::Vector2(pCmd->_fX, pCmd->_fY),
+                                                 pCmd->_eAnchor, pCmd->_szChars, pCmd->_uSize,
+                                                 pCmd->_uSpace, pCmd->_color);
+                    break;
+                }
+
+                // 2Dの三角形を描画
+                case Render::ECmdType_2DTriangleDraw:
+                {
+                    const Render::Cmd2DTriangleDraw* pCmd = &pCommand->_data._2DDrawTriangle;
+                    pPlatformScreen->V2DDrawTriangle(in_rViewPortConfig,
+                                                     Core::Math::Vector2(pCmd->_fX, pCmd->_fY),
+                                                     pCmd->_eAnchor, pCmd->_fAngleDegrees,
+                                                     pCmd->_fSize, pCmd->_color);
+
+                    break;
+                }
+
+                // 2Dパーティクル描画
+                case Render::ECmdType_2DParticalDraw:
+                {
+                    const auto pCmd = &pCommand->_data._Particle;
+                    auto& p         = this->GetPrticle(pCmd->handle);
+                    Core::Math::Vector3 pos(pCmd->_fX, pCmd->_fY, pCmd->_fZ);
+                    pPlatformScreen->V2DDrawPartical(in_rViewPortConfig, p.GetDrawHandle(), pos);
+
+                    break;
+                }
+                    // TODO: コマンドがない場合のメソッドを呼び出す
+                default:
+                    break;
+            }
+
+            pCommand = this->_commandBuff.PopBack();
+        }
     }
 
     HE::Bool SceneViewBase::_PushCommand(Command&& in_rrCmd)

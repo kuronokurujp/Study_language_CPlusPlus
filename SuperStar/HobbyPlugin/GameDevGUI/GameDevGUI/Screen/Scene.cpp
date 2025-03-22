@@ -39,13 +39,17 @@ namespace GameDevGUI
     {
         this->_upSt->VBeginRender();
 
+        ::ImGui::Begin("Window");
         // TODO: GUI処理を記述する
-        //::ImGui::Button("test");
+        if (::ImGui::Button("test"))
+        {
+            HE_LOG_LINE(HE_STR_TEXT("Push"));
+        }
     }
 
     void GameDevGUISceneStrategy::VEndRender()
     {
+        ::ImGui::End();
         this->_upSt->VEndRender();
     }
-
 }  // namespace GameDevGUI

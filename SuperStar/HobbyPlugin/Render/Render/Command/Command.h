@@ -14,10 +14,6 @@ namespace Render
         ECmdType_2DTextDraw,
         // 矩形描画
         ECmdType_2DQuadDraw,
-        // 点描画
-        // ECmdType_2DPointDraw,
-        // 点群描画
-        // ECmdType_2DPointArrayDraw,
         // 円の描画
         ECmdType_2DCircleDraw,
         // 三角形の描画
@@ -54,25 +50,6 @@ namespace Render
 
         Core::Math::Color _color;
     };
-
-    /*
-        /// <summary>
-        /// 2D上で点を描画
-        /// </summary>
-        struct Cmd2DPointDraw
-        {
-            Point3D _point;
-        };
-
-        /// <summary>
-        /// 2D上で点群を描画
-        /// </summary>
-        struct Cmd2DPointArrayDraw
-        {
-            const Point3D* _aPoint = NULL;
-            HE::Uint32 _uCount     = 0;
-        };
-        */
 
     /// <summary>
     /// 画面を指定色でクリア
@@ -123,6 +100,8 @@ namespace Render
     /// <summary>
     /// 描画コマンド
     /// 各コマンドはこれをキャストしてデータ設定をする
+    /// TODO:
+    /// これをカスタムしてコマンドを渡された側でデータをキャストしてレンダリングできないだろうか？
     /// </summary>
     struct Command
     {
@@ -137,8 +116,7 @@ namespace Render
 
             Cmd2DTextDraw _2DDrawText;
             Cmd2DQuadDraw _2DDrawRect;
-            //            Cmd2DPointDraw _2DDrawPoint;
-            //            Cmd2DPointArrayDraw _2DDrawPointCloud;
+
             Cmd2DCircleDraw _2DDrawCircle;
             Cmd2DTriangleDraw _2DDrawTriangle;
             CmdParticleDraw _Particle;
@@ -186,7 +164,7 @@ namespace Render
                                       const Core::Math::Color& in_rColor);
 
     /// <summary>
-    /// TODO: パーティクル描画
+    /// パーティクル描画
     /// </summary>
     extern void Command2DParticalDraw(const Core::Common::Handle in_renderHandle,
                                       const Core::Common::Handle in_particlaHandle,

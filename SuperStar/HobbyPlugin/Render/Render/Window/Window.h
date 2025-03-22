@@ -8,6 +8,7 @@ namespace Platform
 {
     class WindowStrategy;
     class ViewPortStrategy;
+    struct WindowConfig;
 
 }  // namespace Platform
 
@@ -21,6 +22,8 @@ namespace Render
         friend class RenderModule;
 
     public:
+        const Platform::WindowConfig* GetConfig();
+
         /// <summary>
         /// ウィンドウ座標指定
         /// </summary>
@@ -39,6 +42,11 @@ namespace Render
         /// ウィンドウ表示
         /// </summary>
         void Show();
+
+        /// <summary>
+        /// ウィンドウが閉じた状態
+        /// </summary>
+        const HE::Bool IsClose() const;
 
     private:
         HE::Bool Init(Core::Memory::UniquePtr<Platform::WindowStrategy>);

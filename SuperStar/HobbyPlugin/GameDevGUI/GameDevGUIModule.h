@@ -46,7 +46,6 @@ namespace GameDevGUI
         void _VUpdate(const HE::Float32 in_fDeltaTime) override final;
 
     private:
-        void* _pImGuiContext = NULL;
         Core::Common::Handle _windowHandle;
     };
 }  // namespace GameDevGUI

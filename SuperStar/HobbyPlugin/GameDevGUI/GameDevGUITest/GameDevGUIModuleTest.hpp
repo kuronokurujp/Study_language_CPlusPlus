@@ -31,15 +31,17 @@ TEST_CASE("GameDevGUI Test Open / Close")
                         windowHandle = pRenderModule->NewWindow(
                             [](const Core::Common::Handle in_handle)
                             {
+                                auto pPlatformModule = HE_ENGINE.PlatformModule();
+                                auto inputHandle     = pPlatformModule->VInput()->VCreateObject();
                                 Platform::WindowConfig platformWindowConfig;
                                 {
                                     platformWindowConfig._uWidth         = 640;
                                     platformWindowConfig._uHeight        = 480;
                                     platformWindowConfig._uViewPortCount = 1;
                                     platformWindowConfig._bMain          = TRUE;
+                                    platformWindowConfig._inputHandle    = inputHandle;
                                 }
 
-                                auto pPlatformModule = HE_ENGINE.PlatformModule();
                                 return pPlatformModule->VScreen()
                                     ->VCreateWindowStrategy(in_handle, platformWindowConfig);
                             });
@@ -74,16 +76,21 @@ TEST_CASE("GameDevGUI Test Open / Close")
                         windowHandle = pRenderModule->NewWindow(
                             [](const Core::Common::Handle in_handle)
                             {
+                                auto pGameDevGUIModule =
+                                    HE_ENGINE.ModuleManager().Get<GameDevGUI::GameDevGUIModule>();
+
+                                auto pPlatformModule = HE_ENGINE.PlatformModule();
+                                auto inputHandle     = pPlatformModule->VInput()->VCreateObject();
+
                                 Platform::WindowConfig platformWindowConfig;
                                 {
                                     platformWindowConfig._uWidth         = 320;
                                     platformWindowConfig._uHeight        = 240;
                                     platformWindowConfig._uViewPortCount = 1;
                                     platformWindowConfig._bMain          = FALSE;
+                                    platformWindowConfig._inputHandle    = inputHandle;
                                 }
 
-                                auto pGameDevGUIModule =
-                                    HE_ENGINE.ModuleManager().Get<GameDevGUI::GameDevGUIModule>();
                                 return pGameDevGUIModule
                                     ->CreateWindowStrategy(in_handle, platformWindowConfig);
                             });

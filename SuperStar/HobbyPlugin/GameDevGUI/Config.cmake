@@ -12,4 +12,7 @@ set(GAMEDEVGUI_PLUGIN_TARGET_FILES
     GameDevGUI/Screen/Scene.h
     GameDevGUI/Screen/Window.cpp
     GameDevGUI/Screen/Window.h
+    
+    GameDevGUI/PlatformScreen.h
+    GameDevGUI/PlatformScreen.cpp
 )

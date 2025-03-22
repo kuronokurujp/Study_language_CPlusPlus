@@ -23,11 +23,6 @@ namespace PlatformSDL2
         }
 #endif
 
-        /// <summary>
-        /// やめる状態になっているか
-        /// </summary>
-        HE::Bool VIsQuit() override final { return this->_bQuit; }
-
         Core::Memory::SharedPtr<Platform::TimeInterface> VTime() override final
         {
             return this->_spTime;
@@ -63,6 +58,7 @@ namespace PlatformSDL2
         /// モジュール初期化
         /// </summary>
         HE::Bool _VStart() override final;
+
         /// <summary>
         /// インスタンス破棄時に呼ばれる
         /// </summary>
@@ -80,7 +76,5 @@ namespace PlatformSDL2
         Core::Memory::SharedPtr<Platform::ScreenInterface> _spScreen;
         Core::Memory::SharedPtr<Platform::SystemInterface> _spSysmte;
         Core::Memory::SharedPtr<Platform::FontInterface> _spFont;
-
-        HE::Bool _bQuit = FALSE;
     };
 }  // namespace PlatformSDL2

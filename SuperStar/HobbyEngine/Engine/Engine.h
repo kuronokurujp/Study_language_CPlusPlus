@@ -63,10 +63,10 @@ public:
     HE::Bool Start();
 
     // エンジンを稼働させるためのループ用メソッド
-    HE::Bool BeforeUpdateLoop(const HE::Float32);
-    HE::Bool WaitFrameLoop();
-    HE::Bool MainUpdateLoop(const HE::Float32);
-    HE::Bool LateUpdateLoop(const HE::Float32);
+    void BeforeUpdateLoop(const HE::Float32);
+    void WaitFrameLoop();
+    void MainUpdateLoop(const HE::Float32);
+    void LateUpdateLoop(const HE::Float32);
 
     /// <summary>
     /// メモリ管理を取得
@@ -96,9 +96,14 @@ public:
     HE::Uint32 GetFPS();
 
     /// <summary>
-    /// アプリを辞める状態か
+    /// エンジンが終了設定しているか
     /// </summary>
-    HE::Bool IsAppQuit();
+    const HE::Bool IsQuit();
+
+    /// <summary>
+    /// エンジン終了設定
+    /// </summary>
+    void Quit();
 
 private:
     /// <summary>
@@ -109,6 +114,7 @@ private:
 private:
     HE::Bool _bInit  = FALSE;
     HE::Bool _bStart = FALSE;
+    HE::Bool _bQuit  = FALSE;
 
     // メモリ管理
     Core::Memory::Manager _memoryManager;
@@ -162,34 +168,26 @@ static void UnitTestRunnerByModuleOnly(std::function<HE::Bool()> in_runFunc,
 
     const HE::Bool bInitRet = HE_ENGINE.Start();
     HE_ASSERT(bInitRet && "初期化に失敗");
-    HE::Bool bEnd = FALSE;
-    while (bEnd == FALSE)
+    while (TRUE)
     {
-        const HE::Float32 d = HE_ENGINE.GetDeltaTimeSec();
-        if (HE_ENGINE.BeforeUpdateLoop(d))
-        {
-            const HE::Float32 d = HE_ENGINE.GetDeltaTimeSec();
+        HE::Float32 d = HE_ENGINE.GetDeltaTimeSec();
 
-            if (HE_ENGINE.WaitFrameLoop() == FALSE)
-            {
-                break;
-            }
+        HE_ENGINE.BeforeUpdateLoop(d);
+        if (HE_ENGINE.IsQuit()) break;
 
-            if (HE_ENGINE.MainUpdateLoop(d))
-            {
-                HE_ENGINE.LateUpdateLoop(d);
-                // モジュールのテスト
-                bEnd = in_runFunc();
-            }
-            else
-            {
-                bEnd = TRUE;
-            }
-        }
-        else
-        {
-            bEnd = TRUE;
-        }
+        d = HE_ENGINE.GetDeltaTimeSec();
+
+        HE_ENGINE.WaitFrameLoop();
+        if (HE_ENGINE.IsQuit()) break;
+
+        HE_ENGINE.MainUpdateLoop(d);
+        if (HE_ENGINE.IsQuit()) break;
+
+        HE_ENGINE.LateUpdateLoop(d);
+        if (HE_ENGINE.IsQuit()) break;
+
+        // モジュールのテスト
+        if (in_runFunc()) break;
     }
 
     if (in_endFunc)
