@@ -76,6 +76,11 @@ namespace Render
         void ShowWindow(const Core::Common::Handle);
 
         /// <summary>
+        /// ウィンドウ非表示
+        /// </summary>
+        void HideWindow(const Core::Common::Handle);
+
+        /// <summary>
         /// ウィンドウ取得
         /// </summary>
         Window* GetWindow(const Core::Common::Handle);

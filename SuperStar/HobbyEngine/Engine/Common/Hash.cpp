@@ -40,7 +40,7 @@ namespace Core::Common
     DO8(buf, 8);
 
         HE::Uint32 k = 0;
-        for (HE::Uint32 len = static_cast<HE::Uint32>(HE_STR_SIZE(in_szIdent)); 0 < len;)
+        for (HE::Uint32 len = static_cast<HE::Uint32>(HE_STR_LENGTH(in_szIdent)); 0 < len;)
         {
             k = len < uNMax ? len : uNMax;
             len -= k;

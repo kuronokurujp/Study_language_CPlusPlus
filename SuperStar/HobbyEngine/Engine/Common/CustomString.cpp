@@ -66,8 +66,8 @@ namespace Core::Common
         if (in_szOld == NULL) return *this;
         if (in_szNew == NULL) return *this;
 
-        HE::Uint32 uOldLength = static_cast<HE::Uint32>(HE_STR_SIZE(in_szOld));
-        HE::Ptr pNewLength    = static_cast<HE::Ptr>(HE_STR_SIZE(in_szNew));
+        HE::Uint32 uOldLength = static_cast<HE::Uint32>(HE_STR_LENGTH(in_szOld));
+        HE::Ptr pNewLength    = static_cast<HE::Ptr>(HE_STR_LENGTH(in_szNew));
         const HE::Char* szSrc = this->_szBuff;
 
         // 対象を探す
@@ -97,7 +97,7 @@ namespace Core::Common
         HE::Char* szBuffEnd     = this->_szBuff + this->_uCapacity - 1;
         HE::Uint32 uOriginCount = this->Size();
         HE::Uint32 uInsertCount =
-            ((!in_szInsert) ? 1 : static_cast<HE::Uint32>(HE_STR_SIZE(in_szInsert)));
+            ((!in_szInsert) ? 1 : static_cast<HE::Uint32>(HE_STR_LENGTH(in_szInsert)));
 
         // 後ろに追加して終わり
         if (in_uIndex >= uOriginCount) return (*this) += in_szInsert;
@@ -246,7 +246,7 @@ namespace Core::Common
             uOutputTextMaxLen = this->Capacity();
         }
 
-#if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
+#ifdef HE_USE_WCHAR
         // wchar_t型をutf8のcharに変えて出力
         // WideからHE::UTF8にした時の文字列数を取得
         {
@@ -266,6 +266,39 @@ namespace Core::Common
 #endif
     }
 
+    /// <summary>
+    /// TODO: WCharの文字列を出力
+    /// </summary>
+    void StringBase::OutputW(HE::WChar* out, const HE::Uint32 in_uLen) const
+    {
+        HE_ASSERT(out);
+        HE_ASSERT(in_uLen <= this->_uCapacity);
+
+// windowsの場合
+// linuxは未対応
+#ifdef HE_WIN
+        // 利用する文字数を取得
+        HE::Sint32 iUseSize = ::MultiByteToWideChar(CP_UTF8, 0, this->Str(), in_uLen, NULL, 0);
+        // 利用する文字数が制限を超えていないかチェック
+        HE_ASSERT(iUseSize <= in_uLen);
+
+        // HE::UTF8文字列からUTF16の文字列に変える
+        ::MultiByteToWideChar(CP_UTF8, 0, this->Str(), this->_uCapacity, out, iUseSize);
+#endif
+    }
+
+    /// <summary>
+    /// TODO: 文字列を出力
+    /// </summary>
+    void StringBase::Output(HE::Char* out, const HE::Uint32 in_uLen) const
+    {
+        HE_ASSERT_RETURN(out);
+        HE_ASSERT_RETURN(0 < in_uLen);
+
+        // 文字数の長さではなく文字データとしてサイズにしないとコピーがうまくいかない
+        HE_STR_COPY_S(out, in_uLen, this->_szBuff, this->Size());
+    }
+
     StringBase& StringBase::_Copy(const HE::Char* in_szName, const HE::Uint32 in_uLen)
     {
         HE_ASSERT(in_szName && "コピーしたい文字列がない");
@@ -273,7 +306,7 @@ namespace Core::Common
         if (in_szName && 0 < this->_uCapacity)
         {
             auto bSuccess =
-                HE_STR_SUCCESS(HE_STR_CPY_S(this->_szBuff, this->_uCapacity, in_szName, in_uLen));
+                HE_STR_SUCCESS(HE_STR_COPY_S(this->_szBuff, this->_uCapacity, in_szName, in_uLen));
             HE_ASSERT(bSuccess && "文字列コピーに失敗");
         }
         else
@@ -295,10 +328,10 @@ namespace Core::Common
 
             if (iCatCount > 0)
             {
-                auto bSuccess =
-                    HE_STR_SUCCESS(HE_STR_CPY_S(this->_szBuff + _uCount,
-                                                static_cast<HE::Sint32>(this->_uCapacity - _uCount),
-                                                in_szName, iCatCount));
+                auto bSuccess = HE_STR_SUCCESS(
+                    HE_STR_COPY_S(this->_szBuff + _uCount,
+                                  static_cast<HE::Sint32>(this->_uCapacity - _uCount), in_szName,
+                                  iCatCount));
                 HE_ASSERT(bSuccess && "文字列コピーに失敗");
 
                 this->_szBuff[this->_uCapacity - 1] = '\0';

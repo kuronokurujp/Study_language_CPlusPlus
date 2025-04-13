@@ -66,7 +66,7 @@ namespace Lua
             const HE::UTF8* szName = lua_tostring(in_pLuaState, lua_upvalueindex(1));
             // 関数名設定
             Core::Common::g_szTempFixedString128 = szName;
-            HE_STR_CPY_S(pFuncData->szFuncName, HE_ARRAY_NUM(pFuncData->szFuncName),
+            HE_STR_COPY_S(pFuncData->szFuncName, HE_ARRAY_NUM(pFuncData->szFuncName),
                          Core::Common::g_szTempFixedString128.Str(),
                          Core::Common::g_szTempFixedString128.Size());
         }
@@ -110,7 +110,7 @@ namespace Lua
                     const HE::UTF8* pStr                 = lua_tostring(in_pLuaState, i);
                     Core::Common::g_szTempFixedString128 = pStr;
 
-                    HE_STR_CPY_S(pArgData->_data.szText, HE_ARRAY_NUM(pArgData->_data.szText),
+                    HE_STR_COPY_S(pArgData->_data.szText, HE_ARRAY_NUM(pArgData->_data.szText),
                                  Core::Common::g_szTempFixedString128.Str(),
                                  Core::Common::g_szTempFixedString128.Size());
 
@@ -247,7 +247,7 @@ namespace Lua
             _LuaRegistFuncByState(pLuaState, HE_STR_TEXT("HE_LOG"), &_LuaFuncByLog);
         }
 
-        HE_STR_CPY_S(pLuaObject->szName, HE_ARRAY_NUM(pLuaObject->szName),
+        HE_STR_COPY_S(pLuaObject->szName, HE_ARRAY_NUM(pLuaObject->szName),
                      Core::Common::g_szTempFixedString128.Str(),
                      Core::Common::g_szTempFixedString128.Size());
 

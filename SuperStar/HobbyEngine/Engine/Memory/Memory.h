@@ -68,6 +68,7 @@ void* operator new[](size_t in_size, HE::Uint8 in_page, HE::Uint8 in_alignSize,
 // NEWマクロ
 // メモリアライメント設定版
 // 通常はこちらを利用
+// TODO: デフォルトのnewが使えるように#ifdefのスイッチで切り替える仕組みが必要かも
 #define HE_NEW_MEM(type, page)                                                                 \
     new (page, Core::Memory::minimumAlignSize, Core::Memory::Manager::EAllocateLocateType_Top, \
          __FILE__, __LINE__)(type)

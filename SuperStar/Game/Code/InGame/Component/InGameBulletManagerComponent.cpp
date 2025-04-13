@@ -135,8 +135,8 @@ namespace InGame
     {
         InGameBulletObject obj;
 
-        HE_STR_CPY_S(obj.aName, HE_ARRAY_NUM(obj.aName), in_upFactory->VName(),
-                     HE_STR_SIZE(in_upFactory->VName()));
+        HE_STR_COPY_S(obj.aName, HE_ARRAY_NUM(obj.aName), in_upFactory->VName(),
+                     HE_STR_LENGTH(in_upFactory->VName()));
 
         ::memset(&obj.work, 0, HE_ARRAY_SIZE(obj.work));
         in_upFactory->VConfiguration(&obj.work);

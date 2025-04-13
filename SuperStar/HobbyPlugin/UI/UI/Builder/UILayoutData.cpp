@@ -184,15 +184,15 @@ namespace UI::Builder
                         Core::Common::OutputSplitString(aSplitName,
                                                         Core::Common::g_szTempFixedString1024,
                                                         s_locGroupDelimita);
-                        HE_STR_CPY_S(pLabel->szLoc, HE_ARRAY_NUM(pLabel->szLoc),
+                        HE_STR_COPY_S(pLabel->szLoc, HE_ARRAY_NUM(pLabel->szLoc),
                                      aSplitName[0].Str(), aSplitName[0].Size());
 
-                        HE_STR_CPY_S(pLabel->szText, HE_ARRAY_NUM(pLabel->szText),
+                        HE_STR_COPY_S(pLabel->szText, HE_ARRAY_NUM(pLabel->szText),
                                      aSplitName[1].Str(), aSplitName[1].Size());
                     }
                     else
                     {
-                        HE_STR_CPY_S(pLabel->szText, HE_ARRAY_NUM(pLabel->szText),
+                        HE_STR_COPY_S(pLabel->szText, HE_ARRAY_NUM(pLabel->szText),
                                      Core::Common::g_szTempFixedString1024.Str(),
                                      Core::Common::g_szTempFixedString1024.Size());
                     }
@@ -216,7 +216,7 @@ namespace UI::Builder
 
             in_rNode.VOutputString(&Core::Common::g_szTempFixedString1024, HE_STR_U8_TEXT("id"));
             auto* szIdName = &Core::Common::g_szTempFixedString1024;
-            HE_STR_ERRNO e = HE_STR_CPY_S(pData->_szId, HE_ARRAY_NUM(pData->_szId), szIdName->Str(),
+            HE_STR_ERRNO e = HE_STR_COPY_S(pData->_szId, HE_ARRAY_NUM(pData->_szId), szIdName->Str(),
                                           szIdName->Size());
             HE_ASSERT(HE_STR_SUCCESS(e) && "文字列のコピーでエラー");
         }

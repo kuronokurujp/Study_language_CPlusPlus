@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Engine/Common/CustomMap.h"
 #include "Engine/MiniEngine.h"
 #include "Engine/Platform/PlatformScreen.h"
 
@@ -16,6 +17,7 @@ namespace PlatformSDL2
     public:
         SDL2WindowStrategy(const Core::Common::Handle in_handle,
                            const Platform::WindowConfig& in_rConfig, Context in_pContext);
+        void VRelease() override final;
 
         void VBegin() override final;
         void VEnd() override final;
@@ -25,6 +27,7 @@ namespace PlatformSDL2
 
         void VActive() override final;
         void VShow() override final;
+        void VHide() override final;
 
         void VBeginRender() override final;
         void VEndRender() override final;
@@ -34,9 +37,42 @@ namespace PlatformSDL2
         virtual void* VGetContentBySDL2() const;
 #endif
 
+        const HE::Bool VIsClose() const override final { return this->_bClose; }
+
+        void VRegistEventMenuCallback(EventMenuCallback in_callback) override final
+        {
+            this->_eventMenuCallback = std::move(in_callback);
+        }
+
+        const Core::Common::Handle VGetHandle() const override final { return this->_handle; }
+        const Platform::WindowConfig& VGetConfig() const override final { return *this->_pConfig; }
+
+    private:
+        /// <summary>
+        /// TODO: ウィンドウにメニューアイテムを追加
+        /// </summary>
+        const HE::Bool _AddMenuItem(const HE::Uint32 in_uID,
+                                   Platform::WindowConfig::WindowMenuItem& in_rMenuItem);
+
+        /// <summary>
+        /// TODO: メニューアイテムを押した
+        /// </summary>
+        void _OnMenuItem(const HE::Uint32);
+
     private:
         Context _context;
         HE::Uint32 _windowID = 0;
+
+        Core::Common::Handle _handle;
+        Platform::WindowConfig* _pConfig = NULL;
+        HE::Bool _bClose                 = FALSE;
+        // TODO: メニューに関するイベントコールバック
+        EventMenuCallback _eventMenuCallback;
+
+        // TODO: ウィンドウのメニュバーハンドル
+#ifdef HE_WIN
+        void* _hMenuBar = NULL;
+#endif
     };
 
 }  // namespace PlatformSDL2

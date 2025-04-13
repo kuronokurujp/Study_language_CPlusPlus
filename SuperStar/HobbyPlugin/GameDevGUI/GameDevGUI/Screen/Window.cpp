@@ -15,9 +15,15 @@ namespace GameDevGUI
 {
     GameDevGUIWindowStrategy::GameDevGUIWindowStrategy(
         Core::Memory::UniquePtr<Platform::WindowStrategy> in_upSt)
-        : Platform::WindowStrategy(in_upSt->GetHandle(), in_upSt->GetConfig())
+        : Platform::WindowStrategy(in_upSt->VGetHandle(), in_upSt->VGetConfig())
     {
         this->_upSt = std::move(in_upSt);
+    }
+
+    void GameDevGUIWindowStrategy::VRelease()
+    {
+        this->_upSt->VRelease();
+        HE_SAFE_DELETE_UNIQUE_PTR(this->_upSt);
     }
 
     void GameDevGUIWindowStrategy::VBegin()
@@ -45,7 +51,8 @@ namespace GameDevGUI
         ::ImGui_ImplOpenGL3_Init(pPlatformModule->GetOpenGLVersionNameBySDL2());
 
         // 入力イベントを取得
-        auto& pInputObj = HE_ENGINE.PlatformModule()->VInput()->GetObj(this->_config._inputHandle);
+        auto& pInputObj =
+            HE_ENGINE.PlatformModule()->VInput()->GetObj(this->_upSt->VGetConfig().InputHandle());
         pInputObj.SetEventCallback(
             [](void* in_pEvent)
             {
@@ -68,7 +75,6 @@ namespace GameDevGUI
         ::ImGui::DestroyContext(pImGuiContext);
 
         this->_upSt->VEnd();
-        HE_SAFE_DELETE_UNIQUE_PTR(this->_upSt);
 
         this->_pImGuiContext = NULL;
     }
@@ -86,11 +92,6 @@ namespace GameDevGUI
     void GameDevGUIWindowStrategy::VActive()
     {
         this->_upSt->VActive();
-    }
-
-    void GameDevGUIWindowStrategy::VShow()
-    {
-        this->_upSt->VShow();
     }
 
     void GameDevGUIWindowStrategy::VBeginRender()

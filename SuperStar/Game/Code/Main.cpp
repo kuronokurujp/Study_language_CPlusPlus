@@ -124,7 +124,8 @@ HE::Bool WinGameMain::_VStart()
                 auto pPlatformModule = HE_ENGINE.PlatformModule();
                 auto inputHandle     = pPlatformModule->VInput()->VCreateObject();
 
-                Platform::WindowConfig platformWindowConfig;
+                Platform::WindowConfig platformWindowConfig(640, 480, 1, TRUE, inputHandle);
+                /*
                 {
                     platformWindowConfig._uWidth         = 640;
                     platformWindowConfig._uHeight        = 480;
@@ -132,6 +133,7 @@ HE::Bool WinGameMain::_VStart()
                     platformWindowConfig._bMain          = TRUE;
                     platformWindowConfig._inputHandle    = inputHandle;
                 }
+                */
                 return pPlatformModule->VScreen()->VCreateWindowStrategy(in_handle,
                                                                          platformWindowConfig);
             });
@@ -180,7 +182,7 @@ HE::Bool WinGameMain::_VStart()
             HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();
 
         auto* pMainWindow = pRenderModule->GetWindow(windowHandle);
-        pEnhancedInputModule->SetInputHandle(pMainWindow->GetConfig()->_inputHandle);
+        pEnhancedInputModule->SetInputHandle(pMainWindow->GetConfig()->InputHandle());
     }
 
     auto pLevelModule = HE_ENGINE.ModuleManager().Get<Level::LevelModule>();

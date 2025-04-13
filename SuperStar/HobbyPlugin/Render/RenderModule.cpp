@@ -74,11 +74,17 @@ namespace Render
         }
     }
 
-    void RenderModule::ShowWindow(const Core::Common::Handle in_rHandle)
+    void RenderModule::ShowWindow(const Core::Common::Handle in_handle)
     {
-        auto pWindow = this->GetWindow(in_rHandle);
+        auto pWindow = this->GetWindow(in_handle);
         pWindow->Show();
     }
+
+    void RenderModule::HideWindow(const Core::Common::Handle in_handle)
+    {
+        auto pWindow = this->GetWindow(in_handle);
+        pWindow->Hide();
+     }
 
     Window* RenderModule::GetWindow(const Core::Common::Handle in_rHandle)
     {
@@ -95,7 +101,7 @@ namespace Render
 
         // ビューポートの縦横サイズを調整
         // ウィンドウサイズを超えないようにする
-        auto rWindowConfig = pWindow->_upStrategy->GetConfig();
+        auto& rWindowConfig = pWindow->_upStrategy->VGetConfig();
         Platform::ViewPortConfig viewPortConfig;
         {
             viewPortConfig._uWidth  = in_w;
@@ -104,20 +110,20 @@ namespace Render
 
         if (viewPortConfig._uHeight <= 0)
         {
-            viewPortConfig._uHeight = rWindowConfig._uHeight;
+            viewPortConfig._uHeight = rWindowConfig.Height();
         }
-        else if (rWindowConfig._uHeight < viewPortConfig._uHeight)
+        else if (rWindowConfig.Height()< viewPortConfig._uHeight)
         {
-            viewPortConfig._uHeight = rWindowConfig._uHeight;
+            viewPortConfig._uHeight = rWindowConfig.Height();
         }
 
         if (viewPortConfig._uWidth <= 0)
         {
-            viewPortConfig._uWidth = rWindowConfig._uWidth;
+            viewPortConfig._uWidth = rWindowConfig.Width();
         }
-        else if (rWindowConfig._uWidth < viewPortConfig._uWidth)
+        else if (rWindowConfig.Width() < viewPortConfig._uWidth)
         {
-            viewPortConfig._uWidth = rWindowConfig._uWidth;
+            viewPortConfig._uWidth = rWindowConfig.Width();
         }
 
         auto pPlatform  = this->GetDependenceModule<Platform::PlatformModule>();

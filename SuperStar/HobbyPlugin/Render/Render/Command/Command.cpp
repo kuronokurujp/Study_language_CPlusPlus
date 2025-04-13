@@ -27,7 +27,7 @@ namespace Render
             pText2D->_eAnchor = in_eAnchor;
             pText2D->_uSize   = in_uSize;
             pText2D->_uSpace  = in_uSpace;
-            HE_STR_ERRNO e    = HE_STR_CPY_S(pText2D->_szChars, HE_ARRAY_NUM(pText2D->_szChars),
+            HE_STR_ERRNO e    = HE_STR_COPY_S(pText2D->_szChars, HE_ARRAY_NUM(pText2D->_szChars),
                                              in_szrName.Str(), in_szrName.Capacity());
             HE_ASSERT(HE_STR_SUCCESS(e) && "文字列コピーに失敗");
         }

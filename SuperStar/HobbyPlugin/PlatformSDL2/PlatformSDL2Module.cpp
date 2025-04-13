@@ -89,6 +89,11 @@ namespace PlatformSDL2
             this->_spFont   = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Font), this);
         }
 
+        // TODO: ウィンドウズのWinAPIを使えるようにする
+#ifdef HE_WIN
+        SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
+#endif
+
         {
 #ifdef HE_ENGINE_DEBUG
             const GLubyte* pVersion = ::glGetString(GL_VERSION);

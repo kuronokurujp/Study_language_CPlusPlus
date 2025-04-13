@@ -3,14 +3,7 @@
 #include "./ViewPort.h"
 #include "Engine/Common/PoolManager.h"
 #include "Engine/MiniEngine.h"
-
-namespace Platform
-{
-    class WindowStrategy;
-    class ViewPortStrategy;
-    struct WindowConfig;
-
-}  // namespace Platform
+#include "Engine/Platform/PlatformScreen.h"
 
 namespace Render
 {
@@ -23,6 +16,11 @@ namespace Render
 
     public:
         const Platform::WindowConfig* GetConfig();
+
+        /// <summary>
+        /// ウィンドウのメニュー項目のイベント登録
+        /// </summary>
+        void RegistEventMenuCallback(Platform::WindowStrategy::EventMenuCallback);
 
         /// <summary>
         /// ウィンドウ座標指定
@@ -42,6 +40,10 @@ namespace Render
         /// ウィンドウ表示
         /// </summary>
         void Show();
+        /// <summary>
+        /// ウィンドウ非表示
+        /// </summary>
+        void Hide();
 
         /// <summary>
         /// ウィンドウが閉じた状態

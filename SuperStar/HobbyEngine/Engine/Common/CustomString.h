@@ -80,7 +80,7 @@ namespace Core::Common
         HE::Char FirstChar() const { return this->_szBuff[0]; }
         HE::Char LastChar() const
         {
-            auto _uSize = static_cast<HE::Uint32>(HE_STR_SIZE(this->_szBuff));
+            auto _uSize = static_cast<HE::Uint32>(HE_STR_LENGTH(this->_szBuff));
             return this->_szBuff[_uSize - 1];
         }
 
@@ -101,7 +101,7 @@ namespace Core::Common
         // 文字データの要素数(文字数ではない, UTF8だと要素数=文字数とはならない)
         inline HE::Uint32 Size() const HE_NOEXCEPT
         {
-            return static_cast<HE::Uint32>(HE_STR_SIZE(this->_szBuff));
+            return static_cast<HE::Uint32>(HE_STR_LENGTH(this->_szBuff));
         }
 
         inline const HE::Char* Str() const HE_NOEXCEPT { return this->_szBuff; }
@@ -117,14 +117,24 @@ namespace Core::Common
         /// </summary>
         void OutputUTF8(HE::UTF8* out, const HE::Uint32 in_uLen) const;
 
+        /// <summary>
+        /// TODO: WCharの文字列を出力
+        /// </summary>
+        void OutputW(HE::WChar* out, const HE::Uint32 in_uLen) const;
+
+        /// <summary>
+        /// TODO: 文字列を出力
+        /// </summary>
+        void Output(HE::Char* out, const HE::Uint32 in_uLen) const;
+
         // 大文字 / 小文字にする
         void ToLower()
         {
-            HE_STR_LOWER(this->_szBuff, HE_STR_SIZE(this->_szBuff) * sizeof(HE::Char));
+            HE_STR_LOWER(this->_szBuff, HE_STR_LENGTH(this->_szBuff) * sizeof(HE::Char));
         }
         void ToUpper()
         {
-            HE_STR_UPPER(this->_szBuff, HE_STR_SIZE(this->_szBuff) * sizeof(HE::Char));
+            HE_STR_UPPER(this->_szBuff, HE_STR_LENGTH(this->_szBuff) * sizeof(HE::Char));
         }
 
         // 数値を文字列に変換
@@ -289,7 +299,7 @@ namespace Core::Common
         FixedString() : StringBase(this->_szBuff, TCapacity) {}
         FixedString(const HE::Char* in_szName) : StringBase(this->_szBuff, TCapacity)
         {
-            this->_Copy(in_szName, HE_STR_SIZE(in_szName));
+            this->_Copy(in_szName, HE_STR_LENGTH(in_szName));
         }
 #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
         FixedString(const HE::UTF8* in_szNameUTF8) : StringBase(this->_szBuff, TCapacity)
@@ -333,7 +343,7 @@ namespace Core::Common
 #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
                 this->_ConvUTF8toWide(in_szName, TCapacity);
 #else
-                this->_Copy(in_szName, HE_STR_SIZE(in_szName));
+                this->_Copy(in_szName, HE_STR_LENGTH(in_szName));
 #endif
             }
 
@@ -342,38 +352,27 @@ namespace Core::Common
 
         FixedString<TCapacity>& operator=(const FixedString<TCapacity>& r)
         {
-            this->_Copy(r._szBuff, HE_STR_SIZE(r._szBuff));
+            this->_Copy(r._szBuff, HE_STR_LENGTH(r._szBuff));
             return *this;
         }
 
     private:
-#if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
         /// <summary>
         /// HE::UTF8の文字列からワイドの文字列に変えて設定
         /// </summary>
-        /// <param name="in_pStr"></param>
-        /// <param name="in_len"></param>
         HE::Bool _ConvUTF8toWide(const HE::UTF8* in_szNameUTF8, const HE::Uint32 in_uLen)
         {
-            HE_ASSERT(in_szNameUTF8);
-            HE_ASSERT(in_uLen <= TCapacity);
-
+            // 作業用の変数は何度も使うので最初に作成しておく
             static HE::WChar w[TCapacity] = {};
             ::memset(w, 0, HE_ARRAY_SIZE(w));
 
-            // 利用する文字数を取得
-            HE::Sint32 iUseSize = MultiByteToWideChar(CP_UTF8, 0, in_szNameUTF8, in_uLen, NULL, 0);
-            // 利用する文字数が制限を超えていないかチェック
-            HE_ASSERT(iUseSize < TCapacity);
-
-            // HE::UTF8文字列からUTF16の文字列に変える
-            MultiByteToWideChar(CP_UTF8, 0, in_szNameUTF8, TCapacity, &w[0], iUseSize);
-
+            this->OutputW(w, in_uLen);
+            // 出力した文字列をコピーする
             (*this) = w;
 
             return TRUE;
         }
-#endif
+
     private:
         HE::Char _szBuff[TCapacity] = {};
     };

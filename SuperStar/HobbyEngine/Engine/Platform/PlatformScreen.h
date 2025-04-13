@@ -2,6 +2,7 @@
 
 #include <functional>
 
+#include "Engine/Common/CustomMap.h"
 #include "Engine/Common/Handle.h"
 #include "Engine/Math/Math.h"
 #include "Engine/MiniEngine.h"
@@ -10,13 +11,50 @@
 
 namespace Platform
 {
-    struct WindowConfig
+    /// <summary>
+    /// ウィンドウの設定データ
+    /// </summary>
+    class WindowConfig
     {
+    public:
+        /// <summary>
+        /// ウィンドウのメニュー項目について
+        /// TODO: メニュー項目の入れ子項目が今は作れない
+        /// </summary>
+        struct WindowMenuItem
+        {
+            HE::Char szName[128] = {};
+        };
+
+        using MenuItemMap = Core::Common::FixedMap<HE::Uint32, WindowMenuItem, 32>;
+
+    public:
+        WindowConfig(const HE::Uint32 in_uW, const HE::Uint32 in_uH,
+                     const HE::Uint32 in_uViewPortCount, const HE::Bool in_bMain,
+                     const Core::Common::Handle in_inputHandle);
+        WindowConfig(const WindowConfig& in_rOrg);
+
+        inline const HE::Uint32 Width() const { return this->_uWidth; }
+        inline const HE::Uint32 Height() const { return this->_uHeight; }
+        inline const HE::Uint32 ViewPortCount() const { return this->_uViewPortCount; }
+        inline const Core::Common::Handle InputHandle() const { return this->_inputHandle; }
+        inline const HE::Bool IsMain() const { return this->_bMain; }
+
+        const MenuItemMap& GetMenuItemMap() const { return this->_mMenuItem; }
+
+        /// <summary>
+        /// TODO: ウィンドウにメニューアイテムを追加
+        /// </summary>
+        const HE::Bool AddMenuItem(const HE::Uint32 in_uID, const HE::Char* in_szName);
+
+    private:
         HE::Uint32 _uWidth         = 0;
         HE::Uint32 _uHeight        = 0;
         HE::Uint32 _uViewPortCount = 0;
         HE::Bool _bMain            = FALSE;
         Core::Common::Handle _inputHandle;
+
+        MenuItemMap _mMenuItem;
     };
 
     struct ViewPortConfig
@@ -31,13 +69,17 @@ namespace Platform
     class WindowStrategy
     {
     public:
-        WindowStrategy(const Core::Common::Handle, const WindowConfig&);
-        virtual void VRelease();
+        using EventMenuCallback = std::function<void(HE::Uint32)>;
+
+    public:
+        WindowStrategy(const Core::Common::Handle, const WindowConfig&) {}
+        virtual void VRelease() = 0;
 
         virtual void VSetPos(const HE::Uint32 in_uX, const HE::Uint32 in_uY) = 0;
 
         virtual void VActive() = 0;
         virtual void VShow()   = 0;
+        virtual void VHide()   = 0;
 
         virtual void VBegin()                         = 0;
         virtual void VEnd()                           = 0;
@@ -46,20 +88,16 @@ namespace Platform
         virtual void VBeginRender() = 0;
         virtual void VEndRender()   = 0;
 
-        virtual const HE::Bool IsClose() const { return this->_bClose; }
+        virtual const HE::Bool VIsClose() const = 0;
 
 #ifdef HE_USE_SDL2
         virtual void* VGetWindowBySDL2() const { return NULL; }
         virtual void* VGetContentBySDL2() const { return NULL; }
 #endif
+        virtual void VRegistEventMenuCallback(EventMenuCallback in_callback) = 0;
 
-        inline const Core::Common::Handle GetHandle() const { return this->_handle; }
-        inline const WindowConfig& GetConfig() const { return this->_config; }
-
-    protected:
-        Core::Common::Handle _handle;
-        WindowConfig _config;
-        HE::Bool _bClose = FALSE;
+        virtual const Core::Common::Handle VGetHandle() const = 0;
+        virtual const WindowConfig& VGetConfig() const        = 0;
     };
 
     /// <summary>

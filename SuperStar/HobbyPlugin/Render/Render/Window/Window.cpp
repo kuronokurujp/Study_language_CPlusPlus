@@ -8,94 +8,14 @@
 
 namespace Render
 {
-#if 0
-    namespace Local
-    {
-        static void RenderCommand(const Render::Command* in_pCommand,
-                                  const Platform::ViewPortConfig& in_rViewPortConfig,
-                                  Render::SceneViewBase* in_pBaseScene,
-                                  Platform::ScreenInterface* in_pScreen)
-        {
-            // TODO: コマンドに応じた描画処理をする
-            switch (in_pCommand->_uType)
-            {
-                // 画面クリア
-                case Render::ECmdType_ClsScreen:
-                {
-                    const Render::CmdClsScreen* pClsScreen = &in_pCommand->_data._clsScree;
-                    const auto& rColor                     = pClsScreen->_color;
-
-                    in_pScreen->VCls(rColor.c32.r, rColor.c32.b, rColor.c32.g);
-                    break;
-                }
-
-                // 矩形を描画
-                case Render::ECmdType_2DQuadDraw:
-                {
-                    const Render::Cmd2DQuadDraw* pRect2D = &in_pCommand->_data._2DDrawRect;
-
-                    Core::Math::Rect2 r;
-                    r.SetRect(pRect2D->_fLeftX, pRect2D->_fRightX, pRect2D->_fLeftY,
-                              pRect2D->_fRightY, Core::Math::EAnchor::EAnchor_Left);
-
-                    in_pScreen->V2DDrawQuad(in_rViewPortConfig, r, pRect2D->_color);
-                    break;
-                }
-
-                // 2次元の円描画
-                case Render::ECmdType_2DCircleDraw:
-                {
-                    const Render::Cmd2DCircleDraw* pCmd = &in_pCommand->_data._2DDrawCircle;
-
-                    // const Render::Point3D& rPoint = pCmd->_point;
-                    in_pScreen->V2DDrawCircle(in_rViewPortConfig,
-                                              Core::Math::Vector2(pCmd->_fX, pCmd->_fY),
-                                              pCmd->_eAnchor, pCmd->_fSize, pCmd->_color);
-                    break;
-                }
-
-                // 2Dテキストを描画
-                case Render::ECmdType_2DTextDraw:
-                {
-                    const Render::Cmd2DTextDraw* pCmd = &in_pCommand->_data._2DDrawText;
-
-                    in_pScreen->V2DDrawText(in_rViewPortConfig,
-                                            Core::Math::Vector2(pCmd->_fX, pCmd->_fY),
-                                            pCmd->_eAnchor, pCmd->_szChars, pCmd->_uSize,
-                                            pCmd->_uSpace, pCmd->_color);
-                    break;
-                }
-
-                // 2Dの三角形を描画
-                case Render::ECmdType_2DTriangleDraw:
-                {
-                    const Render::Cmd2DTriangleDraw* pCmd = &in_pCommand->_data._2DDrawTriangle;
-                    in_pScreen->V2DDrawTriangle(in_rViewPortConfig,
-                                                Core::Math::Vector2(pCmd->_fX, pCmd->_fY),
-                                                pCmd->_eAnchor, pCmd->_fAngleDegrees, pCmd->_fSize,
-                                                pCmd->_color);
-
-                    break;
-                }
-
-                // 2Dパーティクル描画
-                case Render::ECmdType_2DParticalDraw:
-                {
-                    const auto pCmd = &in_pCommand->_data._Particle;
-                    auto& p         = in_pBaseScene->GetPrticle(pCmd->handle);
-                    Core::Math::Vector3 pos(pCmd->_fX, pCmd->_fY, pCmd->_fZ);
-                    in_pScreen->V2DDrawPartical(in_rViewPortConfig, p.GetDrawHandle(), pos);
-
-                    break;
-                }
-            }
-        }
-    }  // namespace Local
-#endif
-
     const Platform::WindowConfig* Window::GetConfig()
     {
-        return &this->_upStrategy->GetConfig();
+        return &this->_upStrategy->VGetConfig();
+    }
+
+    void Window::RegistEventMenuCallback(Platform::WindowStrategy::EventMenuCallback callback)
+    {
+        this->_upStrategy->VRegistEventMenuCallback(callback);
     }
 
     void Window::SetPos(const HE::Uint32 in_uX, const HE::Uint32 in_uY)
@@ -136,20 +56,26 @@ namespace Render
         this->_bShow = TRUE;
     }
 
+    void Window::Hide()
+    {
+        if (this->_bReady) this->_upStrategy->VHide();
+        this->_bShow = FALSE;
+    }
+
     const HE::Bool Window::IsClose() const
     {
-        return this->_upStrategy->IsClose();
+        return this->_upStrategy->VIsClose();
     }
 
     HE::Bool Window::Init(Core::Memory::UniquePtr<Platform::WindowStrategy> in_upConfig)
     {
         this->_upStrategy = std::move(in_upConfig);
 
-        auto rWindowConfig = this->_upStrategy->GetConfig();
-        HE_ASSERT(0 < rWindowConfig._uViewPortCount);
+        auto rWindowConfig = this->_upStrategy->VGetConfig();
+        HE_ASSERT(0 < rWindowConfig.ViewPortCount());
 
         this->_poolViewPortManager.ReleasePool();
-        this->_poolViewPortManager.ReservePool(rWindowConfig._uViewPortCount);
+        this->_poolViewPortManager.ReservePool(rWindowConfig.ViewPortCount());
 
         return TRUE;
     }
@@ -157,7 +83,7 @@ namespace Render
     void Window::Release()
     {
         // TODO: ウィンドウが持っている入力オブジェクトを削除
-        auto inputHandle = this->_upStrategy->GetConfig()._inputHandle;
+        auto inputHandle = this->_upStrategy->VGetConfig().InputHandle();
         HE_ENGINE.PlatformModule()->VInput()->VReleaseObject(inputHandle);
 
         this->_poolViewPortManager.ReleasePool([](ViewPort* in_pViewPort)
@@ -257,16 +183,6 @@ namespace Render
                     itrScene->second->_BeginRender();
 
                     // ビュー毎に描画コマンド処理
-                    /*
-                    const Render::Command* pCommand = itrScene->second->_commandBuff.PopBack();
-                    while (pCommand != NULL)
-                    {
-                        Local::RenderCommand(pCommand, viewPortConfig, itrScene->second,
-                                             pPlatformScreen.get());
-
-                        pCommand = itrScene->second->_commandBuff.PopBack();
-                    }
-                    */
                     itrScene->second->_Render(viewPortConfig);
 
                     itrScene->second->_EndRender();
