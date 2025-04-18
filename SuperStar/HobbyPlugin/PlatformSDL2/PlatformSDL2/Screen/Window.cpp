@@ -57,9 +57,21 @@ namespace PlatformSDL2
         }
 
         // ウィンドウは最初は非表示にしておく
+
+        Uint32 uFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN;
+        // 設定フラグに応じてウィンドウフラグを設定
+        {
+            auto eConfigFlags = this->_pConfig->Flags();
+            if (eConfigFlags & Platform::WindowConfig::EFlags_Resizable)
+                uFlags |= SDL_WINDOW_RESIZABLE;
+            if (eConfigFlags & Platform::WindowConfig::EFlags_Maximized)
+                uFlags |= SDL_WINDOW_MAXIMIZED;
+            if (eConfigFlags & Platform::WindowConfig::EFlags_Minimized)
+                uFlags |= SDL_WINDOW_MINIMIZED;
+        }
+
         auto pNewWindow =
-            ::SDL_CreateWindow("", x, y, this->_pConfig->Width(), this->_pConfig->Height(),
-                               SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+            ::SDL_CreateWindow("", x, y, this->_pConfig->Width(), this->_pConfig->Height(), uFlags);
         SDL_GLContext pNewContext = NULL;
 
         // Windowに紐づいているOpenGLのコンテキストを生成
@@ -108,7 +120,7 @@ namespace PlatformSDL2
 #ifdef HE_WIN
         this->_hMenuBar = ::CreateMenu();
 #endif
-        // TODO: メニュー項目を追加
+        // メニュー項目を追加
         auto mMenuItemMap = this->_pConfig->GetMenuItemMap();
         {
             for (auto itr = mMenuItemMap.Begin(); itr != mMenuItemMap.End(); ++itr)
@@ -121,14 +133,25 @@ namespace PlatformSDL2
         if (0 < mMenuItemMap.Size())
         {
             auto hWnd = Local::GetSDLWinHandle(pNewWindow);
-            // TODO: 以下を実行するとウィンドウを移動した時になぜか縦に延びる
             ::SetMenu(hWnd, static_cast<HMENU>(this->_hMenuBar));
+        }
+
+        // ウィンドウの右側の×ボタンを消すかどうか
+        if (this->_pConfig->Flags() & Platform::WindowConfig::EFlags_WinDisableCloseBtn)
+        {
+            auto hWnd   = Local::GetSDLWinHandle(pNewWindow);
+            HMENU hMenu = ::GetSystemMenu(hWnd, FALSE);
+            if (hMenu != NULL)
+            {
+                ::DeleteMenu(hMenu, SC_CLOSE, MF_BYCOMMAND);
+            }
         }
 #endif
         // 入力イベントを取得してウィンドウの入力処理
+        auto inputHandle = this->_pConfig->InputHandle();
+        if (inputHandle.Null() == FALSE)
         {
-            auto& pInputObj =
-                HE_ENGINE.PlatformModule()->VInput()->GetObj(this->_pConfig->InputHandle());
+            auto& pInputObj = HE_ENGINE.PlatformModule()->VInput()->GetObj(inputHandle);
             pInputObj.SetEventCallback(
                 [this](void* in_pEvent)
                 {
@@ -159,12 +182,12 @@ namespace PlatformSDL2
                             break;
                         }
 #ifdef HE_WIN
-                            // TODO: ウィンドウのメニューバーの入力取得
+                            // ウィンドウのメニューバーの入力取得
                         case SDL_SYSWMEVENT:
                         {
                             if (pSDLEvent->syswm.msg->msg.win.msg == WM_COMMAND)
                             {
-                                // TODO: 登録したメニュー項目が押されたらコールバックを呼び出す
+                                // 登録したメニュー項目が押されたらコールバックを呼び出す
                                 auto uID = static_cast<HE::Uint32>(
                                     LOWORD(pSDLEvent->syswm.msg->msg.win.wParam));
                                 this->_OnMenuItem(uID);
@@ -180,12 +203,6 @@ namespace PlatformSDL2
                             break;
                         }
 #endif
-                    }
-
-                    // メインウィンドウ終了はエンジンの終了
-                    if (this->_bClose)
-                    {
-                        if (this->_pConfig->IsMain()) HE_ENGINE.Quit();
                     }
                 });
         }
@@ -210,6 +227,11 @@ namespace PlatformSDL2
 
     void SDL2WindowStrategy::VUpdate(const HE::Float32 in_dt)
     {
+        // メインウィンドウ終了はエンジンの終了
+        if (this->_bClose)
+        {
+            if (this->_pConfig->IsMain()) HE_ENGINE.Quit();
+        }
     }
 
     void SDL2WindowStrategy::VSetPos(const HE::Uint32 in_uX, const HE::Uint32 in_uY)
@@ -262,12 +284,12 @@ namespace PlatformSDL2
     }
 
     /// <summary>
-    /// TODO: メニューアイテムを追加
+    /// メニューアイテムを追加
     /// </summary>
     const HE::Bool SDL2WindowStrategy::_AddMenuItem(
         const HE::Uint32 in_uId, Platform::WindowConfig::WindowMenuItem& in_rMenuItem)
     {
-        // TODO: windowsでは文字列型がWChar型でないといけない
+        // windowsでは文字列型がWChar型でないといけない
 #ifdef HE_WIN
         if (this->_hMenuBar != NULL)
         {
@@ -301,7 +323,7 @@ namespace PlatformSDL2
 #endif
 
     /// <summary>
-    /// TODO: メニューアイテムを押した
+    /// メニューアイテムを押した
     /// </summary>
     void SDL2WindowStrategy::_OnMenuItem(const HE::Uint32 in_uID)
     {

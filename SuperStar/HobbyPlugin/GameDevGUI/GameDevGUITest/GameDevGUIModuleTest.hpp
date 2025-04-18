@@ -115,8 +115,12 @@ TEST_CASE("GameDevGUI Test Open / Close")
                                 auto pPlatformModule = HE_ENGINE.PlatformModule();
                                 auto inputHandle     = pPlatformModule->VInput()->VCreateObject();
 
+                                auto eFlag = static_cast<Platform::WindowConfig::EFlags>(
+                                    Platform::WindowConfig::EFlags::EFlags_Resizable |
+                                    Platform::WindowConfig::EFlags::EFlags_WinDisableCloseBtn);
+
                                 Platform::WindowConfig platformWindowConfig(320, 240, 1, FALSE,
-                                                                            inputHandle);
+                                                                            inputHandle, eFlag);
 
                                 return pGameDevGUIModule
                                     ->CreateWindowStrategy(in_handle, platformWindowConfig);

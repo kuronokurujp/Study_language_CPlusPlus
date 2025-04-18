@@ -4,7 +4,7 @@ namespace Platform
 {
     WindowConfig::WindowConfig(const HE::Uint32 in_uW, const HE::Uint32 in_uH,
                                const HE::Uint32 in_uViewPortCount, const HE::Bool in_bMain,
-                               const Core::Common::Handle in_inputHandle)
+                               const Core::Common::Handle in_inputHandle, const EFlags in_eFlags)
 
     {
         this->_bMain          = in_bMain;
@@ -12,6 +12,7 @@ namespace Platform
         this->_uHeight        = in_uH;
         this->_uViewPortCount = in_uViewPortCount;
         this->_inputHandle    = in_inputHandle;
+        this->_eFlags         = in_eFlags;
         this->_mMenuItem.Clear();
     }
 
@@ -23,6 +24,7 @@ namespace Platform
         this->_uViewPortCount = in_rOrg._uViewPortCount;
         this->_inputHandle    = in_rOrg._inputHandle;
         this->_mMenuItem      = in_rOrg._mMenuItem;
+        this->_eFlags         = in_rOrg._eFlags;
     }
 
     /// <summary>

@@ -49,13 +49,13 @@ namespace PlatformSDL2
 
     private:
         /// <summary>
-        /// TODO: ウィンドウにメニューアイテムを追加
+        /// ウィンドウにメニューアイテムを追加
         /// </summary>
         const HE::Bool _AddMenuItem(const HE::Uint32 in_uID,
                                    Platform::WindowConfig::WindowMenuItem& in_rMenuItem);
 
         /// <summary>
-        /// TODO: メニューアイテムを押した
+        /// メニューアイテムを押した
         /// </summary>
         void _OnMenuItem(const HE::Uint32);
 
@@ -66,10 +66,10 @@ namespace PlatformSDL2
         Core::Common::Handle _handle;
         Platform::WindowConfig* _pConfig = NULL;
         HE::Bool _bClose                 = FALSE;
-        // TODO: メニューに関するイベントコールバック
+        // メニューに関するイベントコールバック
         EventMenuCallback _eventMenuCallback;
 
-        // TODO: ウィンドウのメニュバーハンドル
+        // ウィンドウのメニュバーハンドル
 #ifdef HE_WIN
         void* _hMenuBar = NULL;
 #endif
