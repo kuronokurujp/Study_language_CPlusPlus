@@ -54,6 +54,18 @@ endfunction()
 # VCPKGのライブラリをインストール
 function(install_vcpkg_package vcpkg_dir_path vcpkg_manifest_root_path vcpkg_install_dir_path vcpkg_triplet)
 
+# すでにvcpkgがインストール済みかどうかチェック
+# statusファイルのパス
+# vcpkg.jsonで記述したパッケージは全てインストールしているという前提でのチェック
+# 特定のパッケージだけoptionalにした場合はチェック方法が変わるので注意
+set(STATUS_FILE "${vcpkg_install_dir_path}/ThirdParty/VcPkg/vcpkg/status")
+
+# statusファイルの存在を確認
+if(EXISTS "${STATUS_FILE}")
+    message(STATUS "vcpkgパッケージはすでにインストールされています。")
+    return()
+endif()
+
 # 一旦vcpkg関連のファイルを削除
 # これはvcpkgを入れなおしたら環境再構築するため
 if(EXISTS ${vcpkg_manifest_root_path}/vcpkg-configuration.json)
