@@ -112,6 +112,7 @@ typename std::enable_if<std::is_integral<T>::value, T>::type HE_LOOP_IN_RANGE(T 
 #include <cassert>
 
 // アサートマクロ
+// TODO: アサート起きた場合はログを出す専用マクロが必要かな
 #define HE_ASSERT(...) assert(__VA_ARGS__)
 #define HE_ASSERT_RETURN(...) \
     {                         \
