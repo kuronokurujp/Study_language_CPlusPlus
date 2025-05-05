@@ -319,13 +319,12 @@ namespace UI
         auto pActor = this->GetWidget(handlePack);
 
         auto [textHandle, pTextComp] =
-            // this->AddComponent<UI::UITextComponent>(handlePack, in_uSort + 1);
             //  アクターにコンポーネント追加
             pActor->AddComponentByHandleAndComp<UI::UITextComponent>(
                 in_uSort + 1, Actor::Component::EPriorty::EPriorty_Main,
                 [this](const HE::Char* in_szLocGrop, const HE::Char* in_szText)
                 {
-                    // TODO: 言語モジュールがあるなら言語データと紐づいたテキストを返す
+                    // 言語モジュールがあるなら言語データと紐づいたテキストを返す
                     auto pLocalModule =
                         this->GetDependenceModule<Localization::LocalizationModule>();
                     HE_ASSERT_RETURN_VALUE(HE_STR_EMPTY, pLocalModule);

@@ -3,8 +3,6 @@
 #include "Engine/Engine.h"
 
 // 依存するモジュール一覧
-#include "ActorModule.h"
-#include "LocalizationModule.h"
 #include "RenderModule.h"
 
 namespace UI
@@ -16,6 +14,11 @@ namespace UI
         this->_convLocTextFunc = std::move(in_func);
     }
 
+    void UITextComponent::VSetup(const HE::Bool in_bAutoDelete)
+    {
+        UIWidgetComponent::VSetup(in_bAutoDelete);
+    }
+
     void UITextComponent::VUpdate(const HE::Float32 in_fDeltaTime)
     {
         UIWidgetComponent::VUpdate(in_fDeltaTime);
@@ -23,16 +26,9 @@ namespace UI
         // ローカライズテキストならローカライズテキストを取得
         if (0 < this->_szLocGroup.Size() && this->_convLocTextFunc)
         {
-            // TODO: 言語切り替えが必要
+            // 言語切り替えが必要
             this->_szDrawText =
                 this->_convLocTextFunc(this->_szLocGroup.Str(), this->_szText.Str());
-            /*
-            auto pLocalModule = HE_ENGINE.ModuleManager().Get<Localization::LocalizationModule>();
-            HE_ASSERT(pLocalModule);
-
-            this->_szDrawText =
-                pLocalModule->Text(HE_STR_TEXT("JP"), this->_szLocGroup.Str(), this->_szText.Str());
-                */
         }
         else
         {

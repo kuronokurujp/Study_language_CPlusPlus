@@ -18,19 +18,14 @@ namespace UI
         using ConvLocTextFuncType = std::function<const HE::Char*(const HE::Char*, const HE::Char*)>;
 
     public:
-        UITextComponent(ConvLocTextFuncType);// : UIWidgetComponent() { this->_Clear(); }
+        UITextComponent(ConvLocTextFuncType);
 
         /// <summary>
         /// タスク利用した設定をした最初に実行
         /// 登録に必要な情報を設定
         /// </summary>
         /// <param name="bAutoDelete">TRUEだとタスク破棄と同時に削除
-        virtual void VSetup(const HE::Bool in_bAutoDelete) override
-        {
-            UIWidgetComponent::VSetup(in_bAutoDelete);
-
-            this->_Clear();
-        }
+        virtual void VSetup(const HE::Bool in_bAutoDelete) override;
 
         /// <summary>
         /// コンポーネントの更新

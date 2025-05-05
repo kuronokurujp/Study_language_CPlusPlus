@@ -88,7 +88,7 @@ TEST_CASE("UI SimpleTest")
                     pRenderModule->ShowWindow(windowHandle);
                 }
 
-                // TODO: UIのアセットデータをロード
+                // UIのアセットデータをロード
                 // UIのBuilderファイルからレイアウト作成
                 {
                     auto pUIModule    = HE_ENGINE.ModuleManager().Get<UI::UIModule>();
