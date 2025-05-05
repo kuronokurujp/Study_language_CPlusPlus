@@ -26,7 +26,9 @@ if %errorlevel% neq 0 pause & exit /b %errorlevel%
 call %SCRIPT_PATH%\HobbyEngine\Script\MoveDir.bat %SCRIPT_PATH%\Game\Resource\Assets\ %SCRIPT_PATH%\Bin\SuperStar\Release\Assets
 if %errorlevel% neq 0 pause & exit /b %errorlevel%
 
-call %SCRIPT_PATH%\HobbyEngine\Script\MoveDir.bat %SCRIPT_PATH%\Game\Resource\TestAssets\ %SCRIPT_PATH%\Bin\Test\Debug\Assets
+REM call %SCRIPT_PATH%\HobbyEngine\Script\MoveDir.bat %SCRIPT_PATH%\Game\Resource\TestAssets\ %SCRIPT_PATH%\Bin\Test\Debug\Assets
+REM if %errorlevel% neq 0 pause & exit /b %errorlevel%
+call %SCRIPT_PATH%\HobbyEngine\Script\MoveDir.bat %SCRIPT_PATH%\Test\Resource\Assets\ %SCRIPT_PATH%\Bin\Test\Debug\Assets
 if %errorlevel% neq 0 pause & exit /b %errorlevel%
 
 endlocal
