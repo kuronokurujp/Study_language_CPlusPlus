@@ -39,7 +39,7 @@ namespace InGame
             auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
 
             auto upStrategy = HE_MAKE_CUSTOM_UNIQUE_PTR((InGame::InGameShotEventManagerStrategy));
-            this->_shotEventHandle = pEventModule->AddEventManager(std::move(upStrategy));
+            this->_shotEventHandle = pEventModule->AddNetwork(std::move(upStrategy));
             HE_ASSERT(this->_shotEventHandle.Null() == FALSE);
 
             auto shotEventListener =
@@ -48,7 +48,7 @@ namespace InGame
                                           [this](Event::EventDataInterfacePtr const& in_spEventData)
                                           { return this->_HandleEvent(in_spEventData); });
 
-            if (pEventModule->AddListener(shotEventListener, INGAME_SHOT_EVENT_TYPE_NAME) == FALSE)
+            if (pEventModule->AddListener(shotEventListener, INGAME_SHOT_EVENT_NETWORK_NAME) == FALSE)
             {
                 HE_ASSERT(0 && "イベントリスナー設定に失敗");
             }
@@ -62,9 +62,9 @@ namespace InGame
         auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
 
         // 設定したイベントリスナーを解放
-        pEventModule->RemoveAllListener(INGAME_SHOT_EVENT_TYPE_NAME);
+        pEventModule->RemoveAllListener(INGAME_SHOT_EVENT_NETWORK_NAME);
         // 作成したイベント管理を解放
-        pEventModule->RemoveEventManager(this->_shotEventHandle);
+        pEventModule->RemoveNetwork(this->_shotEventHandle);
 
         this->_mBulletStrategy.Clear();
         return InGame::InGameCollisionComponent::VEnd();
@@ -207,7 +207,7 @@ namespace InGame
         // ゲームのイベント処理を記述
 
         // 通常弾を打つ
-        if (in_spEventData->VDataTypeHash() == EventShotNormalBullet::EventTypeHash())
+        if (in_spEventData->VEventHash() == EventShotNormalBullet::EventTypeHash())
         {
             // 通常弾の発射処理
 

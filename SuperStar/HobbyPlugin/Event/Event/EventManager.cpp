@@ -2,9 +2,11 @@
 
 #include <chrono>
 
+#include "Engine/Common/Hash.h"
+
 namespace Event
 {
-    EventManager::EventManager(Core::Memory::UniquePtr<EventManagerStrategyInterface> in_upStrategy)
+    EventManager::EventManager(Core::Memory::UniquePtr<EventNetworkStrategyInterface> in_upStrategy)
         : _iActiveQueue(0)
     {
         this->_upStrategy = std::move(in_upStrategy);
@@ -55,10 +57,10 @@ namespace Event
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upStrategy);
     }
 
-    HE::Bool EventManager::AddListener(EventListenerPtr const& in_rListener,
-                                       EventTypeStr const& in_rType)
+    const HE::Uint64 EventManager::AddListener(EventListenerPtr const& in_rListener,
+                                               EventTypeStr const& in_rType)
     {
-        if (this->ValidateType(in_rType) == FALSE) return FALSE;
+        if (this->ValidateType(in_rType) == FALSE) return 0;
 
         // リスナーマップのエントリ探し、
         // エントリに対応するテーブルがなければエントリ作成
@@ -68,7 +70,7 @@ namespace Event
         if (itr == this->_mRegistry.End())
         {
             itr = this->_mRegistry.Add(in_rType.Hash(), EventListenerTable());
-            if (itr.IsValid() == FALSE) return FALSE;
+            if (itr.IsValid() == FALSE) return 0;
         }
 
         // リスナーマップリスト更新
@@ -78,10 +80,13 @@ namespace Event
 
         // マップから取得した要素にあるリスナーリストにすでに登録されているかチェック
         // すでに登録済みならリスト登録はスキップ
+        auto ulHash = Core::Common::HashName(in_rListener->VName());
         for (EventListenerTable::iterator it = rTable.begin(), itEnd = rTable.end(); it != itEnd;
              it++)
         {
-            if (*it == in_rListener) return FALSE;
+            // TODO: 同じハッシュ値のリスナーがあったら失敗にする
+            auto ulCheckHash = Core::Common::HashName((*it)->VName());
+            HE_ASSERT_RETURN_VALUE(ulCheckHash != ulHash, 0);
         }
 
         // イベント型の有効性を確認
@@ -90,10 +95,10 @@ namespace Event
         rTable.push_back(in_rListener);
 
         // 登録に成功
-        return TRUE;
+        return ulHash;
     }
 
-    HE::Bool EventManager::RemoveListener(EventListenerPtr const& in_rListener,
+    HE::Bool EventManager::RemoveListener(const HE::Uint64 in_ulListenrHash,
                                           EventTypeStr const& in_rType)
     {
         if (this->ValidateType(in_rType) == FALSE) return FALSE;
@@ -107,7 +112,8 @@ namespace Event
             for (EventListenerTable::iterator it2 = table.begin(), it2End = table.end();
                  it2 != it2End; it2++)
             {
-                if (*it2 == in_rListener)
+                auto checkHash = Core::Common::HashName((*it2)->VName());
+                if (checkHash == in_ulListenrHash)
                 {
                     // 目的のリスナーを発見。テーブルから削除
                     table.erase(it2);
@@ -167,9 +173,9 @@ namespace Event
                 }
             }
 
-            if (this->VValidateType(in_rEvent->VHash()) == FALSE) return bProc;
+            if (this->VValidateType(in_rEvent->VNetworkHash()) == FALSE) return bProc;
 
-            auto itr = this->_mRegistry.FindKey(in_rEvent->VHash());
+            auto itr = this->_mRegistry.FindKey(in_rEvent->VNetworkHash());
             if (itr == this->_mRegistry.End()) return bProc;
 
             EventListenerTable const& table = itr->data;
@@ -194,7 +200,7 @@ namespace Event
         HE_ASSERT(0 <= this->_iActiveQueue);
         HE_ASSERT(this->_iActiveQueue < EConstants_NumQueues);
 
-        if (this->ValidateHash(in_spEvent->VEventTypeHash()) == FALSE) return FALSE;
+        if (this->ValidateHash(in_spEvent->VNetworkHash()) == FALSE) return FALSE;
 
         this->_aQueue[this->_iActiveQueue].push_back(in_spEvent);
 
@@ -273,7 +279,7 @@ namespace Event
             // イベントタイプに対応したリスナーにイベントを投げる
             {
                 // イベントタイプに対応したリスナーを取得
-                auto itListeners = this->_mRegistry.FindKey(spEvent->VEventTypeHash());
+                auto itListeners = this->_mRegistry.FindKey(spEvent->VNetworkHash());
 
                 // イベントで指定したタイプのリスナーがいないのでスキップ
                 if (itListeners == this->_mRegistry.End()) continue;
@@ -334,7 +340,7 @@ namespace Event
 
     HE::Bool EventManager::ValidateHash(const HE::Uint64 in_ulHash) const
     {
-        return this->_upStrategy->VIsEventTypeHash(in_ulHash);
+        return this->_upStrategy->VIsHash(in_ulHash);
     }
 
     // 情報探索メソッド

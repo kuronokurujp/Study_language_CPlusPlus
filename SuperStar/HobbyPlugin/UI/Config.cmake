@@ -12,6 +12,8 @@ set(UI_PLUGIN_TARGET_FILES
     
     UI/Widget.h
     UI/Widget.cpp
+    UI/Event.h
+    UI/Event.cpp
     
     UI/Builder/UILayoutBuilder.h
     UI/Builder/UILayoutBuilder.cpp

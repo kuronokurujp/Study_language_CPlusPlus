@@ -2,8 +2,13 @@
 
 namespace Event
 {
-    const Core::Common::Handle EventModule::AddEventManager(
-        Core::Memory::UniquePtr<EventManagerStrategyInterface> in_upStrategy)
+    EventModule::EventModule() : ModuleBase(ModuleName())
+    {
+        this->_mEventMng.Clear();
+    }
+
+    const Core::Common::Handle EventModule::AddNetwork(
+        Core::Memory::UniquePtr<EventNetworkStrategyInterface> in_upStrategy)
     {
         Core::Common::Handle handle;
 
@@ -16,7 +21,7 @@ namespace Event
         return handle;
     }
 
-    HE::Bool EventModule::RemoveEventManager(const Core::Common::Handle& in_rHandle)
+    HE::Bool EventModule::RemoveNetwork(const Core::Common::Handle& in_rHandle)
     {
         // 確保した管理インスタンスを破棄
         if (this->_mEventMng.Contains(in_rHandle) == FALSE) return FALSE;
@@ -29,24 +34,29 @@ namespace Event
         return this->_mEventMng.Erase(in_rHandle);
     }
 
-    HE::Bool EventModule::AddListener(EventListenerPtr const& in_rListener,
-                                      EventTypeStr const& in_rType)
+    const HE::Uint64 EventModule::AddListener(EventListenerPtr const& in_rListener,
+                                              EventTypeStr const& in_rType)
     {
+        HE::Uint64 ulListenerHash = 0;
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
         {
             // in_rTypeのリスナー管理データに登録
-            itr->_data->AddListener(in_rListener, in_rType);
+            auto ulHash = itr->_data->AddListener(in_rListener, in_rType);
+            if (ulHash != 0)
+            {
+                ulListenerHash = ulHash;
+            }
         }
 
-        return TRUE;
+        return ulListenerHash;
     }
 
-    HE::Bool EventModule::RemoveListener(EventListenerPtr const& in_rListener,
+    HE::Bool EventModule::RemoveListener(const HE::Uint64 in_ulHashistener,
                                          EventTypeStr const& in_rType)
     {
         for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
         {
-            itr->_data->RemoveListener(in_rListener, in_rType);
+            itr->_data->RemoveListener(in_ulHashistener, in_rType);
         }
 
         return TRUE;
@@ -78,7 +88,8 @@ namespace Event
     /// </summary>
     HE::Bool EventModule::_VStart()
     {
-        this->_mEventMng.Clear();
+        // MEMO: このメソッド前に別モジュールの_VStartメソッドで_mEventMng.Addが呼ばれている
+        // this->_mEventMng.Clear();
         return TRUE;
     }
 
@@ -91,7 +102,7 @@ namespace Event
         auto itr = this->_mEventMng.Begin();
         while (itr != this->_mEventMng.End())
         {
-            this->RemoveEventManager(itr->_key);
+            this->RemoveNetwork(itr->_key);
             itr = this->_mEventMng.Begin();
         }
 

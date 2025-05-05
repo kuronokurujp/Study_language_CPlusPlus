@@ -48,7 +48,7 @@ namespace InGame
 
             auto upStrategy =
                 HE_MAKE_CUSTOM_UNIQUE_PTR((InGame::InGameCharacterEventManagerStrategy));
-            this->_characterEventHandle = pEventModule->AddEventManager(std::move(upStrategy));
+            this->_characterEventHandle = pEventModule->AddNetwork(std::move(upStrategy));
             HE_ASSERT(this->_characterEventHandle.Null() == FALSE);
 
             auto spCharacterEventListener =
@@ -58,7 +58,7 @@ namespace InGame
                                           { return this->_HandleCharacterEvent(in_spEventData); });
 
             if (pEventModule->AddListener(spCharacterEventListener,
-                                          INGAME_CHARACTER_EVENT_TYPE_NAME) == FALSE)
+                                          INGAME_CHARACTER_EVENT_NAME) == FALSE)
             {
                 HE_ASSERT(0 && "キャラクターイベントリスナー設定に失敗");
             }
@@ -84,9 +84,9 @@ namespace InGame
         auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
 
         // 設定したイベントリスナーを解放
-        pEventModule->RemoveAllListener(INGAME_CHARACTER_EVENT_TYPE_NAME);
+        pEventModule->RemoveAllListener(INGAME_CHARACTER_EVENT_NAME);
         // 作成したイベント管理を解放
-        pEventModule->RemoveEventManager(this->_characterEventHandle);
+        pEventModule->RemoveNetwork(this->_characterEventHandle);
 
         // 作成したアクターを全て破棄
         this->RemoveActor(&this->_playerHandle);
@@ -222,7 +222,7 @@ namespace InGame
         Event::EventDataInterfacePtr const& in_spEventData)
     {
         // ゲームのキャラクターイベント処理
-        const HE::Uint32 uEventHash = in_spEventData->VDataTypeHash();
+        const HE::Uint32 uEventHash = in_spEventData->VEventHash();
 
         // 移動処理をする
         if (uEventHash == EventCharacterMove::EventTypeHash())

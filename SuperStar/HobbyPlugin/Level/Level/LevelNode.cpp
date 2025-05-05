@@ -69,7 +69,7 @@ namespace Level
     {
         if (Actor::Object::VBegin() == FALSE) return FALSE;
 
-        if (this->_actorManager.Start(256, 2) == FALSE)
+        if (ACTOR_MANAGER_START(this->_actorManager, 256, 2) == FALSE)
         {
             HE_ASSERT(FALSE && "レベルノードのアクター管理の初期化が失敗");
             return FALSE;

@@ -78,17 +78,27 @@ namespace Core::Common
         /// プールするためのデータバッファ数を指定して確保
         /// 継承したクラスが必ず実行
         /// </summary>
+
+#ifdef HE_ENGINE_DEBUG
+        void ReservePool(const HE::Uint32 in_uMax, const char* in_szFileName,
+                         const HE::Uint32 in_uFileLine)
+#else
         void ReservePool(const HE::Uint32 in_uMax)
+#endif
         {
             // TODO: 予約した数を変えたい場合にも対応できるようにしたほうがいい
 
             if (this->_upCacheDatas == NULL)
-                this->_upCacheDatas = HE_MAKE_CUSTOM_UNIQUE_PTR((std::vector<T*>));
+                // this->_upCacheDatas = HE_MAKE_CUSTOM_UNIQUE_PTR((std::vector<T*>));
+                this->_upCacheDatas =
+                    Core::Memory::MakeCustomUniquePtr<std::vector<T*>>(in_szFileName, in_uFileLine);
 
             if (this->_upUserSlot == NULL)
             {
                 this->_upUserSlot =
-                    HE_MAKE_CUSTOM_UNIQUE_PTR((std::unordered_map<Core::Common::Handle, T*>));
+                    // HE_MAKE_CUSTOM_UNIQUE_PTR((std::unordered_map<Core::Common::Handle, T*>));
+                    Core::Memory::MakeCustomUniquePtr<std::unordered_map<Core::Common::Handle, T*>>(
+                        in_szFileName, in_uFileLine);
             }
 
             this->_upCacheDatas->reserve(in_uMax);
@@ -412,4 +422,11 @@ namespace Core::Common
 
         HE::Uint32 _uFreeSlotMax = 0;
     };
+
+// TODO: 使っている箇所を特定するためのマクロ
+#ifdef HE_ENGINE_DEBUG
+#define POOL_RESERVE_POOL(VAL) ReservePool(VAL, __FILE__, __LINE__)
+#else
+#define POOL_RESERVE_POOL(VAL) ReservePool(VAL)
+#endif
 }  // namespace Core::Common

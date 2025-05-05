@@ -207,7 +207,7 @@ namespace PlatformSDL2
 
     Input::Input()
     {
-        this->_poolInputObject.ReservePool(32);
+        this->_poolInputObject.POOL_RESERVE_POOL(32);
     }
 
     void Input::VRelease()

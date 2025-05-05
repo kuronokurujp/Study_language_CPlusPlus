@@ -12,14 +12,27 @@ namespace Actor
 
     void ActorManager::Release()
     {
+        this->End();
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upDecorator);
     }
 
+#ifdef HE_ENGINE_DEBUG
+    HE::Bool ActorManager::Start(const HE::Uint32 in_uActorCapacity,
+                                 const HE::Uint32 in_uActorGroupMax, const char* in_szFileName,
+                                 const HE::Uint32 in_uFileLine)
+#else
     HE::Bool ActorManager::Start(const HE::Uint32 in_uActorCapacity,
                                  const HE::Uint32 in_uActorGroupMax)
+#endif
     {
         HE_ASSERT(1 < in_uActorGroupMax);
+#ifdef HE_ENGINE_DEBUG
+        if (this->_taskManager.Init(in_uActorCapacity, in_uActorGroupMax, in_szFileName,
+                                    in_uFileLine) == FALSE)
+            return FALSE;
+#else
         if (this->_taskManager.Init(in_uActorCapacity, in_uActorGroupMax) == FALSE) return FALSE;
+#endif
 
         if (this->_upDecorator)
         {

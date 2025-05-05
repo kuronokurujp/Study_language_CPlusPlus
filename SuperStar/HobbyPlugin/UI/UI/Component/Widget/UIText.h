@@ -15,7 +15,10 @@ namespace UI
         HE_GENERATED_CLASS_BODY_HEADER(UITextComponent, UIWidgetComponent);
 
     public:
-        UITextComponent() : UIWidgetComponent() { this->_Clear(); }
+        using ConvLocTextFuncType = std::function<const HE::Char*(const HE::Char*, const HE::Char*)>;
+
+    public:
+        UITextComponent(ConvLocTextFuncType);// : UIWidgetComponent() { this->_Clear(); }
 
         /// <summary>
         /// タスク利用した設定をした最初に実行
@@ -72,7 +75,8 @@ namespace UI
             this->_szDrawText.Clear();
             this->_szLocGroup.Clear();
             // this->_rect.Clear();
-            this->_eAnchor = Core::Math::EAnchor_Left;
+            this->_eAnchor         = Core::Math::EAnchor_Left;
+            this->_convLocTextFunc = NULL;
         }
 
     private:
@@ -82,5 +86,7 @@ namespace UI
         // Core::Math::Rect2 _rect;
         Core::Math::EAnchor _eAnchor = Core::Math::EAnchor_Left;
         HE::Uint32 _uFontSize        = 32;
+
+        ConvLocTextFuncType _convLocTextFunc;
     };
 }  // namespace UI

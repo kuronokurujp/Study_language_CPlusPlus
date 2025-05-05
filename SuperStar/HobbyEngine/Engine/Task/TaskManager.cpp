@@ -42,13 +42,22 @@ namespace Core
         this->End();
     }
 
+#ifdef HE_ENGINE_DEBUG
+    HE::Bool TaskManager::Init(const HE::Uint32 in_uTaskMax, const HE::Sint32 in_iGroupNum,
+                               const char* in_szFileName, const HE::Uint32 in_uFileLine)
+#else
     HE::Bool TaskManager::Init(const HE::Uint32 in_uTaskMax, const HE::Sint32 in_iGroupNum)
+#endif
     {
         // 管理グループ数が0以下なら失敗
         if (in_iGroupNum <= 0) return FALSE;
 
         // プールのバッファ予約
+#ifdef HE_ENGINE_DEBUG
+        this->ReservePool(in_uTaskMax, in_szFileName, in_uFileLine);
+#else
         this->ReservePool(in_uTaskMax);
+#endif
 
         // タスクグループを確保
         this->_pTasks =

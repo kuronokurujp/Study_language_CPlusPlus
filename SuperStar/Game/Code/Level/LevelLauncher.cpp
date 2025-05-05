@@ -21,26 +21,32 @@ namespace Level
         const HE::Bool bRet = Level::Node::VBegin();
         HE_ASSERT(bRet);
 
-        // UIイベントをキャッチするコンポーネントを追加
+        // TODO: UIのイベントリスナー登録
         {
-            auto [h, comp] =
-                this->AddComponentByHandleAndComp<Level::LevelUserInputReceiveComponent>(
-                    0, Actor::Component::EPriorty::EPriorty_Main);
-
-            auto handler = HE_MAKE_CUSTOM_UNIQUE_PTR(
-                (Level::LevelUserInputMessage),
-                [this](const HE::Char* in_pMsg)
+            auto pEventModule      = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
+            auto spUIEventListener = HE_MAKE_CUSTOM_SHARED_PTR(
+                (Event::EventListenerWithRegistEventFunc), HE_STR_TEXT("UIEvent"),
+                [this](Event::EventDataInterfacePtr const& in_spEventData)
                 {
-                    HE_LOG_LINE(in_pMsg);
-                    // 次のレベルへ遷移
-                    if (HE_STR_CMP(in_pMsg, HE_STR_TEXT("C_TitleSeq")) == 0)
+                    // TODO: UIのボタンクリック受信
+                    if (in_spEventData->VEventHash() == UI::EventButtonClick::Hash())
                     {
-                        auto pLevelModule = HE_ENGINE.ModuleManager().Get<Level::LevelModule>();
-                        // タイトルへ遷移する
-                        pLevelModule->GetManager()->StartLevel<Level::LevelTitle>();
+                        auto pEvent = reinterpret_cast<UI::EventButtonClick*>(in_spEventData.get());
+
+                        // 次のレベルへ遷移
+                        if (pEvent->_szMsg == HE_STR_TEXT("C_TitleSeq"))
+                        {
+                            auto pLevelModule = HE_ENGINE.ModuleManager().Get<Level::LevelModule>();
+                            // タイトルへ遷移する
+                            pLevelModule->GetManager()->StartLevel<Level::LevelTitle>();
+                        }
                     }
+
+                    return TRUE;
                 });
-            comp->SetReceiver(std::move(handler));
+
+            this->_ulEventListenerHash =
+                pEventModule->AddListener(spUIEventListener, EVENT_NETWORK_NAME_UIMODULE);
         }
 
         // UIのBuilderファイルからレイアウト作成
@@ -50,9 +56,8 @@ namespace Level
                 Core::File::Path(HE_STR_TEXT("UI"), HE_STR_TEXT("Builder"), HE_STR_TEXT("Test"),
                                  HE_STR_TEXT("Launcher.xml")));
             // widgetを作成
-            // レベルが切り替わると自動的にwidgetは破棄される
-            pUIModule->NewLayoutByLayotuAsset(this->_layoutAssetHandle, 0, Game::g_sceneUIHandle,
-                                              this->Handle());
+            this->_widget = pUIModule->NewLayoutByLayotuAsset(this->_layoutAssetHandle, 0,
+                                                              Game::g_sceneUIHandle);
         }
 
         return bRet;
@@ -60,10 +65,22 @@ namespace Level
 
     HE::Bool LevelLauncher::VEnd()
     {
+        // TODO: 作成したUIWidgetを破棄
+        {
+            auto pUIModule = HE_ENGINE.ModuleManager().Get<UI::UIModule>();
+            pUIModule->DeleteWidget(this->_widget);
+        }
+
         // ロードしたアセットを破棄
         {
             auto pUIModule = HE_ENGINE.ModuleManager().Get<UI::UIModule>();
             pUIModule->UnloadAssetWithLayoutBuild(this->_layoutAssetHandle);
+        }
+
+        // TODO: UI用のイベントリスナーを外す
+        {
+            auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
+            pEventModule->RemoveListener(this->_ulEventListenerHash, EVENT_NETWORK_NAME_UIMODULE);
         }
 
         const HE::Bool bRet = Level::Node::VEnd();

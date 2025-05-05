@@ -19,6 +19,7 @@ target_include_directories(${UI_PLUGIN_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/../AssetManager/
         ${CMAKE_CURRENT_SOURCE_DIR}/../Render/
         ${CMAKE_CURRENT_SOURCE_DIR}/../Localization/
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Level/
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Event/
+        # ${CMAKE_CURRENT_SOURCE_DIR}/../Level/
         ${CMAKE_CURRENT_SOURCE_DIR}/../EnhancedInput/
 )

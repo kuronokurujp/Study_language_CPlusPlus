@@ -48,7 +48,7 @@ namespace Render
         this->_upStrategy = std::move(in_upStg);
 
         this->_poolSceneManager.ReleasePool();
-        this->_poolSceneManager.ReservePool(in_uSceneCount);
+        this->_poolSceneManager.POOL_RESERVE_POOL(in_uSceneCount);
 
         return TRUE;
     }

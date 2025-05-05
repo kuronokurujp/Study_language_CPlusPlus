@@ -24,7 +24,7 @@ namespace AssetManager
     HE::Bool AssetManagerModule::_VStart()
     {
         // 利用するアセット数を設定
-        this->_poolAssetDataManager.ReservePool(1024);
+        this->_poolAssetDataManager.POOL_RESERVE_POOL(1024);
 
         return TRUE;
     }

@@ -6,7 +6,7 @@ namespace InGame
                                                  const Core::Math::Vector2& in_rPos,
                                                  const Core::Math::Vector2& in_rDir,
                                                  const HE::Uint32 in_uCollisionHashCode)
-        : Event::BaseEventData(INGAME_SHOT_EVENT_TYPE_NAME, s_szEventType, in_fTimeStamp),
+        : Event::BaseEventData(INGAME_SHOT_EVENT_NETWORK_NAME, s_szEventType, in_fTimeStamp),
           _pos(in_rPos),
           _dir(in_rDir),
           _uCollisionHashCode(in_uCollisionHashCode)

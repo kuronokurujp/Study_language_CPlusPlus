@@ -30,16 +30,21 @@ namespace Level
             pInputModule->AddCommonMappingAction(Local::mInputAction);
         }
 
-        // UIイベントをキャッチするコンポーネントを追加
-        {
-            auto [compHandle, pComp] =
-                this->AddComponentByHandleAndComp<Level::LevelUserInputReceiveComponent>(
-                    0, Actor::Component::EPriorty::EPriorty_Main);
+        /*
+                // UIイベントをキャッチするコンポーネントを追加
+                {
+                    auto [compHandle, pComp] =
+                        this->AddComponentByHandleAndComp<Level::LevelUserInputReceiveComponent>(
+                            0, Actor::Component::EPriorty::EPriorty_Main);
 
-            auto handler = HE_MAKE_CUSTOM_UNIQUE_PTR((Level::LevelUserInputMessage),
-                                                     [this](const HE::Char* in_pMsg)
-                                                     { HE_LOG_LINE(in_pMsg); });
-            pComp->SetReceiver(std::move(handler));
+                    auto handler = HE_MAKE_CUSTOM_UNIQUE_PTR((Level::LevelUserInputMessage),
+                                                             [this](const HE::Char* in_pMsg)
+                                                             { HE_LOG_LINE(in_pMsg); });
+                    pComp->SetReceiver(std::move(handler));
+                }
+        */
+        // TODO: UIのイベントリスナー登録
+        {
         }
 
         // UIのBuilderファイルからレイアウト作成
@@ -52,8 +57,8 @@ namespace Level
 
             // widgetを作成
             // レベルが切り替わると自動的にwidgetは破棄される
-            pUIModule->NewLayoutByLayotuAsset(this->_layoutAssetHandle, 0, Game::g_sceneUIHandle,
-                                              this->Handle());
+            this->_widget = pUIModule->NewLayoutByLayotuAsset(this->_layoutAssetHandle, 0,
+                                                              Game::g_sceneUIHandle);
         }
 
         return bRet;
@@ -61,6 +66,11 @@ namespace Level
 
     HE::Bool LevelTitle::VEnd()
     {
+        {
+            auto pUIModule = HE_ENGINE.ModuleManager().Get<UI::UIModule>();
+            pUIModule->DeleteWidget(this->_widget);
+        }
+
         // 専用の入力アクションを外す
         {
             auto pInputModule = HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();

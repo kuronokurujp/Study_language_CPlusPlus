@@ -2,39 +2,54 @@
 
 #include "Engine/Common/CustomMap.h"
 #include "Engine/Memory/Memory.h"
-#include "LevelModule.h"
 
 namespace UI
 {
     // クラス内のみで利用する
     namespace Local
     {
+        /// <summary>
+        /// UIイベント管理の拡張クラス
+        /// </summary>
+        class UIEventNetworkStrategy final : public Event::EventNetworkStrategyInterface
+        {
+        public:
+            UIEventNetworkStrategy()
+                : _ulEventTypeHash(Core::Common::HashName(EVENT_NETWORK_NAME_UIMODULE))
+            {
+            }
+
+            HE::Bool VIsHash(const HE::Uint64 in_ulHash)
+            {
+                return (this->_ulEventTypeHash == in_ulHash);
+            }
+
+        private:
+            HE::Uint64 _ulEventTypeHash = 0;
+        };
+
         static Core::Common::FixedMap<Builder::EAnchor, Core::Math::EAnchor, 3>
             mPosAnthorToRect2Anchor = {{Builder::EAnchor::EAnchor_Left,
                                         Core::Math::EAnchor::EAnchor_Left},
                                        {Builder::EAnchor::EPosAnchor_Center,
                                         Core::Math::EAnchor::EAnchor_Center}};
-    }
+    }  // namespace Local
 
     UIModule::UIModule() : ModuleBase(ModuleName())
     {
         // 依存しているモジュールを設定
         // モジュールの依存設定していないと依存したモジュールが使えない
         this->_AppendDependenceModule<AssetManager::AssetManagerModule>();
-        this->_AppendDependenceModule<Level::LevelModule>();
         this->_AppendDependenceModule<Localization::LocalizationModule>();
         this->_AppendDependenceModule<Render::RenderModule>();
+        this->_AppendDependenceModule<Event::EventModule>();
         this->_AppendDependenceModule<Actor::ActorModule>();
     }
 
-    Widget* UIModule::GetWidget(const UIWidgetHandlePack& in_rHandlePack)
+    Widget* UIModule::GetWidget(const Core::Common::Handle& in_rHandlePack)
     {
-        auto pLevelModule = this->GetDependenceModule<Level::LevelModule>();
-        HE_ASSERT(pLevelModule);
-
         Actor::Object* pActor = NULL;
-        pActor                = pLevelModule->GetLevel(in_rHandlePack._levelHandle)
-                     .GetActor<Actor::Object>(in_rHandlePack._widgetHandle);
+        pActor                = this->_actorManager.Get(in_rHandlePack);
         HE_ASSERT(pActor);
 
         return reinterpret_cast<Widget*>(pActor);
@@ -45,7 +60,52 @@ namespace UI
     /// </summary>
     HE::Bool UIModule::_VStart()
     {
+        // TODO: UIイベント専用の制御を追加
+        {
+            auto pEventModule  = this->GetDependenceModule<Event::EventModule>();
+            auto upStrategy    = HE_MAKE_CUSTOM_UNIQUE_PTR((Local::UIEventNetworkStrategy));
+            this->_eventHandle = pEventModule->AddNetwork(std::move(upStrategy));
+            HE_ASSERT(this->_eventHandle.Null() == FALSE);
+        }
+
+        return ACTOR_MANAGER_START(this->_actorManager, 128, 2);
+    }
+
+    HE::Bool UIModule::_VRelease()
+    {
+        // TODO: UIイベント専用の制御を破棄
+        {
+            auto pEventModule = this->GetDependenceModule<Event::EventModule>();
+            pEventModule->RemoveNetwork(this->_eventHandle);
+        }
+
+        this->_actorManager.Release();
         return TRUE;
+    }
+
+    void UIModule::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
+    {
+        this->_actorManager.BeginUpdate(in_fDeltaTime);
+    }
+
+    void UIModule::_VUpdate(const HE::Float32 in_fDeltaTime)
+    {
+        this->_actorManager.Update(in_fDeltaTime);
+    }
+
+    void UIModule::_VLateUpdate(const HE::Float32 in_fDeltaTime)
+    {
+        this->_actorManager.LateUpdate(in_fDeltaTime);
+    }
+
+    void UIModule::_QuqueEventByButtonClick(const Core::Common::StringBase& in_rMsg)
+    {
+        // TODO: ボタンクリックのイベント作成
+        auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((EventButtonClick), in_rMsg);
+
+        // TODO: 作成したイベントをキューに積む
+        auto pEventModule = this->GetDependenceModule<Event::EventModule>();
+        pEventModule->QueueEvent(spEvent);
     }
 
     Core::Common::Handle UIModule::LoadAssetWithLayoutBuild(const Core::File::Path& in_rFilePath)
@@ -74,15 +134,15 @@ namespace UI
         pAssetManagerModule->Unload(in_rHandle);
     }
 
-    const UIWidgetHandlePack UIModule::NewLayer(const Core::Common::StringBase& in_szrName,
-                                                const Core::Math::Vector2& in_rPos,
-                                                const Core::Math::Vector2& in_rSize,
-                                                const Core::Math::Color in_color,
-                                                const HE::Uint32 in_uSort,
-                                                const Core::Common::Handle in_viewHandle,
-                                                const Core::Common::Handle in_levelHandle)
+    const Core::Common::Handle UIModule::NewLayer(const Core::Common::StringBase& in_szrName,
+                                                  const Core::Math::Vector2& in_rPos,
+                                                  const Core::Math::Vector2& in_rSize,
+                                                  const Core::Math::Color in_color,
+                                                  const HE::Uint32 in_uSort,
+                                                  const Core::Common::Handle in_viewHandle)
+    //                                             const Core::Common::Handle in_levelHandle)
     {
-        auto handlePack = this->NewWidget(in_szrName, in_uSort, in_levelHandle);
+        auto handlePack = this->NewWidget(in_szrName, in_uSort);  //, in_levelHandle);
 
         auto [hInputRouter, pComp] = this->AddComponent<Actor::InputComponent>(handlePack, 0);
         // 入力ルーター設定
@@ -104,12 +164,11 @@ namespace UI
         return handlePack;
     }
 
-    const UIWidgetHandlePack UIModule::NewLayoutByLayotuAsset(
+    const Core::Common::Handle UIModule::NewLayoutByLayotuAsset(
         const Core::Common::Handle& in_rAssetHandle, const HE::Uint32 in_uSort,
-        const Core::Common::Handle& in_rViewHandle, const Core::Common::Handle& in_rLevelHandle)
+        const Core::Common::Handle& in_rViewHandle)
     {
         HE_ASSERT(in_rAssetHandle.Null() == FALSE);
-        HE_ASSERT(in_rLevelHandle.Null() == FALSE);
         HE_ASSERT(in_rViewHandle.Null() == FALSE);
 
         auto pAssetManagerModule = this->GetDependenceModule<AssetManager::AssetManagerModule>();
@@ -131,7 +190,7 @@ namespace UI
                   "レイヤーノードが存在しない");
 
         // レイアウトを作成
-        UIWidgetHandlePack rootLayerHandle;
+        Core::Common::Handle rootLayerHandle;
         {
             auto pLayerData = &layerNode._data._exData._layer;
             Core::Math::Color c{pLayerData->_style._uColor};
@@ -140,13 +199,13 @@ namespace UI
                 this->NewLayer(Core::Common::FixedString64(layerNode._data._szId),
                                Core::Math::Vector2(pLayerData->_fX, pLayerData->_fY),
                                Core::Math::Vector2(pLayerData->_style._fW, pLayerData->_style._fH),
-                               c, in_uSort, in_rViewHandle, in_rLevelHandle);
+                               c, in_uSort, in_rViewHandle);
         }
 
-        UIWidgetHandlePack parentHandle;
+        Core::Common::Handle parentHandle;
         asset.DoSearchHierarchyNode(
             {HE_STR_U8_TEXT("ui"), HE_STR_U8_TEXT("layer")},
-            [this, in_rViewHandle, in_rLevelHandle, &parentHandle,
+            [this, in_rViewHandle, &parentHandle,
              rootLayerHandle](const UI::Builder::Node& in_rWidgetData, HE::Uint32 in_uSort,
                               const HE::Bool in_bRoot)
             {
@@ -155,8 +214,8 @@ namespace UI
                     parentHandle = rootLayerHandle;
                 }
 
-                auto pLevelModule = this->GetDependenceModule<Level::LevelModule>();
-                HE_ASSERT(pLevelModule);
+                // auto pLevelModule = this->GetDependenceModule<Level::LevelModule>();
+                // HE_ASSERT(pLevelModule);
 
                 const auto pNodeData = &in_rWidgetData._data;
                 // TODO: 関数テーブルにしてswitch文を消す方向にするかも
@@ -183,7 +242,7 @@ namespace UI
                         auto h = this->NewLabelWidget(Core::Common::FixedString64(pNodeData->_szId),
                                                       in_uSort, pLabel->szLoc, pLabel->szText,
                                                       pStyle->_uSize, rect, pStyle->_uColor,
-                                                      in_rViewHandle, in_rLevelHandle);
+                                                      in_rViewHandle);
 
                         this->AddChildWidget(parentHandle, h);
                         parentHandle = h;
@@ -201,14 +260,12 @@ namespace UI
                                          Local::mPosAnthorToRect2Anchor[pButton->_eAnchor]);
                         auto h =
                             this->NewButtonWidget(Core::Common::FixedString64(pNodeData->_szId),
-                                                  in_uSort, rect, pStyle->_uColor, in_rViewHandle,
-                                                  in_rLevelHandle);
+                                                  in_uSort, rect, pStyle->_uColor, in_rViewHandle);
 
                         // ボタンを押した時のイベントを設定
                         {
                             Actor::Object* pWidget = NULL;
-                            pWidget = pLevelModule->GetLevel(parentHandle._levelHandle)
-                                          .GetActor<Actor::Object>(h._widgetHandle);
+                            pWidget                = this->_actorManager.Get(h);
                             HE_ASSERT(pWidget);
 
                             auto [btnWidgetHandle, pWidgetCmp] =
@@ -219,27 +276,17 @@ namespace UI
                             UI::UIButtonComponent* pBtnComp =
                                 reinterpret_cast<UI::UIButtonComponent*>(pWidgetCmp);
 
-                            auto handler = HE_MAKE_CUSTOM_UNIQUE_PTR(
-                                (UI::UIButtonMessageHandlerDefault), pNodeData->_szId,
-                                [this, parentHandle](Core::Common::StringBase& in_msg)
-                                {
-                                    auto pLevelModule =
-                                        this->GetDependenceModule<Level::LevelModule>();
-                                    HE_ASSERT(pLevelModule);
-
-                                    // ボタン入力をレベルのコンポーネントに通知
-                                    auto [handle, c] =
-                                        pLevelModule->GetLevel(parentHandle._levelHandle)
-                                            .GetComponentHandleAndComponent(
-                                                &Level::LevelUserInputReceiveComponent::CLASS_RTTI);
-                                    if (handle.Null() == FALSE)
-                                    {
-                                        Level::LevelUserInputReceiveComponent* pUserInputEventComp =
-                                            reinterpret_cast<
-                                                Level::LevelUserInputReceiveComponent*>(c);
-                                        pUserInputEventComp->Message(in_msg.Str());
-                                    }
-                                });
+                            auto handler =
+                                HE_MAKE_CUSTOM_UNIQUE_PTR((UI::UIButtonMessageHandlerDefault),
+                                                          pNodeData->_szId,
+                                                          [this, parentHandle](
+                                                              Core::Common::StringBase& in_rMsg)
+                                                          {
+                                                              // TODO:
+                                                              // イベントモジュールにUIイベント発行
+                                                              this->_QuqueEventByButtonClick(
+                                                                  in_rMsg);
+                                                          });
                             pBtnComp->SetPushHandler(std::move(handler));
                         }
 
@@ -254,28 +301,40 @@ namespace UI
         return rootLayerHandle;
     }  // namespace UI
 
-    const UIWidgetHandlePack UIModule::NewLabelWidget(
+    const Core::Common::Handle UIModule::NewLabelWidget(
         const Core::Common::StringBase& in_szrName, const HE::Uint32 in_uSort,
         const HE::Char* in_szLocGroupName, const HE::Char* in_szText, const HE::Uint32 in_uFontSize,
         const Core::Math::Rect2& in_rTextRect, const HE::Uint32 in_uTextColor,
-        const Core::Common::Handle& in_rViewHandle, const Core::Common::Handle& in_rLevelHandle)
+        const Core::Common::Handle& in_rViewHandle)
     {
-        auto handlePack = this->NewWidget(in_szrName, in_uSort, in_rLevelHandle);
-
-        auto pLevelModule = this->GetDependenceModule<Level::LevelModule>();
-        HE_ASSERT(pLevelModule);
+        auto handlePack = this->NewWidget(in_szrName, in_uSort);
 
         Actor::Object* pWidget = NULL;
 
-        pWidget = pLevelModule->GetLevel(handlePack._levelHandle)
-                      .GetActor<Actor::Object>(handlePack._widgetHandle);
+        pWidget = this->_actorManager.Get(handlePack);
         if (pWidget == NULL) return handlePack;
 
         // ボタンの上に表示するテキストコンポーネント追加と設定
+
+        auto pActor = this->GetWidget(handlePack);
+
         auto [textHandle, pTextComp] =
-            this->AddComponent<UI::UITextComponent>(handlePack, in_uSort + 1);
+            // this->AddComponent<UI::UITextComponent>(handlePack, in_uSort + 1);
+            //  アクターにコンポーネント追加
+            pActor->AddComponentByHandleAndComp<UI::UITextComponent>(
+                in_uSort + 1, Actor::Component::EPriorty::EPriorty_Main,
+                [this](const HE::Char* in_szLocGrop, const HE::Char* in_szText)
+                {
+                    // TODO: 言語モジュールがあるなら言語データと紐づいたテキストを返す
+                    auto pLocalModule =
+                        this->GetDependenceModule<Localization::LocalizationModule>();
+                    HE_ASSERT_RETURN_VALUE(HE_STR_EMPTY, pLocalModule);
+
+                    return pLocalModule->Text(HE_STR_TEXT("JP"), in_szLocGrop, in_szText);
+                });
         {
-            UI::UITextComponent* pText = pWidget->GetComponent<UI::UITextComponent>(textHandle);
+            UI::UITextComponent* pText =
+                pTextComp;  // pWidget->GetComponent<UI::UITextComponent>(textHandle);
             pText->SetPos(in_rTextRect.Pos());
             pText->SetViewHandle(in_rViewHandle);
             pText->SetText(in_szText);
@@ -290,21 +349,15 @@ namespace UI
         return handlePack;
     }
 
-    const UIWidgetHandlePack UIModule::NewButtonWidget(const Core::Common::StringBase& in_szrName,
-                                                       const HE::Uint32 in_uSort,
-                                                       const Core::Math::Rect2& in_rBtnRect,
-                                                       const HE::Uint32 in_uBtnColor,
-                                                       const Core::Common::Handle& in_rViewHandle,
-                                                       const Core::Common::Handle& in_rLevelHandle)
-
+    const Core::Common::Handle UIModule::NewButtonWidget(const Core::Common::StringBase& in_szrName,
+                                                         const HE::Uint32 in_uSort,
+                                                         const Core::Math::Rect2& in_rBtnRect,
+                                                         const HE::Uint32 in_uBtnColor,
+                                                         const Core::Common::Handle& in_rViewHandle)
     {
-        auto widgetHandle = this->NewWidget(in_szrName, in_uSort, in_rLevelHandle);
+        auto widgetHandle = this->NewWidget(in_szrName, in_uSort);
 
-        auto pLevelModule = this->GetDependenceModule<Level::LevelModule>();
-        HE_ASSERT(pLevelModule);
-
-        Widget* pWidget = pLevelModule->GetLevel(widgetHandle._levelHandle)
-                              .GetActor<Widget>(widgetHandle._widgetHandle);
+        auto pWidget = this->_actorManager.Get(widgetHandle);
         if (pWidget == NULL) return widgetHandle;
 
         // ボタンコンポーネント追加と設定
@@ -321,32 +374,35 @@ namespace UI
         return widgetHandle;
     }
 
-    const UIWidgetHandlePack UIModule::NewWidget(const Core::Common::StringBase& in_szrName,
-                                                 const HE::Uint32 in_uSort,
-                                                 const Core::Common::Handle& in_rLevelHandle)
+    const Core::Common::Handle UIModule::NewWidget(const Core::Common::StringBase& in_szrName,
+                                                   const HE::Uint32 in_uSort)
     {
-        auto pLevelModule = this->GetDependenceModule<Level::LevelModule>();
-        HE_ASSERT(pLevelModule);
-
-        auto handle = pLevelModule->GetLevel(in_rLevelHandle).AddActor<Widget>();
+        auto handle = this->_actorManager.Add<Widget>();
         HE_ASSERT(handle.Null() == FALSE);
 
-        return UIWidgetHandlePack(handle, in_rLevelHandle);
+        return Core::Common::Handle(handle);
     }
 
-    HE::Bool UIModule::AddChildWidget(UIWidgetHandlePack& in_rParent,
-                                      UIWidgetHandlePack& in_rWidget)
+    /// <summary>
+    /// TODO: Widgetを破棄
+    /// </summary>
+    void UIModule::DeleteWidget(Core::Common::Handle& in_rPack)
     {
-        HE_ASSERT(in_rParent._levelHandle == in_rWidget._levelHandle);
-        auto pLevelModule = this->GetDependenceModule<Level::LevelModule>();
-        HE_ASSERT(pLevelModule);
-
-        return pLevelModule->GetLevel(in_rParent._levelHandle)
-            .ChainActor(in_rWidget._widgetHandle, in_rParent._widgetHandle);
+        this->_actorManager.Remove(&in_rPack);
     }
 
-    HE::Bool UIModule::_VRelease()
+    HE::Bool UIModule::AddChildWidget(Core::Common::Handle& in_rParent,
+                                      Core::Common::Handle& in_rWidget)
     {
-        return TRUE;
+        // HE_ASSERT(in_rParent._levelHandle == in_rWidget._levelHandle);
+        //  auto pLevelModule = this->GetDependenceModule<Level::LevelModule>();
+        //  HE_ASSERT(pLevelModule);
+
+        //        return pLevelModule->GetLevel(in_rParent._levelHandle)
+        //            .ChainActor(in_rWidget._widgetHandle, in_rParent._widgetHandle);
+        auto pParentActor = this->_actorManager.Get(in_rParent);
+        // 子アクターに親アクターを設定する
+        return pParentActor->AddChildTask(in_rWidget);
     }
+
 }  // namespace UI

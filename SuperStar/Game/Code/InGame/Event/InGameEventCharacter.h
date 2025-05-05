@@ -9,7 +9,7 @@
 // イベントのモジュール
 #include "EventModule.h"
 
-#define INGAME_CHARACTER_EVENT_TYPE_NAME HE_STR_TEXT("InGameCharacterEvent")
+#define INGAME_CHARACTER_EVENT_NAME HE_STR_TEXT("InGameCharacterEvent")
 
 namespace InGame
 {
@@ -18,21 +18,21 @@ namespace InGame
     /// <summary>
     /// キャラクターのイベント管理の拡張クラス
     /// </summary>
-    class InGameCharacterEventManagerStrategy final : public Event::EventManagerStrategyInterface
+    class InGameCharacterEventManagerStrategy final : public Event::EventNetworkStrategyInterface
     {
     public:
         InGameCharacterEventManagerStrategy()
-            : _ulEventTypeHash(Core::Common::HashName(INGAME_CHARACTER_EVENT_TYPE_NAME))
+            : _ulHash(Core::Common::HashName(INGAME_CHARACTER_EVENT_NAME))
         {
         }
 
-        HE::Bool VIsEventTypeHash(const HE::Uint64 in_ulHash)
+        HE::Bool VIsHash(const HE::Uint64 in_ulHash)
         {
-            return (this->_ulEventTypeHash == in_ulHash);
+            return (this->_ulHash == in_ulHash);
         }
 
     private:
-        HE::Uint64 _ulEventTypeHash = 0;
+        HE::Uint64 _ulHash = 0;
     };
 
     /// <summary>

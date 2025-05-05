@@ -5,6 +5,7 @@
 
 #include "Engine/Common/CustomMap.h"
 #include "Engine/Common/CustomVector.h"
+#include "Engine/Common/PoolManager.h"
 #include "Engine/MiniEngine.h"
 #include "EventInterface.h"
 
@@ -15,12 +16,12 @@ namespace Event
     /// <summary>
     /// イベント管理のストラテジーインターフェイス
     /// </summary>
-    class EventManagerStrategyInterface
+    class EventNetworkStrategyInterface
     {
     public:
-        EventManagerStrategyInterface()                     = default;
-        virtual ~EventManagerStrategyInterface()            = default;
-        virtual HE::Bool VIsEventTypeHash(const HE::Uint64) = 0;
+        EventNetworkStrategyInterface()            = default;
+        virtual ~EventNetworkStrategyInterface()   = default;
+        virtual HE::Bool VIsHash(const HE::Uint64) = 0;
     };
 
     /// <summary>
@@ -37,7 +38,7 @@ namespace Event
         };
 
     public:
-        EventManager(Core::Memory::UniquePtr<EventManagerStrategyInterface>);
+        EventManager(Core::Memory::UniquePtr<EventNetworkStrategyInterface>);
         virtual ~EventManager();
 
         /// <summary>
@@ -50,12 +51,12 @@ namespace Event
 
         /// <summary>
         /// リスナー登録
-        /// 登録したらTRUEを返す
-        /// すでに登録済みなど登録失敗したらFALSE
+        /// 登録したらリスナーのハッシュ値を返す
+        /// 失敗したら0
         /// </summary>
-        HE::Bool AddListener(EventListenerPtr const&, EventTypeStr const&);
+        const HE::Uint64 AddListener(EventListenerPtr const&, EventTypeStr const&);
 
-        HE::Bool RemoveListener(EventListenerPtr const&, EventTypeStr const&);
+        HE::Bool RemoveListener(const HE::Uint64, EventTypeStr const&);
         HE::Bool RemoveAllListener(EventTypeStr const&);
         /*
                 HE::Bool VTrigger(EventDataInterfacePtr const&) const ;
@@ -101,6 +102,6 @@ namespace Event
         // キューに入ろうとするイベントは他方のキューに置かれる
         HE::Sint32 _iActiveQueue = 0;
 
-        Core::Memory::UniquePtr<EventManagerStrategyInterface> _upStrategy;
+        Core::Memory::UniquePtr<EventNetworkStrategyInterface> _upStrategy;
     };
 }  // namespace Event

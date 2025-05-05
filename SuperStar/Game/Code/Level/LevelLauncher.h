@@ -23,5 +23,7 @@ namespace Level
 
     private:
         Core::Common::Handle _layoutAssetHandle;
+        Core::Common::Handle _widget;
+        HE::Uint64 _ulEventListenerHash = 0;
     };
 }  // namespace Level

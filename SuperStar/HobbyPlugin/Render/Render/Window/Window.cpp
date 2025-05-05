@@ -75,7 +75,7 @@ namespace Render
         HE_ASSERT(0 < rWindowConfig.ViewPortCount());
 
         this->_poolViewPortManager.ReleasePool();
-        this->_poolViewPortManager.ReservePool(rWindowConfig.ViewPortCount());
+        this->_poolViewPortManager.POOL_RESERVE_POOL(rWindowConfig.ViewPortCount());
 
         return TRUE;
     }

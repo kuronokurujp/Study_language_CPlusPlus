@@ -7,7 +7,7 @@ namespace Render
 {
     SceneViewBase::SceneViewBase()
     {
-        this->_runtimePoolPrticleBlob.ReservePool(1024);
+        this->_runtimePoolPrticleBlob.POOL_RESERVE_POOL(1024);
     }
 
     HE::Bool SceneViewBase::Init(Core::Memory::UniquePtr<Platform::SceneStrategyInterface> in_upSt)

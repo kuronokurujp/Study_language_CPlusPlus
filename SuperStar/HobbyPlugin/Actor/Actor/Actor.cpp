@@ -34,12 +34,12 @@ namespace Actor
 
         this->_Clear();
 
-        if (this->_components.Init(32, 32) == FALSE)
+        if (TASK_MANAGER_INIT(this->_components, 32, 32) == FALSE)
         {
             HE_ASSERT(FALSE && "コンポーネントのタスク管理の初期化失敗");
         }
 
-        if (this->_lateComponents.Init(32, 32) == FALSE)
+        if (TASK_MANAGER_INIT(this->_lateComponents, 32, 32) == FALSE)
         {
             HE_ASSERT(FALSE && "コンポーネントのタスク管理の初期化失敗");
         }

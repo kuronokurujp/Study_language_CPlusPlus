@@ -9,19 +9,30 @@
 
 namespace UI
 {
+    UITextComponent::UITextComponent(ConvLocTextFuncType in_func) : UIWidgetComponent()
+    {
+        this->_Clear();
+
+        this->_convLocTextFunc = std::move(in_func);
+    }
+
     void UITextComponent::VUpdate(const HE::Float32 in_fDeltaTime)
     {
         UIWidgetComponent::VUpdate(in_fDeltaTime);
 
         // ローカライズテキストならローカライズテキストを取得
-        if (0 < this->_szLocGroup.Size())
+        if (0 < this->_szLocGroup.Size() && this->_convLocTextFunc)
         {
             // TODO: 言語切り替えが必要
+            this->_szDrawText =
+                this->_convLocTextFunc(this->_szLocGroup.Str(), this->_szText.Str());
+            /*
             auto pLocalModule = HE_ENGINE.ModuleManager().Get<Localization::LocalizationModule>();
             HE_ASSERT(pLocalModule);
 
             this->_szDrawText =
                 pLocalModule->Text(HE_STR_TEXT("JP"), this->_szLocGroup.Str(), this->_szText.Str());
+                */
         }
         else
         {

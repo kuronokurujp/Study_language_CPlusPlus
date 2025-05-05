@@ -350,7 +350,7 @@ namespace PlatformSDL2
         // TODO: パーティクルのメッシュプールを作成
         {
             auto pPool = HE_NEW_MEM(Local::PoolParticleMesh, 0);
-            pPool->ReservePool(1024);
+            pPool->POOL_RESERVE_POOL(1024);
             this->_pPoolParticleMesh = pPool;
         }
     }

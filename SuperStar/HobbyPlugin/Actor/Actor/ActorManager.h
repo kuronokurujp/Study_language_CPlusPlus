@@ -40,6 +40,7 @@ namespace Actor
         /// <summary>
         /// 解放処理
         /// これを実行するとインスタンスが残っていても利用できない
+        /// タスク破棄などメモリ解放される
         /// </summary>
         void Release();
 
@@ -47,9 +48,17 @@ namespace Actor
         /// 起動する
         /// 必ず最初に呼び出す
         /// グループ最大数は2以上にする
+        /// TODO: 使用者が保留アクターを考慮した設定を考えるのはおかしい
+        /// TODO:
+        /// 内部で保留アクター用のグループを作るようにして設定側ではグループ最大数を1にしても問題ないようにする
         /// 保留のアクターを管理する専用グループを作るため
         /// </summary>
+#ifdef HE_ENGINE_DEBUG
+        HE::Bool Start(const HE::Uint32 in_uActorCapacity, const HE::Uint32 in_uActorGroupMax,
+                       const char* in_szFileName, const HE::Uint32 in_uFileLine);
+#else
         HE::Bool Start(const HE::Uint32 in_uActorCapacity, const HE::Uint32 in_uActorGroupMax);
+#endif
 
         /// <summary>
         /// 起動終了
@@ -163,4 +172,12 @@ namespace Actor
         /// </summary>
         Core::Common::FixedMap<HE::Uint64, PendingData, 256> _pendingDataMap;
     };
+
+// Startメソッドの実行箇所を特定するマクロ
+#ifdef HE_ENGINE_DEBUG
+#define ACTOR_MANAGER_START(OBJ, CAPACITY, GROUP_MAX) \
+    (OBJ).Start(CAPACITY, GROUP_MAX, __FILE__, __LINE__)
+#else
+#define ACTOR_MANAGER_START(OBJ, CAPACITY, GROUP_MAX) (OBJ).Start(CAPACITY, GROUP_MAX)
+#endif
 }  // namespace Actor

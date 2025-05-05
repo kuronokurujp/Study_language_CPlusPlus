@@ -16,19 +16,22 @@ namespace Event
         HE_MODULE_GENRATE_DECLARATION(EventModule);
 
     public:
-        EventModule() : ModuleBase(ModuleName()) {}
+        EventModule();// : ModuleBase(ModuleName()) {}
 
-        const Core::Common::Handle AddEventManager(
-            Core::Memory::UniquePtr<EventManagerStrategyInterface>);
-        HE::Bool RemoveEventManager(const Core::Common::Handle&);
+        /// <summary>
+        /// イベントを受信・送信するネットワークを追加
+        /// </summary>
+        const Core::Common::Handle AddNetwork(
+            Core::Memory::UniquePtr<EventNetworkStrategyInterface>);
+        HE::Bool RemoveNetwork(const Core::Common::Handle&);
 
         /// <summary>
         /// リスナー登録 / 解除
         /// 登録したらTRUEを返す
         /// すでに登録済みなど登録失敗したらFALSE
         /// </summary>
-        HE::Bool AddListener(EventListenerPtr const&, EventTypeStr const&);
-        HE::Bool RemoveListener(EventListenerPtr const&, EventTypeStr const&);
+        const HE::Uint64 AddListener(EventListenerPtr const&, EventTypeStr const&);
+        HE::Bool RemoveListener(const HE::Uint64, EventTypeStr const&);
         // 指定タイプのリスナーを一括で破棄
         HE::Bool RemoveAllListener(EventTypeStr const&);
 
