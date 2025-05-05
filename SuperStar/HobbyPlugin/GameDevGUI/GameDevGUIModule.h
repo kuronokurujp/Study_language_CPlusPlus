@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "./GameDevGUI/Screen/Scene.h"
 #include "Engine/Common/CustomMap.h"
 #include "Engine/MiniEngine.h"
 #include "Engine/Module/Module.h"
@@ -28,7 +29,7 @@ namespace GameDevGUI
         /// <summary>
         /// ImGUI用のシーン戦略を作成
         /// </summary>
-        Core::Memory::UniquePtr<Platform::SceneStrategyInterface> CreateSceneStrategy();
+        Core::Memory::UniquePtr<GameDevGUISceneStrategy> CreateSceneStrategy();
 
     protected:
         /// <summary>

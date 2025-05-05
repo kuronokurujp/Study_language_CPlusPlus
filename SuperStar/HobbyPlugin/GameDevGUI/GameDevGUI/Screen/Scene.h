@@ -23,6 +23,7 @@ namespace GameDevGUI
         void VEndRender() override final;
 
         // TODO: ボタンやテキストを扱うメソッドを作る
+        // TODO: タイトル名を入れる
 
     private:
         Core::Memory::UniquePtr<Platform::SceneStrategyInterface> _upSt;

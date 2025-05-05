@@ -143,7 +143,15 @@ TEST_CASE("GameDevGUI Test Open / Close")
                             {
                                 auto pGameDevGUIModule =
                                     HE_ENGINE.ModuleManager().Get<GameDevGUI::GameDevGUIModule>();
-                                return pGameDevGUIModule->CreateSceneStrategy();
+
+                                Core::Memory::UniquePtr<GameDevGUI::GameDevGUISceneStrategy>
+                                    sceneSt = pGameDevGUIModule->CreateSceneStrategy();
+
+                                // TODO: カスタムシーンを作成
+                                {
+                                }
+
+                                return std::move(sceneSt);
                             });
                         sceneHandle = handle;
                     }
