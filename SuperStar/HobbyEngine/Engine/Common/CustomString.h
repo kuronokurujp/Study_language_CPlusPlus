@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <functional>
 #include <string_view>
 
 #include "CustomArray.h"
@@ -387,6 +388,13 @@ namespace Core::Common
     typedef FixedString<1024> FixedString1024;
 
     /// <summary>
+    /// TODO: UTF8文字列を区切る
+    /// </summary>
+    extern void SplitWithUTF8(std::function<void(const HE::UTF8*, const HE::Uint32)> in_resultFunc,
+                              HE::UTF8* in_szName, const HE::Uint32 in_uLen,
+                              const HE::UTF8* in_szDelim);
+
+    /// <summary>
     /// 指定文字列を指定文字で区切って出力
     /// </summary>
     static void OutputSplitString(ArrayBase<FixedString1024>& out, StringBase& in_szrName,
@@ -451,5 +459,18 @@ namespace Core::Common
     extern FixedString256 g_szTempFixedString256;
     extern FixedString512 g_szTempFixedString512;
     extern FixedString1024 g_szTempFixedString1024;
+
+    /// <summary>
+    /// 作業用のUTF8文字列変数
+    /// ローカル内で文字列制御をする一時利用できる変数
+    /// ※グローバルで利用は絶対してはいけない
+    /// </summary>
+    extern HE::UTF8 g_szTempFixedUTF8_16[16];
+    extern HE::UTF8 g_szTempFixedUTF8_32[32];
+    extern HE::UTF8 g_szTempFixedUTF8_64[64];
+    extern HE::UTF8 g_szTempFixedUTF8_128[128];
+    extern HE::UTF8 g_szTempFixedUTF8_256[256];
+    extern HE::UTF8 g_szTempFixedUTF8_512[512];
+    extern HE::UTF8 g_szTempFixedUTF8_1024[1024];
 
 }  // namespace Core::Common

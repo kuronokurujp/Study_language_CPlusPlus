@@ -423,10 +423,10 @@ namespace Core::Common
         HE::Uint32 _uFreeSlotMax = 0;
     };
 
-// TODO: 使っている箇所を特定するためのマクロ
+// 使っている箇所を特定するためのマクロ
 #ifdef HE_ENGINE_DEBUG
-#define POOL_RESERVE_POOL(VAL) ReservePool(VAL, __FILE__, __LINE__)
+#define POOL_RESERVE_POOL(VAL) ReservePool((VAL), __FILE__, __LINE__)
 #else
-#define POOL_RESERVE_POOL(VAL) ReservePool(VAL)
+#define POOL_RESERVE_POOL(VAL) ReservePool((VAL))
 #endif
 }  // namespace Core::Common

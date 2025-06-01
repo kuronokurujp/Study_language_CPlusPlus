@@ -51,9 +51,9 @@ namespace GameDevGUI
         ::ImGui_ImplOpenGL3_Init(pPlatformModule->GetOpenGLVersionNameBySDL2());
 
         // 入力イベントを取得
-        auto& pInputObj =
+        auto pInputObj =
             HE_ENGINE.PlatformModule()->VInput()->GetObj(this->_upSt->VGetConfig().InputHandle());
-        pInputObj.SetEventCallback(
+        pInputObj->SetEventCallback(
             [](void* in_pEvent)
             {
                 const SDL_Event* pSDLEvent = reinterpret_cast<const SDL_Event*>(in_pEvent);

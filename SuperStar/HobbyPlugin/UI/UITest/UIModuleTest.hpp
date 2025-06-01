@@ -1,14 +1,13 @@
 ﻿#pragma once
 
-#define HE_UNIT_TEST_MODE
 #include "../AssetManager/AssetManagerModule.h"
+#include "../EnhancedInput/EnhancedInputModule.h"
 #include "../Event/EventModule.h"
 #include "../Localization/LocalizationModule.h"
 #include "../PlatformSDL2/PlatformSDL2Module.h"
 #include "../Render/RenderModule.h"
 #include "../UI/UIModule.h"
 #include "Engine/Common/Function.h"
-#include "Engine/Engine.h"
 
 // TODO: UIテスト
 TEST_CASE("UI SimpleTest")
@@ -18,17 +17,30 @@ TEST_CASE("UI SimpleTest")
     Core::Common::Handle debugWindowHandle;
     Core::Common::Handle layoutAssetHandle;
     Core::Common::Handle widget;
+    Core::Common::Handle uiEventListenerHash;
 
-    UnitTestRunnerByModuleOnly<PlatformSDL2::PlatformSDL2Module, Render::RenderModule, UI::UIModule,
-                               Event::EventModule, AssetManager::AssetManagerModule,
-                               Localization::LocalizationModule>(
-        [&uStep, &sceneHandle, &debugWindowHandle, &layoutAssetHandle, &widget]()
+    StartupEngineByUnitTest<PlatformSDL2::PlatformSDL2Module, Render::RenderModule, UI::UIModule,
+                            Event::EventModule, AssetManager::AssetManagerModule,
+                            Localization::LocalizationModule, EnhancedInput::EnhancedInputModule>(
+        [&uStep, &sceneHandle, &debugWindowHandle, &layoutAssetHandle, &widget,
+         &uiEventListenerHash]()
         {
             auto pPlatformModule = HE_ENGINE.PlatformModule();
             auto pRenderModule   = HE_ENGINE.ModuleManager().Get<Render::RenderModule>();
 
             if (uStep == 0)
             {
+                // TODO: インプットにUI用のアクションを追加
+                {
+                    auto pInputModule =
+                        HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();
+                    // TODO: ボタンを押した時のアクション
+                    pInputModule->AddAction(HE_STR_TEXT("OnClickLeft"),
+                                            EnhancedInput::ActionData(
+                                                {Platform::EInputMouseType::EInputMouseType_Left}));
+                    // TODO: UI側はそのアクションが起きた時にUI用のインプットアクション実行
+                }
+
                 // リソースの起点ディレクトリを設定
                 auto pAssetManagerModule =
                     HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
@@ -51,8 +63,8 @@ TEST_CASE("UI SimpleTest")
                 }
 
                 // メインウィンドウ
+                Core::Common::Handle windowHandle;
                 {
-                    Core::Common::Handle windowHandle;
                     Core::Common::Handle viewPortHandle;
                     {
                         // ゲームウィンドウを生成
@@ -88,6 +100,15 @@ TEST_CASE("UI SimpleTest")
                     pRenderModule->ShowWindow(windowHandle);
                 }
 
+                // TODO: 入力設定
+                {
+                    auto pEnhancedInputModule =
+                        HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();
+
+                    auto* pMainWindow = pRenderModule->GetWindow(windowHandle);
+                    pEnhancedInputModule->SetInputHandle(pMainWindow->GetConfig()->InputHandle());
+                }
+
                 // UIのアセットデータをロード
                 // UIのBuilderファイルからレイアウト作成
                 {
@@ -99,6 +120,29 @@ TEST_CASE("UI SimpleTest")
                     widget = pUIModule->NewLayoutByLayotuAsset(layoutAssetHandle, 0, sceneHandle);
                 }
 
+                // TODO: UIのイベントリスナー登録
+                {
+                    auto pEventModule      = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
+                    auto spUIEventListener = HE_MAKE_CUSTOM_SHARED_PTR(
+                        (Event::EventListenerWithRegistEventFunc), HE_STR_TEXT("UIEvent"),
+                        [](Event::EventDataInterfacePtr const& in_spEventData)
+                        {
+                            // TODO: UIのボタンクリック受信
+                            if (in_spEventData->VEventHash() == UI::EventButtonClick::Hash())
+                            {
+                                auto pEvent =
+                                    reinterpret_cast<UI::EventButtonClick*>(in_spEventData.get());
+
+                                // 次のレベルへ遷移
+                                HE_LOG_LINE(pEvent->_szMsg.Str());
+                            }
+
+                            return TRUE;
+                        });
+
+                    uiEventListenerHash =
+                        pEventModule->AddListener(spUIEventListener, EVENT_TYPE_UIMODULE);
+                }
                 ++uStep;
 
                 return FALSE;

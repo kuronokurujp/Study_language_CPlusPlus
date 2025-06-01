@@ -3,9 +3,10 @@
 #include "Actor/Actor.h"
 #include "Actor/ActorInterface.h"
 #include "Actor/ActorManager.h"
-#include "EnhancedInputModule.h"
 // エンジン最小インクルード
 #include "Engine/MiniEngine.h"
+// 利用モジュール
+#include "EnhancedInputModule.h"
 
 namespace Level
 {
@@ -19,11 +20,13 @@ namespace Level
         HE_CLASS_MOVE_NG(Node);
 
     public:
-        enum ETaskUpdateId
-        {
-            // 入力更新
-            ETaskUpdateId_Input = Task::uNoneId + 1,
-        };
+        /*
+            enum ETaskUpdateId
+            {
+                // 入力更新
+                ETaskUpdateId_Input = Task::uNoneId + 1,
+            };
+            */
 
         Node();
         virtual ~Node() = default;
@@ -56,7 +59,9 @@ namespace Level
         /// <summary>
         /// イベント
         /// </summary>
-        void VEvent(const Core::TaskData&) override final;
+        // void VEvent(const Core::TaskData&) override final;
+
+        virtual void VProcessInput(const EnhancedInput::InputMap&);
 
         /// <summary>
         /// レベルにアクターを追加
@@ -121,8 +126,6 @@ namespace Level
         /// タスク破棄
         /// </summary>
         void _VDestory() override final;
-
-        virtual void _VProcessInput(const EnhancedInput::InputMap* in_pInputMap);
 
         /// <summary>
         /// 追加したコンポーネントのセットアップ

@@ -4,6 +4,7 @@
 #define HE_UNIT_TEST_MODE
 
 #include "Engine/MiniEngine.h"
+#include "TestCommon.h"
 #include "ThirdParty/Catch.hpp"
 
 // デバッグビルドのみ有効
@@ -68,6 +69,9 @@ int main(int argc, char* const argv[])
 
 #endif  // __OBJC__
 
+// TODO: 現在はコメントアウトでどのテストON/OFFにしている
+// TODO: テスト追加や削除などはコード上で行うのではなく設定上でするとかしたい
+#if 0
 // エンジンのテスト一覧
 
 // マクロテストコード
@@ -121,9 +125,15 @@ int main(int argc, char* const argv[])
 // イベントテスト
 #include "TestCode/Event/TestEvent.hpp"
 
+#endif
 // GUIテスト
 // SDL2のテスト
 // #include "PlatformSDL2Test/PlatformSDL2ModuleTest.hpp"
+// #include "GameDevGUITest/GameDevGUIModuleTest.hpp"
+
+#include "UITest/UIModuleTest.hpp"
+
+#if 0 
 // ゲーム用のテスト一覧
 
 // Lambdaテストコード
@@ -132,5 +142,6 @@ int main(int argc, char* const argv[])
 // ゲーム用アセットのテスト
 // ゲームプロジェクトはアプリプロジェクトでコードの実態を入れ込むためにcppファイルもインクルードしないといけない
 #include "TestCode/Asset/TestAsset.hpp"
+#endif
 
 #endif

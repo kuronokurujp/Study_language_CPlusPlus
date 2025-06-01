@@ -4,16 +4,23 @@
 #include "Engine/Module/Module.h"
 #include "Engine/Platform/PlatformInput.h"
 
+// モジュールのヘッダーファイルは全てインクルードする
+#include "EnhancedInput/Actor/ActorManagerDecorater.h"
+#include "EnhancedInput/Actor/InputComponent.h"
+#include "EnhancedInput/Event.h"
+
 namespace EnhancedInput
 {
     /// <summary>
     /// 入力タイプ
     /// </summary>
+    /*
     enum EInputType
     {
         EInputType_Keyboard = 0,
         EInputType_Touch,
     };
+    */
 
     /// <summary>
     /// 入力アクションデータ
@@ -25,7 +32,16 @@ namespace EnhancedInput
 
         // CustomFixMapクラスでバッファデータを作成時に使う
         ActionData() {}
-        ActionData(const ActionKeyMap& in_arKeys) { this->aKeyboardKeys = in_arKeys; }
+        ActionData(const ActionKeyMap& in_arKeys)
+        {
+            this->aTouchs.Clear();
+            this->aKeyboardKeys = in_arKeys;
+        }
+        ActionData(const ActionTouchMap& in_arTouch)
+        {
+            this->aKeyboardKeys.Clear();
+            this->aTouchs = in_arTouch;
+        }
         ActionData(const ActionKeyMap& in_arKeys, const ActionTouchMap& in_arTouchs)
         {
             this->aKeyboardKeys = in_arKeys;
@@ -55,6 +71,7 @@ namespace EnhancedInput
     /// <summary>
     /// アクションを入力したデータ
     /// </summary>
+    /*
     struct InputData
     {
         EInputType eType;
@@ -73,6 +90,7 @@ namespace EnhancedInput
             } touch;
         } item;
     };
+    */
 
     /// <summary>
     /// アクションデータのマップ型
@@ -82,8 +100,10 @@ namespace EnhancedInput
     /// <summary>
     /// 入力データのマップ型
     /// </summary>
+    /*
     using InputMap = Core::Common::FixedMap<Core::Common::FixedString64,
                                             Core::Common::FixedVector<InputData, 32>, 32>;
+                                            */
 
     /// <summary>
     /// インプット用の追加モジュール
@@ -104,24 +124,27 @@ namespace EnhancedInput
         }
 
         /// <summary>
-        /// 共通利用のアクションをマッピングデータを設定
+        /// アクションをマッピングデータを設定
         /// </summary>
         /// <param name="in_mrTable"></param>
-        void SetCommonMappingAction(const ActionMap&);
+        void SetAction(const ActionMap&);
 
         /// <summary>
-        /// 共通利用のアクションマッピングデータを追加
+        /// アクションマッピングデータを追加
         /// </summary>
         /// <param name=""></param>
-        void AddCommonMappingAction(const ActionMap&);
+        void AddAction(const ActionMap&);
+        void AddAction(const Core::Common::FixedString64&, const ActionData&);
+
         /// <summary>
-        /// 共通利用のアクションマッピングデータを外す
+        /// アクションマッピングデータを外す
         /// </summary>
         /// <param name="in_pActonName"></param>
-        void RemoveCommonMappingAction(const ActionMap&);
-        void RemoveCommonMappingAction(const HE::Char*);
+        void RemoveAction(const ActionMap&);
+        void RemoveAction(const HE::Char*);
 
-        const InputMap& GetInputMap() const { return this->_mInputAction; }
+        // TODO: これは削除してイベントクラスとする
+        // const InputMap& GetInputMap() const { return this->_mInputAction; }
 
     protected:
         /// <summary>
@@ -146,9 +169,12 @@ namespace EnhancedInput
         /// <summary>
         /// マッピングしたアクションの入力リスト
         /// </summary>
-        InputMap _mInputAction;
+        // InputMap _mInputAction;
 
         Core::Common::Handle _inputHandle;
+        Core::Common::Handle _eventHandle;
+
+        Core::Memory::SharedPtr<EventInput> _spEventInput;
     };
 
 }  // namespace EnhancedInput

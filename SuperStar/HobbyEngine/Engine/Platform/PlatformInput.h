@@ -340,6 +340,6 @@ namespace Platform
         virtual const Core::Common::Handle VCreateObject() = 0;
         virtual void VReleaseObject(Core::Common::Handle&) = 0;
 
-        virtual InputObject& GetObj(const Core::Common::Handle) = 0;
+        virtual InputObject* GetObj(const Core::Common::Handle) = 0;
     };
 }  // namespace Platform

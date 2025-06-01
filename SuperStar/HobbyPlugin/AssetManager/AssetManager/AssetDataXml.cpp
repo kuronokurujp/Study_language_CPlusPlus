@@ -52,6 +52,18 @@ namespace AssetManager
                 }
             }
 
+            const HE::Bool VOutputUTF8(HE::UTF8* out, const HE::Uint32 in_uLen,
+                                       const HE::UTF8* in_szName) override
+            {
+                auto attr = this->_value.attribute(in_szName);
+                if (attr.empty() == FALSE)
+                {
+                    HE_STR_U8_COPY_S(out, in_uLen, attr.as_string(), HE_STR_U8_LENGTH(attr.as_string()));
+                    return TRUE;
+                }
+                return FALSE;
+            }
+
         public:
             pugi::xml_node _value;
         };

@@ -66,6 +66,8 @@ namespace AssetManager
         virtual HE::Float32 VGetFloat32(const HE::UTF8* in_szName = NULL) = 0;
         virtual void VOutputString(Core::Common::StringBase* out,
                                    const HE::UTF8* in_szName = NULL)      = 0;
+        virtual const HE::Bool VOutputUTF8(HE::UTF8* out, const HE::Uint32 in_uLen,
+                                           const HE::UTF8* in_szName)     = 0;
 
     protected:
         HE::Sint32 _sLevel = sNoneLevel;

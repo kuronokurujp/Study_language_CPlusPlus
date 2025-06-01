@@ -8,7 +8,7 @@
 // TODO: Tomlファイルテスト
 TEST_CASE("AssetManager Module TomlFile")
 {
-    UnitTestRunnerByModuleOnly<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module>(
+    StartupEngineByUnitTest<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module>(
         []()
         {
             auto pModule = HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
@@ -63,7 +63,7 @@ TEST_CASE("AssetManager Module TomlFile")
 // TODO: Jsonファイルテスト
 TEST_CASE("AssetManager Module JsonFile")
 {
-    UnitTestRunnerByModuleOnly<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module>(
+    StartupEngineByUnitTest<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module>(
         []()
         {
             auto pModule = HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
@@ -138,7 +138,7 @@ TEST_CASE("AssetManager Module JsonFile")
 #if 0
 TEST_CASE("AssetManager Module TomlFile")
 {
-    UnitTestRunnerByModuleOnly<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module>(
+    StartupEngineByUnitTest<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module>(
         []()
         {
             auto pModule = HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();

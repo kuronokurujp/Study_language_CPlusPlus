@@ -296,6 +296,9 @@ extern void FreeMemory(void*);
         }                              \
     }
 
+// TODO: メモリクリア
+#define HE_CLS_MEM(ptr, size) ;;memset((ptr), 0, (size));
+
 // メモリ解放をラップする構造体
 struct DeleterFreeMemory
 {

@@ -56,33 +56,19 @@ namespace Core::Common
             const Pair* operator->() const { return &this->_pNode->_pair; }
 
             // インクリメント
+            // ++は前方のみ
             Iterator& operator++()
             {
                 this->_pNode = this->_pNode->_pNext;
                 return *this;
             }
 
-            // インクリメント
-            Iterator operator++(int)
-            {
-                IteratorChar iter = *this;
-                ++(*this);
-                return iter;
-            }
-
             // デクリメント
+            // --は前方のみ
             Iterator& operator--()
             {
                 this->_pNode = this->_pNode->_pPrev;
                 return *this;
-            }
-
-            // デクリメント
-            Iterator operator--(int)
-            {
-                IteratorChar iter = *this;
-                --(*this);
-                return iter;
             }
 
             // 比較

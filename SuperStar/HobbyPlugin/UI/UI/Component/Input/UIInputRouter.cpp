@@ -7,15 +7,15 @@
 
 namespace UI
 {
-    void UIInputRouterStrategy::VProcessInput(const void* in_pInputMap,
+    void UIInputRouterStrategy::VProcessInput(const EnhancedInput::InputMap& in_mInputMap,
                                               Actor::Object* in_pSelfObject)
     {
-        HE_ASSERT(in_pInputMap);
-        HE_ASSERT(in_pSelfObject);
+        HE_ASSERT_RETURN(in_pSelfObject);
 
-        auto pInputMap = reinterpret_cast<const EnhancedInput::InputMap*>(in_pInputMap);
+        auto pInputMap = &in_mInputMap;
         HE_ASSERT(pInputMap);
 
+        // TODO: 入力マップとの関連付けが必要
         // UIのユーザー入力があるかチェック
         if (pInputMap->Contains(HE_STR_TEXT("UIButton")) == FALSE) return;
 
@@ -48,5 +48,4 @@ namespace UI
             }
         }
     }
-
 }  // namespace UI

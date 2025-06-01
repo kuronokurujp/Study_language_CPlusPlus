@@ -2,66 +2,15 @@
 
 #include "Level/Component/LevelBaseComponent.h"
 
+// 利用モジュール一覧
+#include "EnhancedInputModule.h"
+
 namespace Level
 {
-    /// <summary>
-    /// レベルノードにつけるアクター管理のデコレーター
-    /// </summary>
-    class ActorManagerDecorater final : public Actor::ActorManagerDecoraterlnterface
-    {
-    public:
-        HE::Bool VStart(Actor::ActorManager*) override final
-        {
-            this->_lstInputComponent.Clear();
-
-            return TRUE;
-        }
-
-        /// <summary>
-        /// 管理下にあるアクターに入力状態を送信
-        /// </summary>
-        void ProcessInput(const EnhancedInput::InputMap* in_pInputMap)
-        {
-            HE_ASSERT(in_pInputMap);
-
-            const void* pInputMap = reinterpret_cast<const void*>(in_pInputMap);
-            for (auto it = this->_lstInputComponent.BeginItr();
-                 it != this->_lstInputComponent.EndItr(); ++it)
-            {
-                it->ProcessInput(pInputMap);
-            }
-        }
-
-        /// <summary>
-        /// 入力コンポーネントの登録・解除
-        /// </summary>
-        void VOnActorRegistComponent(Actor::Component* in_pComponent) override final
-        {
-            HE_ASSERT(in_pComponent);
-
-            if (in_pComponent->VGetRTTI().DerivesFrom(&Actor::InputComponent::CLASS_RTTI) == FALSE)
-                return;
-
-            auto pInputComponent = reinterpret_cast<Actor::InputComponent*>(in_pComponent);
-            this->_lstInputComponent.PushBack(*pInputComponent);
-        }
-
-        void VOnActorUnRegistComponent(Actor::Component* in_pComponent) override final
-        {
-            HE_ASSERT(in_pComponent);
-            if (in_pComponent->VGetRTTI().DerivesFrom(&Actor::InputComponent::CLASS_RTTI) == FALSE)
-                return;
-
-            auto pInputComponent = reinterpret_cast<Actor::InputComponent*>(in_pComponent);
-            this->_lstInputComponent.Erase(pInputComponent);
-        }
-
-    private:
-        Core::Common::CustomList<Actor::InputComponent> _lstInputComponent;
-    };
-
     Node::Node()
-        : Actor::Object(), _actorManager(HE_MAKE_CUSTOM_UNIQUE_PTR((ActorManagerDecorater)))
+        : Actor::Object(),
+          _actorManager(
+              HE_MAKE_CUSTOM_UNIQUE_PTR((EnhancedInput::ActorManagerDecoraterWithInputSystem)))
     {
     }
 
@@ -108,26 +57,33 @@ namespace Level
         this->_actorManager.LateUpdate(in_fDt);
     }
 
-    void Node::VEvent(const Core::TaskData& in_rTaskData)
+    void Node::VProcessInput(const EnhancedInput::InputMap& in_pInputMap)
     {
-        Actor::Object::VEvent(in_rTaskData);
-
-        switch (in_rTaskData.uId)
+        auto pDecotrater = reinterpret_cast<EnhancedInput::ActorManagerDecoraterWithInputSystem*>(
+            this->_actorManager.GetDecorater());
+        pDecotrater->ProcessInput(in_pInputMap);
+    }
+    /*
+        void Node::VEvent(const Core::TaskData& in_rTaskData)
         {
-            // 入力送信
-            case Node::ETaskUpdateId_Input:
+            Actor::Object::VEvent(in_rTaskData);
+
+            switch (in_rTaskData.uId)
             {
-                HE_ASSERT(in_rTaskData.pData);
-                const auto pInputMap =
-                    reinterpret_cast<EnhancedInput::InputMap*>(in_rTaskData.pData);
+                // 入力送信
+                case Node::ETaskUpdateId_Input:
+                {
+                    HE_ASSERT(in_rTaskData.pData);
+                    const auto pInputMap =
+                        reinterpret_cast<EnhancedInput::InputMap*>(in_rTaskData.pData);
 
-                this->_VProcessInput(pInputMap);
+                    this->_VProcessInput(pInputMap);
 
-                break;
+                    break;
+                }
             }
         }
-    }
-
+        */
     // レベルに追加されたアクターを削除
     void Node::RemoveActor(Core::Common::Handle* in_pActor)
     {
@@ -152,13 +108,6 @@ namespace Level
     {
         this->_actorManager.Release();
         Actor::Object::_VDestory();
-    }
-
-    void Node::_VProcessInput(const EnhancedInput::InputMap* in_pInputMap)
-    {
-        ActorManagerDecorater* pDecotrater =
-            reinterpret_cast<ActorManagerDecorater*>(this->_actorManager.GetDecorater());
-        pDecotrater->ProcessInput(in_pInputMap);
     }
 
     /// <summary>

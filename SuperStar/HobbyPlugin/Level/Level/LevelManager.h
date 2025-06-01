@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+// TODO: クラスの細分化しすぎ
+#if 0
 #include "ActorModule.h"
 #include "Engine/Common/CustomArray.h"
 #include "Engine/MiniEngine.h"
@@ -63,7 +65,7 @@ namespace Level
         /// 起動するレベルを設定
         /// </summary>
         template <class T>
-        HE::Bool StartLevel()
+        HE::Bool ChangeMainLevel()
         {
             HE_STATIC_ASSERT(std::is_base_of<Node, T>::value,
                              "Tクラスはレベルのノードクラスを継承していない");
@@ -72,7 +74,7 @@ namespace Level
             Core::Common::Handle handle = this->_upNodeManager->Add<T>();
             if (handle.Null()) return FALSE;
 
-            return this->_StartLevel(handle);
+            return this->_InitMainLevel(handle);
         }
 
         /// <summary>
@@ -81,7 +83,7 @@ namespace Level
         Node* GetLevel(const Core::Common::Handle&);
 
     private:
-        HE::Bool _StartLevel(const Core::Common::Handle&);
+        HE::Bool _InitMainLevel(const Core::Common::Handle&);
 
     private:
         // レベルのノードをアクターとして管理
@@ -97,5 +99,5 @@ namespace Level
         /// </summary>
         Core::Common::Handle _nextLevelHandle;
     };
-
 }  // namespace Level
+#endif

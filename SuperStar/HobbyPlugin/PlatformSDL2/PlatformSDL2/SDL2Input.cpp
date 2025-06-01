@@ -255,10 +255,11 @@ namespace PlatformSDL2
         this->_poolInputObject.Free(in_rHandle, TRUE);
     }
 
-    Platform::InputObject& Input::GetObj(const Core::Common::Handle in_handle)
+    Platform::InputObject* Input::GetObj(const Core::Common::Handle in_handle)
     {
         auto pObj = reinterpret_cast<Local::InputObject*>(this->_poolInputObject.Ref(in_handle));
-        return *pObj;
+        HE_ASSERT_RETURN_VALUE(NULL, pObj);
+        return pObj;
     }
 
 }  // namespace PlatformSDL2

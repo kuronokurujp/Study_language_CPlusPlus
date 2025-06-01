@@ -9,6 +9,8 @@
 
 namespace UI
 {
+    class UIButtonComponent;
+
     /// <summary>
     /// ボタンのプッシュ通知ハンドラー
     /// </summary>
@@ -20,13 +22,13 @@ namespace UI
         UIButtonMessageHandler()          = default;
         virtual ~UIButtonMessageHandler() = default;
 
-        void OnPush() { this->_VOnPushInternal(); }
+        void OnPush(UIButtonComponent* in_pBtnComp) { this->_VOnPushInternal(in_pBtnComp); }
 
     protected:
-        virtual void _VOnPushInternal() = 0;
+        virtual void _VOnPushInternal(UIButtonComponent* in_bBtnComp) = 0;
     };
 
-    using UIButtonMessageHandlerImpOnPush = std::function<void(Core::Common::StringBase&)>;
+    using UIButtonMessageHandlerImpOnPush = std::function<void(UIButtonComponent*)>;
 
     /// <summary>
     /// ボタンのプッシュ通知
@@ -37,19 +39,19 @@ namespace UI
         HE_CLASS_COPY_NG(UIButtonMessageHandlerDefault);
 
     public:
-        UIButtonMessageHandlerDefault() = default;
-        UIButtonMessageHandlerDefault(const HE::Char* in_szMsg,
-                                      UIButtonMessageHandlerImpOnPush in_func)
-            : _onPush(in_func), _szMsg(in_szMsg)
+        // UIButtonMessageHandlerDefault() = default;
+        UIButtonMessageHandlerDefault(UIButtonMessageHandlerImpOnPush in_func)
+            : _onPush(std::move(in_func))
         {
         }
 
     protected:
-        void _VOnPushInternal() override final { this->_onPush(this->_szMsg); }
+        void _VOnPushInternal(
+            UIButtonComponent* in_pBtnComp) override final;  // { this->_onPush(this->_szMsg); }
 
     private:
         UIButtonMessageHandlerImpOnPush _onPush;
-        Core::Common::FixedString128 _szMsg;
+        // Core::Common::FixedString128 _szMsg;
     };
 
     /// <summary>
@@ -62,7 +64,8 @@ namespace UI
         HE_GENERATED_CLASS_BODY_HEADER(UIButtonComponent, UIWidgetComponent);
 
     public:
-        UIButtonComponent() : UIWidgetComponent() { this->_Clear(); }
+        UIButtonComponent(Core::Memory::UniquePtr<
+                          UIButtonMessageHandler>);  // : UIWidgetComponent() { this->_Clear(); }
 
         /// <summary>
         /// タスク利用した設定をした最初に実行
@@ -86,10 +89,12 @@ namespace UI
         /// プッシュ通知のハンドラーを設定
         /// ユニークポインタで所有権を移譲している
         /// </summary>
+        /*
         void SetPushHandler(Core::Memory::UniquePtr<UIButtonMessageHandler> in_spHandler)
         {
             this->_pushHandler = std::move(in_spHandler);
         }
+        */
 
         // void SetWidth(const HE::Float32 in_fW) { this->_fWidth = in_fW; }
         // void SetHeight(const HE::Float32 in_fH) { this->_fHeight = in_fH; }
@@ -106,15 +111,15 @@ namespace UI
             UIWidgetComponent::_Clear();
 
             this->_pushHandler.release();
-            // this->_fWidth  = 0.0f;
-            // this->_fHeight = 0.0f;
+            //  this->_fWidth  = 0.0f;
+            //  this->_fHeight = 0.0f;
             this->_eAnchor = Core::Math::EAnchor_Left;
         }
 
     private:
         Core::Memory::UniquePtr<UIButtonMessageHandler> _pushHandler;
-        // HE::Float32 _fWidth          = 0.0f;
-        // HE::Float32 _fHeight         = 0.0f;
+        //  HE::Float32 _fWidth          = 0.0f;
+        //  HE::Float32 _fHeight         = 0.0f;
         Core::Math::EAnchor _eAnchor = Core::Math::EAnchor_Left;
     };
 }  // namespace UI

@@ -3,16 +3,23 @@
 #include "Engine/Math/Vector3.h"
 
 // 依存するモジュール一覧
-#include "ActorModule.h"
+// #include "ActorModule.h"
 #include "RenderModule.h"
 
 namespace UI
 {
+    UIButtonComponent::UIButtonComponent(
+        Core::Memory::UniquePtr<UIButtonMessageHandler> in_uHandler)
+        : UIWidgetComponent()
+    {
+        this->_Clear();
+
+        this->_pushHandler = std::move(in_uHandler);
+    }
+
     void UIButtonComponent::VSetup(const HE::Bool in_bAutoDelete)
     {
         UIWidgetComponent::VSetup(in_bAutoDelete);
-
-        this->_Clear();
     }
 
     /// <summary>
@@ -64,8 +71,15 @@ namespace UI
 
         if (rect.InSidePoint(Core::Math::Vector2(in_rTouch._fX, in_rTouch._fY)))
         {
-            this->_pushHandler->OnPush();
+            this->_pushHandler->OnPush(this);
+            // auto* pEventModule = this->GetDependenceModule<Event::EventModule>();
+            // pEventModule->QueueEvent(spEventInput);
         }
+    }
+
+    void UIButtonMessageHandlerDefault::_VOnPushInternal(UIButtonComponent* in_pBtnComp)
+    {
+        this->_onPush(in_pBtnComp);
     }
 
 }  // namespace UI

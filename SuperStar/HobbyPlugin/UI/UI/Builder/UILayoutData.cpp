@@ -15,7 +15,7 @@ namespace UI::Builder
     /// </summary>
     namespace Local
     {
-        constexpr HE::Char s_locGroupDelimita = HE_STR_TEXT('.');
+        constexpr HE::UTF8* s_locGroupDelimita = HE_STR_TEXT(".");
 
         /// <summary>
         /// UIのスタイルカラー
@@ -60,20 +60,19 @@ namespace UI::Builder
             return EAnchor_Left;
         }
 
-        static void ParseStyle(Style* out, const Core::Common::StringBase& in_szStyle)
+        static void ParseStyle(Style* out, HE::UTF8* in_szStyle)
         {
-            static HE::UTF8 buff[1024] = {0};
-            HE_ASSERT(in_szStyle.Size() < HE_ARRAY_SIZE(buff));
+            HE_ASSERT_RETURN(out);
+            HE_ASSERT_RETURN(in_szStyle);
             {
                 out->_fH     = 0.0f;
                 out->_fW     = 0.0f;
                 out->_uColor = 0;
                 out->_uSize  = 32;
             }
-            in_szStyle.OutputUTF8(buff, HE_ARRAY_NUM(buff));
 
             HE::UTF8* pRestartToken = NULL;
-            HE::UTF8* pToken        = ::strtok_s(buff, ";", &pRestartToken);
+            HE::UTF8* pToken        = ::strtok_s(in_szStyle, ";", &pRestartToken);
 
             while (pToken != NULL)
             {
@@ -87,11 +86,11 @@ namespace UI::Builder
 
                     if (::strcmp(szKey, "w") == 0)
                     {
-                        out->_fW = HE_STR_TO_FLOAT32(pValue);
+                        out->_fW = HE_U8_TO_FLOAT32(pValue);
                     }
                     else if (::strcmp(szKey, "h") == 0)
                     {
-                        out->_fH = HE_STR_TO_FLOAT32(pValue);
+                        out->_fH = HE_U8_TO_FLOAT32(pValue);
                     }
                     else if (::strcmp(szKey, "color") == 0)
                     {
@@ -113,7 +112,7 @@ namespace UI::Builder
                         if (bColorName == FALSE)
                         {
                             // TODO: カラー名がないので16進数数字と判断して数値に変換
-                            out->_uColor = HE_STRHEX_TO_UINT32(szColorName);
+                            out->_uColor = HE_U8_HEX_TO_UINT32(szColorName);
 #ifdef HE_LITTLE_ENDIAN
                             HE_SWAP_BYTE_32BIT(out->_uColor);
 #endif
@@ -121,7 +120,7 @@ namespace UI::Builder
                     }
                     else if (::strcmp(szKey, "size") == 0)
                     {
-                        out->_uSize = HE_STR_TO_UINT32(pValue);
+                        out->_uSize = HE_U8_TO_UINT32(pValue);
                     }
                 }
 
@@ -158,10 +157,13 @@ namespace UI::Builder
                 pBtn->_fX           = in_rNode.VGetFloat32({HE_STR_U8_TEXT("x")});
                 pBtn->_fY           = in_rNode.VGetFloat32({HE_STR_U8_TEXT("y")});
                 pBtn->_eAnchor      = GetPosAnchor(in_rNode);
+                // TODO: インプットのキーを取得
+                in_rNode.VOutputUTF8(pBtn->_szInputKey, HE_ARRAY_SIZE(pBtn->_szInputKey), HE_STR_U8_TEXT("input"));
 
-                in_rNode.VOutputString(&Core::Common::g_szTempFixedString1024,
-                                       HE_STR_U8_TEXT("style"));
-                ParseStyle(&pBtn->_style, Core::Common::g_szTempFixedString1024);
+                in_rNode.VOutputUTF8(Core::Common::g_szTempFixedUTF8_1024,
+                                     HE_ARRAY_SIZE(Core::Common::g_szTempFixedUTF8_1024),
+                                     HE_STR_U8_TEXT("style"));
+                ParseStyle(&pBtn->_style, Core::Common::g_szTempFixedUTF8_1024);
             }
             else if (szAttrName == HE_STR_U8_TEXT("label"))
             {
@@ -173,34 +175,55 @@ namespace UI::Builder
 
                 // ローカライズテキストか
                 pLabel->bLoc = (in_rNode.VGetUInt32({HE_STR_U8_TEXT("loc")}) != 0);
-                in_rNode.VOutputString(&Core::Common::g_szTempFixedString1024,
-                                       HE_STR_U8_TEXT("text"));
-                if (0 < Core::Common::g_szTempFixedString1024.Length())
+
+                if (in_rNode.VOutputUTF8(Core::Common::g_szTempFixedUTF8_1024,
+                                         HE_ARRAY_SIZE(Core::Common::g_szTempFixedUTF8_1024),
+                                         HE_STR_U8_TEXT("text")))
                 {
                     if (pLabel->bLoc)
                     {
-                        Core::Common::FixedArray<Core::Common::FixedString1024, 3> aSplitName;
+                        // TODO: 文字列を分割してローカライズ用のデータを構築
+                        Core::Common::SplitWithUTF8(
+                            // TODO: 分割されたトークンを受け取る
+                            [pLabel](const HE::UTF8* in_szToken, const HE::Uint32 in_uTokenCount)
+                            {
+                                switch (in_uTokenCount)
+                                {
+                                    case 1:
+                                    {
+                                        HE_STR_COPY_S(pLabel->szLoc, HE_ARRAY_NUM(pLabel->szLoc),
+                                                      in_szToken, HE_STR_U8_LENGTH(in_szToken));
 
-                        Core::Common::OutputSplitString(aSplitName,
-                                                        Core::Common::g_szTempFixedString1024,
-                                                        s_locGroupDelimita);
-                        HE_STR_COPY_S(pLabel->szLoc, HE_ARRAY_NUM(pLabel->szLoc),
-                                     aSplitName[0].Str(), aSplitName[0].Size());
+                                        break;
+                                    }
+                                    case 2:
+                                    {
+                                        HE_STR_COPY_S(pLabel->szText, HE_ARRAY_NUM(pLabel->szText),
+                                                      in_szToken, HE_STR_U8_LENGTH(in_szToken));
 
-                        HE_STR_COPY_S(pLabel->szText, HE_ARRAY_NUM(pLabel->szText),
-                                     aSplitName[1].Str(), aSplitName[1].Size());
+                                        break;
+                                    }
+                                    default:
+                                        break;
+                                }
+                            },
+                            Core::Common::g_szTempFixedUTF8_1024,
+                            HE_STR_U8_LENGTH(Core::Common::g_szTempFixedUTF8_1024),
+                            s_locGroupDelimita);
                     }
                     else
                     {
                         HE_STR_COPY_S(pLabel->szText, HE_ARRAY_NUM(pLabel->szText),
-                                     Core::Common::g_szTempFixedString1024.Str(),
-                                     Core::Common::g_szTempFixedString1024.Size());
+                                      Core::Common::g_szTempFixedUTF8_1024,
+                                      HE_STR_U8_LENGTH(Core::Common::g_szTempFixedUTF8_1024));
                     }
                 }
 
-                in_rNode.VOutputString(&Core::Common::g_szTempFixedString1024,
-                                       HE_STR_U8_TEXT("style"));
-                ParseStyle(&pLabel->_style, Core::Common::g_szTempFixedString1024);
+                in_rNode.VOutputUTF8(Core::Common::g_szTempFixedUTF8_1024,
+                                     HE_ARRAY_SIZE(Core::Common::g_szTempFixedUTF8_1024),
+                                     HE_STR_U8_TEXT("style"));
+
+                ParseStyle(&pLabel->_style, Core::Common::g_szTempFixedUTF8_1024);
             }
             else if (szAttrName == HE_STR_U8_TEXT("layer"))
             {
@@ -209,16 +232,19 @@ namespace UI::Builder
                 pLayer->_fX         = in_rNode.VGetFloat32({HE_STR_U8_TEXT("x")});
                 pLayer->_fY         = in_rNode.VGetFloat32({HE_STR_U8_TEXT("y")});
 
-                in_rNode.VOutputString(&Core::Common::g_szTempFixedString1024,
-                                       HE_STR_U8_TEXT("style"));
-                ParseStyle(&pLayer->_style, Core::Common::g_szTempFixedString1024);
+                in_rNode.VOutputUTF8(Core::Common::g_szTempFixedUTF8_1024,
+                                     HE_ARRAY_SIZE(Core::Common::g_szTempFixedUTF8_1024),
+                                     HE_STR_U8_TEXT("style"));
+
+                ParseStyle(&pLayer->_style, Core::Common::g_szTempFixedUTF8_1024);
             }
 
-            in_rNode.VOutputString(&Core::Common::g_szTempFixedString1024, HE_STR_U8_TEXT("id"));
-            auto* szIdName = &Core::Common::g_szTempFixedString1024;
-            HE_STR_ERRNO e = HE_STR_COPY_S(pData->_szId, HE_ARRAY_NUM(pData->_szId), szIdName->Str(),
-                                          szIdName->Size());
-            HE_ASSERT(HE_STR_SUCCESS(e) && "文字列のコピーでエラー");
+            {
+                auto szIdName = HE_STR_U8_TEXT("id");
+                auto bRet =
+                    in_rNode.VOutputUTF8(pData->_szId, HE_ARRAY_SIZE(pData->_szId), szIdName);
+                HE_ASSERT(bRet && "文字列のコピーでエラー");
+            }
         }
     }  // namespace Local
 

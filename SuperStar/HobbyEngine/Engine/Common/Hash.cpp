@@ -8,7 +8,7 @@ namespace Core::Common
     // NMAXは 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1を満たすnの最大数
     constexpr const HE::Uint32 uNMax = 5552;
 
-    HE::Uint64 HashName(const HE::Char* in_szIdent)
+    HE::Hash HashName(const HE::Char* in_szIdent)
     {
         if (in_szIdent == NULL) return 0;
 

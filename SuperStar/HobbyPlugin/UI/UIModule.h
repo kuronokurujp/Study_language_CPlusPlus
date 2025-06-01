@@ -24,23 +24,23 @@
 
 namespace UI
 {
-/*
-    /// <summary>
-    /// widget用のハンドル
-    /// </summary>
-    class Core::Common::Handle
-    {
-    public:
-        Core::Common::Handle() { this->_widgetHandle.Clear(); }
-
-        Core::Common::Handle(const Core::Common::Handle& in_rWidgetHandle)
+    /*
+        /// <summary>
+        /// widget用のハンドル
+        /// </summary>
+        class Core::Common::Handle
         {
-            this->_widgetHandle = in_rWidgetHandle;
-        }
+        public:
+            Core::Common::Handle() { this->_widgetHandle.Clear(); }
 
-        Core::Common::Handle _widgetHandle;
-    };
-    */
+            Core::Common::Handle(const Core::Common::Handle& in_rWidgetHandle)
+            {
+                this->_widgetHandle = in_rWidgetHandle;
+            }
+
+            Core::Common::Handle _widgetHandle;
+        };
+        */
 
     /// <summary>
     /// UI用の追加モジュール
@@ -67,18 +67,18 @@ namespace UI
         /// <summary>
         /// アセットデータからレイアウトを新規作成
         /// </summary>
-        const Core::Common::Handle NewLayoutByLayotuAsset(const Core::Common::Handle& in_rAssetHandle,
-                                                        const HE::Uint32 in_sort,
-                                                        const Core::Common::Handle& in_rViewHandle);
+        const Core::Common::Handle NewLayoutByLayotuAsset(
+            const Core::Common::Handle& in_rAssetHandle, const HE::Uint32 in_sort,
+            const Core::Common::Handle& in_rViewHandle);
 
         // UIのLayerを作成する
         // 描画ソート機能は未実装
         const Core::Common::Handle NewLayer(const Core::Common::StringBase& in_szrName,
-                                          const Core::Math::Vector2& in_rPos,
-                                          const Core::Math::Vector2& in_rSize,
-                                          const Core::Math::Color in_color,
-                                          const HE::Uint32 in_sort,
-                                          const Core::Common::Handle in_viewHandle);
+                                            const Core::Math::Vector2& in_rPos,
+                                            const Core::Math::Vector2& in_rSize,
+                                            const Core::Math::Color in_color,
+                                            const HE::Uint32 in_sort,
+                                            const Core::Common::Handle in_viewHandle);
 
         /// <summary>
         /// テキストラベルWidgetを作成
@@ -95,15 +95,15 @@ namespace UI
         /// ボタンWidget作成
         /// </summary>
         const Core::Common::Handle NewButtonWidget(const Core::Common::StringBase& in_szrName,
-                                                 const HE::Uint32 in_sort,
-                                                 const Core::Math::Rect2& in_rBtnRect,
-                                                 const HE::Uint32 in_uBtnColor,
-                                                 const Core::Common::Handle& in_rViewHandle);
+                                                   const HE::Uint32 in_sort,
+                                                   const Core::Math::Rect2& in_rBtnRect,
+                                                   const HE::Uint32 in_uBtnColor,
+                                                   const Core::Common::Handle& in_rViewHandle);
 
         // UIのWidgetを作成する
         // TODO: 描画ソート機能は未実装
         const Core::Common::Handle NewWidget(const Core::Common::StringBase& in_szName,
-                                           const HE::Uint32 in_uSort);
+                                             const HE::Uint32 in_uSort);
 
         /// <summary>
         /// TODO: Widgetを破棄
@@ -114,15 +114,16 @@ namespace UI
         HE::Bool AddChildWidget(Core::Common::Handle& in_rParent, Core::Common::Handle& in_rWidget);
 
         // Widgetにコンポーネント追加
-        template <class T>
+        template <class T, typename... TArgs>
         std::tuple<Core::Common::Handle, T*> AddComponent(
-            const Core::Common::Handle& in_rWidgetHandle, const HE::Uint32 in_iUpdateOrder)
+            const Core::Common::Handle& in_rWidgetHandle, const HE::Uint32 in_iUpdateOrder,
+            TArgs&&... in_args)
         {
             auto pActor = this->GetWidget(in_rWidgetHandle);
             // アクターにコンポーネント追加
-            return pActor
-                ->AddComponentByHandleAndComp<T>(in_iUpdateOrder,
-                                                 Actor::Component::EPriorty::EPriorty_Main);
+            return pActor->AddComponentByHandleAndComp<T>(in_iUpdateOrder,
+                                                          Actor::Component::EPriorty::EPriorty_Main,
+                                                          std::forward<TArgs>(in_args)...);
         }
 
         Widget* GetWidget(const Core::Common::Handle&);
@@ -155,17 +156,12 @@ namespace UI
 
     private:
         /// <summary>
-        /// TODO: ボタンクリックのイベントキューへ積む
-        /// </summary>
-        void _QuqueEventByButtonClick(const Core::Common::StringBase&);
-
-    private:
-        /// <summary>
         /// レベルに紐づけるアクター管理
         /// </summary>
-        Actor::ActorManager _actorManager;
+        Actor::ActorManager* _actorManager;
 
         Core::Common::Handle _eventHandle;
+        HE::Uint64 _inputEventListenerHash = 0;
     };
 
 }  // namespace UI

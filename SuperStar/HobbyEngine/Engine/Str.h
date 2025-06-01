@@ -7,10 +7,10 @@
 // プラットフォームがWindows
 
 #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
-    // プラットフォームのChar型がWChar型
-    #define HE_USE_WCHAR
+// プラットフォームのChar型がWChar型
+#define HE_USE_WCHAR
 #else
-    // プラットフォームのChar型がchar型
+// プラットフォームのChar型がchar型
 #endif
 
 #ifdef HE_USE_WCHAR
@@ -75,8 +75,32 @@
 // 必ずUTF8の文字列を使う時に利用
 #define HE_STR_U8_TEXT(t) u8##t
 
+// UTF8(char)専用のマクロ
+// どんな環境で必ずUTF8を扱う時に利用
+#define HE_STR_U8_LENGTH(t) static_cast<HE::Uint32>(::strlen(t))
+#define HE_STR_U8_CMP(a, b) ::strcmp(a, b)
+
+#define HE_STR_U8_COPY_S(dst, dst_size, src, src_len) ::strncpy_s(dst, dst_size, src, src_len)
+#define HE_STR_U8_STR(t01, t02) ::strstr(t01, t02)
+#define HE_STR_U8_VSNPRINTF(dst, len, count, fmt, arg) ::vsnprintf_s(dst, len, count, fmt, arg)
+
+#define HE_STR_U8_LOWER(s, size)              \
+    {                                         \
+        for (HE::Uint32 i = 0; i < size; ++i) \
+        {                                     \
+            s[i] = ::tolower(s[i]);           \
+        }                                     \
+    }
+#define HE_STR_U8_UPPER(s, size)              \
+    {                                         \
+        for (HE::Uint32 i = 0; i < size; ++i) \
+        {                                     \
+            s[i] = ::toupper(s[i]);           \
+        }                                     \
+    }
+
 // WCharを固定で利用する場合の文字列マクロ
-#if  defined(HE_WIN)
+#if defined(HE_WIN)
 
 #define HE_STR_W_TEXT(t) L##t
 
@@ -84,7 +108,6 @@
 #define HE_STR_W_TEXT(t) ##t
 
 #endif
-
 
 #define HE_STR_ERRNO errno_t
 #define HE_STR_SUCCESS(e) e == 0 ? TRUE : FALSE

@@ -9,4 +9,12 @@ set(ENHANCED_INPUT_PLUGIN_TARGET_FILES
 
     EnhancedInputModule.cpp
     EnhancedInputModule.h
+
+    EnhancedInput/Common.h
+    EnhancedInput/Event.h
+
+    EnhancedInput/Actor/ActorManagerDecorater.cpp
+    EnhancedInput/Actor/ActorManagerDecorater.h
+    EnhancedInput/Actor/InputComponent.h
+    EnhancedInput/Actor/InputComponent.cpp
 )

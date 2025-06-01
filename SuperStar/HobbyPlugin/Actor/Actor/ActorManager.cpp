@@ -54,29 +54,35 @@ namespace Actor
     /// </summary>
     void ActorManager::Remove(Core::Common::Handle* in_pActorHandle)
     {
-        HE_ASSERT(in_pActorHandle);
-        HE_ASSERT((in_pActorHandle->Null() == FALSE) && "アクターを破棄するハンドルがない");
+        HE_ASSERT_RETURN(in_pActorHandle);
+        HE_ASSERT_RETURN((in_pActorHandle->Null() == FALSE) && "アクターを破棄するハンドルがない");
 
         // 入力コンポーネントがついている場合は登録リストから外す
         auto pObject = this->Get(*in_pActorHandle);
-
-        // タスクの全削除処理ですでにタスクが存在しないケースがある
-        if (pObject == NULL)
+        if (pObject != NULL)
         {
-            in_pActorHandle->Clear();
+            pObject->ForeachComponents(
+                [this](const Core::Common::Handle& in_rHandle, Actor::Component* in_pCmp)
+                {
+                    if (in_rHandle.Null()) return TRUE;
+
+                    this->VOnActorUnRegistComponent(in_pCmp);
+                    return TRUE;
+                });
+
+            this->_taskManager.RemoveTask(in_pActorHandle);
             return;
         }
 
-        pObject->ForeachComponents(
-            [this](const Core::Common::Handle& in_rHandle, Actor::Component* in_pCmp)
-            {
-                if (in_rHandle.Null()) return TRUE;
+        // タスクの全削除処理ですでにタスクが存在しないケースがある
+        // TODO: ペンディングマップにあるかチェック
+        if (this->_pendingDataMap.Contains(*in_pActorHandle))
+        {
+            // TODO: ペンディングマップから外す
+            this->_pendingDataMap.Erase(*in_pActorHandle);
+        }
 
-                this->VOnActorUnRegistComponent(in_pCmp);
-                return TRUE;
-            });
-
-        this->_taskManager.RemoveTask(in_pActorHandle);
+        in_pActorHandle->Clear();
     }
 
     Object* ActorManager::Get(const Core::Common::Handle& in_rActorHandle)
@@ -152,6 +158,20 @@ namespace Actor
     void ActorManager::Event(const Core::TaskData& in_rTaskData)
     {
         this->_taskManager.EventAll(in_rTaskData);
+    }
+
+    void ActorManager::ForeachActor(std::function<void(Object*)> in_func)
+    {
+        const HE::Sint32 iMax = this->_GetUpdateGroupMax();
+        for (HE::Sint32 i = 0; i < iMax; ++i)
+        {
+            this->_taskManager.ForeachByGroup(i,
+                                              [&in_func](Core::Task* in_pTask)
+                                              {
+                                                  auto pObj = reinterpret_cast<Object*>(in_pTask);
+                                                  in_func(pObj);
+                                              });
+        }
     }
 
     void ActorManager::_UpdatePending()

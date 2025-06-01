@@ -2,7 +2,7 @@
 
 #include "Actor.h"
 #include "ActorInterface.h"
-#include "Component/InputComponent.h"
+//#include "Component/InputComponent.h"
 #include "Engine/Common/CustomMap.h"
 #include "Engine/Common/Handle.h"
 #include "Engine/MiniEngine.h"
@@ -86,6 +86,8 @@ namespace Actor
         /// </summary>
         void Event(const Core::TaskData&);
 
+        void ForeachActor(std::function<void(Object*)> in_func);
+
         /// <summary>
         /// アクター追加
         /// </summary>
@@ -109,7 +111,7 @@ namespace Actor
 
             if (this->_bUpdatingActors)
             {
-                HE::Uint32 dataIdx = this->_pendingDataMap.Size();
+                // HE::Uint32 dataIdx = this->_pendingDataMap.Size();
                 this->_pendingDataMap.Add(handle, PendingData{handle, 0});
             }
 

@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include "Actor/Component/InputComponent.h"
 #include "Engine/Common/Handle.h"
 #include "Engine/MiniEngine.h"
 
 namespace Actor
 {
     class ActorManager;
+    class Component;
 
     /// <summary>
     /// アクター管理を拡張するデコレーターインターフェイス

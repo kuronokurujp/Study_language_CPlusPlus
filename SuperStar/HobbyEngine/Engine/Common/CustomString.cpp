@@ -398,6 +398,14 @@ namespace Core::Common
     FixedString512 g_szTempFixedString512;
     FixedString1024 g_szTempFixedString1024;
 
+    HE::UTF8 g_szTempFixedUTF8_16[16]     = "";
+    HE::UTF8 g_szTempFixedUTF8_32[32]     = "";
+    HE::UTF8 g_szTempFixedUTF8_64[64]     = "";
+    HE::UTF8 g_szTempFixedUTF8_128[128]   = "";
+    HE::UTF8 g_szTempFixedUTF8_256[256]   = "";
+    HE::UTF8 g_szTempFixedUTF8_512[512]   = "";
+    HE::UTF8 g_szTempFixedUTF8_1024[1024] = "";
+
     /// <summary>
     /// UTF8の文字からユニコード値にして返す
     /// </summary>
@@ -430,6 +438,23 @@ namespace Core::Common
         }
 
         return 0;
+    }
+
+    /// <summary>
+    /// TODO: UTF8文字列を区切る
+    /// </summary>
+    void SplitWithUTF8(std::function<void(const HE::UTF8*, const HE::Uint32)> in_resultFunc,
+                       HE::UTF8* in_szName, const HE::Uint32 in_uLen, const HE::UTF8* in_szDelim)
+    {
+        HE::UTF8* szToken = std::strtok(in_szName, in_szDelim);
+        HE::Uint32 uCount = 1;
+        while (szToken != nullptr)
+        {
+            in_resultFunc(szToken, uCount);
+            ++uCount;
+
+            szToken = std::strtok(nullptr, in_szDelim);
+        }
     }
 
 }  // namespace Core::Common

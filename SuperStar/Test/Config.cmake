@@ -6,7 +6,8 @@ set(TEST_TARGET_FILES
 	.editorconfig
 	README.md
 	LICENSE.txt
-	
+
 	TestMain.cpp
+	TestCommon.h
 	ThirdParty/Catch.hpp
 )

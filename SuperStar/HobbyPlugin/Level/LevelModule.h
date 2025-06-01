@@ -12,12 +12,14 @@
 // モジュールのヘッダーファイルは全てインクルードする
 #include "Level/Component/LevelBaseComponent.h"
 #include "Level/Component/LevelUserInputReceive.h"
-#include "Level/LevelManager.h"
+// #include "Level/LevelManager.h"
 #include "Level/LevelNode.h"
 
 namespace Level
 {
-    class Manager;
+    // class Manager;
+    //  前方宣言
+    class Node;
 
     /// <summary>
     /// レベル用の追加モジュール
@@ -31,12 +33,31 @@ namespace Level
     public:
         LevelModule();
 
-        std::shared_ptr<Manager>& GetManager() { return this->_spLevelManager; }
+        // std::shared_ptr<Manager>& GetManager() { return this->_spLevelManager; }
 
-        Node& GetLevel(const Core::Common::Handle& in_rHandle) const
+        /// <summary>
+        /// メインレベルの切り替え
+        /// </summary>
+        template <class T>
+        HE::Bool ChangeMainLevel()
+        {
+            HE_STATIC_ASSERT(std::is_base_of<Node, T>::value,
+                             "Tクラスはレベルのノードクラスを継承していない");
+
+            // レベルのノードは使いまわさない
+            Core::Common::Handle handle = this->_upNodeManager->Add<T>();
+            if (handle.Null()) return FALSE;
+
+            // TODO: メインレベルの初期化
+            return this->_InitMainLevel(handle);
+        }
+
+        Node& GetLevel(const Core::Common::Handle& in_rHandle) const;
+        /*
         {
             return *(this->_spLevelManager->GetLevel(in_rHandle));
         }
+        */
 
     protected:
         /// <summary>
@@ -65,6 +86,27 @@ namespace Level
         void _VLateUpdate(const HE::Float32) override final;
 
     private:
-        std::shared_ptr<Manager> _spLevelManager = NULL;
+        /// <summary>
+        /// ユーザー入力処理
+        /// </summary>
+        // void _ProcessInput(void*);
+
+        HE::Bool _InitMainLevel(const Core::Common::Handle&);
+
+    private:
+        Core::Common::Handle _inputEventListenerHandle;
+
+        // レベルのノードをアクターとして管理
+        Core::Memory::UniquePtr<Actor::ActorManager> _upNodeManager;
+
+        /// <summary>
+        /// カレントレベルのハンドル
+        /// </summary>
+        Core::Common::Handle _currentLevelHandle;
+
+        /// <summary>
+        ///  切り替え先のレベルのハンドル
+        /// </summary>
+        Core::Common::Handle _nextLevelHandle;
     };
 }  // namespace Level

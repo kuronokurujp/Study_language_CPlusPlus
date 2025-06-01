@@ -74,6 +74,25 @@ namespace AssetManager
                 }
             }
 
+            const HE::Bool VOutputUTF8(HE::UTF8* out, const HE::Uint32 in_uLen,
+                                       const HE::UTF8* in_szName) override
+            {
+                simdjson::dom::element element = this->_value;
+                if (in_szName != NULL)
+                {
+                    element = this->_value[in_szName];
+                }
+
+                auto val = element.get_string();
+                if (val.error() == FALSE)
+                {
+                    HE_STR_U8_COPY_S(out, in_uLen, val.value().data(),
+                                     HE_STR_U8_LENGTH(val.value().data()));
+                    return TRUE;
+                }
+                return FALSE;
+            }
+
         public:
             simdjson::dom::element _value;
         };

@@ -14,7 +14,7 @@ namespace Core::Common
 
     /// <summary>
     /// UUID生成したのを128Bitに省略して返す
-    /// UUIDは本来128Bitなので32Bitに省略した事で値の衝突率が高くなるので扱いには注意が必要
+    /// UUIDは本来128Bitなので64Bitに省略した事で値の衝突率が高くなるので扱いには注意が必要
     /// </summary>
     extern HE::Uint64 GenerateUUIDBy64Bit();
 

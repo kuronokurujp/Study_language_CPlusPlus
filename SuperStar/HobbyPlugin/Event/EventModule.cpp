@@ -4,83 +4,33 @@ namespace Event
 {
     EventModule::EventModule() : ModuleBase(ModuleName())
     {
-        this->_mEventMng.Clear();
     }
 
-    const Core::Common::Handle EventModule::AddNetwork(
-        Core::Memory::UniquePtr<EventNetworkStrategyInterface> in_upStrategy)
+    const Core::Common::Handle EventModule::AddListener(EventListenerPtr const& in_rListener,
+                                                        const HE::Hash in_hash)
     {
-        Core::Common::Handle handle;
-
-        ++this->_uAddEventMngCount;
-        handle.SetIndex(this->_uAddEventMngCount);
-
-        // ストラテジーの所有権を管理インスタンスへ
-        this->_mEventMng.Add(handle, HE_NEW_MEM(EventManager, 0)(std::move(in_upStrategy)));
-
-        return handle;
-    }
-
-    HE::Bool EventModule::RemoveNetwork(const Core::Common::Handle& in_rHandle)
-    {
-        // 確保した管理インスタンスを破棄
-        if (this->_mEventMng.Contains(in_rHandle) == FALSE) return FALSE;
-
-        auto pEventMng = this->_mEventMng.FindKey(in_rHandle);
-        pEventMng->_data->Release();
-
-        HE_SAFE_DELETE_MEM(pEventMng->_data);
-
-        return this->_mEventMng.Erase(in_rHandle);
-    }
-
-    const HE::Uint64 EventModule::AddListener(EventListenerPtr const& in_rListener,
-                                              EventTypeStr const& in_rType)
-    {
-        HE::Uint64 ulListenerHash = 0;
-        for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
+        if (this->_pEventSingleProcess == NULL)
         {
-            // in_rTypeのリスナー管理データに登録
-            auto ulHash = itr->_data->AddListener(in_rListener, in_rType);
-            if (ulHash != 0)
-            {
-                ulListenerHash = ulHash;
-            }
+            this->_pEventSingleProcess = HE_NEW_MEM(EventProcess, 0)(HE_STR_TEXT("Single"));
         }
 
-        return ulListenerHash;
+        return this->_pEventSingleProcess->AddListener(in_rListener, in_hash);
     }
 
-    HE::Bool EventModule::RemoveListener(const HE::Uint64 in_ulHashistener,
-                                         EventTypeStr const& in_rType)
+    HE::Bool EventModule::RemoveListener(const HE::Hash in_ulHashistener)
     {
-        for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
-        {
-            itr->_data->RemoveListener(in_ulHashistener, in_rType);
-        }
-
-        return TRUE;
+        return this->_pEventSingleProcess->RemoveListener(in_ulHashistener);
     }
 
-    HE::Bool EventModule::RemoveAllListener(EventTypeStr const& in_rType)
+    HE::Bool EventModule::RemoveAllListener()
     {
-        for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
-        {
-            // 指定タイプの全リスナーを破棄
-            itr->_data->RemoveAllListener(in_rType);
-        }
-
-        return TRUE;
+        return this->_pEventSingleProcess->RemoveAllListener();
     }
 
-    HE::Bool EventModule::QueueEvent(EventDataInterfacePtr const& in_spEventData)
+    HE::Bool EventModule::QueueEvent(EventDataInterfacePtr const& in_spEventData,
+                                     const HE::Hash in_hash)
     {
-        for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
-        {
-            itr->_data->QueueEvent(in_spEventData);
-        }
-
-        return TRUE;
+        return this->_pEventSingleProcess->QueueEvent(in_spEventData, in_hash);
     }
 
     /// <summary>
@@ -88,8 +38,11 @@ namespace Event
     /// </summary>
     HE::Bool EventModule::_VStart()
     {
-        // MEMO: このメソッド前に別モジュールの_VStartメソッドで_mEventMng.Addが呼ばれている
-        // this->_mEventMng.Clear();
+        if (this->_pEventSingleProcess == NULL)
+        {
+            this->_pEventSingleProcess = HE_NEW_MEM(EventProcess, 0)(HE_STR_TEXT("Single"));
+        }
+
         return TRUE;
     }
 
@@ -99,25 +52,15 @@ namespace Event
     HE::Bool EventModule::_VRelease()
     {
         // 全ての管理インスタンスを破棄
-        auto itr = this->_mEventMng.Begin();
-        while (itr != this->_mEventMng.End())
-        {
-            this->RemoveNetwork(itr->_key);
-            itr = this->_mEventMng.Begin();
-        }
+        this->_pEventSingleProcess->Release();
+        HE_SAFE_DELETE_MEM(this->_pEventSingleProcess);
 
         return TRUE;
     }
 
     void EventModule::_VLateUpdate(const HE::Float32 in_fDeltaTime)
     {
-        // 全ての管理インスタンスを実行
-        for (auto itr = this->_mEventMng.Begin(); itr != this->_mEventMng.End(); ++itr)
-        {
-            // TODO: 指定時間でイベント処理を途中終了しないようにする
-            // TODO: マルチコアかマルチスレッドを使うかも
-            itr->_data->Tick(EventManager::EConstancs_Infinite);
-        }
+        this->_pEventSingleProcess->Tick(EventProcess::EConstancs_Infinite);
     }
 
 }  // namespace Event

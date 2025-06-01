@@ -2,6 +2,17 @@
 
 #include <cstdint>
 
+#if __cplusplus >= 202002L
+// C++20以降のコード
+#define HE_CPP_20_OR_LATER 1
+#elif __cplusplus >= 201703L
+// C++17以降のコード
+#define HE_CPP_17_OR_LATER 1
+#else
+// C++17未満のコード
+#define HE_CPP_17_BEFORE 1
+#endif
+
 // Windows環境かどうか
 #if defined(_WIN64) || defined(_WIN86)
 
@@ -42,6 +53,9 @@ namespace HE
     using Uint16 = unsigned short;
     using Sint8  = signed char;
     using Uint8  = unsigned char;
+    // TODO: ハッシュ用の型を用意
+    // プラットフォームによって32/64bitと切り替える可能性を考えて
+    using Hash = Uint64;
 
 // WindowsではUnicode前提実装なのでwchar型にしている
 #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
@@ -49,10 +63,14 @@ namespace HE
     using WChar = wchar_t;
     using UTF8  = char;
 #else
-    using Char  = char;
+
+#ifdef HE_CPP_20_OR_LATER
+    using Char = char8_t;
+#else
+    using Char = char;
+#endif
     using UTF8  = char;
     using WChar = wchar_t;
-
 #endif
 
     using Bool    = char;

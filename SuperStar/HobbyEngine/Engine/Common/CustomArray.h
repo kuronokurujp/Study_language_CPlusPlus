@@ -84,10 +84,10 @@ namespace Core::Common
         FixedArray(std::initializer_list<TType>& in_rInitList)
             : ArrayBase<TType>(this->_aBuff, TCapacity)
         {
-            const Uint32 uMinCapacity = HE_MIN(TCapacity, in_rInitList.size());
+            const HE::Uint32 uMinCapacity = HE_MIN(TCapacity, in_rInitList.size());
 
             auto it = in_rInitList.begin();
-            for (Uint32 i = 0; i < uMinCapacity; ++i)
+            for (HE::Uint32 i = 0; i < uMinCapacity; ++i)
             {
                 this->_aBuff[i] = *it;
             }

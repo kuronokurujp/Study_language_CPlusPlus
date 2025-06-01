@@ -149,6 +149,8 @@ namespace Module
         /// </summary>
         virtual HE::Bool _VRelease() = 0;
 
+        // TODO: 本当に前と後更新が必要なのだろうか？
+        // 正直無駄な処理なのではと思った
         /// <summary>
         /// モジュール前更新
         /// </summary>

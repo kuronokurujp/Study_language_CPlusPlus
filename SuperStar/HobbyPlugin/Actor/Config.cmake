@@ -9,18 +9,16 @@ set(ACTOR_PLUGIN_TARGET_FILES
 
     ActorModule.cpp
     ActorModule.h
-    
+
     Actor/Actor.h
     Actor/Actor.cpp
     Actor/ActorInterface.h
     Actor/ActorManager.h
     Actor/ActorManager.cpp
-    
+
     Actor/Component/Component.h
     Actor/Component/Component.cpp
 
-    Actor/Component/InputComponent.h
-    Actor/Component/InputComponent.cpp
     Actor/Component/TransformComponent.h
     Actor/Component/TransformComponent.cpp
 )

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Actor/Component/InputComponent.h"
+#include "EnhancedInput/Actor/InputComponent.h"
 
 namespace UI
 {
@@ -9,13 +9,14 @@ namespace UI
     /// UIのWidgetのタップやボタン入力を行い,
     /// 各Widgetへ結果を送信する
     /// </summary>
-    class UIInputRouterStrategy final : public Actor::InputStrategyBase
+    class UIInputRouterStrategy final : public EnhancedInput::InputStrategyBase
     {
         HE_CLASS_COPY_NG(UIInputRouterStrategy);
 
     public:
-        UIInputRouterStrategy() : Actor::InputStrategyBase() {}
+        // TODO: インプットマップの設定
+        UIInputRouterStrategy() : EnhancedInput::InputStrategyBase() {}
 
-        void VProcessInput(const void* in_pInputMap, Actor::Object*) override final;
+        void VProcessInput(const EnhancedInput::InputMap&, Actor::Object*) override final;
     };
 }  // namespace UI

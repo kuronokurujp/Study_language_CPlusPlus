@@ -151,8 +151,8 @@ namespace PlatformSDL2
         auto inputHandle = this->_pConfig->InputHandle();
         if (inputHandle.Null() == FALSE)
         {
-            auto& pInputObj = HE_ENGINE.PlatformModule()->VInput()->GetObj(inputHandle);
-            pInputObj.SetEventCallback(
+            auto* pInputObj = HE_ENGINE.PlatformModule()->VInput()->GetObj(inputHandle);
+            pInputObj->SetEventCallback(
                 [this](void* in_pEvent)
                 {
                     const SDL_Event* pSDLEvent = reinterpret_cast<const SDL_Event*>(in_pEvent);

@@ -13,22 +13,25 @@ namespace Event
 {
     using EventListenerList = std::vector<EventListenerPtr>;
 
-    /// <summary>
-    /// イベント管理のストラテジーインターフェイス
-    /// </summary>
-    class EventNetworkStrategyInterface
-    {
-    public:
-        EventNetworkStrategyInterface()            = default;
-        virtual ~EventNetworkStrategyInterface()   = default;
-        virtual HE::Bool VIsHash(const HE::Uint64) = 0;
-    };
+    /*
+        /// <summary>
+        /// イベントプロセスのストラテジーインターフェイス
+        /// </summary>
+        class EventProcessStrategyInterface
+        {
+        public:
+            EventProcessStrategyInterface()          = default;
+            virtual ~EventProcessStrategyInterface() = default;
+            virtual HE::Bool VIsHash(const HE::Hash) = 0;
+            // TODO: ハッシュ値
+            virtual HE::Hash VHash() const = 0;
+        };
+        */
 
     /// <summary>
-    /// イベント管理
-    /// 複数のイベントタイプを扱える
+    /// イベントプロセス
     /// </summary>
-    class EventManager final
+    class EventProcess final
     {
     public:
         enum EConstants
@@ -38,8 +41,9 @@ namespace Event
         };
 
     public:
-        EventManager(Core::Memory::UniquePtr<EventNetworkStrategyInterface>);
-        virtual ~EventManager();
+        // EventProcess(Core::Memory::UniquePtr<EventProcessStrategyInterface>);
+        EventProcess(const HE::Char* in_szName);
+        virtual ~EventProcess();
 
         /// <summary>
         /// イベントがないかどうか
@@ -54,15 +58,15 @@ namespace Event
         /// 登録したらリスナーのハッシュ値を返す
         /// 失敗したら0
         /// </summary>
-        const HE::Uint64 AddListener(EventListenerPtr const&, EventTypeStr const&);
+        const Core::Common::Handle AddListener(EventListenerPtr const&, const HE::Hash);
 
-        HE::Bool RemoveListener(const HE::Uint64, EventTypeStr const&);
-        HE::Bool RemoveAllListener(EventTypeStr const&);
+        HE::Bool RemoveListener(const HE::Uint64);
+        HE::Bool RemoveAllListener();
         /*
                 HE::Bool VTrigger(EventDataInterfacePtr const&) const ;
         */
 
-        HE::Bool QueueEvent(EventDataInterfacePtr const&);
+        HE::Bool QueueEvent(EventDataInterfacePtr const&, const HE::Hash);
 
 #if 0
         HE::Bool VAbortEvent(EventTypeStr const&) override final;
@@ -70,13 +74,13 @@ namespace Event
 
         HE::Bool Tick(const HE::Uint32);
 
-        HE::Bool ValidateType(EventTypeStr const&) const;
-        HE::Bool ValidateHash(const HE::Uint64) const;
+        // HE::Bool ValidateType(EventTypeStr const&) const;
+        // HE::Bool ValidateHash(const HE::Hash) const;
 
         // 情報探索メソッド
 
         // 特定のイベント型に関連づけられたリスナーのリストを取得
-        HE::Bool OutputListenerList(EventListenerList*, EventTypeStr const&) const;
+        HE::Bool OutputListenerList(EventListenerList*, const HE::Hash) const;
 
     private:
         // TODO: stdのデータ構造はすべて自前で作成したカスタム用に差し替える予定
@@ -86,14 +90,25 @@ namespace Event
         // イベント型のセットに結果を導入
         using EventTypeSetRes = std::pair<EventTypeSet::iterator, HE::Bool>;
         // イベント型ごとに一つのリスト(マップに格納される)
-        using EventListenerTable = std::list<EventListenerPtr>;
+        // using EventListenerTable = std::list<EventListenerPtr>;
+        using EventListenerTable =
+            Core::Common::FixedMap<Core::Common::Handle, EventListenerPtr, 128>;
         // イベント識別子をリスナーリストにマッピング
-        using EventListenerMap = Core::Common::FixedMap<HE::Uint64, EventListenerTable, 512>;
+        using EventListenerMap = Core::Common::FixedMap<HE::Uint64, EventListenerTable*, 512>;
         // 処理待ちイベントのキュー、または処理中のイベントのキュー
-        using EventQueue = std::list<EventDataInterfacePtr>;
+        using EventQueue = std::list<std::tuple<HE::Hash, EventDataInterfacePtr>>;
 
+    private:
+        const Core::Common::Handle _AddListener(EventListenerMap* in_mpListener,
+                                                EventListenerPtr const& in_rListener,
+                                                const HE::Hash in_hash);
+
+        HE::Bool _RemoveListener(EventListenerMap*, const HE::Uint64);
+
+    private:
         // イベント型をリスナーにマッピング
-        EventListenerMap _mRegistry;
+        EventListenerMap _mListener;
+        EventListenerMap _mListenerBySpecalEvent;
 
         // 二重バッファのイベント処理のキュー
         EventQueue _aQueue[EConstants_NumQueues];
@@ -102,6 +117,8 @@ namespace Event
         // キューに入ろうとするイベントは他方のキューに置かれる
         HE::Sint32 _iActiveQueue = 0;
 
-        Core::Memory::UniquePtr<EventNetworkStrategyInterface> _upStrategy;
+        HE::Hash _hash = 0;
+
+        // Core::Memory::UniquePtr<EventProcessStrategyInterface> _upStrategy;
     };
 }  // namespace Event

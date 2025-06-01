@@ -51,7 +51,7 @@ namespace Event
             const Core::Common::FixedString128& in_szrName,
             std::function<HE::Bool(Event::EventDataInterfacePtr const&)> in_func)
         {
-            this->_func   = in_func;
+            this->_func   = std::move(in_func);
             this->_szName = in_szrName;
         }
 

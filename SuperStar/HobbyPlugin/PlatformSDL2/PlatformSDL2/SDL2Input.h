@@ -23,7 +23,7 @@ namespace PlatformSDL2
         virtual const Core::Common::Handle VCreateObject() override final;
         virtual void VReleaseObject(Core::Common::Handle&) override final;
 
-        virtual Platform::InputObject& GetObj(const Core::Common::Handle) override final;
+        virtual Platform::InputObject* GetObj(const Core::Common::Handle) override final;
 
     private:
         Core::Common::RuntimePoolManager<Platform::InputObject> _poolInputObject;

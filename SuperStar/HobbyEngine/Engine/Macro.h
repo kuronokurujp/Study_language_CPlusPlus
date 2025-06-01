@@ -3,17 +3,17 @@
 // 利用頻度の多いマクロとテンプレート関数を用意
 // マクロとして利用するのでテンプレート関数名はマクロの表記ルールにしている
 
-#include <math.h>
+#include <cmath>
 
 #include "Config.h"
 #include "Str.h"
 #include "Type.h"
 
-// 文字列から数値に変換
-#define HE_STR_TO_UINT32(__x__) std::stoul((__x__))
-#define HE_STR_TO_FLOAT32(__x__) std::stof((__x__))
-// 16進数文字列を数値に変換
-#define HE_STRHEX_TO_UINT32(__x__) std::stoul((__x__), NULL, 16)
+// UTF8文字列から数値に変換
+#define HE_U8_TO_UINT32(__x__) std::stoul((__x__))
+#define HE_U8_TO_FLOAT32(__x__) std::stof((__x__))
+// 16進数UTF8文字列を数値に変換
+#define HE_U8_HEX_TO_UINT32(__x__) std::stoul((__x__), NULL, 16)
 
 // 引数に設定した32bit変数のバイト並びを反転して書き換え
 #define HE_SWAP_BYTE_32BIT(__x__)                    \
@@ -126,6 +126,7 @@ typename std::enable_if<std::is_integral<T>::value, T>::type HE_LOOP_IN_RANGE(T 
         }                     \
     }
 
+// TODO: アサート条件を第一引数にして...にして_x_のその後の引数にできないか
 #define HE_ASSERT_RETURN_VALUE(_x_, ...) \
     {                                    \
         assert(__VA_ARGS__);             \

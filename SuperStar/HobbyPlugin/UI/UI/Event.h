@@ -7,7 +7,7 @@
 // イベントのモジュール
 #include "EventModule.h"
 
-#define EVENT_NETWORK_NAME_UIMODULE HE_STR_TEXT("UIEvent")
+#define EVENT_TYPE_UIMODULE (Event::BaseEventData::EType_SpecalEvent)
 
 namespace UI
 {
@@ -17,8 +17,8 @@ namespace UI
     class EventButtonClick final : public Event::BaseEventData
     {
     public:
-        EventButtonClick(const Core::Common::StringBase& in_rMsg)
-            : Event::BaseEventData(EVENT_NETWORK_NAME_UIMODULE, s_szEventName), _szMsg(in_rMsg)
+        EventButtonClick(const HE::UTF8* in_pMsg)
+            : Event::BaseEventData(s_szEventName), _szMsg(in_pMsg)
         {
         }
 
@@ -29,7 +29,7 @@ namespace UI
 
     private:
         static inline Event::EventTypeStr s_szEventName = HE_STR_TEXT("UIEvent_ButtonClick");
-        static inline HE::Uint32 s_uEventHash       = s_szEventName.Hash();
+        static inline HE::Uint32 s_uEventHash           = s_szEventName.Hash();
     };
 
 }  // namespace UI

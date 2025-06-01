@@ -73,6 +73,26 @@ namespace AssetManager
                 }
             }
 
+            const HE::Bool VOutputUTF8(HE::UTF8* out, const HE::Uint32 in_uLen,
+                                       const HE::UTF8* in_szName) override
+            {
+                toml::node* pRefNode = this->_value.node();
+                if (in_szName != NULL)
+                {
+                    auto node = pRefNode->at_path(in_szName);
+                    pRefNode  = node.node();
+                }
+
+                if (pRefNode->is_string())
+                {
+                    auto str = pRefNode->as_string()->get();
+                    HE_STR_U8_COPY_S(out, in_uLen, str.c_str(), HE_STR_U8_LENGTH(str.c_str()));
+                    return TRUE;
+                }
+
+                return FALSE;
+            }
+
         public:
             toml::node_view<toml::node> _value;
         };

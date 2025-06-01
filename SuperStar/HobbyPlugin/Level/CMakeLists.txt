@@ -11,10 +11,11 @@ option(LEVEL_PLUGIN_BUILD_SHARED_LIBS "build shared library" OFF)
 # プラグイン共通ビルド処理.
 common_build_plugin("${LEVEL_PLUGIN_NAME}" "${LEVEL_PLUGIN_TARGET_FILES}" "$CACHE{CACHE_ENGINE_INCLUDE_CODE}" ${LEVEL_PLUGIN_BUILD_SHARED_LIBS})
 
-target_include_directories(${LEVEL_PLUGIN_NAME} 
+target_include_directories(${LEVEL_PLUGIN_NAME}
     PRIVATE
         # プラグインに依存しているプラグインコード
         # ライブラリのリンクはcmakeで指定したCMakeLists.txtでやっている
         ${CMAKE_CURRENT_SOURCE_DIR}/../Actor/
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Event/
         ${CMAKE_CURRENT_SOURCE_DIR}/../EnhancedInput/
 )

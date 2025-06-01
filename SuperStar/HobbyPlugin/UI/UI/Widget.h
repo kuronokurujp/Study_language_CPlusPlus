@@ -16,8 +16,10 @@ namespace UI
         HE_CLASS_MOVE_NG(Widget);
 
     public:
-        Widget() : Actor::Object() {}
+        Widget(const Core::Common::StringBase& in_szrName);  // : Actor::Object();
         virtual ~Widget() = default;
+
+        const HE::Char* Name() const { return this->_szName.Str(); }
 
         /// <summary>
         /// 開始
@@ -30,5 +32,8 @@ namespace UI
         /// 継承したクラスで必ず基本クラスのメソッドを呼ぶ
         /// </summary>
         virtual HE::Bool VEnd() override;
+
+    private:
+        Core::Common::FixedString128 _szName;
     };
 }  // namespace UI

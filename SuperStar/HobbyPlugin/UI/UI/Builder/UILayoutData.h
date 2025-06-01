@@ -43,7 +43,7 @@ namespace UI::Builder
         /// </summary>
         struct Data
         {
-            HE::Char _szId[64]   = {0};
+            HE::UTF8 _szId[64]   = {0};
             EWidget _eWidgetType = EWidget::EWidget_None;
 
             union ExData
@@ -58,8 +58,8 @@ namespace UI::Builder
                     EAnchor _eAnchor;
                     HE::Bool bLoc;
                     HE::Float32 _fX, _fY;
-                    HE::Char szLoc[64];
-                    HE::Char szText[64];
+                    HE::UTF8 szLoc[64];
+                    HE::UTF8 szText[64];
                     Style _style;
                 } _label;
 
@@ -67,6 +67,8 @@ namespace UI::Builder
                 {
                     EAnchor _eAnchor;
                     HE::Float32 _fX, _fY;
+                    // TODO: インプットのキーを追加
+                    HE::UTF8 _szInputKey[32];
                     Style _style;
                 } button;
 

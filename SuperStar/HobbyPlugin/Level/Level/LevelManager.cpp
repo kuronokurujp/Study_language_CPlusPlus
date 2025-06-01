@@ -1,4 +1,5 @@
-﻿#include "LevelManager.h"
+﻿#if 0
+#include "LevelManager.h"
 
 #include "ActorModule.h"
 #include "Engine/Memory/Memory.h"
@@ -75,7 +76,7 @@ namespace Level
         return pNode;
     }
 
-    HE::Bool Manager::_StartLevel(const Core::Common::Handle& in_rHandle)
+    HE::Bool Manager::_InitMainLevel(const Core::Common::Handle& in_rHandle)
     {
         this->_nextLevelHandle = in_rHandle;
 
@@ -90,3 +91,4 @@ namespace Level
     }
 
 }  // namespace Level
+#endif
