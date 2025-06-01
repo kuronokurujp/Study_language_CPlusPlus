@@ -18,8 +18,7 @@ namespace Level
         HE::Bool VBegin() override final;
         HE::Bool VEnd() override final;
 
-    protected:
-        void _VProcessInput(const EnhancedInput::InputMap* in_pInputMap) override final;
+        void VProcessInput(const EnhancedInput::InputMap&) override final;
 
     private:
         Core::Common::Handle _layoutAssetHandle;

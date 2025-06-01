@@ -88,7 +88,6 @@ namespace InGame
 
         WorkFixVector _vBullet;
         Core::Common::Handle _viewHandle;
-
-        Core::Common::Handle _shotEventHandle;
+        Core::Common::Handle _eventListeningHandle;
     };
 }  // namespace InGame

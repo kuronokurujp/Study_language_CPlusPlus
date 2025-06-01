@@ -9,31 +9,11 @@
 // イベントのモジュール
 #include "EventModule.h"
 
-#define INGAME_CHARACTER_EVENT_NAME HE_STR_TEXT("InGameCharacterEvent")
+#define EVENT_TYPE_INGAME_CHARACTER (Core::Common::HashName(HE_STR_TEXT("InGameCharacterEvent")))
 
 namespace InGame
 {
     class InGameBulletManagerComponent;
-
-    /// <summary>
-    /// キャラクターのイベント管理の拡張クラス
-    /// </summary>
-    class InGameCharacterEventManagerStrategy final : public Event::EventNetworkStrategyInterface
-    {
-    public:
-        InGameCharacterEventManagerStrategy()
-            : _ulHash(Core::Common::HashName(INGAME_CHARACTER_EVENT_NAME))
-        {
-        }
-
-        HE::Bool VIsHash(const HE::Uint64 in_ulHash)
-        {
-            return (this->_ulHash == in_ulHash);
-        }
-
-    private:
-        HE::Uint64 _ulHash = 0;
-    };
 
     /// <summary>
     /// 移動

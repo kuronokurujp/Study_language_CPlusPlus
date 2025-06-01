@@ -8,31 +8,11 @@
 // イベントのモジュール
 #include "EventModule.h"
 
-#define INGAME_SHOT_EVENT_NETWORK_NAME HE_STR_TEXT("InGameShotEvent")
+#define EVENT_TYPE_INGAME_SHOT (Core::Common::HashName(HE_STR_TEXT("InGameShotEvent")))
 
 namespace InGame
 {
     class InGameBulletManagerComponent;
-
-    /// <summary>
-    /// 弾の発射するイベント管理の拡張クラス
-    /// </summary>
-    class InGameShotEventManagerStrategy final : public Event::EventNetworkStrategyInterface
-    {
-    public:
-        InGameShotEventManagerStrategy()
-            : _ulHash(Core::Common::HashName(INGAME_SHOT_EVENT_NETWORK_NAME))
-        {
-        }
-
-        HE::Bool VIsHash(const HE::Uint64 in_ulHash)
-        {
-            return (this->_ulHash == in_ulHash);
-        }
-
-    private:
-        HE::Uint64 _ulHash = 0;
-    };
 
     /// <summary>
     /// 通常弾を発射するイベント

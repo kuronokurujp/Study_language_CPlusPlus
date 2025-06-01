@@ -103,7 +103,7 @@ HE::Bool WinGameMain::_VLoad()
         mInputAction.Add(HE_STR_TEXT("UIButton"), EnhancedInput::ActionData(aKeys, aTouchs));
 
         auto pInputModule = HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();
-        pInputModule->SetCommonMappingAction(mInputAction);
+        pInputModule->SetAction(mInputAction);
     }
 
     return TRUE;
@@ -188,9 +188,9 @@ HE::Bool WinGameMain::_VStart()
     auto pLevelModule = HE_ENGINE.ModuleManager().Get<Level::LevelModule>();
 #ifdef HE_ENGINE_DEBUG
     // デバッグレベルを開始
-    pLevelModule->GetManager()->StartLevel<Level::LevelLauncher>();
+    pLevelModule->ChangeMainLevel<Level::LevelLauncher>();
 #else
-    pLevelModule->GetManager()->StartLevel<Level::LevelTitle>();
+    pLevelModule->ChangeMainLevel<Level::LevelTitle>();
 #endif
 
     return TRUE;

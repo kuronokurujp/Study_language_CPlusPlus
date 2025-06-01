@@ -27,7 +27,7 @@ namespace Level
         // ユーザー共通入力割り当て設定
         {
             auto pInputModule = HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();
-            pInputModule->AddCommonMappingAction(Local::mInputAction);
+            pInputModule->AddAction(Local::mInputAction);
         }
 
         /*
@@ -74,7 +74,7 @@ namespace Level
         // 専用の入力アクションを外す
         {
             auto pInputModule = HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();
-            pInputModule->RemoveCommonMappingAction(Local::mInputAction);
+            pInputModule->RemoveAction(Local::mInputAction);
         }
 
         // ロードしたアセットを破棄
@@ -89,24 +89,25 @@ namespace Level
         return bRet;
     }
 
-    void LevelTitle::_VProcessInput(const EnhancedInput::InputMap* in_pInputMap)
+    void LevelTitle::VProcessInput(const EnhancedInput::InputMap& in_rInputMap)
     {
-        Level::Node::_VProcessInput(in_pInputMap);
+        Level::Node::VProcessInput(in_rInputMap);
 
         // メインゲーム開始入力があるか
         {
-            if (in_pInputMap->Contains(Local::szInputActionNameByGameStart))
+            if (in_rInputMap.Contains(Local::szInputActionNameByGameStart))
             {
                 // メインゲームに遷移
                 auto pLevelModule = HE_ENGINE.ModuleManager().Get<Level::LevelModule>();
-                pLevelModule->GetManager()->StartLevel<Level::LevelInGame>();
+                pLevelModule->ChangeMainLevel<Level::LevelInGame>();
+                //pLevelModule->GetManager()->ChangeMainLevel<Level::LevelInGame>();
                 return;
             }
         }
 
         // ゲーム終了入力があるか
         {
-            if (in_pInputMap->Contains(Local::szInputActionNameByGameEnd))
+            if (in_rInputMap.Contains(Local::szInputActionNameByGameEnd))
             {
                 // TODO: ゲーム終了
                 return;

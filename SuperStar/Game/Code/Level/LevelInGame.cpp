@@ -141,7 +141,7 @@ namespace Level
         // ユーザー共通入力割り当て設定
         {
             auto pInputModule = HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();
-            pInputModule->AddCommonMappingAction(Local::mInputActionByPlay);
+            pInputModule->AddAction(Local::mInputActionByPlay);
         }
 
         // 背景のレベル追加
@@ -187,7 +187,7 @@ namespace Level
                                                               InGame::EObjectTag::EObjectTag_Player,
                                                               in_rTarget.ulMetaData, 1);
 
-                                pEventModule->QueueEvent(spEvent);
+                                pEventModule->QueueEvent(spEvent, EVENT_TYPE_INGAME_CHARACTER);
                             }
 
                             break;
@@ -202,7 +202,7 @@ namespace Level
                                                               InGame::EObjectTag::EObjectTag_Enemy,
                                                               in_rTarget.ulMetaData, 1);
 
-                                pEventModule->QueueEvent(spEvent);
+                                pEventModule->QueueEvent(spEvent, EVENT_TYPE_INGAME_CHARACTER);
                             }
 
                             break;
@@ -241,7 +241,7 @@ namespace Level
         // 専用の入力アクションを外す
         {
             auto pInputModule = HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();
-            pInputModule->RemoveCommonMappingAction(Local::mInputActionByPlay);
+            pInputModule->RemoveAction(Local::mInputActionByPlay);
         }
 
         this->_spGameAsset.reset();
@@ -266,33 +266,32 @@ namespace Level
         InGame::CollisionAll();
     }
 
-    void LevelInGame::_VProcessInput(const EnhancedInput::InputMap* in_pInputMap)
+    void LevelInGame::VProcessInput(const EnhancedInput::InputMap& in_rInputMap)
     {
-        HE_ASSERT(in_pInputMap);
-        Level::Node::_VProcessInput(in_pInputMap);
+        Level::Node::VProcessInput(in_rInputMap);
 
         auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
 
         Core::Math::Vector2 move;
-        if (in_pInputMap->Contains(Local::szInputMoveUp))
+        if (in_rInputMap.Contains(Local::szInputMoveUp))
         {
             move += Core::Math::Vector2(0.0f, -1.0f);
         }
-        else if (in_pInputMap->Contains(Local::szInputMoveDown))
+        else if (in_rInputMap.Contains(Local::szInputMoveDown))
         {
             move += Core::Math::Vector2(0.0f, 1.0f);
         }
 
-        if (in_pInputMap->Contains(Local::szInputMoveLeft))
+        if (in_rInputMap.Contains(Local::szInputMoveLeft))
         {
             move += Core::Math::Vector2(-1.0f, 0.0f);
         }
-        else if (in_pInputMap->Contains(Local::szInputMoveRight))
+        else if (in_rInputMap.Contains(Local::szInputMoveRight))
         {
             move += Core::Math::Vector2(1.0f, 0.0f);
         }
 
-        if (in_pInputMap->Contains(Local::szInputShot))
+        if (in_rInputMap.Contains(Local::szInputShot))
         {
             auto pStageComponent = this->GetComponent<InGame::InGameStageManagerComponent>(
                 this->_stageManagerComponentHandle);
@@ -302,7 +301,7 @@ namespace Level
             {
                 auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterAttack), 0,
                                                          InGame::EObjectTag_Player, rHandle);
-                pEventModule->QueueEvent(spEvent);
+                pEventModule->QueueEvent(spEvent, EVENT_TYPE_INGAME_CHARACTER);
             }
         }
 
@@ -317,7 +316,7 @@ namespace Level
                 move.Normalize();
                 auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterMove), 0,
                                                          InGame::EObjectTag_Player, rHandle, move);
-                pEventModule->QueueEvent(spEvent);
+                pEventModule->QueueEvent(spEvent, EVENT_TYPE_INGAME_CHARACTER);
             }
         }
     }

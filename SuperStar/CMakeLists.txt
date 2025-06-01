@@ -90,6 +90,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+# MSVCコンパイラだとCPPのバージョン定義は以下のオプションがついていないといけない
+if(MSVC)
+    add_compile_options(/Zc:__cplusplus)
+endif()
+
 # 各ビルドタイプに対応するフラグを設定する
 # set(CMAKE_CXX_FLAGS_UNITTEST "${CMAKE_CXX_FLAGS_DEBUG}")
 # set(CMAKE_C_FLAGS_UNITTEST "${CMAKE_C_FLAGS_DEBUG}")
@@ -194,7 +199,9 @@ check_variable(ENGINE_NAME)
 
 # ライブラリ名をリストにまとめる
 set(PLUGIN_LIBRARIES
+# TODO: デバッグのみ入れる
   ${GAMEDEVGUI_PLUGIN_NAME}
+# TODO: デバッグのみ入れる
   ${RUNTIMEDEBUG_PLUGIN_NAME}
   ${LUA_PLUGIN_NAME}
   ${EVENT_PLUGIN_NAME}
@@ -214,6 +221,7 @@ set(PLUGIN_LIBRARIES
 # 設定プロジェクトのライブラリ・インクルードディレクトリ登録
 target_link_libraries(${APP_NAME} ${PLUGIN_LIBRARIES})
 
+# TODO: デバッグのみ
 # テストプロジェクト作成
 add_subdirectory(Test)
 
@@ -242,5 +250,7 @@ target_link_libraries(${TEST_APP_NAME} ${PLUGIN_LIBRARIES})
 
 # アプリのビルド前にバッチファイルを実行させるターゲットに依存させて
 # アプリのビルド前にバッチファイルを実行させている
+# TODO: TEST_APP_NAMEはデバッグのみ
 add_dependencies(${TEST_APP_NAME} RunBatch)
+
 add_dependencies(${APP_NAME} RunBatch)

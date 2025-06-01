@@ -118,9 +118,8 @@ namespace InGame
         Core::Common::Handle _enemyParamaterAssetHandle;
         Core::Common::Handle _stageTimelineParamaterAssetHandle;
         Core::Common::Handle _playerHandle;
+        Core::Common::Handle _characterEventListenerHandle;
         Core::Memory::SharedPtr<Game::GameAssetMap> _spGameAssetMap;
-
-        Core::Common::Handle _characterEventHandle;
 
         Core::Common::FixedMap<HE::Uint32, Core::Common::Handle, 256> _mEnemyMap;
         HE::Float32 _fTime      = 0.0f;

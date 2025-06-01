@@ -19,13 +19,13 @@ namespace Level
     HE::Bool LevelLauncher::VBegin()
     {
         const HE::Bool bRet = Level::Node::VBegin();
-        HE_ASSERT(bRet);
+        HE_ASSERT_RETURN_VALUE(FALSE, bRet);
 
         // TODO: UIのイベントリスナー登録
         {
             auto pEventModule      = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
             auto spUIEventListener = HE_MAKE_CUSTOM_SHARED_PTR(
-                (Event::EventListenerWithRegistEventFunc), HE_STR_TEXT("UIEvent"),
+                (Event::EventListenerWithRegistEventFunc), HE_STR_TEXT("UI"),
                 [this](Event::EventDataInterfacePtr const& in_spEventData)
                 {
                     // TODO: UIのボタンクリック受信
@@ -38,15 +38,17 @@ namespace Level
                         {
                             auto pLevelModule = HE_ENGINE.ModuleManager().Get<Level::LevelModule>();
                             // タイトルへ遷移する
-                            pLevelModule->GetManager()->StartLevel<Level::LevelTitle>();
+                            pLevelModule->ChangeMainLevel<Level::LevelTitle>();
                         }
                     }
 
                     return TRUE;
                 });
 
-            this->_ulEventListenerHash =
-                pEventModule->AddListener(spUIEventListener, EVENT_NETWORK_NAME_UIMODULE);
+            this->_ulEventListenerHandle =
+                pEventModule->AddListener(spUIEventListener, EVENT_TYPE_UIMODULE);
+            HE_ASSERT_RETURN_VALUE(FALSE, (this->_ulEventListenerHandle.Null() == FALSE) &&
+                                              "UIのイベントリスナー設定ができない");
         }
 
         // UIのBuilderファイルからレイアウト作成
@@ -80,7 +82,7 @@ namespace Level
         // TODO: UI用のイベントリスナーを外す
         {
             auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
-            pEventModule->RemoveListener(this->_ulEventListenerHash, EVENT_NETWORK_NAME_UIMODULE);
+            pEventModule->RemoveListener(this->_ulEventListenerHandle);
         }
 
         const HE::Bool bRet = Level::Node::VEnd();

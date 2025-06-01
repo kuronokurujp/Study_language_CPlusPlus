@@ -46,22 +46,17 @@ namespace InGame
         {
             auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
 
-            auto upStrategy =
-                HE_MAKE_CUSTOM_UNIQUE_PTR((InGame::InGameCharacterEventManagerStrategy));
-            this->_characterEventHandle = pEventModule->AddNetwork(std::move(upStrategy));
-            HE_ASSERT(this->_characterEventHandle.Null() == FALSE);
-
             auto spCharacterEventListener =
                 HE_MAKE_CUSTOM_SHARED_PTR((Event::EventListenerWithRegistEventFunc),
                                           HE_STR_TEXT("LevelInGameCharacterListener"),
                                           [this](Event::EventDataInterfacePtr const& in_spEventData)
                                           { return this->_HandleCharacterEvent(in_spEventData); });
 
-            if (pEventModule->AddListener(spCharacterEventListener,
-                                          INGAME_CHARACTER_EVENT_NAME) == FALSE)
-            {
-                HE_ASSERT(0 && "キャラクターイベントリスナー設定に失敗");
-            }
+            this->_characterEventListenerHandle =
+                pEventModule->AddListener(spCharacterEventListener,
+                                          EVENT_TYPE_INGAME_CHARACTER);
+            HE_ASSERT((this->_characterEventListenerHandle.Null() == FALSE) &&
+                      "キャラクターイベントリスナー設定に失敗");
         }
 
         // TODO: Luaスクリプトからの関数受け取り
@@ -84,9 +79,7 @@ namespace InGame
         auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
 
         // 設定したイベントリスナーを解放
-        pEventModule->RemoveAllListener(INGAME_CHARACTER_EVENT_NAME);
-        // 作成したイベント管理を解放
-        pEventModule->RemoveNetwork(this->_characterEventHandle);
+        pEventModule->RemoveListener(this->_characterEventListenerHandle);
 
         // 作成したアクターを全て破棄
         this->RemoveActor(&this->_playerHandle);
@@ -152,7 +145,7 @@ namespace InGame
                                                          Core::Math::Vector2(fPosX, fPosY));
 
                 auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
-                pEventModule->QueueEvent(spEvent);
+                pEventModule->QueueEvent(spEvent, EVENT_TYPE_INGAME_CHARACTER);
             }
             else if (Core::Common::g_szTempFixedString1024 == HE_STR_TEXT("put_zako"))
             {
@@ -166,7 +159,7 @@ namespace InGame
                 ++this->_uEnemyId;
 
                 auto pEventModule = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
-                pEventModule->QueueEvent(spEvent);
+                pEventModule->QueueEvent(spEvent, EVENT_TYPE_INGAME_CHARACTER);
             }
 
             ++this->_uTimelineNo;
@@ -202,7 +195,7 @@ namespace InGame
             move.Normalize();
             auto spEvent = HE_MAKE_CUSTOM_SHARED_PTR((InGame::EventCharacterMove), 0,
                                                      InGame::EObjectTag_Enemy, handle, move);
-            pEventModule->QueueEvent(spEvent);
+            pEventModule->QueueEvent(spEvent, EVENT_TYPE_INGAME_CHARACTER);
 
             return;
         }
@@ -685,7 +678,7 @@ namespace InGame
     void InGameStageManagerComponent::_Clear()
     {
         this->_playerHandle.Clear();
-        this->_characterEventHandle.Clear();
+        this->_characterEventListenerHandle.Clear();
         this->_mEnemyMap.Clear();
 
         this->_fTime       = 0.0f;

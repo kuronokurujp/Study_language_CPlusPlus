@@ -27,8 +27,7 @@ namespace Level
         /// </summary>
         void VUpdate(const HE::Float32 in_fDt) override final;
 
-    protected:
-        void _VProcessInput(const EnhancedInput::InputMap* in_pInputMap) override final;
+        void VProcessInput(const EnhancedInput::InputMap&) override final;
 
     private:
         Core::Common::Handle _systemComponentHandle;
