@@ -422,4 +422,5 @@ VcPkg/
 vcpkg-configuration.json
 vcpkg.json
 Sample/*
+*.exe
 
