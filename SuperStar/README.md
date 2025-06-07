@@ -96,6 +96,12 @@
 1. コマンドプロンプトに"All Complete"が表示したら Build ディレクトリが作られているので,<br>
    その中の SuperStar.sln ファイルがあるので開く
 
+- 注意点
+    - Visual Studio 2022 Communityを更新したば場合<br>
+      ProjClear.batを実行
+      - 理由
+        - Visual Studioの古いバージョンでビルドしたのが残っていると更新したバージョンとの違いでProBuild.batが失敗する
+
 ## clang-format ツールで c++コード整形の環境構築手順
 
 #### ツール環境構築
