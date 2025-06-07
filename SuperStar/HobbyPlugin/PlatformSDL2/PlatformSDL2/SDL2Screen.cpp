@@ -410,6 +410,20 @@ namespace PlatformSDL2
             pMat->VRelease();
             HE_SAFE_DELETE_MEM(this->_p2DQuadMat);
         }
+
+        {
+            if (Local::s_pDummyWindow)
+            {
+                ::SDL_GL_DeleteContext(Local::s_pDummyWindow);
+                Local::s_pDummyWindow = NULL;
+            }
+
+            if (Local::s_pShareContext)
+            {
+                ::SDL_DestroyWindow(reinterpret_cast<SDL_Window*>(Local::s_pShareContext));
+                Local::s_pShareContext = NULL;
+            }
+        }
     }
 
     Core::Memory::UniquePtr<Platform::WindowStrategy> Screen::VCreateWindowStrategy(
