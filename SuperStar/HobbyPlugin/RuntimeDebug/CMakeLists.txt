@@ -1,7 +1,7 @@
 # プラグインビルドの共通処理.
-include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICTY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICY_SCOPE)
 # プラグインの共通情報.
-include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICTY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
 # 共有ライブラリとして生成するためのオプションの定義.
 option(RUNTIMEDEBUG_PLUGIN_BUILD_SHARED_LIBS "build shared library" OFF)
 # プラグイン共通ビルド処理.
@@ -18,13 +18,13 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH})
     # SDL2のパッケージを探す
     # find_package(インストールしたパッケージ名 REQUIRED CONFIG)
     # プラグインをリンク
-    # target_link_libraries(${RUNTIMEDEBUG_PLUGIN_NAME} 
+    # target_link_libraries(${RUNTIMEDEBUG_PLUGIN_NAME}
     #     PRIVATE
     #     # SDL2関連のライブラリを設定
     #     vcpkgのパッケージのライブラリファイルを指定
     # )
     # プラグインのインクルード
-    # target_include_directories(${RUNTIMEDEBUG_PLUGIN_NAME} 
+    # target_include_directories(${RUNTIMEDEBUG_PLUGIN_NAME}
     #     PRIVATE
             # ここは書き換えない
     #         ./${VCPKG_DIR_PATH}/include/

@@ -1,7 +1,7 @@
 # Makeに必要な情報をインストール
-include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICTY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON) 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # 単体テストアプリのプロジェクト登録.
 add_executable(${TEST_APP_NAME})

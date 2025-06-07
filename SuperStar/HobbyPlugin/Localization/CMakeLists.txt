@@ -1,7 +1,7 @@
 # プラグインビルドの共通処理.
-include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICTY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICY_SCOPE)
 # Renderプラグインの共通情報.
-include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICTY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
 
 message("build localization plugin lib!")
 
@@ -16,7 +16,7 @@ common_build_plugin(
     ${LOCALIZATION_PLUGIN_BUILD_SHARED_LIBS}
 )
 
-target_include_directories(${LOCALIZATION_PLUGIN_NAME} 
+target_include_directories(${LOCALIZATION_PLUGIN_NAME}
     PRIVATE
         # プラグインに依存しているプラグインコード
         # ライブラリのリンクはプロジェクトのCMakeLists.txtでやっている

@@ -1,7 +1,7 @@
 # プラグインビルドの共通処理.
-include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICTY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICY_SCOPE)
 # プラグインの共通情報.
-include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICTY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
 # 共有ライブラリとして生成するためのオプションの定義.
 option(GAMEDEVGUI_PLUGIN_BUILD_SHARED_LIBS "build shared library" OFF)
 # プラグイン共通ビルド処理.
@@ -19,14 +19,14 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH})
     # ImGUIのパッケージを探す
     find_package(imgui CONFIG REQUIRED)
     # プラグインをリンク
-    target_link_libraries(${GAMEDEVGUI_PLUGIN_NAME} 
+    target_link_libraries(${GAMEDEVGUI_PLUGIN_NAME}
         PRIVATE
         # ImGUI関連のライブラリを設定
         # vcpkgのパッケージのライブラリファイルを指定
         imgui::imgui
     )
     # プラグインのインクルード
-    target_include_directories(${GAMEDEVGUI_PLUGIN_NAME} 
+    target_include_directories(${GAMEDEVGUI_PLUGIN_NAME}
         PRIVATE
             ./${VCPKG_DIR_PATH}/include/
     )
@@ -34,7 +34,7 @@ else()
     message(STATUS "Non VcpkgDir ${VCPKG_DIR_PATH}")
 endif()
 
-target_include_directories(${GAMEDEVGUI_PLUGIN_NAME} 
+target_include_directories(${GAMEDEVGUI_PLUGIN_NAME}
     PRIVATE
         # プラグインに依存しているプラグインコード
         # ライブラリのリンクはプロジェクトのCMakeLists.txtでやっている

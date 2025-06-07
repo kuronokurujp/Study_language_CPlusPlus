@@ -1,7 +1,7 @@
 # プラグインビルドの共通処理.
-include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICTY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICY_SCOPE)
 # プラグインの共通情報.
-include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICTY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
 # 共有ライブラリとして生成するためのオプションの定義.
 option(PLATFORMSDL2_PLUGIN_BUILD_SHARED_LIBS "build shared library" OFF)
 # プラグイン共通ビルド処理.
@@ -33,7 +33,7 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH})
     # SOIL2
     find_package(SOIL2 REQUIRED)
 
-    target_link_libraries(${PLATFORMSDL2_PLUGIN_NAME} 
+    target_link_libraries(${PLATFORMSDL2_PLUGIN_NAME}
         PRIVATE
         # SDL2関連のライブラリを設定
         $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
@@ -58,7 +58,7 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH})
         ${SOIL2_INCLUDE_DIRS}/../lib/soil2.lib
     )
 
-    target_include_directories(${PLATFORMSDL2_PLUGIN_NAME} 
+    target_include_directories(${PLATFORMSDL2_PLUGIN_NAME}
         PRIVATE
             # 絶対パスの中にincludeの文字列が入っているとパス設定がうまくいかない
             # 相対パス設定ならうまくいった
