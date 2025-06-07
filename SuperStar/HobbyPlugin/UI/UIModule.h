@@ -24,24 +24,6 @@
 
 namespace UI
 {
-    /*
-        /// <summary>
-        /// widget用のハンドル
-        /// </summary>
-        class Core::Common::Handle
-        {
-        public:
-            Core::Common::Handle() { this->_widgetHandle.Clear(); }
-
-            Core::Common::Handle(const Core::Common::Handle& in_rWidgetHandle)
-            {
-                this->_widgetHandle = in_rWidgetHandle;
-            }
-
-            Core::Common::Handle _widgetHandle;
-        };
-        */
-
     /// <summary>
     /// UI用の追加モジュール
     /// </summary>
@@ -53,11 +35,16 @@ namespace UI
         UIModule();
 
         /// <summary>
+        /// UIが扱う拡張インプットの入力名を追加
+        /// </summary>
+        /// <param name=""></param>
+        void AddActiveInputName(const HE::Char*);
+
+        /// <summary>
         /// BuildFileをロード
         /// </summary>
-        /// <param name="in_rFilePath"></param>
         /// <returns></returns>
-        Core::Common::Handle LoadAssetWithLayoutBuild(const Core::File::Path& in_rFilePath);
+        const Core::Common::Handle LoadAssetWithLayoutBuild(const Core::File::Path&);
 
         /// <summary>
         /// ロードしたBuildFileのアセットを解放
@@ -162,6 +149,8 @@ namespace UI
 
         Core::Common::Handle _eventHandle;
         HE::Uint64 _inputEventListenerHash = 0;
+
+        UI::UIInputRouterStrategy::ActiveInputVector _vActiveInput;
     };
 
 }  // namespace UI

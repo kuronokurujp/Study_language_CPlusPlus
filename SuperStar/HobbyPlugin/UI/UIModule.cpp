@@ -27,6 +27,11 @@ namespace UI
         this->_AppendDependenceModule<EnhancedInput::EnhancedInputModule>();
     }
 
+    void UIModule::AddActiveInputName(const HE::Char* in_szName)
+    {
+        this->_vActiveInput.PushBack(in_szName);
+    }
+
     Widget* UIModule::GetWidget(const Core::Common::Handle& in_rHandlePack)
     {
         Actor::Object* pActor = NULL;
@@ -55,7 +60,7 @@ namespace UI
                 (Event::EventListenerWithRegistEventFunc), HE_STR_TEXT("UIModule_InputEvent"),
                 [this](Event::EventDataInterfacePtr const& in_spEventData)
                 {
-                    HE_LOG_LINE(HE_STR_TEXT("%ld"), in_spEventData->VEventHash());
+                    // HE_LOG_LINE(HE_STR_TEXT("%s"), in_spEventData->VEventTypeName());
 
                     // TODO: 入力イベント
                     if (in_spEventData->VEventHash() == EnhancedInput::EventInput::Hash())
@@ -81,6 +86,7 @@ namespace UI
 
     HE::Bool UIModule::_VRelease()
     {
+        this->_vActiveInput.Clear();
         this->_actorManager->Release();
         HE_SAFE_DELETE_MEM(this->_actorManager);
         return TRUE;
@@ -101,7 +107,8 @@ namespace UI
         this->_actorManager->LateUpdate(in_fDeltaTime);
     }
 
-    Core::Common::Handle UIModule::LoadAssetWithLayoutBuild(const Core::File::Path& in_rFilePath)
+    const Core::Common::Handle UIModule::LoadAssetWithLayoutBuild(
+        const Core::File::Path& in_rFilePath)
     {
         auto pAssetManagerModule = this->GetDependenceModule<AssetManager::AssetManagerModule>();
         HE_ASSERT(pAssetManagerModule);
@@ -137,7 +144,9 @@ namespace UI
         auto handlePack = this->NewWidget(in_szrName, in_uSort);
 
         // レイヤーにユーザー入力ルーティングを追加
-        auto pInputStrategy = HE_MAKE_CUSTOM_SHARED_PTR((UI::UIInputRouterStrategy));
+        // TODO: ルーティングに拡張インプットのインプット名の配列を設定する
+        auto pInputStrategy =
+            HE_MAKE_CUSTOM_SHARED_PTR((UI::UIInputRouterStrategy), this->_vActiveInput);
         auto [hInputRouter, pComp] =
             this->AddComponent<EnhancedInput::InputComponent>(handlePack, 0, pInputStrategy);
         // レイヤーコンポーネントを追加

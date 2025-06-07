@@ -159,7 +159,7 @@ namespace Event
 
         for (EventQueue::iterator it = evtQueue.begin(), itEnd = evtQueue.end(); it != itEnd; it++)
         {
-            if ((*it)->VEventTypeStr() == in_rType)
+            if ((*it)->VEventTypeName() == in_rType)
             {
                 it          = evtQueue.erase(it);
                 bProcResult = TRUE;

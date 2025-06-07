@@ -30,15 +30,18 @@ TEST_CASE("UI SimpleTest")
 
             if (uStep == 0)
             {
-                // TODO: インプットにUI用のアクションを追加
+                // インプットにUI用のアクションを追加
                 {
                     auto pInputModule =
                         HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();
-                    // TODO: ボタンを押した時のアクション
-                    pInputModule->AddAction(HE_STR_TEXT("OnClickLeft"),
+                    // ボタンを押した時のアクション
+                    auto szClickLeftName = HE_STR_TEXT("OnClickLeft");
+                    pInputModule->AddAction(szClickLeftName,
                                             EnhancedInput::ActionData(
                                                 {Platform::EInputMouseType::EInputMouseType_Left}));
-                    // TODO: UI側はそのアクションが起きた時にUI用のインプットアクション実行
+                    // UI側はそのアクションが起きた時にUI用のインプットアクション実行
+                    auto pUIModule = HE_ENGINE.ModuleManager().Get<UI::UIModule>();
+                    pUIModule->AddActiveInputName(szClickLeftName);
                 }
 
                 // リソースの起点ディレクトリを設定
@@ -100,7 +103,7 @@ TEST_CASE("UI SimpleTest")
                     pRenderModule->ShowWindow(windowHandle);
                 }
 
-                // TODO: 入力設定
+                // 入力設定
                 {
                     auto pEnhancedInputModule =
                         HE_ENGINE.ModuleManager().Get<EnhancedInput::EnhancedInputModule>();
@@ -120,20 +123,19 @@ TEST_CASE("UI SimpleTest")
                     widget = pUIModule->NewLayoutByLayotuAsset(layoutAssetHandle, 0, sceneHandle);
                 }
 
-                // TODO: UIのイベントリスナー登録
+                // UIのイベントリスナー登録
                 {
                     auto pEventModule      = HE_ENGINE.ModuleManager().Get<Event::EventModule>();
                     auto spUIEventListener = HE_MAKE_CUSTOM_SHARED_PTR(
                         (Event::EventListenerWithRegistEventFunc), HE_STR_TEXT("UIEvent"),
                         [](Event::EventDataInterfacePtr const& in_spEventData)
                         {
-                            // TODO: UIのボタンクリック受信
+                            // UIのボタンクリック受信
                             if (in_spEventData->VEventHash() == UI::EventButtonClick::Hash())
                             {
                                 auto pEvent =
                                     reinterpret_cast<UI::EventButtonClick*>(in_spEventData.get());
 
-                                // 次のレベルへ遷移
                                 HE_LOG_LINE(pEvent->_szMsg.Str());
                             }
 

@@ -1,10 +1,9 @@
 ﻿#pragma once
 
 // エンジン最小インクルード
+#include "Engine/Common/CustomMap.h"
 #include "Engine/MiniEngine.h"
 #include "Engine/Platform/PlatformInput.h"
-
-#include "Engine/Common/CustomMap.h"
 
 namespace EnhancedInput
 {
@@ -38,10 +37,15 @@ namespace EnhancedInput
             } touch;
         } item;
     };
+
+    /// <summary>
+    /// 入力したデータのベクター型
+    /// </summary>
+    using InputDataVector = Core::Common::FixedVector<InputData, 16>;
+
     /// <summary>
     /// 入力データのマップ型
     /// </summary>
-    using InputMap = Core::Common::FixedMap<Core::Common::FixedString32,
-                                            Core::Common::FixedVector<InputData, 16>, 16>;
+    using InputMap = Core::Common::FixedMap<Core::Common::FixedString32, InputDataVector, 16>;
 
 }  // namespace EnhancedInput

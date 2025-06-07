@@ -14,9 +14,15 @@ namespace UI
         HE_CLASS_COPY_NG(UIInputRouterStrategy);
 
     public:
+        using ActiveInputVector = Core::Common::FixedVector<Core::Common::FixedString128, 32>;
+
+    public:
         // TODO: インプットマップの設定
-        UIInputRouterStrategy() : EnhancedInput::InputStrategyBase() {}
+        UIInputRouterStrategy(ActiveInputVector&);
 
         void VProcessInput(const EnhancedInput::InputMap&, Actor::Object*) override final;
+
+    private:
+        ActiveInputVector _vActiveInput;
     };
 }  // namespace UI
