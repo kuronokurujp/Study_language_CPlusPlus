@@ -17,3 +17,8 @@
 # ビルドツールのLinux用シェル
 mvnm    text eol=lf
 gradlew text eol=lf
+
+# バイナリ管理
+/Tool/*/main.exe filter=lfs diff=lfs merge=lfs -text
+/Game/Resource/Assets/*/Font.ttf filter=lfs diff=lfs merge=lfs -text
+/Test/Resource/Assets/*/Font.ttf filter=lfs diff=lfs merge=lfs -text
