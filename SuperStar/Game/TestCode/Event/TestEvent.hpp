@@ -4,14 +4,14 @@
 
 namespace EventTest
 {
-    static const Event::EventTypeStr s_TestEventType(HE_STR_TEXT("TestEvent"));
-    static const Event::EventTypeStr s_TestEventType2(HE_STR_TEXT("TestEvent2"));
+    static const HE::Char* s_szTestEventType  = HE_STR_TEXT("TestEvent");
+    static const HE::Char* s_szTestEventType2 = HE_STR_TEXT("TestEvent2");
 
     class EvtDataTextPut final : public Event::BaseEventData
     {
     public:
         EvtDataTextPut(const Event::EventTypeStr& in_rEventType)
-            : Event::BaseEventData(in_rEventType, _szDataType, 0), _sCount(0)
+            : Event::BaseEventData(in_rEventType), _sCount(0)
         {
         }
 
@@ -33,7 +33,7 @@ TEST_CASE("Event System")
 
         HE::Bool VHandleEvent(Event::EventDataInterfacePtr const& in_spEvent) override final
         {
-            if (EventTest::EvtDataTextPut::_szDataType.Hash() == in_spEvent->VDataTypeHash())
+            if (EventTest::EvtDataTextPut::_szDataType.Hash() == in_spEvent->VEventHash())
             {
                 EventTest::EvtDataTextPut* pEvtData =
                     reinterpret_cast<EventTest::EvtDataTextPut*>(in_spEvent.get());
@@ -45,15 +45,6 @@ TEST_CASE("Event System")
             }
 
             return TRUE;
-        }
-    };
-
-    class TestEventManagerStrategy final : public Event::EventManagerStrategyInterface
-    {
-    public:
-        HE::Bool VIsEventTypeHash(const HE::Uint64 in_ulHash)
-        {
-            return (EventTest::s_TestEventType.Hash() == in_ulHash);
         }
     };
 
@@ -75,28 +66,30 @@ TEST_CASE("Event System")
         CHECK(memoryManager.CheckAllMemoryBlock());
     }
 
-    auto st = HE_MAKE_CUSTOM_UNIQUE_PTR((TestEventManagerStrategy));
-    Event::EventManager eventMng(std::move(st));
+    Event::EventProcess eventProcess(HE_STR_TEXT("Test"));
 
     HE_LOG_LINE(HE_STR_TEXT("EventMangerTest"));
 
     // リスナー登録
     auto spTestListenr = HE_MAKE_CUSTOM_UNIQUE_PTR((TestListener));
 
+    const HE::Char* szListenerType01 = HE_STR_TEXT("Listener01");
+
     // リスナー追加は初回なので必ず成功する
-    CHECK(eventMng.AddListener(std::move(spTestListenr), EventTest::s_TestEventType));
+    CHECK(eventProcess.AddListener(std::move(spTestListenr), szListenerType01));
 
     // イベントは生成して所有権は管理側に渡す
     auto spTestEvent =
-        HE_MAKE_CUSTOM_UNIQUE_PTR((EventTest::EvtDataTextPut), EventTest::s_TestEventType);
-    CHECK(eventMng.QueueEvent(std::move(spTestEvent)));
+        HE_MAKE_CUSTOM_UNIQUE_PTR((EventTest::EvtDataTextPut), EventTest::s_szTestEventType);
+    // 指定したリスナーへイベント送る
+    CHECK(eventProcess.QueueEvent(std::move(spTestEvent), szListenerType01));
 
     // 登録しているイベント型名から登録リスナーを出力
     // 共有ポインタなので取得したリストは解放しないとメモリが残る
     {
         Event::EventListenerList typeList;
 
-        CHECK(eventMng.OutputListenerList(&typeList, EventTest::s_TestEventType));
+        CHECK(eventProcess.OutputListenerList(&typeList, szListenerType01));
         for (Event::EventListenerList::const_iterator i = typeList.begin(); i != typeList.end();
              i++)
         {
@@ -104,13 +97,13 @@ TEST_CASE("Event System")
         }
     }
 
-    while (eventMng.EmptyEvent() == FALSE)
+    while (eventProcess.EmptyEvent() == FALSE)
     {
-        CHECK(eventMng.Tick(Event::EventManager::EConstancs_Infinite));
+        CHECK(eventProcess.Tick(Event::EventProcess::EConstancs_Infinite));
     }
 
     // 戦略アリゴリズムで確保したヒープを解放してメモリアロケーター破棄でエラーにならないようにする
-    eventMng.Release();
+    eventProcess.Release();
 
     CHECK(memoryManager.VRelease());
     memoryManager.Reset();
@@ -128,17 +121,6 @@ TEST_CASE("Event System All Remove Listener")
         HE::Bool VHandleEvent(Event::EventDataInterfacePtr const&) override final { return TRUE; }
     };
 
-    class TestEventManagerStrategy final : public Event::EventManagerStrategyInterface
-    {
-    public:
-        HE::Bool VIsEventTypeHash(const HE::Uint64 in_ulHash)
-        {
-            if (EventTest::s_TestEventType.Hash() == in_ulHash) return TRUE;
-            if (EventTest::s_TestEventType2.Hash() == in_ulHash) return TRUE;
-            return FALSE;
-        }
-    };
-
     // カスタムヒープを使うのでメモリアロケーターを作成
     Core::Memory::Manager memoryManager;
     CHECK(memoryManager.Start(0x1000000));
@@ -157,28 +139,29 @@ TEST_CASE("Event System All Remove Listener")
         CHECK(memoryManager.CheckAllMemoryBlock());
     }
 
-    auto st = HE_MAKE_CUSTOM_UNIQUE_PTR((TestEventManagerStrategy));
-    Event::EventManager eventMng(std::move(st));
+    Event::EventProcess eventProcess(HE_STR_TEXT("Test02"));
 
     HE_LOG_LINE(HE_STR_TEXT("EventMangerTest RemoveAllListener"));
 
     // リスナー登録
     // イベントタイプが違うリスナーを登録
+    const HE::Char* szListenerType01 = HE_STR_TEXT("ListenerType01");
+    const HE::Char* szListenerType02 = HE_STR_TEXT("ListenerType02");
     {
         auto spTestListenr  = HE_MAKE_CUSTOM_UNIQUE_PTR((TestListener));
         auto spTestListenr2 = HE_MAKE_CUSTOM_UNIQUE_PTR((TestListener));
 
         // リスナー追加は初回なので必ず成功する
-        CHECK(eventMng.AddListener(std::move(spTestListenr), EventTest::s_TestEventType));
-        CHECK(eventMng.AddListener(std::move(spTestListenr2), EventTest::s_TestEventType2));
+        CHECK(eventProcess.AddListener(std::move(spTestListenr), szListenerType01));
+        CHECK(eventProcess.AddListener(std::move(spTestListenr2), szListenerType02));
     }
 
     // 指定タイプのリスナーを一括破棄
-    CHECK(eventMng.RemoveAllListener(EventTest::s_TestEventType));
-    CHECK(eventMng.RemoveAllListener(EventTest::s_TestEventType2));
+    CHECK(eventProcess.RemoveListener(szListenerType01));
+    CHECK(eventProcess.RemoveListener(szListenerType02));
 
     // 戦略アリゴリズムで確保したヒープを解放してメモリアロケーター破棄でエラーにならないようにする
-    eventMng.Release();
+    eventProcess.Release();
 
     CHECK(memoryManager.VRelease());
     memoryManager.Reset();

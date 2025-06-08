@@ -12,7 +12,7 @@
 #include "EnhancedInput/Common.h"
 
 // 拡張インプットのイベントタイプハッシュ値
-#define EVENT_TYPE_ENHANCEDINPUT (Event::BaseEventData::EType_SpecalEvent)
+#define EVENT_TYPE_ENHANCEDINPUT (Event::BaseEventData::ListenerSpecal)
 
 namespace EnhancedInput
 {

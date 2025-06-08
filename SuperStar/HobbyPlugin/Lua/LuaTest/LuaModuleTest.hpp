@@ -7,7 +7,7 @@
 
 TEST_CASE("Lua Module Create And Release")
 {
-    UnitTestRunnerByModuleOnly<Lua::LuaModule>(
+    StartupEngineByUnitTest<Lua::LuaModule>(
         []()
         {
             auto pModule = HE_ENGINE.ModuleManager().Get<Lua::LuaModule>();
@@ -24,7 +24,7 @@ TEST_CASE("Lua Module Create And Release")
 
 TEST_CASE("Lua Module Test Call Func")
 {
-    UnitTestRunnerByModuleOnly<Lua::LuaModule>(
+    StartupEngineByUnitTest<Lua::LuaModule>(
         []()
         {
             auto pModule = HE_ENGINE.ModuleManager().Get<Lua::LuaModule>();
@@ -89,7 +89,7 @@ TEST_CASE("Lua Module Test Call Func")
 TEST_CASE("Lua Module Script Func Catch")
 {
     HE::Uint32 uCount = 0;
-    UnitTestRunnerByModuleOnly<Lua::LuaModule>(
+    StartupEngineByUnitTest<Lua::LuaModule>(
         [&uCount]()
         {
             auto pModule = HE_ENGINE.ModuleManager().Get<Lua::LuaModule>();

@@ -1,5 +1,4 @@
 ﻿// 以下のマクロ定義するとCatch2側でエントリーポイント(main)関数が定義される
-// #define CATCH_CONFIG_MAIN
 #define CATCH_CONFIG_RUNNER
 #define HE_UNIT_TEST_MODE
 
@@ -71,7 +70,7 @@ int main(int argc, char* const argv[])
 
 // TODO: 現在はコメントアウトでどのテストON/OFFにしている
 // TODO: テスト追加や削除などはコード上で行うのではなく設定上でするとかしたい
-#if 0
+#if 1
 // エンジンのテスト一覧
 
 // マクロテストコード
@@ -131,9 +130,9 @@ int main(int argc, char* const argv[])
 // #include "PlatformSDL2Test/PlatformSDL2ModuleTest.hpp"
 // #include "GameDevGUITest/GameDevGUIModuleTest.hpp"
 
-#include "UITest/UIModuleTest.hpp"
+// #include "UITest/UIModuleTest.hpp"
 
-#if 0 
+#if 1
 // ゲーム用のテスト一覧
 
 // Lambdaテストコード

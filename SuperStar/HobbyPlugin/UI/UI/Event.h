@@ -7,7 +7,7 @@
 // イベントのモジュール
 #include "EventModule.h"
 
-#define EVENT_TYPE_UIMODULE (Event::BaseEventData::EType_SpecalEvent)
+#define EVENT_TYPE_UIMODULE (Event::BaseEventData::ListenerSpecal)
 
 namespace UI
 {

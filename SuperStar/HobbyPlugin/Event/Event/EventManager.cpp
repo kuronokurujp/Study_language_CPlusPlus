@@ -68,18 +68,31 @@ namespace Event
     const Core::Common::Handle EventProcess::AddListener(EventListenerPtr const& in_rListener,
                                                          const HE::Hash in_hash)
     {
-        if (in_hash == BaseEventData::EType_SpecalEvent)
+        if (in_hash == BaseEventData::ListenerSpecal)
             return this->_AddListener(&this->_mListenerBySpecalEvent, in_rListener, in_hash);
 
         return this->_AddListener(&this->_mListener, in_rListener, in_hash);
     }
 
-    HE::Bool EventProcess::RemoveListener(const HE::Uint64 in_ulListenrHash)
+    const Core::Common::Handle EventProcess::AddListener(EventListenerPtr const& in_rListener,
+                                                         const HE::Char* in_szName)
     {
-        if (this->_RemoveListener(&this->_mListener, in_ulListenrHash)) return TRUE;
-        if (this->_RemoveListener(&this->_mListenerBySpecalEvent, in_ulListenrHash)) return TRUE;
+        auto hash = Core::Common::HashName(in_szName);
+        return this->AddListener(in_rListener, hash);
+    }
+
+    HE::Bool EventProcess::RemoveListener(const HE::Hash in_listenerTypeHash)
+    {
+        if (this->_RemoveListener(&this->_mListener, in_listenerTypeHash)) return TRUE;
+        if (this->_RemoveListener(&this->_mListenerBySpecalEvent, in_listenerTypeHash)) return TRUE;
 
         return FALSE;
+    }
+
+    HE::Bool EventProcess::RemoveListener(const HE::Char* in_listenerTypeName)
+    {
+        auto hash = Core::Common::HashName(in_listenerTypeName);
+        return this->RemoveListener(hash);
     }
 
     HE::Bool EventProcess::RemoveAllListener()
@@ -95,7 +108,7 @@ namespace Event
         {
             HE::Bool bProc = FALSE;
 
-            auto itrSpecalEvant = this->_mListener.FindKey(BaseEventData::EType_SpecalEvent);
+            auto itrSpecalEvant = this->_mListener.FindKey(BaseEventData::ListenerSpecal);
             if (itrSpecalEvant != this->_mListener.End())
             {
                 EventListenerTable const& pTable = itrSpecalEvant->data;
@@ -132,15 +145,23 @@ namespace Event
     */
 
     HE::Bool EventProcess::QueueEvent(EventDataInterfacePtr const& in_spEvent,
-                                      const HE::Hash in_typeHash)
+                                      const HE::Hash in_listenerHash)
     {
         HE_ASSERT(0 <= this->_iActiveQueue);
         HE_ASSERT(this->_iActiveQueue < EConstants_NumQueues);
 
-        this->_aQueue[this->_iActiveQueue].push_back(std::tuple(in_typeHash, in_spEvent));
+        this->_aQueue[this->_iActiveQueue].push_back(std::tuple(in_listenerHash, in_spEvent));
 
         return TRUE;
     }
+
+    HE::Bool EventProcess::QueueEvent(EventDataInterfacePtr const& in_spEvent,
+                                      const HE::Char* in_szListenerName)
+    {
+        auto hash = Core::Common::HashName(in_szListenerName);
+        return this->QueueEvent(in_spEvent, hash);
+    }
+
 #if 0
     HE::Bool EventProcess::VAbortEvent(EventTypeStr const& in_rType)
     {
@@ -190,7 +211,7 @@ namespace Event
         while (0 < this->_aQueue[iQueueToProcess].size())
         {
             // リスナーに投げるイベント取り出す
-            auto [typeHash, spEvent] = this->_aQueue[iQueueToProcess].front();
+            auto [listenerHash, spEvent] = this->_aQueue[iQueueToProcess].front();
             this->_aQueue[iQueueToProcess].pop_front();
 
             // 特殊イベントタイプのリスナー処理
@@ -215,7 +236,7 @@ namespace Event
             // イベントタイプに対応したリスナーにイベントを投げる
             {
                 // イベントタイプに対応したリスナーを取得
-                auto itListeners = this->_mListener.FindKey(typeHash);
+                auto itListeners = this->_mListener.FindKey(listenerHash);
 
                 // イベントで指定したタイプのリスナーがいないのでスキップ
                 if (itListeners == this->_mListener.End()) continue;
@@ -283,6 +304,13 @@ namespace Event
     // 情報探索メソッド
 
     // 特定のイベント型に関連づけられたリスナーのリストを取得
+    HE::Bool EventProcess::OutputListenerList(EventListenerList* out,
+                                              const HE::Char* in_szListenerTypeName) const
+    {
+        auto hash = Core::Common::HashName(in_szListenerTypeName);
+        return this->OutputListenerList(out, hash);
+    }
+
     HE::Bool EventProcess::OutputListenerList(EventListenerList* out, const HE::Hash in_hash) const
     {
         HE_ASSERT(out);
@@ -342,7 +370,7 @@ namespace Event
     }
 
     HE::Bool EventProcess::_RemoveListener(EventListenerMap* in_mpListener,
-                                           const HE::Uint64 in_ulListenrHash)
+                                           const HE::Uint64 in_ulListenrNameHash)
     {
         HE::Bool bErase = FALSE;
         for (auto itr = in_mpListener->Begin(); itr != in_mpListener->End(); ++itr)
@@ -350,8 +378,7 @@ namespace Event
             auto pTable = itr->_data;
             for (auto it2 = pTable->Begin(), it2End = pTable->End(); it2 != it2End; ++it2)
             {
-                auto checkHash = Core::Common::HashName(it2->_data->VName());
-                if (checkHash == in_ulListenrHash)
+                if (it2->_key == in_ulListenrNameHash)
                 {
                     // 目的のリスナーを発見。テーブルから削除
                     pTable->Erase(it2);
@@ -366,7 +393,7 @@ namespace Event
                 }
             }
         }
-        return HE::Bool();
+        return bErase;
     }
 
 }  // namespace Event

@@ -134,7 +134,7 @@ namespace Core
         static const HE::Uint32 taskNum = 256;
 
         // タスクシステムの初期化
-        CHECK(manager.Init(taskNum, 3));
+        CHECK(TASK_MANAGER_INIT(manager, taskNum, 3));
 
         // タスクの確保数が意図通りか
         CHECK(manager.Max() == taskNum);
@@ -169,7 +169,7 @@ namespace Core
         static const HE::Uint32 taskNum = 256;
 
         // タスクシステムの初期化
-        CHECK(manager.Init(taskNum, Local::EGroup_Num));
+        CHECK(TASK_MANAGER_INIT(manager, taskNum, Local::EGroup_Num));
         // タスクの確保数が意図通りか
         CHECK(manager.Max() == taskNum);
         // タスクの利用数が意図通りか
@@ -273,7 +273,7 @@ namespace Core
         static const HE::Uint32 taskNum = 256;
 
         // タスクシステムの初期化
-        CHECK(manager.Init(taskNum, Local::EGroup_Num));
+        CHECK(TASK_MANAGER_INIT(manager, taskNum, Local::EGroup_Num));
         // タスクの確保数が意図通りか
         CHECK(manager.Max() == taskNum);
         // タスクの利用数が意図通りか
@@ -349,7 +349,7 @@ namespace Core
         static const HE::Uint32 taskNum = 256;
 
         // タスクシステムの初期化
-        CHECK(manager.Init(taskNum, Local::EGroup_Num));
+        CHECK(TASK_MANAGER_INIT(manager, taskNum, Local::EGroup_Num));
         // タスクの確保数が意図通りか
         CHECK(manager.Max() == taskNum);
         // タスクの利用数が意図通りか
@@ -462,7 +462,7 @@ namespace Core
         static const HE::Uint32 taskNum = 256;
 
         // タスクシステムの初期化
-        CHECK(manager.Init(taskNum, EGroup_Num));
+        CHECK(TASK_MANAGER_INIT(manager, taskNum, EGroup_Num));
         // タスクの確保数が意図通りか
         CHECK(manager.Max() == taskNum);
         // タスクの利用数が意図通りか

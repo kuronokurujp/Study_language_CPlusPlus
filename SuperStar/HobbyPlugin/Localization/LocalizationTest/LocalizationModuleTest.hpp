@@ -8,7 +8,7 @@
 // テキスト取得
 TEST_CASE("Localization Module Text")
 {
-    UnitTestRunnerByModuleOnly<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module,
+    StartupEngineByUnitTest<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module,
                                Localization::LocalizationModule>(
         []()
         {

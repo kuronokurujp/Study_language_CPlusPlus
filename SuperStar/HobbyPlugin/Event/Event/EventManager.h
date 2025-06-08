@@ -41,7 +41,6 @@ namespace Event
         };
 
     public:
-        // EventProcess(Core::Memory::UniquePtr<EventProcessStrategyInterface>);
         EventProcess(const HE::Char* in_szName);
         virtual ~EventProcess();
 
@@ -59,14 +58,17 @@ namespace Event
         /// 失敗したら0
         /// </summary>
         const Core::Common::Handle AddListener(EventListenerPtr const&, const HE::Hash);
+        const Core::Common::Handle AddListener(EventListenerPtr const&, const HE::Char*);
 
-        HE::Bool RemoveListener(const HE::Uint64);
+        HE::Bool RemoveListener(const HE::Hash);
+        HE::Bool RemoveListener(const HE::Char*);
         HE::Bool RemoveAllListener();
         /*
                 HE::Bool VTrigger(EventDataInterfacePtr const&) const ;
         */
 
         HE::Bool QueueEvent(EventDataInterfacePtr const&, const HE::Hash);
+        HE::Bool QueueEvent(EventDataInterfacePtr const&, const HE::Char*);
 
 #if 0
         HE::Bool VAbortEvent(EventTypeStr const&) override final;
@@ -74,13 +76,11 @@ namespace Event
 
         HE::Bool Tick(const HE::Uint32);
 
-        // HE::Bool ValidateType(EventTypeStr const&) const;
-        // HE::Bool ValidateHash(const HE::Hash) const;
-
         // 情報探索メソッド
 
         // 特定のイベント型に関連づけられたリスナーのリストを取得
         HE::Bool OutputListenerList(EventListenerList*, const HE::Hash) const;
+        HE::Bool OutputListenerList(EventListenerList*, const HE::Char*) const;
 
     private:
         // TODO: stdのデータ構造はすべて自前で作成したカスタム用に差し替える予定

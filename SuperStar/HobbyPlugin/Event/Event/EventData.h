@@ -25,10 +25,7 @@ namespace Event
     class BaseEventData : public EventDataInterface
     {
     public:
-        enum EType
-        {
-            EType_SpecalEvent = 0,
-        };
+        static const HE::Hash ListenerSpecal = 0;
 
         explicit BaseEventData(const EventTypeStr& in_rDataType,
                                const HE::Float32 in_fTimeStamp = 0.0f)
