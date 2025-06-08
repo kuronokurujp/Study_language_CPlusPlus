@@ -97,7 +97,7 @@ namespace HE
 
 // ポインタのNULLなのでc++でのポインタNULLのnullptrに置き換える必要がある
 // NULLが整数0だポインタのNULLとc++コンパイラは解釈してくれない
-#if NULL
+#ifdef NULL
 
 #undef NULL
 
