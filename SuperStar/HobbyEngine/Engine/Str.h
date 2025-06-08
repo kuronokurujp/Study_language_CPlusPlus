@@ -32,6 +32,8 @@
 // wchar_t型を標準テキスト型に
 #define HE_STR_TEXT(t) L##t
 #define HE_STR_EMPTY L""
+// 一文字の空文字
+#define HE_STR_CHAR_EMPTY L'\0'
 
 // 1文字を小文字に変える
 #define HE_CHAR_LOWWER(c) ::towlower(c)
@@ -66,6 +68,9 @@
 // HE::UTF8を標準テキスト型に
 #define HE_STR_TEXT(t) u8##t
 #define HE_STR_EMPTY u8""
+// 一文字の空文字
+#define HE_STR_CHAR_EMPTY u8'\0'
+
 // 1文字を小文字に変える
 #define HE_CHAR_LOWWER(c) ::tolower(c)
 

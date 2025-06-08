@@ -383,7 +383,7 @@ namespace Core::Common
         {
             this->_aChar[i] = this->_pStr[this->_sIndex + i];
         }
-        this->_aChar[uOffset] = NULL;
+        this->_aChar[uOffset] = HE_STR_CHAR_EMPTY;
 
 #endif
         return this->_aChar;
