@@ -81,18 +81,12 @@ namespace Event
         return this->AddListener(in_rListener, hash);
     }
 
-    HE::Bool EventProcess::RemoveListener(const HE::Hash in_listenerTypeHash)
+    HE::Bool EventProcess::RemoveListener(const Core::Common::Handle in_handle)
     {
-        if (this->_RemoveListener(&this->_mListener, in_listenerTypeHash)) return TRUE;
-        if (this->_RemoveListener(&this->_mListenerBySpecalEvent, in_listenerTypeHash)) return TRUE;
+        if (this->_RemoveListener(&this->_mListener, in_handle)) return TRUE;
+        if (this->_RemoveListener(&this->_mListenerBySpecalEvent, in_handle)) return TRUE;
 
         return FALSE;
-    }
-
-    HE::Bool EventProcess::RemoveListener(const HE::Char* in_listenerTypeName)
-    {
-        auto hash = Core::Common::HashName(in_listenerTypeName);
-        return this->RemoveListener(hash);
     }
 
     HE::Bool EventProcess::RemoveAllListener()
@@ -370,7 +364,7 @@ namespace Event
     }
 
     HE::Bool EventProcess::_RemoveListener(EventListenerMap* in_mpListener,
-                                           const HE::Uint64 in_ulListenrNameHash)
+                                           const Core::Common::Handle in_handle)
     {
         HE::Bool bErase = FALSE;
         for (auto itr = in_mpListener->Begin(); itr != in_mpListener->End(); ++itr)
@@ -378,7 +372,7 @@ namespace Event
             auto pTable = itr->_data;
             for (auto it2 = pTable->Begin(), it2End = pTable->End(); it2 != it2End; ++it2)
             {
-                if (it2->_key == in_ulListenrNameHash)
+                if (it2->_key == in_handle)
                 {
                     // 目的のリスナーを発見。テーブルから削除
                     pTable->Erase(it2);

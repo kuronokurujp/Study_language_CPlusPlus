@@ -145,20 +145,24 @@ TEST_CASE("Event System All Remove Listener")
 
     // リスナー登録
     // イベントタイプが違うリスナーを登録
-    const HE::Char* szListenerType01 = HE_STR_TEXT("ListenerType01");
-    const HE::Char* szListenerType02 = HE_STR_TEXT("ListenerType02");
+    Core::Common::Handle handle01;
+    Core::Common::Handle handle02;
     {
-        auto spTestListenr  = HE_MAKE_CUSTOM_UNIQUE_PTR((TestListener));
-        auto spTestListenr2 = HE_MAKE_CUSTOM_UNIQUE_PTR((TestListener));
+        auto spTestListenr               = HE_MAKE_CUSTOM_UNIQUE_PTR((TestListener));
+        auto spTestListenr2              = HE_MAKE_CUSTOM_UNIQUE_PTR((TestListener));
+        const HE::Char* szListenerType01 = HE_STR_TEXT("ListenerType01");
+        const HE::Char* szListenerType02 = HE_STR_TEXT("ListenerType02");
 
         // リスナー追加は初回なので必ず成功する
-        CHECK(eventProcess.AddListener(std::move(spTestListenr), szListenerType01));
-        CHECK(eventProcess.AddListener(std::move(spTestListenr2), szListenerType02));
+        handle01 = eventProcess.AddListener(std::move(spTestListenr), szListenerType01);
+        CHECK(handle01.Null() == FALSE);
+        handle02 = eventProcess.AddListener(std::move(spTestListenr2), szListenerType02);
+        CHECK(handle01.Null() == FALSE);
     }
 
     // 指定タイプのリスナーを一括破棄
-    CHECK(eventProcess.RemoveListener(szListenerType01));
-    CHECK(eventProcess.RemoveListener(szListenerType02));
+    CHECK(eventProcess.RemoveListener(handle01));
+    CHECK(eventProcess.RemoveListener(handle02));
 
     // 戦略アリゴリズムで確保したヒープを解放してメモリアロケーター破棄でエラーにならないようにする
     eventProcess.Release();

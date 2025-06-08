@@ -60,8 +60,7 @@ namespace Event
         const Core::Common::Handle AddListener(EventListenerPtr const&, const HE::Hash);
         const Core::Common::Handle AddListener(EventListenerPtr const&, const HE::Char*);
 
-        HE::Bool RemoveListener(const HE::Hash);
-        HE::Bool RemoveListener(const HE::Char*);
+        HE::Bool RemoveListener(const Core::Common::Handle in_handle);
         HE::Bool RemoveAllListener();
         /*
                 HE::Bool VTrigger(EventDataInterfacePtr const&) const ;
@@ -103,7 +102,7 @@ namespace Event
                                                 EventListenerPtr const& in_rListener,
                                                 const HE::Hash in_hash);
 
-        HE::Bool _RemoveListener(EventListenerMap*, const HE::Uint64);
+        HE::Bool _RemoveListener(EventListenerMap*, const Core::Common::Handle);
 
     private:
         // イベント型をリスナーにマッピング
