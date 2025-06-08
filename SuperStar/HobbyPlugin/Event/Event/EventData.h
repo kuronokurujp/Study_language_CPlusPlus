@@ -13,8 +13,8 @@ namespace Event
         virtual ~EventDataInterface() = default;
 
         // virtual const EventTypeStr& VEventTypeName() const = 0;
-        virtual HE::Uint64 VEventHash() const         = 0;
-        virtual HE::Float32 VTimeStamp() const        = 0;
+        virtual HE::Uint64 VEventHash() const          = 0;
+        virtual HE::Float32 VTimeStamp() const         = 0;
         virtual const HE::Char* VEventTypeName() const = 0;
         // virtual void VSerialize(std::ostrstream& out) const = 0;
     };

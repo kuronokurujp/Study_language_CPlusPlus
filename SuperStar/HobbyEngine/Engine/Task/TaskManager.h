@@ -38,7 +38,8 @@ namespace Core
         /// 利用前に必ず呼び出す
         /// </summary>
 #ifdef HE_ENGINE_DEBUG
-        HE::Bool Init(const HE::Uint32 in_uTaskMax, const HE::Sint32 in_iGroupNum, const char* in_szFileName, const HE::Uint32 in_uFileLine);
+        HE::Bool Init(const HE::Uint32 in_uTaskMax, const HE::Sint32 in_iGroupNum,
+                      const char* in_szFileName, const HE::Uint32 in_uFileLine);
 #else
         HE::Bool Init(const HE::Uint32 in_uTaskMax, const HE::Sint32 in_iGroupNum);
 #endif
@@ -190,10 +191,11 @@ namespace Core
         HE::Uint32 _iGroupNum = 0;
     };
 
-// TODO: 各メソッドを呼び出している箇所を特定するマクロ
+// 各メソッドを呼び出している箇所を特定するマクロ
 #ifdef HE_ENGINE_DEBUG
-    #define TASK_MANAGER_INIT(OBJ, TASK_VAL, GROUP_VAL) (OBJ).Init(TASK_VAL, GROUP_VAL, __FILE__, __LINE__)
+#define TASK_MANAGER_INIT(OBJ, TASK_VAL, GROUP_VAL) \
+    (OBJ).Init(TASK_VAL, GROUP_VAL, __FILE__, __LINE__)
 #else
-    #define TASK_MANAGER_INIT(OBJ, TASK_VAL, GROUP_VAL) (OBJ).Init(TASK_VAL, GROUP_VAL)
+#define TASK_MANAGER_INIT(OBJ, TASK_VAL, GROUP_VAL) (OBJ).Init(TASK_VAL, GROUP_VAL)
 #endif
 };  // namespace Core

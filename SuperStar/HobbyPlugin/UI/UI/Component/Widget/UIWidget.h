@@ -38,8 +38,14 @@ namespace UI
         /// <returns></returns>
         virtual HE::Bool VEnd() override;
 
-        virtual void VOnTouch(const EnhancedInput::InputData::Item::Touch& in_rTouch) {}
-        virtual void VOnKey(const EnhancedInput::InputData::Item::Key& in_rKeyboard) {}
+        virtual void VOnTouch(const HE::Char* in_szInputName,
+                              const EnhancedInput::InputData::Item::Touch&)
+        {
+        }
+        virtual void VOnKey(const HE::Char* in_szInputName,
+                            const EnhancedInput::InputData::Item::Key&)
+        {
+        }
 
         void SetPos(const Core::Math::Vector2&);
         void SetSize(const Core::Math::Vector2&);

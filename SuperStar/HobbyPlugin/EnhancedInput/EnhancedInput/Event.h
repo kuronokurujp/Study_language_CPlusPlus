@@ -11,13 +11,13 @@
 // モジュール内のファイル
 #include "EnhancedInput/Common.h"
 
-// TODO: 拡張インプットのイベントタイプハッシュ値
+// 拡張インプットのイベントタイプハッシュ値
 #define EVENT_TYPE_ENHANCEDINPUT (Event::BaseEventData::EType_SpecalEvent)
 
 namespace EnhancedInput
 {
     /// <summary>
-    /// TODO: 入力状態イベント
+    /// 入力状態イベント
     /// </summary>
     class EventInput final : public Event::BaseEventData
     {

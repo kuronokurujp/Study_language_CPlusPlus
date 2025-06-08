@@ -58,7 +58,8 @@ namespace AssetManager
                 auto attr = this->_value.attribute(in_szName);
                 if (attr.empty() == FALSE)
                 {
-                    HE_STR_U8_COPY_S(out, in_uLen, attr.as_string(), HE_STR_U8_LENGTH(attr.as_string()));
+                    HE_STR_U8_COPY_S(out, in_uLen, attr.as_string(),
+                                     HE_STR_U8_LENGTH(attr.as_string()));
                     return TRUE;
                 }
                 return FALSE;

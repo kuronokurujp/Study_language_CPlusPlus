@@ -55,7 +55,7 @@ namespace Render::Prticle
         /// </summary>
         void Release();
 
-        // TODO: 座標や速度,色設定
+        // 座標や速度,色設定
         // 座標系は正規化デバイス座標系で-1 から 1になる
         void SetPositions(const Core::Common::ArrayBase<Core::Math::Vector3>&);
         void SetVelocitys(const Core::Common::ArrayBase<Core::Math::Vector3>&);

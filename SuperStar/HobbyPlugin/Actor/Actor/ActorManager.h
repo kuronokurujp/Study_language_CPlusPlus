@@ -2,7 +2,6 @@
 
 #include "Actor.h"
 #include "ActorInterface.h"
-//#include "Component/InputComponent.h"
 #include "Engine/Common/CustomMap.h"
 #include "Engine/Common/Handle.h"
 #include "Engine/MiniEngine.h"
@@ -111,8 +110,7 @@ namespace Actor
 
             if (this->_bUpdatingActors)
             {
-                // HE::Uint32 dataIdx = this->_pendingDataMap.Size();
-                this->_pendingDataMap.Add(handle, PendingData{handle, 0});
+                this->_mPendingActor.Add(handle, PendingData{handle, 0});
             }
 
             return handle;
@@ -172,7 +170,7 @@ namespace Actor
         /// <summary>
         /// 更新保留アクターのデータ
         /// </summary>
-        Core::Common::FixedMap<HE::Uint64, PendingData, 256> _pendingDataMap;
+        Core::Common::FixedMap<HE::Uint64, PendingData, 256> _mPendingActor;
     };
 
 // Startメソッドの実行箇所を特定するマクロ

@@ -18,52 +18,39 @@ namespace UI
     {
         HE_ASSERT_RETURN(in_pSelfObject);
 
-        auto pInputMap = &in_mInputMap;
-        HE_ASSERT(pInputMap);
-
-        // TODO: 入力マップとの関連付けが必要
-        // UIのユーザー入力があるかチェック
-        EnhancedInput::InputDataVector* pInputDataVector = NULL;
-        {
-            for (auto i = 0; i < this->_vActiveInput.Capacity(); ++i)
-            {
-                if (pInputMap->Contains(this->_vActiveInput[i]))
-                {
-                    pInputDataVector = &pInputMap->FindKey(this->_vActiveInput[i])->_data;
-                    break;
-                }
-            }
-        }
-
-        if (pInputDataVector == NULL)
-        {
-            // UIのユーザー入力がない場合は何もしない
-            return;
-        }
-
         // 入力結果をWidgetに通知
         Widget* pWidget = reinterpret_cast<Widget*>(in_pSelfObject);
-        HE_ASSERT(pWidget != NULL);
+        HE_ASSERT_RETURN(pWidget != NULL);
 
         // Widgetアクターに設定しているUIWidgetコンポーネントを全て取得
         Core::Common::FixedStack<Actor::Component*, 128> sWidgetComponent;
         pWidget->OutputChildrenComponent(&sWidgetComponent, &UIWidgetComponent::CLASS_RTTI);
 
-        HE::Uint32 _uSize = sWidgetComponent.Size();
-        Core::Common::Handle handle;
+        HE::Uint32 uSize = sWidgetComponent.Size();
+        HE_ASSERT_RETURN(0 < uSize);
 
-        // UIに関わる, マウスのクリックやキーボードなどの結果を受け取り, 各入力端末へ通知する
-        // ルーター側でUIの入力処理を制御
-        // UIレイヤーに応じてボタンを押せないとか
-        for (HE::Uint32 i = 0; i < pInputDataVector->Size(); ++i)
+        // UIのユーザー入力があるかチェック
+        for (auto i = 0; i < this->_vActiveInput.Capacity(); ++i)
         {
-            if ((*pInputDataVector)[i].eType == EnhancedInput::EInputType::EInputType_Touch)
+            if (in_mInputMap.Contains(this->_vActiveInput[i]) == FALSE) continue;
+
+            const auto& rInputDataVector = in_mInputMap.FindKey(this->_vActiveInput[i])->_data;
+
+            // UIに関わる, マウスのクリックやキーボードなどの結果を受け取り,
+            // 各入力端末へ通知する ルーター側でUIの入力処理を制御
+            // UIレイヤーに応じてボタンを押せないとか
+            for (HE::Uint32 i = 0; i < rInputDataVector.Size(); ++i)
             {
-                while (sWidgetComponent.Empty() == FALSE)
+                const auto* pInputData = rInputDataVector.GetPtr(i);
+                HE_ASSERT_RETURN(pInputData);
+
+                if (pInputData->eType == EnhancedInput::EInputType::EInputType_Touch)
                 {
-                    UIWidgetComponent* c =
-                        reinterpret_cast<UIWidgetComponent*>(sWidgetComponent.PopBack());
-                    c->VOnTouch((*pInputDataVector)[i].item.touch);
+                    while (sWidgetComponent.Empty() == FALSE)
+                    {
+                        auto c = reinterpret_cast<UIWidgetComponent*>(sWidgetComponent.PopBack());
+                        c->VOnTouch(this->_vActiveInput[i].Str(), pInputData->item.touch);
+                    }
                 }
             }
         }

@@ -33,8 +33,6 @@ namespace Level
     public:
         LevelModule();
 
-        // std::shared_ptr<Manager>& GetManager() { return this->_spLevelManager; }
-
         /// <summary>
         /// メインレベルの切り替え
         /// </summary>
@@ -48,16 +46,11 @@ namespace Level
             Core::Common::Handle handle = this->_upNodeManager->Add<T>();
             if (handle.Null()) return FALSE;
 
-            // TODO: メインレベルの初期化
+            // メインレベルの初期化
             return this->_InitMainLevel(handle);
         }
 
         Node& GetLevel(const Core::Common::Handle& in_rHandle) const;
-        /*
-        {
-            return *(this->_spLevelManager->GetLevel(in_rHandle));
-        }
-        */
 
     protected:
         /// <summary>

@@ -119,12 +119,12 @@ namespace Core::Common
         void OutputUTF8(HE::UTF8* out, const HE::Uint32 in_uLen) const;
 
         /// <summary>
-        /// TODO: WCharの文字列を出力
+        /// WCharの文字列を出力
         /// </summary>
         void OutputW(HE::WChar* out, const HE::Uint32 in_uLen) const;
 
         /// <summary>
-        /// TODO: 文字列を出力
+        /// 文字列を出力
         /// </summary>
         void Output(HE::Char* out, const HE::Uint32 in_uLen) const;
 
@@ -388,7 +388,7 @@ namespace Core::Common
     typedef FixedString<1024> FixedString1024;
 
     /// <summary>
-    /// TODO: UTF8文字列を区切る
+    /// UTF8文字列を区切る
     /// </summary>
     extern void SplitWithUTF8(std::function<void(const HE::UTF8*, const HE::Uint32)> in_resultFunc,
                               HE::UTF8* in_szName, const HE::Uint32 in_uLen,

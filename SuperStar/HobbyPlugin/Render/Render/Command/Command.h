@@ -18,7 +18,7 @@ namespace Render
         ECmdType_2DCircleDraw,
         // 三角形の描画
         ECmdType_2DTriangleDraw,
-        // TODO: パーティクルの描画
+        // パーティクルの描画
         ECmdType_2DParticalDraw
     };
 
@@ -89,7 +89,7 @@ namespace Render
     };
 
     /// <summary>
-    /// TODO: パーティクルの描画
+    /// パーティクルの描画
     /// </summary>
     struct CmdParticleDraw
     {

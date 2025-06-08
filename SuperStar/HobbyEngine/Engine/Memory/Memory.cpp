@@ -28,6 +28,8 @@ void* operator new(size_t in_size, HE::Uint8 in_page, HE::Uint8 in_alignSize,
         return pMem;
     }
 
+    // TODO: メモリアロケーターがない場合は通常のnewを呼ぶようにする
+
     HE_LOG_LINE(HE_STR_TEXT("警告: アプリ用のメモリアロケーターがない"));
 
     return NULL;
@@ -71,6 +73,7 @@ void* AllocateMemory(const HE::Uint32 in_uAllocateSize, const HE::Uint8 in_page,
                      const Core::Memory::Manager::EAllocateLocateType in_eLocateType,
                      const HE::UTF8* in_pFile, HE::Uint32 in_uLine)
 {
+    // TODO: メモリアロケーターがない場合は通常のnewを呼ぶようにする
     void* pMem = (Core::Memory::Manager::I().Allocate(in_uAllocateSize, in_page, in_alignSize,
                                                       in_eLocateType, in_pFile, in_uLine));
     return pMem;

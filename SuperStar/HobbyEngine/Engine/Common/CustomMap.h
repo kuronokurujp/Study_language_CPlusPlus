@@ -589,7 +589,7 @@ namespace Core::Common
         HE::Sint32 _CompareByData(const TData& in_rLeft, const TData& in_rRight) const HE_NOEXCEPT
         {
             // TODO:
-            // 比較演算しを対応しているかどうかチェックして対応していない場合はスキップできるか？
+            // テンプレート型が比較演算子を対応しているかどうか事前にチェックしてコンパイルエラーにできるだろうか?
             if (in_rLeft < in_rRight)
             {
                 // 右に付ける

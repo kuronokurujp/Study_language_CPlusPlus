@@ -84,7 +84,7 @@ namespace Render
     {
         auto pWindow = this->GetWindow(in_handle);
         pWindow->Hide();
-     }
+    }
 
     Window* RenderModule::GetWindow(const Core::Common::Handle in_rHandle)
     {
@@ -112,7 +112,7 @@ namespace Render
         {
             viewPortConfig._uHeight = rWindowConfig.Height();
         }
-        else if (rWindowConfig.Height()< viewPortConfig._uHeight)
+        else if (rWindowConfig.Height() < viewPortConfig._uHeight)
         {
             viewPortConfig._uHeight = rWindowConfig.Height();
         }
@@ -184,7 +184,7 @@ namespace Render
         HE_ASSERT_RETURN_VALUE((ParticleBlobObject(NullHandle, NULL)),
                                in_renderHandle.Null() == FALSE);
 
-        // TODO: パーティクル描画ハンドルを生成
+        // パーティクル描画ハンドルを生成
         auto upCreateParticlaHandler =
             HE_MAKE_CUSTOM_UNIQUE_PTR((Render::Prticle::Blob::CreateFunctionType),
                                       [this](HE::Uint32 in_uCount)
@@ -240,7 +240,7 @@ namespace Render
         auto pScene = this->_GetSceneBase(pBlob->GetRenderHandle());
         HE_ASSERT_RETURN(pScene);
 
-        // TODO: 管理から外す
+        // 管理から外す
         this->_mParticleHandle.erase(in_rPrticleHandle);
 
         pBlob->Release();

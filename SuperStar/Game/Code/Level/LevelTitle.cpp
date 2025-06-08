@@ -100,7 +100,6 @@ namespace Level
                 // メインゲームに遷移
                 auto pLevelModule = HE_ENGINE.ModuleManager().Get<Level::LevelModule>();
                 pLevelModule->ChangeMainLevel<Level::LevelInGame>();
-                //pLevelModule->GetManager()->ChangeMainLevel<Level::LevelInGame>();
                 return;
             }
         }

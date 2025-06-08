@@ -8,7 +8,7 @@ namespace Core::Memory
     {
         if (this->_IsReady() == FALSE) return TRUE;
 
-            // メモリが残っているかチェック
+        // メモリが残っているかチェック
 #ifdef HE_ENGINE_DEBUG
         if (this->CheckAllMemoryLeak() == FALSE)
         {

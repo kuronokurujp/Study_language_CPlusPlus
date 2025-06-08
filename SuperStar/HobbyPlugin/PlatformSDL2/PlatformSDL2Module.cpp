@@ -89,7 +89,7 @@ namespace PlatformSDL2
             this->_spFont   = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Font), this);
         }
 
-        // TODO: ウィンドウズのWinAPIを使えるようにする
+        // ウィンドウズのWinAPIを使えるようにする
 #ifdef HE_WIN
         SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 #endif
@@ -127,7 +127,7 @@ namespace PlatformSDL2
     /// </summary>
     HE::Bool PlatformSDL2Module::_VRelease()
     {
-        // TODO: 各機能の解放
+        // 各機能の解放
         this->_spInput->VRelease();
         this->_spFont->VRelease();
         this->_spScreen->VRelease();

@@ -9,7 +9,7 @@
 #include "../UI/UIModule.h"
 #include "Engine/Common/Function.h"
 
-// TODO: UIテスト
+// UIテスト
 TEST_CASE("UI SimpleTest")
 {
     HE::Uint32 uStep = 0;

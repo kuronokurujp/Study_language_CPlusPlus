@@ -36,8 +36,7 @@ namespace GameDevGUI
         return std::move(upSt);
     }
 
-    Core::Memory::UniquePtr<GameDevGUISceneStrategy>
-    GameDevGUIModule::CreateSceneStrategy()
+    Core::Memory::UniquePtr<GameDevGUISceneStrategy> GameDevGUIModule::CreateSceneStrategy()
     {
         auto pPlatformModule = HE_ENGINE.PlatformModule();
 

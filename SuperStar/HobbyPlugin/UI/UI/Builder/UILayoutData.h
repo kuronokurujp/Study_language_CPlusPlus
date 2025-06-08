@@ -67,7 +67,7 @@ namespace UI::Builder
                 {
                     EAnchor _eAnchor;
                     HE::Float32 _fX, _fY;
-                    // TODO: インプットのキーを追加
+                    // インプットのキーを追加
                     HE::UTF8 _szInputKey[32];
                     Style _style;
                 } button;

@@ -5,7 +5,7 @@
 #include "./PlatformSDL2Module.h"
 #include "Engine/Engine.h"
 
-// TODO: テキスト取得
+// テキスト取得
 TEST_CASE("Localization Module Text")
 {
     UnitTestRunnerByModuleOnly<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module,

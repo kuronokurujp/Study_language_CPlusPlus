@@ -142,7 +142,7 @@ namespace PlatformSDL2
         // シェーダーに行列を渡す
         void SetMatrixUniform(const HE::UTF8* in_pName, const Core::Math::Matrix4* in_pMat)
         {
-            // todo: 失敗した場合を今は考えないで後で対処
+            // TODO: 失敗した場合を今は考えないで後で対処
             GLint loc = glGetUniformLocation(this->shaderProgram, in_pName);
             HE_ASSERT(loc != -1);
 
@@ -278,7 +278,7 @@ namespace PlatformSDL2
 
             // コンパイル失敗
 #ifdef HE_ENGINE_DEBUG
-            // todo: ログファイルにも出したいな
+            // TODO: ログファイルにも出したいな
             HE::UTF8 szBuffer[512];
             ::memset(szBuffer, 0, 512);
             glGetProgramInfoLog(this->shaderProgram, 511, nullptr, szBuffer);

@@ -17,7 +17,7 @@ namespace UI
         using ActiveInputVector = Core::Common::FixedVector<Core::Common::FixedString128, 32>;
 
     public:
-        // TODO: インプットマップの設定
+        // インプットマップの設定
         UIInputRouterStrategy(ActiveInputVector&);
 
         void VProcessInput(const EnhancedInput::InputMap&, Actor::Object*) override final;

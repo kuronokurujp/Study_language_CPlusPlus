@@ -12,7 +12,7 @@ namespace PlatformSDL2
     // 前方宣言
     class PlatformSDL2Module;
 
-    class Screen final : public Platform::ScreenInterface, public Platform::ScreenRenderInterface
+    class Screen final : public Platform::SceneInterface, public Platform::RenderInterface
     {
     public:
         // このクラスはModule下にあるのでこのクラスが生きている間はModuleは必ず存在しているのを保障している
@@ -22,7 +22,7 @@ namespace PlatformSDL2
         /// <summary>
         /// スクリーン描画インターフェイス
         /// </summary>
-        ScreenRenderInterface* VGetDrawInterface() override final;
+        RenderInterface* VGetRenderer() override final;
 
         /// <summary>
         /// ウィンドウロジックを生成
@@ -50,12 +50,12 @@ namespace PlatformSDL2
         Core::Memory::UniquePtr<Platform::SceneStrategyInterface> VCreateScene2DStrategy()
             override final;
 
-        // TODO: パーティクルの生成
+        // パーティクルの生成
         // 描画は戻り値のハンドルを指定
         Core::Common::Handle VParticalCreate(const HE::Uint32 in_uCount) override final;
 
         /// <summary>
-        /// TODO: 生成したパーティクルを削除
+        /// 生成したパーティクルを削除
         /// </summary>
         void VParticalDelete(Core::Common::Handle) override final;
 
@@ -66,14 +66,13 @@ namespace PlatformSDL2
             const Core::Common::Handle,
             const Core::Common::ArrayBase<Core::Math::Vector3>&) override final;
 
-
         /// <summary>
         /// 画面を色クリア
         /// </summary>
         void VCls(const HE::Uint32 in_uR, const HE::Uint32 in_uG,
                   const HE::Uint32 in_uB) override final;
 
-        // TODO: 2D上でのパーティクル描画
+        // 2D上でのパーティクル描画
         void V2DDrawPartical(const Platform::ViewPortConfig& in_rViewConfig,
                              const Core::Common::Handle in_rParticleHandle,
                              const Core::Math::Vector3&) override final;
@@ -124,7 +123,7 @@ namespace PlatformSDL2
 
         void* _pWhiteTex = NULL;
 
-        // TODO: パーティクルのマテリアルとメッシュプール
+        // パーティクルのマテリアルとメッシュプール
         void* _pParticleMat      = NULL;
         void* _pPoolParticleMesh = NULL;
     };

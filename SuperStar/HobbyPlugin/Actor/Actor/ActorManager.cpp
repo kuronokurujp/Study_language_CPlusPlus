@@ -75,11 +75,11 @@ namespace Actor
         }
 
         // タスクの全削除処理ですでにタスクが存在しないケースがある
-        // TODO: ペンディングマップにあるかチェック
-        if (this->_pendingDataMap.Contains(*in_pActorHandle))
+        // ペンディングマップにあるかチェック
+        if (this->_mPendingActor.Contains(*in_pActorHandle))
         {
-            // TODO: ペンディングマップから外す
-            this->_pendingDataMap.Erase(*in_pActorHandle);
+            // ペンディングマップから外す
+            this->_mPendingActor.Erase(*in_pActorHandle);
         }
 
         in_pActorHandle->Clear();
@@ -177,14 +177,14 @@ namespace Actor
     void ActorManager::_UpdatePending()
     {
         // 保留グループに設定したタスクを更新グループに移動
-        for (auto b = this->_pendingDataMap.Begin(); b != this->_pendingDataMap.End(); ++b)
+        for (auto b = this->_mPendingActor.Begin(); b != this->_mPendingActor.End(); ++b)
         {
             const auto pData = &b->_data;
             const HE::Bool bRet =
                 this->_taskManager.MoveGropuTask(pData->handle, pData->sMoveGroupId);
             HE_ASSERT(bRet && "保留中のタスクを稼働中に切り替え失敗した");
         }
-        this->_pendingDataMap.Clear();
+        this->_mPendingActor.Clear();
     }
 
 }  // namespace Actor

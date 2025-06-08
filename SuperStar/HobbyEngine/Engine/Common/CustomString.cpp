@@ -274,8 +274,8 @@ namespace Core::Common
         HE_ASSERT(out);
         HE_ASSERT(in_uLen <= this->_uCapacity);
 
-// windowsの場合
-// linuxは未対応
+        // windowsの場合
+        // linuxは未対応
 #ifdef HE_WIN
         // 利用する文字数を取得
         HE::Sint32 iUseSize = ::MultiByteToWideChar(CP_UTF8, 0, this->Str(), in_uLen, NULL, 0);
@@ -288,7 +288,7 @@ namespace Core::Common
     }
 
     /// <summary>
-    /// TODO: 文字列を出力
+    /// 文字列を出力
     /// </summary>
     void StringBase::Output(HE::Char* out, const HE::Uint32 in_uLen) const
     {
@@ -362,7 +362,6 @@ namespace Core::Common
 
     StringBase::IteratorChar& StringBase::IteratorChar::operator++()
     {
-        // TODO: return ステートメントをここに挿入します
 #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
         ++this->_sIndex;
 #else
@@ -441,7 +440,7 @@ namespace Core::Common
     }
 
     /// <summary>
-    /// TODO: UTF8文字列を区切る
+    /// UTF8文字列を区切る
     /// </summary>
     void SplitWithUTF8(std::function<void(const HE::UTF8*, const HE::Uint32)> in_resultFunc,
                        HE::UTF8* in_szName, const HE::Uint32 in_uLen, const HE::UTF8* in_szDelim)

@@ -46,12 +46,10 @@ namespace UI
         }
 
     protected:
-        void _VOnPushInternal(
-            UIButtonComponent* in_pBtnComp) override final;  // { this->_onPush(this->_szMsg); }
+        void _VOnPushInternal(UIButtonComponent* in_pBtnComp) override final;
 
     private:
         UIButtonMessageHandlerImpOnPush _onPush;
-        // Core::Common::FixedString128 _szMsg;
     };
 
     /// <summary>
@@ -85,25 +83,13 @@ namespace UI
         /// </summary>
         void VUpdate(const HE::Float32) override;
 
-        /// <summary>
-        /// プッシュ通知のハンドラーを設定
-        /// ユニークポインタで所有権を移譲している
-        /// </summary>
-        /*
-        void SetPushHandler(Core::Memory::UniquePtr<UIButtonMessageHandler> in_spHandler)
-        {
-            this->_pushHandler = std::move(in_spHandler);
-        }
-        */
-
-        // void SetWidth(const HE::Float32 in_fW) { this->_fWidth = in_fW; }
-        // void SetHeight(const HE::Float32 in_fH) { this->_fHeight = in_fH; }
         void SetAnchor(const Core::Math::EAnchor in_eAnchor) { this->_eAnchor = in_eAnchor; }
 
         /// <summary>
         /// タッチイベント
         /// </summary>
-        void VOnTouch(const EnhancedInput::InputData::Item::Touch& in_rTouch) override;
+        void VOnTouch(const HE::Char* in_szInputName,
+                      const EnhancedInput::InputData::Item::Touch&) override;
 
     private:
         void _Clear()

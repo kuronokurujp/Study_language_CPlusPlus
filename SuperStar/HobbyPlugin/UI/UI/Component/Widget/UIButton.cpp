@@ -58,7 +58,8 @@ namespace UI
         Render::Command2DQuadDraw(this->_viewHandle, rect, {this->_uColor});
     }
 
-    void UIButtonComponent::VOnTouch(const EnhancedInput::InputData::Item::Touch& in_rTouch)
+    void UIButtonComponent::VOnTouch(const HE::Char* in_szInputName,
+                                     const EnhancedInput::InputData::Item::Touch& in_rTouch)
     {
         Core::Math::Rect2 rect;
         Core::Math::Rect2 orgRect;
@@ -72,8 +73,6 @@ namespace UI
         if (rect.InSidePoint(Core::Math::Vector2(in_rTouch._fX, in_rTouch._fY)))
         {
             this->_pushHandler->OnPush(this);
-            // auto* pEventModule = this->GetDependenceModule<Event::EventModule>();
-            // pEventModule->QueueEvent(spEventInput);
         }
     }
 

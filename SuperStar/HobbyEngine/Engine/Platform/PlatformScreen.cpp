@@ -28,13 +28,13 @@ namespace Platform
     }
 
     /// <summary>
-    /// TODO: ウィンドウにメニュー項目追加
+    /// ウィンドウにメニュー項目追加
     /// </summary>
     const HE::Bool WindowConfig::AddMenuItem(const HE::Uint32 in_uID, const HE::Char* in_szName)
     {
         if (this->_mMenuItem.Contains(in_uID)) return FALSE;
 
-        // TODO: メニュー項目を追加
+        // メニュー項目を追加
         {
             auto item = WindowMenuItem();
 

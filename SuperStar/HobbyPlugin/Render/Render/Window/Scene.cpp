@@ -57,9 +57,8 @@ namespace Render
     void SceneViewBase::_Render(const Platform::ViewPortConfig& in_rViewPortConfig)
     {
         // 戦略からプラットフォームを取得してレンダリング
-        auto pPlatformScreen = this->_upSt->VGetPlatformScreenDraw();
-        if (pPlatformScreen == NULL)
-            return;
+        auto pPlatformScreen = this->_upSt->VGetRenderer();
+        if (pPlatformScreen == NULL) return;
 
         // ビュー毎に描画コマンド処理
         const Render::Command* pCommand = this->_commandBuff.PopBack();

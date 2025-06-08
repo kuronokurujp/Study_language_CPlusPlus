@@ -37,7 +37,7 @@ namespace EnhancedInput
         HE_GENERATED_CLASS_BODY_HEADER(InputComponent, Component);
 
     public:
-        InputComponent(Core::Memory::SharedPtr<InputStrategyBase>);// : Actor::Component() {}
+        InputComponent(Core::Memory::SharedPtr<InputStrategyBase>);  // : Actor::Component() {}
         virtual ~InputComponent();
 
         /// <summary>
@@ -49,11 +49,6 @@ namespace EnhancedInput
         /// 入力処理
         /// </summary>
         void ProcessInput(const InputMap&);
-
-        /// <summary>
-        /// ストラテジー設定
-        /// </summary>
-        //void SetStrategy(Core::Memory::SharedPtr<InputStrategyBase>);
 
     private:
         Core::Memory::SharedPtr<InputStrategyBase> _spStrategy = NULL;

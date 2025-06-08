@@ -28,14 +28,14 @@ namespace Render::Prticle
     {
         this->_uCount = in_uCount;
 
-        // TODO: プラットフォームからパーティクルのハンドルを生成
+        // プラットフォームからパーティクルのハンドルを生成
         this->_drawHandle = this->_upCreateFunc->CallByRef(this->_uCount);
         HE_ASSERT(this->_drawHandle.Null() == FALSE);
     }
 
     void Blob::Release()
     {
-        // TODO: パーティクルハンドル解放
+        // パーティクルハンドル解放
         this->_upDeleteFunc->CallByRef(this->_drawHandle);
 
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upCreateFunc);
@@ -46,19 +46,19 @@ namespace Render::Prticle
 
     void Blob::SetPositions(const Core::Common::ArrayBase<Core::Math::Vector3>& in_rArray)
     {
-        // TODO: パーティクルの座標を書き込む
+        // パーティクルの座標を書き込む
         this->_upPositionFunc->CallByRef(this->_drawHandle, in_rArray);
     }
 
     void Blob::SetVelocitys(const Core::Common::ArrayBase<Core::Math::Vector3>& in_rArray)
     {
-        // TODO: パーティクルの座標を書き込む
+        // パーティクルの座標を書き込む
         this->_upVelocityFunc->CallByRef(this->_drawHandle, in_rArray);
     }
 
     void Blob::SetColors(const Core::Common::ArrayBase<Core::Math::Color>& in_rArray)
     {
-        // TODO: パーティクルの座標を書き込む
+        // TODO: パーティクルの色を書き込む
     }
 
 }  // namespace Render::Prticle

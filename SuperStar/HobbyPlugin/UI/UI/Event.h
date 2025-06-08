@@ -12,7 +12,7 @@
 namespace UI
 {
     /// <summary>
-    /// TODO: UIボタンをクリックイベント
+    /// UIボタンをクリックイベント
     /// </summary>
     class EventButtonClick final : public Event::BaseEventData
     {

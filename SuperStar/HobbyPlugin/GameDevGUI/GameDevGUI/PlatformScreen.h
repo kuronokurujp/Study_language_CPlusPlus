@@ -12,7 +12,7 @@ namespace GameDevGUI
     /// <summary>
     /// DevGUIのシーンレンダリング
     /// </summary>
-    class ScreenRender final : public Platform::ScreenRenderInterface
+    class ScreenRender final : public Platform::RenderInterface
     {
     public:
         /// <summary>
@@ -21,7 +21,7 @@ namespace GameDevGUI
         void VCls(const HE::Uint32 in_uR, const HE::Uint32 in_uG,
                   const HE::Uint32 in_uB) override final;
 
-        // TODO: 2D上でのパーティクル描画
+        // 2D上でのパーティクル描画
         void V2DDrawPartical(const Platform::ViewPortConfig& in_rViewConfig,
                              const Core::Common::Handle in_rParticleHandle,
                              const Core::Math::Vector3&) override final;

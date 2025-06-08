@@ -5,7 +5,7 @@
 #include "Engine/Engine.h"
 
 #if 0
-// TODO: Tomlファイルテスト
+// Tomlファイルテスト
 TEST_CASE("AssetManager Module TomlFile")
 {
     StartupEngineByUnitTest<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module>(
@@ -60,7 +60,7 @@ TEST_CASE("AssetManager Module TomlFile")
 #endif
 
 #if 0
-// TODO: Jsonファイルテスト
+// Jsonファイルテスト
 TEST_CASE("AssetManager Module JsonFile")
 {
     StartupEngineByUnitTest<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module>(
@@ -134,7 +134,7 @@ TEST_CASE("AssetManager Module JsonFile")
 }
 #endif
 
-// TODO: xmlファイルテスト
+// xmlファイルテスト
 #if 0
 TEST_CASE("AssetManager Module TomlFile")
 {

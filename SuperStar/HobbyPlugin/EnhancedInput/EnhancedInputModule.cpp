@@ -133,7 +133,7 @@ namespace EnhancedInput
             }
         }
 
-        // TODO: 入力結果をイベント送信
+        // 入力結果をイベント送信
         if (this->_spEventInput->Empty() == FALSE)
         {
             auto* pEventModule = this->GetDependenceModule<Event::EventModule>();

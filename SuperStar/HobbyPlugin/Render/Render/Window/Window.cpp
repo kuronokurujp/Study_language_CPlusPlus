@@ -82,7 +82,7 @@ namespace Render
 
     void Window::Release()
     {
-        // TODO: ウィンドウが持っている入力オブジェクトを削除
+        // ウィンドウが持っている入力オブジェクトを削除
         auto inputHandle = this->_upStrategy->VGetConfig().InputHandle();
         HE_ENGINE.PlatformModule()->VInput()->VReleaseObject(inputHandle);
 

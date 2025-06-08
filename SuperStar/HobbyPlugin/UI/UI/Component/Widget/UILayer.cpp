@@ -9,9 +9,8 @@ namespace UI
     {
         UIWidgetComponent::VUpdate(in_fDt);
 
-        // TODO: サイズがあれば矩形描画
+        // サイズがあれば矩形描画
         if (Core::Math::NearZero(this->_size._fX)) return;
-
         if (Core::Math::NearZero(this->_size._fY)) return;
 
         auto pTrans = this->GetTransformComponent();

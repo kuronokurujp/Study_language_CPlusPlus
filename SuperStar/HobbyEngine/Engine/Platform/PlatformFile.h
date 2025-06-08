@@ -27,7 +27,7 @@ namespace Platform
         // TODO: ファイルを開いて一気にバイナルデータを出力するのが必要かも
         // ファイルを開いてバイナルデータを返す
         virtual std::tuple<void*, HE::Uint32> VLoadBinary(const Core::File::Path&) = 0;
-        // TODO+ テキストファイルをロードしてテキストデータを出力
+        // テキストファイルをロードしてテキストデータを出力
         virtual std::tuple<HE::Char*, HE::Uint32> VLoadText(const Core::File::Path&) = 0;
     };
 }  // namespace Platform

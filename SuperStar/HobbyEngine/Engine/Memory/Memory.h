@@ -20,6 +20,9 @@
 
     2024/12/03
         - operator new[]を使うと予期しないエラーが起きるので使わないようにする
+    2025/05/08
+        - operator newを使わない方法にするのがいい気がしてきた
+        - しかしその場合はクラスや構造体かを判別してコンストラクタやデストラクタを呼ぶ必要がある
 */
 
 #include <memory>
@@ -296,8 +299,11 @@ extern void FreeMemory(void*);
         }                              \
     }
 
-// TODO: メモリクリア
-#define HE_CLS_MEM(ptr, size) ;;memset((ptr), 0, (size));
+// メモリクリア
+#define HE_CLS_MEM(ptr, size) \
+    ;                         \
+    ;                         \
+    memset((ptr), 0, (size));
 
 // メモリ解放をラップする構造体
 struct DeleterFreeMemory

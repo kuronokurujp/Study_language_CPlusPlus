@@ -19,10 +19,10 @@ namespace Platform
     public:
         enum EFlags
         {
-            EFlags_None            = 0x00000000,
-            EFlags_Resizable       = 0x00000010,
-            EFlags_Minimized       = 0x00000020,
-            EFlags_Maximized       = 0x00000040,
+            EFlags_None               = 0x00000000,
+            EFlags_Resizable          = 0x00000010,
+            EFlags_Minimized          = 0x00000020,
+            EFlags_Maximized          = 0x00000040,
             EFlags_WinDisableCloseBtn = 0x00000080,
         };
 
@@ -133,31 +133,9 @@ namespace Platform
     };
 
     /// <summary>
-    /// シーンのロジックインターフェイス
+    /// レンダリングのインターフェイス
     /// </summary>
-    class SceneStrategyInterface
-    {
-    public:
-        virtual ~SceneStrategyInterface() = default;
-
-        virtual HE::Bool VBegin() = 0;
-        virtual void VEnd()       = 0;
-
-        virtual void VUpdate(const HE::Float32) = 0;
-        virtual void VBeginRender()             = 0;
-        virtual void VEndRender()               = 0;
-
-        /// <summary>
-        /// シーンを描画するプラットフォームのインスタンス
-        /// </summary>
-        /// <returns></returns>
-        virtual class ScreenRenderInterface* VGetPlatformScreenDraw() { return NULL; }
-    };
-
-    /// <summary>
-    /// シーンレンダリングのインターフェイス
-    /// </summary>
-    class ScreenRenderInterface
+    class RenderInterface
     {
     public:
         /// <summary>
@@ -166,7 +144,7 @@ namespace Platform
         virtual void VCls(const HE::Uint32 in_uR, const HE::Uint32 in_uG,
                           const HE::Uint32 in_uB) = 0;
 
-        // TODO: パーティクルの描画
+        // パーティクルの描画
         virtual void V2DDrawPartical(const Platform::ViewPortConfig& in_rViewConfig,
                                      const Core::Common::Handle in_rParticleHandle,
                                      const Core::Math::Vector3&) = 0;
@@ -203,11 +181,33 @@ namespace Platform
                                      const Core::Math::Color) = 0;
     };
 
-    class ScreenInterface
+    /// <summary>
+    /// シーンのロジックインターフェイス
+    /// </summary>
+    class SceneStrategyInterface
     {
     public:
-        virtual ~ScreenInterface() = default;
-        virtual void VRelease()    = 0;
+        virtual ~SceneStrategyInterface() = default;
+
+        virtual HE::Bool VBegin() = 0;
+        virtual void VEnd()       = 0;
+
+        virtual void VUpdate(const HE::Float32) = 0;
+        virtual void VBeginRender()             = 0;
+        virtual void VEndRender()               = 0;
+
+        /// <summary>
+        /// シーンを描画するプラットフォームのインスタンス
+        /// </summary>
+        /// <returns></returns>
+        virtual RenderInterface* VGetRenderer() = 0;
+    };
+
+    class SceneInterface
+    {
+    public:
+        virtual ~SceneInterface() = default;
+        virtual void VRelease()   = 0;
 
         virtual Core::Memory::UniquePtr<WindowStrategy> VCreateWindowStrategy(
             const Core::Common::Handle, const WindowConfig&) = 0;
@@ -218,13 +218,16 @@ namespace Platform
         virtual Core::Memory::UniquePtr<SceneStrategyInterface> VCreateSceneUIStrategy() = 0;
         virtual Core::Memory::UniquePtr<SceneStrategyInterface> VCreateScene2DStrategy() = 0;
 
-        // TODO: パーティクルの生成
-        // 描画は戻り値のハンドルを指定
-        // 事前に生成しておく必要がある
+        /// <summary>
+        /// 指定された数のパーティクルを作成
+        /// 事前に生成しておく必要がある
+        /// </summary>
+        /// <param name="in_uCount">作成するパーティクルの数</param>
+        /// <returns>作成されたパーティクルを識別するハンドル</returns>
         virtual Core::Common::Handle VParticalCreate(const HE::Uint32 in_uCount) = 0;
 
         /// <summary>
-        /// TODO: 生成したパーティクルを削除
+        /// 生成したパーティクルを削除
         /// </summary>
         virtual void VParticalDelete(Core::Common::Handle) = 0;
 
@@ -233,7 +236,7 @@ namespace Platform
         virtual void VParticalSetVelocitys(const Core::Common::Handle,
                                            const Core::Common::ArrayBase<Core::Math::Vector3>&) = 0;
 
-        virtual ScreenRenderInterface* VGetDrawInterface() = 0;
+        virtual RenderInterface* VGetRenderer() = 0;
     };
 
 }  // namespace Platform

@@ -111,7 +111,7 @@ namespace UI::Builder
 
                         if (bColorName == FALSE)
                         {
-                            // TODO: カラー名がないので16進数数字と判断して数値に変換
+                            // カラー名がないので16進数数字と判断して数値に変換
                             out->_uColor = HE_U8_HEX_TO_UINT32(szColorName);
 #ifdef HE_LITTLE_ENDIAN
                             HE_SWAP_BYTE_32BIT(out->_uColor);
@@ -157,8 +157,9 @@ namespace UI::Builder
                 pBtn->_fX           = in_rNode.VGetFloat32({HE_STR_U8_TEXT("x")});
                 pBtn->_fY           = in_rNode.VGetFloat32({HE_STR_U8_TEXT("y")});
                 pBtn->_eAnchor      = GetPosAnchor(in_rNode);
-                // TODO: インプットのキーを取得
-                in_rNode.VOutputUTF8(pBtn->_szInputKey, HE_ARRAY_SIZE(pBtn->_szInputKey), HE_STR_U8_TEXT("input"));
+                // インプットのキーを取得
+                in_rNode.VOutputUTF8(pBtn->_szInputKey, HE_ARRAY_SIZE(pBtn->_szInputKey),
+                                     HE_STR_U8_TEXT("input"));
 
                 in_rNode.VOutputUTF8(Core::Common::g_szTempFixedUTF8_1024,
                                      HE_ARRAY_SIZE(Core::Common::g_szTempFixedUTF8_1024),
@@ -182,9 +183,9 @@ namespace UI::Builder
                 {
                     if (pLabel->bLoc)
                     {
-                        // TODO: 文字列を分割してローカライズ用のデータを構築
+                        // 文字列を分割してローカライズ用のデータを構築
                         Core::Common::SplitWithUTF8(
-                            // TODO: 分割されたトークンを受け取る
+                            // 分割されたトークンを受け取る
                             [pLabel](const HE::UTF8* in_szToken, const HE::Uint32 in_uTokenCount)
                             {
                                 switch (in_uTokenCount)

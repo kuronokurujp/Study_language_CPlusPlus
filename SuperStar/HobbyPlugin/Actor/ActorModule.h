@@ -8,7 +8,6 @@
 #include "Actor/ActorInterface.h"
 #include "Actor/ActorManager.h"
 #include "Actor/Component/Component.h"
-//#include "Actor/Component/InputComponent.h"
 #include "Actor/Component/TransformComponent.h"
 
 namespace Actor

@@ -69,7 +69,7 @@ namespace PlatformSDL2
         void* _pMeshLayout = NULL;
     };
 
-    // TODO: パーティクルのメッシュ生成
+    // パーティクルのメッシュ生成
     class ParticleMesh
     {
     public:

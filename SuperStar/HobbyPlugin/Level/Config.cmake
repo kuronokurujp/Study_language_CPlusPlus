@@ -6,12 +6,10 @@ set(LEVEL_PLUGIN_TARGET_FILES
     .editorconfig
     LICENSE.txt
     README.md
-    
+
     LevelModule.h
     LevelModule.cpp
-    
-    Level/LevelManager.h
-    Level/LevelManager.cpp
+
     Level/LevelNode.h
     Level/LevelNode.cpp
     Level/Component/LevelUserInputReceive.h

@@ -43,14 +43,14 @@ namespace Core::File
             ::PathCchCombine(szTmp, 512, this->_szPath.Str(), in_szPath);
             this->_szPath = szTmp;
 #else
-            // TODO: パス連結未対応
-            constexpr HE::Char deilmiter = HE_STR_TEXT('/');
+            // パス連結未対応
+            constexpr HE::Char szDeilmiter = HE_STR_TEXT('/');
 
             // パスの後ろに区切り文字がある
-            if (this->_szPath.LastChar() == deilmiter)
+            if (this->_szPath.LastChar() == szDeilmiter)
             {
                 // 後ろに付けるパスの先頭に区切り文字がある
-                if (in_szPath.FirstChar() == deilmiter)
+                if (in_szPath.FirstChar() == szDeilmiter)
                 {
                     // 区切り文字が二つになるので一つ消して連結
                     auto szChar = in_szPath.Str();
@@ -66,14 +66,14 @@ namespace Core::File
             // 前のパスの後ろに区切り文字がない
             else
             {
-                if (in_szPath.LastChar() == deilmiter)
+                if (in_szPath.LastChar() == szDeilmiter)
                 {
                     this->_szPath += in_szPath;
                     return;
                 }
             }
 
-            this->_szPath += deilmiter;
+            this->_szPath += szDeilmiter;
             this->_szPath += in_szPath;
 
 #endif

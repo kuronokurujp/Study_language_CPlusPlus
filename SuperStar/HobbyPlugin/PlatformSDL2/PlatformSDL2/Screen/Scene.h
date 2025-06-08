@@ -20,7 +20,7 @@ namespace PlatformSDL2
         void VBeginRender() override final;
         void VEndRender() override final;
 
-        Platform::ScreenRenderInterface* VGetPlatformScreenDraw() override final;
+        Platform::RenderInterface* VGetRenderer() override final;
     };
 
     /// <summary>

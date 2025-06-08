@@ -40,7 +40,7 @@ namespace PlatformSDL2
 
         ::glBindTexture(this->_uTextureType, this->_uTextureID);
 
-        // TODO: 使うテクスチャーの縦横
+        // 使うテクスチャーの縦横
         GLint width, height;
         glGetTexLevelParameteriv(this->_uTextureType, 0, GL_TEXTURE_WIDTH, &width);
         glGetTexLevelParameteriv(this->_uTextureType, 0, GL_TEXTURE_HEIGHT, &height);
@@ -149,7 +149,7 @@ namespace PlatformSDL2
         this->_uHeight = height;
 
 #ifdef HE_ENGINE_DEBUG
-        // TODO: 画像データを表示
+        // 画像データを表示
         HE_LOG_LINE(HE_STR_TEXT("Tex Width(%d), Height(%d)"), this->_uWidth, this->_uHeight);
         HE_LOG_LINE(HE_STR_TEXT("Tex channels(%d)"), channels);
 

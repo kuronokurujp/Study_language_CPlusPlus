@@ -38,7 +38,7 @@ namespace PlatformSDL2
             return this->_spFile;
         }
 
-        Core::Memory::SharedPtr<Platform::ScreenInterface> VScreen() override final
+        Core::Memory::SharedPtr<Platform::SceneInterface> VScreen() override final
         {
             return this->_spScreen;
         }
@@ -73,7 +73,7 @@ namespace PlatformSDL2
         Core::Memory::SharedPtr<Platform::TimeInterface> _spTime;
         Core::Memory::SharedPtr<Platform::InputInterface> _spInput;
         Core::Memory::SharedPtr<Platform::FileInterface> _spFile;
-        Core::Memory::SharedPtr<Platform::ScreenInterface> _spScreen;
+        Core::Memory::SharedPtr<Platform::SceneInterface> _spScreen;
         Core::Memory::SharedPtr<Platform::SystemInterface> _spSysmte;
         Core::Memory::SharedPtr<Platform::FontInterface> _spFont;
     };

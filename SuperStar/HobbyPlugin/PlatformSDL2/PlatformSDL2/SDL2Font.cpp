@@ -47,7 +47,7 @@ namespace PlatformSDL2
                 return FontData{library, NULL, NULL, NULL};
             }
 
-            // TODO: SDL2_ttfのフォントデータを作成
+            // SDL2_ttfのフォントデータを作成
             SDL_RWops* pRWops = ::SDL_RWFromMem(in_pFontBinary, in_uFontDataSize);
             if (pRWops == NULL)
             {

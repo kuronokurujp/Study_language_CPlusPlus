@@ -26,7 +26,7 @@ namespace PlatformSDL2
         // TODO: ファイルを開いて一気にバイナルデータを出力するのが必要かも
         // ファイルを開いてバイナルヒープを返す
         std::tuple<void*, HE::Uint32> VLoadBinary(const Core::File::Path&) override final;
-        // TODO+ テキストファイルをロードしてテキストデータを出力
+        // テキストファイルをロードしてテキストデータを出力
         std::tuple<HE::Char*, HE::Uint32> VLoadText(const Core::File::Path&) override final;
 
     private:

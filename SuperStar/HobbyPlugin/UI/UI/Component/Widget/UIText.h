@@ -15,7 +15,8 @@ namespace UI
         HE_GENERATED_CLASS_BODY_HEADER(UITextComponent, UIWidgetComponent);
 
     public:
-        using ConvLocTextFuncType = std::function<const HE::Char*(const HE::Char*, const HE::Char*)>;
+        using ConvLocTextFuncType =
+            std::function<const HE::Char*(const HE::Char*, const HE::Char*)>;
 
     public:
         UITextComponent(ConvLocTextFuncType);

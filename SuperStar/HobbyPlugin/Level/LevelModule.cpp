@@ -1,7 +1,6 @@
 ﻿#include "LevelModule.h"
 
 #include "Engine/Memory/Memory.h"
-#include "Level/LevelManager.h"
 
 // モジュール
 #include "EnhancedInputModule.h"
@@ -21,7 +20,6 @@ namespace Level
 
     Node& LevelModule::GetLevel(const Core::Common::Handle& in_rHandle) const
     {
-        // TODO: return ステートメントをここに挿入します
         Level::Node* pNode = reinterpret_cast<Level::Node*>(this->_upNodeManager->Get(in_rHandle));
         return *pNode;
     }
@@ -33,9 +31,6 @@ namespace Level
     {
         // レベル関連の準備
         {
-            // this->_spLevelManager = HE_MAKE_CUSTOM_SHARED_PTR((Manager));
-            // this->_spLevelManager->Init();
-
             // タスク管理を初期化
             // 利用するタスク設定は内部で固定する
             auto upStg =
@@ -114,25 +109,11 @@ namespace Level
 
     void LevelModule::_VUpdate(const HE::Float32 in_fDt)
     {
-        // TODO: 入力結果をイベントに切り替えて入力モジュールとの蜜結合を解除
-        /*
-        {
-            // インプット入力対象に入力結果を送信
-            auto pEnhancedInputModule =
-                this->GetDependenceModule<EnhancedInput::EnhancedInputModule>();
-
-            // 入力結果を渡す
-            this->_spLevelManager->ProcessInput(in_fDt, pEnhancedInputModule->GetInputMap());
-        }
-        */
-
-        // this->_spLevelManager->Update(in_fDt);
         this->_upNodeManager->Update(in_fDt);
     }
 
     void LevelModule::_VLateUpdate(const HE::Float32 in_fDt)
     {
-        // this->_spLevelManager->LateUpdate(in_fDt);
         this->_upNodeManager->LateUpdate(in_fDt);
     }
 

@@ -42,13 +42,11 @@ namespace PlatformSDL2
     {
     }
 
-    Platform::ScreenRenderInterface* SDL2SceneStrategy2D::VGetPlatformScreenDraw()
+    Platform::RenderInterface* SDL2SceneStrategy2D::VGetRenderer()
     {
-        // TODO:
-        // スクリーンのプラットフォームは動的に切り替えたいのでストラテジー側から取得できるように変える
         auto pPlatformModule = HE_ENGINE.PlatformModule();
         HE_ASSERT(pPlatformModule);
 
-        return pPlatformModule->VScreen()->VGetDrawInterface();
+        return pPlatformModule->VScreen()->VGetRenderer();
     }
 }  // namespace PlatformSDL2

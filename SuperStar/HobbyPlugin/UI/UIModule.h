@@ -9,7 +9,7 @@
 #include "ActorModule.h"
 #include "LocalizationModule.h"
 #include "RenderModule.h"
-// TODO: イベントモジュールを使ってUI用のイベントを発行
+// イベントモジュールを使ってUI用のイベントを発行
 #include "EventModule.h"
 
 // モジュールのヘッダーファイルは全てインクルードする
@@ -93,7 +93,7 @@ namespace UI
                                              const HE::Uint32 in_uSort);
 
         /// <summary>
-        /// TODO: Widgetを破棄
+        /// Widgetを破棄
         /// </summary>
         void DeleteWidget(Core::Common::Handle&);
 

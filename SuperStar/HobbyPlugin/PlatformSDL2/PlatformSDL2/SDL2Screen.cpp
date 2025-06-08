@@ -310,7 +310,7 @@ namespace PlatformSDL2
             this->_pWhiteTex = pWhiteTex;
         }
 
-        // TODO: パーティクルのマテリアルを生成
+        // パーティクルのマテリアルを生成
         {
             auto pMat = HE_NEW_MEM(Material, 0);
 
@@ -347,7 +347,7 @@ namespace PlatformSDL2
             this->_pParticleMat = pMat;
         }
 
-        // TODO: パーティクルのメッシュプールを作成
+        // パーティクルのメッシュプールを作成
         {
             auto pPool = HE_NEW_MEM(Local::PoolParticleMesh, 0);
             pPool->POOL_RESERVE_POOL(1024);
@@ -460,7 +460,7 @@ namespace PlatformSDL2
 
     Core::Common::Handle Screen::VParticalCreate(const HE::Uint32 in_uCount)
     {
-        // TODO: パーティクル用のメッシュを生成
+        // パーティクル用のメッシュを生成
         auto pPool           = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
         auto [handle, pMesh] = pPool->Alloc<ParticleMesh>();
         HE_ASSERT(handle.Null() == FALSE);
@@ -472,7 +472,7 @@ namespace PlatformSDL2
 
     void Screen::VParticalDelete(Core::Common::Handle in_handle)
     {
-        // TODO: 生成したパーティクルを削除
+        // 生成したパーティクルを削除
         auto pPool         = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
         auto pParticleMesh = pPool->Ref(in_handle);
         HE_ASSERT_RETURN(pParticleMesh);
@@ -504,7 +504,7 @@ namespace PlatformSDL2
         pParticleMesh->SetVelocitys(in_rVelocitys);
     }
 
-    Platform::ScreenRenderInterface* Screen::VGetDrawInterface()
+    Platform::RenderInterface* Screen::VGetRenderer()
     {
         return this;
     }

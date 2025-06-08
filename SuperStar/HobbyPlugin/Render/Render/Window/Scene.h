@@ -53,7 +53,7 @@ namespace Render
         HE::Bool _PushCommand(Command&& in_rrCmd);
 
     protected:
-        // TODO: 描画に必要なリソースをアクセスするようにしている
+        // 描画に必要なリソースをアクセスするようにしている
         Core::Memory::UniquePtr<class Platform::SceneStrategyInterface> _upSt;
 
         CommandBuffer _commandBuff;

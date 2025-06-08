@@ -52,7 +52,7 @@ namespace PlatformSDL2
         /// ウィンドウにメニューアイテムを追加
         /// </summary>
         const HE::Bool _AddMenuItem(const HE::Uint32 in_uID,
-                                   Platform::WindowConfig::WindowMenuItem& in_rMenuItem);
+                                    Platform::WindowConfig::WindowMenuItem& in_rMenuItem);
 
         /// <summary>
         /// メニューアイテムを押した

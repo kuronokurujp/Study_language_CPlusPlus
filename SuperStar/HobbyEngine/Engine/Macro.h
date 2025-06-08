@@ -185,7 +185,7 @@ void HE_LOG_UPDATE_FORMAT_STRING(std::wstring& in_szFormat, size_t& in_rPos, con
     {
         if (in_rPos != std::wstring::npos)
         {
-            // TODO: ANSI文字は正常に出るが、日本語など2byte以上を使う文字では文字化けする
+            // ANSI文字は正常に出るが、日本語など2byte以上を使う文字では文字化けする
             in_szFormat.replace(in_rPos, 2, L"%hs");
         }
     }

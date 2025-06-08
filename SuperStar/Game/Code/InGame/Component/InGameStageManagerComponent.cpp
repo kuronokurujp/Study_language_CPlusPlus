@@ -53,8 +53,7 @@ namespace InGame
                                           { return this->_HandleCharacterEvent(in_spEventData); });
 
             this->_characterEventListenerHandle =
-                pEventModule->AddListener(spCharacterEventListener,
-                                          EVENT_TYPE_INGAME_CHARACTER);
+                pEventModule->AddListener(spCharacterEventListener, EVENT_TYPE_INGAME_CHARACTER);
             HE_ASSERT((this->_characterEventListenerHandle.Null() == FALSE) &&
                       "キャラクターイベントリスナー設定に失敗");
         }

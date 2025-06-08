@@ -25,6 +25,12 @@ namespace GameDevGUI
         // TODO: ボタンやテキストを扱うメソッドを作る
         // TODO: タイトル名を入れる
 
+        /// <summary>
+        /// シーンを描画するプラットフォームのインスタンス
+        /// </summary>
+        /// <returns></returns>
+        virtual Platform::RenderInterface* VGetRenderer() override final { return NULL; }
+
     private:
         Core::Memory::UniquePtr<Platform::SceneStrategyInterface> _upSt;
     };

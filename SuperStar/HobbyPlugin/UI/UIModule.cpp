@@ -46,14 +46,14 @@ namespace UI
     /// </summary>
     HE::Bool UIModule::_VStart()
     {
-        // TODO: UIWidgetアクター管理を作成
+        // UIWidgetアクター管理を作成
         {
             auto upStg =
                 HE_MAKE_CUSTOM_UNIQUE_PTR((EnhancedInput::ActorManagerDecoraterWithInputSystem));
             this->_actorManager = HE_NEW_MEM(Actor::ActorManager, 0)(std::move(upStg));
         }
 
-        // TODO: インプットのイベントリスナー登録
+        // インプットのイベントリスナー登録
         {
             auto pEventModule      = this->GetDependenceModule<Event::EventModule>();
             auto spUIEventListener = HE_MAKE_CUSTOM_SHARED_PTR(
@@ -62,12 +62,12 @@ namespace UI
                 {
                     // HE_LOG_LINE(HE_STR_TEXT("%s"), in_spEventData->VEventTypeName());
 
-                    // TODO: 入力イベント
+                    // 入力イベント
                     if (in_spEventData->VEventHash() == EnhancedInput::EventInput::Hash())
                     {
                         auto pEvent =
                             reinterpret_cast<EnhancedInput::EventInput*>(in_spEventData.get());
-                        // TODO: 入力情報を伝える
+                        // 入力情報を伝える
                         auto pInputSystem =
                             reinterpret_cast<EnhancedInput::ActorManagerDecoraterWithInputSystem*>(
                                 this->_actorManager->GetDecorater());
@@ -77,7 +77,7 @@ namespace UI
                     return TRUE;
                 });
 
-            // TODO: 拡張インプットの方で先に設定してもらわないと失敗した
+            // 拡張インプットの方で先に設定してもらわないと失敗した
             this->_inputEventListenerHash =
                 pEventModule->AddListener(spUIEventListener, EVENT_TYPE_ENHANCEDINPUT);
         }
@@ -144,11 +144,13 @@ namespace UI
         auto handlePack = this->NewWidget(in_szrName, in_uSort);
 
         // レイヤーにユーザー入力ルーティングを追加
-        // TODO: ルーティングに拡張インプットのインプット名の配列を設定する
+        // ルーティングに拡張インプットのインプット名の配列を設定する
         auto pInputStrategy =
             HE_MAKE_CUSTOM_SHARED_PTR((UI::UIInputRouterStrategy), this->_vActiveInput);
+
         auto [hInputRouter, pComp] =
             this->AddComponent<EnhancedInput::InputComponent>(handlePack, 0, pInputStrategy);
+
         // レイヤーコンポーネントを追加
         auto [hLayer, pLayourComp] = this->AddComponent<UI::UILayerComponent>(handlePack, 0);
         pLayourComp->SetPos(in_rPos);
@@ -314,18 +316,18 @@ namespace UI
         return handlePack;
     }
 
-    const Core::Common::Handle UIModule::NewButtonWidget(const Core::Common::StringBase& in_szrName,
+    const Core::Common::Handle UIModule::NewButtonWidget(const Core::Common::StringBase& in_szName,
                                                          const HE::Uint32 in_uSort,
                                                          const Core::Math::Rect2& in_rBtnRect,
                                                          const HE::Uint32 in_uBtnColor,
                                                          const Core::Common::Handle& in_rViewHandle)
     {
-        auto widgetHandle = this->NewWidget(in_szrName, in_uSort);
+        auto widgetHandle = this->NewWidget(in_szName, in_uSort);
 
         auto pWidget = this->_actorManager->Get(widgetHandle);
         if (pWidget == NULL) return widgetHandle;
 
-        // TODO: ボタンを押した時のハンドラーを生成して押した時のイベント通知する
+        // ボタンを押した時のハンドラーを生成して押した時のイベント通知する
         auto handler =
             HE_MAKE_CUSTOM_UNIQUE_PTR((UI::UIButtonMessageHandlerDefault),
                                       [this](UIButtonComponent* in_pBtnComp)
@@ -334,7 +336,7 @@ namespace UI
                                               this->GetDependenceModule<Event::EventModule>();
                                           HE_ASSERT_RETURN(pEventModule);
 
-                                          // TODO: ボタンイベントを通知
+                                          // ボタンイベントを通知
                                           auto pWidget =
                                               reinterpret_cast<Widget*>(in_pBtnComp->Owner());
                                           HE_ASSERT_RETURN(pWidget);
@@ -342,7 +344,7 @@ namespace UI
                                           auto spEvent =
                                               HE_MAKE_CUSTOM_SHARED_PTR((EventButtonClick),
                                                                         pWidget->Name());
-                                          // TODO: 実行したフレームで通知が必要かも?
+                                          // 実行したフレームで通知が必要かも?
                                           pEventModule->QueueEvent(spEvent, EVENT_TYPE_UIMODULE);
                                       });
 
@@ -371,7 +373,7 @@ namespace UI
     }
 
     /// <summary>
-    /// TODO: Widgetを破棄
+    /// Widgetを破棄
     /// </summary>
     void UIModule::DeleteWidget(Core::Common::Handle& in_rPack)
     {

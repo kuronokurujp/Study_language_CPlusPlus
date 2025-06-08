@@ -51,7 +51,7 @@ namespace Platform
         /// <summary>
         /// スクリーン関連
         /// </summary>
-        virtual Core::Memory::SharedPtr<Platform::ScreenInterface> VScreen() = 0;
+        virtual Core::Memory::SharedPtr<Platform::SceneInterface> VScreen() = 0;
 
         /// <summary>
         /// システム関連

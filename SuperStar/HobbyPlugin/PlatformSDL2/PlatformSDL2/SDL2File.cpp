@@ -141,36 +141,6 @@ namespace PlatformSDL2
                 HE_SAFE_DELETE_MEM(pData);
             }
             HE_ASSERT(bRet && "ファイル読み込みに失敗");
-
-            // TODO: 読み込んだファイルがUTF8のBOM付きとか16byteのUnicoeとかで処理を分ける予定
-            /*
-                        auto ch1 = pData[0];
-                        auto ch2 = pData[1];
-                        if (ch1 == 0xff && ch2 == 0xfe)
-                        {
-                            // The file contains UTF-16LE BOM
-                            HE_LOG_LINE(HE_STR_TEXT("16LE"));
-                        }
-                        else if (ch1 == 0xfe && ch2 == 0xff)
-                        {
-                            // The file contains UTF-16BE BOM
-                            HE_LOG_LINE(HE_STR_TEXT("16BE"));
-                        }
-                        else
-                        {
-                            auto ch3 = pData[2];
-                            if (ch1 == 0xef && ch2 == 0xbb && ch3 == 0xbf)
-                            {
-                                // The file contains UTF-8 BOM
-                                HE_LOG_LINE(HE_STR_TEXT("UTF8_BOM"));
-                            }
-                            else
-                            {
-                                // The file does not have BOM
-                                HE_LOG_LINE(HE_STR_TEXT("UTF8"));
-                            }
-                        }
-                        */
         }
 
         this->VFileClose(handle);
