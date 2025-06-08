@@ -44,6 +44,10 @@ int CATCH_INTERNAL_CDECL main(int argc, char* argv[])
 #endif
     const int ret = Catch::Session().run(argc, argv);
 
+#ifdef HE_WIN
+    ::TerminateProcess(::GetCurrentProcess(), 0);
+#endif
+
     return ret;
 }
 

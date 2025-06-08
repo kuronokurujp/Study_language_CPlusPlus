@@ -212,8 +212,11 @@ namespace PlatformSDL2
     {
         // ウィンドウのメニューを削除
 #ifdef HE_WIN
-        ::DestroyMenu(static_cast<HMENU>(this->_hMenuBar));
-        this->_hMenuBar = NULL;
+        if (this->_hMenuBar)
+        {
+            ::DestroyMenu(static_cast<HMENU>(this->_hMenuBar));
+            this->_hMenuBar = NULL;
+        }
 #endif
 
         auto [pGLContext, pWindow] = this->_context;

@@ -59,6 +59,7 @@ int main()
 
     pAppEngineFramework->Release();
 
+    ::TerminateProcess(::GetCurrentProcess(), 0);
     return 0;
 }
 
