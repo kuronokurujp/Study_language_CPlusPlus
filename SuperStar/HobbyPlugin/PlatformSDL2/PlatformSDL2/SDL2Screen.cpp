@@ -414,13 +414,13 @@ namespace PlatformSDL2
         {
             if (Local::s_pDummyWindow)
             {
-                ::SDL_GL_DeleteContext(Local::s_pDummyWindow);
+                ::SDL_DestroyWindow(reinterpret_cast<SDL_Window*>(Local::s_pDummyWindow));
                 Local::s_pDummyWindow = NULL;
             }
 
             if (Local::s_pShareContext)
             {
-                ::SDL_DestroyWindow(reinterpret_cast<SDL_Window*>(Local::s_pShareContext));
+                ::SDL_GL_DeleteContext(Local::s_pShareContext);
                 Local::s_pShareContext = NULL;
             }
         }
