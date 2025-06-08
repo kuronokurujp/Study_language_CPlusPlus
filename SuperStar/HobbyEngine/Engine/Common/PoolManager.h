@@ -279,7 +279,7 @@ namespace Core::Common
         {
             if (in_rHandle.Null()) return NULL;
             // 要素があるかチェック
-            if (this->_upUserSlot == FALSE) return NULL;
+            if (this->_upUserSlot == NULL) return NULL;
 
             if (this->_upUserSlot->find(in_rHandle) != this->_upUserSlot->end())
                 return this->_upUserSlot->at(in_rHandle);

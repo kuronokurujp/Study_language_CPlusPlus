@@ -38,7 +38,7 @@ TEST_CASE("FixString OutputUTF8")
 {
     // Char型の文字列を作る
     Core::Common::FixedString128 szStr(HE_STR_TEXT("日本語"));
-    HE::UTF8 szUTF8[32] = {NULL};
+    HE::UTF8 szUTF8[32] = HE_STR_EMPTY;
 
     // UTF8型に変える
     szStr.OutputUTF8(szUTF8, 32);

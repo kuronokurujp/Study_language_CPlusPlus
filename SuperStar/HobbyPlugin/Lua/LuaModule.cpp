@@ -8,7 +8,7 @@
 
 namespace Lua
 {
-    static HE::UTF8 s_szPushStackTempText[1024] = {NULL};
+    static HE::UTF8 s_szPushStackTempText[1024] = HE_STR_EMPTY;
 
     // Luaモジュールのインスタンスは一つしかない前提
     static Core::Common::FixedStack<LuaFuncData, 128> s_sLuaFuncResultData;
@@ -39,7 +39,7 @@ namespace Lua
     {
         Core::Common::g_szTempFixedString256 = in_szFuncName;
 
-        HE::UTF8 szRegistFuncName[256] = {NULL};
+        HE::UTF8 szRegistFuncName[256] = HE_STR_EMPTY;
         Core::Common::g_szTempFixedString256
             .OutputUTF8(szRegistFuncName, Core::Common::g_szTempFixedString256.Capacity());
 
@@ -283,7 +283,7 @@ namespace Lua
         auto* pLuaObject = this->_luaObjectPool.Ref(in_rHandle);
         if (pLuaObject == NULL) return FALSE;
 
-        HE::UTF8 szText[1024] = {NULL};
+        HE::UTF8 szText[1024] = HE_STR_EMPTY;
         Core::Common::g_szTempFixedString1024.OutputUTF8(szText, HE_ARRAY_NUM(szText));
 
         lua_State* pLuaState = reinterpret_cast<lua_State*>(pLuaObject->pLuaState);

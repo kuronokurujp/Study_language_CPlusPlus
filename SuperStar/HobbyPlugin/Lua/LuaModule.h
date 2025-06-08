@@ -36,7 +36,7 @@ namespace Lua
     struct LuaFuncData
     {
         // 関数名
-        HE::Char szFuncName[128] = {NULL};
+        HE::Char szFuncName[128] = HE_STR_EMPTY;
         // 各引数
         // 引数名は取れないので, 使う側が配列の要素位置を意識する必要がある
         LuaFuncArgData aArg[6];
@@ -54,7 +54,7 @@ namespace Lua
     private:
         struct LuaObject
         {
-            HE::Char szName[128] = {NULL};
+            HE::Char szName[128] = HE_STR_EMPTY;
             void* pLuaState      = NULL;
         };
 
