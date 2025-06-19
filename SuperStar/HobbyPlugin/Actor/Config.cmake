@@ -1,24 +1,30 @@
-set(ACTOR_PLUGIN_NAME HobbyEnginePlugin_Actor)
+set(PLUGIN_ACTOR_NAME HobbyPlugin_Actor)
+set(PLUGIN_ACTOR_INC_DIR ${CMAKE_CURRENT_LIST_DIR}/Inc)
 
-# プロジェクトに登録するファイル群
-# ここに全て記載する
-set(ACTOR_PLUGIN_TARGET_FILES
+set(PLUGIN_ACTOR_TARGET_COMMON_FILES
     .editorconfig
     LICENSE.txt
     README.md
 
-    ActorModule.cpp
-    ActorModule.h
+)
+set(PLUGIN_ACTOR_TARGET_INC_FILES
+    Inc/ActorModule.h
 
-    Actor/Actor.h
-    Actor/Actor.cpp
-    Actor/ActorInterface.h
-    Actor/ActorManager.h
-    Actor/ActorManager.cpp
+    Inc/Actor/Actor.h
+    Inc/Actor/ActorInterface.h
+    Inc/Actor/ActorManager.h
 
-    Actor/Component/Component.h
-    Actor/Component/Component.cpp
+    Inc/Actor/Component/Component.h
+    Inc/Actor/Component/TransformComponent.h
+)
 
-    Actor/Component/TransformComponent.h
-    Actor/Component/TransformComponent.cpp
+# プロジェクトに登録するファイル群
+# ここに全て記載する
+set(PLUGIN_ACTOR_TARGET_SRC_FILES
+    Src/ActorModule.cpp
+
+    Src/Actor.cpp
+    Src/ActorManager.cpp
+    Src/Component/Component.cpp
+    Src/Component/TransformComponent.cpp
 )

@@ -1,0 +1,1 @@
+SuperStar/Tool/*/main.exe filter=lfs diff=lfs merge=lfs -text

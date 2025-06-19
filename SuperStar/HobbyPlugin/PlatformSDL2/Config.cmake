@@ -1,9 +1,3 @@
-# プロジェクト全体で利用する基本となる文字コードをUTF8にする
-# SDL2はwchar_t型を使わないから
-set(CACHE_CHARACTER_CODE_UTF8_FLAG 1 CACHE STRING "" FORCE)
-# プラットフォーム名
-set(CACHE_PLATFORM_TYPE HE_USE_SDL2 CACHE STRING "" FORCE)
-
 set(PLATFORMSDL2_PLUGIN_NAME HobbyEnginePlugin_PlatformSDL2)
 # プロジェクトに登録するファイル群
 # ここに全て記載する
@@ -13,7 +7,7 @@ set(PLATFORMSDL2_PLUGIN_TARGET_FILES
     README.md
     PlatformSDL2Module.cpp
     PlatformSDL2Module.h
-    
+
     PlatformSDL2/SDL2File.cpp
     PlatformSDL2/SDL2File.h
     PlatformSDL2/SDL2Input.cpp
@@ -33,7 +27,7 @@ set(PLATFORMSDL2_PLUGIN_TARGET_FILES
     PlatformSDL2/Screen/ViewPort.cpp
     PlatformSDL2/Screen/Scene.h
     PlatformSDL2/Screen/Scene.cpp
-    
+
     PlatformSDL2/Screen/Draw/Material.cpp
     PlatformSDL2/Screen/Draw/Material.h
     PlatformSDL2/Screen/Draw/Mesh.cpp
@@ -41,3 +35,16 @@ set(PLATFORMSDL2_PLUGIN_TARGET_FILES
     PlatformSDL2/Screen/Draw/Texture.cpp
     PlatformSDL2/Screen/Draw/Texture.h
 )
+
+function(setup_sdl2)
+    # SDL2のプラットフォームタイプをマクロ設定
+    if(DEFINED CACHE{CACHE_PLATFORM_TYPE})
+        message(Platform Type: HE_USE_SDL2)
+        add_compile_definitions(HE_USE_SDL2)
+    else()
+        message(None Platform Type)
+    endif()
+endfunction()
+
+# includeと同時に実行
+setup_sdl2()

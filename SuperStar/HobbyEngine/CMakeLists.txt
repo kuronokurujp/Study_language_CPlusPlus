@@ -1,31 +1,20 @@
 # 共通情報を取得.
 include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Project.cmake NO_POLICY_SCOPE)
 
 message("build engine lib!")
 
-set(CACHE_ENGINE_INCLUDE_CODE ${CMAKE_CURRENT_SOURCE_DIR}/ CACHE STRING global_engine_include_code)
+# 静的ライブラリの設定
+project_configure_static_lib_target(${ENGINE_NAME})
 
-# 共有ライブラリとして生成するためのオプションの定義.
-option(ENGINE_BUILD_SHARED_LIBS "build engine as a shared library" OFF)
+# プロジェクトの設定
+project_configure_target(${ENGINE_NAME})
 
-# オプションで生成するライブラリの種類(SHARED/STATIC)を切り替える.
-if (ENGINE_BUILD_SHARED_LIBS)
-    add_library(${ENGINE_NAME} SHARED)
-else()
-    add_library(${ENGINE_NAME} STATIC)
-endif()
-
-# C++のコンパイラの設定
-set_target_properties(${ENGINE_NAME} PROPERTIES
-	CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
-)
-
-# engine生成に必要なソースファイル.
-target_sources(${ENGINE_NAME}
-    PRIVATE
-    ${ENGINE_TARGET_FILES}
+# ターゲットへファイル群の設定
+project_configure_files_target(${ENGINE_NAME}
+    ${ENGINE_TARGET_COMMON_FILES}
+    ${ENGINE_TARGET_SRC_FILES}
+    ${ENGINE_TARGET_INC_FILES}
 )
 
 # Windows特有のライブラリをリンク
@@ -34,20 +23,7 @@ if (MSVC)
 endif()
 
 # プロジェクトが参照できるインクルードディレクトリのパス.
-target_include_directories(${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${ENGINE_NAME} PUBLIC ${ENGINE_INC_DIR})
 
-# ランタイムライブラリを設定
-target_compile_options(
-    ${ENGINE_NAME}
-    PRIVATE
-    $<IF:$<CONFIG:Debug>,/MTd,/MT>
-)
-
-# ビルドのマルチプロセス設定.
-target_compile_options(${ENGINE_NAME} PRIVATE /MP)
-# Unicode文字セットを設定.
-target_compile_options(${ENGINE_NAME} PRIVATE /DUNICODE /D_UNICODE)
-
-# ファイルのフィルタリング設定.
-# VSプロジェクト上で見やすくするため.
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ENGINE_TARGET_FILES})
+# テスト用サブディレクトリを追加
+add_subdirectory(Test)

@@ -1,39 +1,51 @@
 cmake_minimum_required(VERSION 3.26)
 
-# 共通情報を取得
-include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
-# 各プロジェクトの共通情報を取得
+# エンジン提供の共通情報
+include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyEngine/cmake/Common.cmake NO_POLICY_SCOPE)
+# エンジン提供のProject構築情報
+include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyEngine/cmake/Project.cmake NO_POLICY_SCOPE)
+# エンジン提供のエンコーディングをUTF8構築
+include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyEngine/cmake/UTF8.cmake NO_POLICY_SCOPE)
+
 # ゲームアプリ
-include(${CMAKE_CURRENT_SOURCE_DIR}/Game/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/Game/Config.cmake NO_POLICY_SCOPE)
+
 # ゲームエンジン
-include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyEngine/Config.cmake NO_POLICY_SCOPE)
-# DXLibプラグイン(未使用)
-# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/DxLib/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyEngine/Config.cmake NO_POLICY_SCOPE)
 # SDL2プラットフォーム
-include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/PlatformSDL2/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/PlatformSDL2/Config.cmake NO_POLICY_SCOPE)
 # 描画プラグイン
-include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Render/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Render/Config.cmake NO_POLICY_SCOPE)
 # アクタープラグイン
 include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Actor/Config.cmake NO_POLICY_SCOPE)
 # アセット管理プラグイン
-include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/AssetManager/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/AssetManager/Config.cmake NO_POLICY_SCOPE)
 # レベルプラグイン
-include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Level/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Level/Config.cmake NO_POLICY_SCOPE)
 # ローカライズプラグイン
-include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Localization/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Localization/Config.cmake NO_POLICY_SCOPE)
 # UIプラグイン
-include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/UI/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/UI/Config.cmake NO_POLICY_SCOPE)
 # EnhancedInputプラグイン
-include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/EnhancedInput/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/EnhancedInput/Config.cmake NO_POLICY_SCOPE)
 # Eventプラグイン
-include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Event/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Event/Config.cmake NO_POLICY_SCOPE)
 # Luaプラグイン
-include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Lua/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Lua/Config.cmake NO_POLICY_SCOPE)
 # TODO: 以下はデバッグのみ利用(リリース版では含めないようにする)
 # ランタイムのDebugプラグイン
-include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/RuntimeDebug/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/RuntimeDebug/Config.cmake NO_POLICY_SCOPE)
 # ゲーム開発用のGUIプラグイン
-include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/GameDevGUI/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/GameDevGUI/Config.cmake NO_POLICY_SCOPE)
+
+# VSソリューション名をワークスペース名にしている
+set(WORKSPACE_NAME SuperStar)
+
+# ワークスペース名と使用言語C++をプロジェクトに設定.
+project(${WORKSPACE_NAME} VERSION 2.0 LANGUAGES C CXX)
+
+# 処理開始のBootを取り込む
+include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyEngine/cmake/Boot.cmake NO_POLICY_SCOPE)
 
 option(
   CORE_CRL_MD
@@ -49,9 +61,6 @@ set(CHACHE_VCPKG_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/vcpkg" CACHE STRIN
 
 # 環境変数からvcpkgのパスを取得してツールチェインを設定
 set(CMAKE_TOOLCHAIN_FILE "$CACHE{CHACHE_VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file" FORCE)
-
-# ワークスペース名と使用言語C++をプロジェクトに設定.
-project(${WORKSPACE_NAME} VERSION 2.0 LANGUAGES C CXX)
 
 # 単体テスト用のビルドUnitTestを追加
 # set(CMAKE_CONFIGURATION_TYPES "Debug;Release;UnitTest" CACHE STRING "Configs" FORCE)
@@ -69,188 +78,93 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bin/${WORKSPACE_N
 #   CACHE STRING "Configurations" FORCE
 # )
 set(CMAKE_CONFIGURATION_TYPES Debug Release
-   CACHE STRING "Configurations" FORCE
+  CACHE STRING "Configurations" FORCE
 )
-
-# Suppress generation of ZERO_CHECK project.
-set(CMAKE_SUPPRESS_REGENERATION ON)
-
-# makeコマンド実行時のビルドステップの詳細表示.
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
-# 警告とすべてエラーとして扱う.
-set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
-
-# C++コンパイラの設定.
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-# Cコンパイラの設定.
-set(CMAKE_C_STANDARD 17)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-
-# MSVCコンパイラだとCPPのバージョン定義は以下のオプションがついていないといけない
-if(MSVC)
-    add_compile_options(/Zc:__cplusplus)
-endif()
-
-# 各ビルドタイプに対応するフラグを設定する
-# set(CMAKE_CXX_FLAGS_UNITTEST "${CMAKE_CXX_FLAGS_DEBUG}")
-# set(CMAKE_C_FLAGS_UNITTEST "${CMAKE_C_FLAGS_DEBUG}")
-# set(CMAKE_EXE_LINKER_FLAGS_UNITTEST "")
-# set(CMAKE_SHARED_LINKER_FLAGS_UNITTEST "")
-
-# ランタイムライブラリを /MT または /MD に統一
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
-
-# アーキテクチャ指定.
-if(CMAKE_EXE_LINKER_FLAGS STREQUAL "/machine:x64")
-  set(ARCH x86_64)
-  set(DX_ARCH x64)
-elseif(CMAKE_EXE_LINKER_FLAGS STREQUAL "/machine:X86")
-  set(ARCH x86)
-  set(DX_ARCH Win32)
-else()
-  message(FATAL_ERROR "[${WORKSPACE_NAME}] Invalid linker flag ${CMAKE_EXE_LINKER_FLAGS}.")
-endif()
-
-# VSコンパイラを指定.
-if(MSVC_VERSION GREATER_EQUAL 1930 AND MSVC_VERSION LESS 1950)
-  # Visual Studio 2022
-  set(COMPILER 143)
-  set(MSVC_YEAR 2022)
-elseif(MSVC)
-  message(FATAL_ERROR "[${WORKSPACE_NAME}] Unsupported Visual C++ compiler used.")
-else()
-  message(FATAL_ERROR "[${WORKSPACE_NAME}] Unsupported compiler used.")
-endif()
-
-if($CACHE{CACHE_CHARACTER_CODE_UTF8_FLAG})
-  add_compile_definitions(HE_CHARACTER_CODE_UTF8)
-endif()
-
-# プラットフォームタイプがあればマクロとして設定
-if(DEFINED CACHE{CACHE_PLATFORM_TYPE})
-  message(Platform Type: $CACHE{CACHE_PLATFORM_TYPE})
-  add_compile_definitions($CACHE{CACHE_PLATFORM_TYPE})
-else()
-  message(None Platform Type)
-endif()
 
 # 各プロジェクトを設定
-add_subdirectory(HobbyEngine EXCLUDE_FROM_ALL)
-# add_subdirectory(HobbyPlugin/DxLib EXCLUDE_FROM_ALL)
-add_subdirectory(HobbyPlugin/PlatformSDL2 EXCLUDE_FROM_ALL)
-add_subdirectory(HobbyPlugin/Render EXCLUDE_FROM_ALL)
-add_subdirectory(HobbyPlugin/Actor EXCLUDE_FROM_ALL)
-add_subdirectory(HobbyPlugin/AssetManager EXCLUDE_FROM_ALL)
-add_subdirectory(HobbyPlugin/Level EXCLUDE_FROM_ALL)
-add_subdirectory(HobbyPlugin/Localization EXCLUDE_FROM_ALL)
-add_subdirectory(HobbyPlugin/UI EXCLUDE_FROM_ALL)
-add_subdirectory(HobbyPlugin/EnhancedInput EXCLUDE_FROM_ALL)
-add_subdirectory(HobbyPlugin/Event EXCLUDE_FROM_ALL)
-add_subdirectory(HobbyPlugin/Lua EXCLUDE_FROM_ALL)
+# TODO: ファイルを構成を大幅に変更で一つ一つ対応
+add_subdirectory(HobbyEngine)
+# add_subdirectory(HobbyPlugin/PlatformSDL2)
+# add_subdirectory(HobbyPlugin/Render)
+add_subdirectory(HobbyPlugin/Actor)
+# add_subdirectory(HobbyPlugin/AssetManager)
+# add_subdirectory(HobbyPlugin/Level)
+# add_subdirectory(HobbyPlugin/Localization)
+# add_subdirectory(HobbyPlugin/UI)
+# add_subdirectory(HobbyPlugin/EnhancedInput)
+# add_subdirectory(HobbyPlugin/Event)
+# add_subdirectory(HobbyPlugin/Lua)
 # TODO: 以下のはデバッグのみ利用(リリース版では含めないようにする)
-add_subdirectory(HobbyPlugin/RuntimeDebug EXCLUDE_FROM_ALL)
-add_subdirectory(HobbyPlugin/GameDevGUI EXCLUDE_FROM_ALL)
+# add_subdirectory(HobbyPlugin/RuntimeDebug)
+# add_subdirectory(HobbyPlugin/GameDevGUI)
 
 # テストプロジェクトを作る
-include(${CMAKE_CURRENT_SOURCE_DIR}/Test/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_CURRENT_SOURCE_DIR}/Test/Config.cmake NO_POLICY_SCOPE)
 
-add_subdirectory(Game)
+# add_subdirectory(Game)
 
-# スタートプロジェクトの設定.
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
 
-# デバッグ実行時に参照する作業ディレクトリ.
-set_target_properties(${APP_NAME} PROPERTIES
-  VS_DEBUGGER_WORKING_DIRECTORY
-    ${CMAKE_CURRENT_SOURCE_DIR}/Bin/${WORKSPACE_NAME}/${CMAKE_CFG_INTDIR}
-)
-
-# バッチファイルを実行するカスタムターゲットを作成
-add_custom_target(
-    RunBatch ALL  # 必ず実行されるように設定
-    COMMAND cmd /c "${CMAKE_CURRENT_SOURCE_DIR}/UpdateAsset.bat"
-    COMMENT "Running UpdateAsset.bat during build."
-)
 
 # TODO: 以下のはデバッグのみ利用(リリース版では含めないようにする)
-check_variable(RUNTIMEDEBUG_PLUGIN_NAME)
-check_variable(GAMEDEVGUI_PLUGIN_NAME)
+# common_check_variable(RUNTIMEDEBUG_PLUGIN_NAME)
+# common_check_variable(GAMEDEVGUI_PLUGIN_NAME)
 
 # デバッグ/リリースで含める
-check_variable(LUA_PLUGIN_NAME)
-check_variable(EVENT_PLUGIN_NAME)
-check_variable(ENHANCED_INPUT_PLUGIN_NAME)
-check_variable(UI_PLUGIN_NAME)
-check_variable(LOCALIZATION_PLUGIN_NAME)
-check_variable(LEVEL_PLUGIN_NAME)
-check_variable(ASSET_MANAGER_PLUGIN_NAME)
-check_variable(ACTOR_PLUGIN_NAME)
-check_variable(RENDER_PLUGIN_NAME)
-# check_variable(DXLIB_PLUGIN_NAME)
-check_variable(PLATFORMSDL2_PLUGIN_NAME)
-check_variable(ENGINE_NAME)
+# common_check_variable(LUA_PLUGIN_NAME)
+# common_check_variable(EVENT_PLUGIN_NAME)
+# common_check_variable(ENHANCED_INPUT_PLUGIN_NAME)
+# common_check_variable(UI_PLUGIN_NAME)
+# common_check_variable(LOCALIZATION_PLUGIN_NAME)
+# common_check_variable(LEVEL_PLUGIN_NAME)
+# common_check_variable(ASSET_MANAGER_PLUGIN_NAME)
+# common_check_variable(PLUGIN_ACTOR_NAME)
+# common_check_variable(RENDER_PLUGIN_NAME)
+# common_check_variable(PLATFORMSDL2_PLUGIN_NAME)
+# common_check_variable(ENGINE_NAME)
 
 # ライブラリ名をリストにまとめる
 set(PLUGIN_LIBRARIES
 # TODO: デバッグのみ入れる
-  ${GAMEDEVGUI_PLUGIN_NAME}
+#   ${GAMEDEVGUI_PLUGIN_NAME}
 # TODO: デバッグのみ入れる
-  ${RUNTIMEDEBUG_PLUGIN_NAME}
-  ${LUA_PLUGIN_NAME}
-  ${EVENT_PLUGIN_NAME}
-  ${ENHANCED_INPUT_PLUGIN_NAME}
-  ${UI_PLUGIN_NAME}
-  ${LOCALIZATION_PLUGIN_NAME}
-  ${LEVEL_PLUGIN_NAME}
-  ${ASSET_MANAGER_PLUGIN_NAME}
-  ${RENDER_PLUGIN_NAME}
-  ${ACTOR_PLUGIN_NAME}
-#  ${DXLIB_PLUGIN_NAME}
-  ${PLATFORMSDL2_PLUGIN_NAME}
+#   ${RUNTIMEDEBUG_PLUGIN_NAME}
+#   ${LUA_PLUGIN_NAME}
+#   ${EVENT_PLUGIN_NAME}
+#   ${ENHANCED_INPUT_PLUGIN_NAME}
+#   ${UI_PLUGIN_NAME}
+#   ${LOCALIZATION_PLUGIN_NAME}
+#   ${LEVEL_PLUGIN_NAME}
+#   ${ASSET_MANAGER_PLUGIN_NAME}
+#   ${RENDER_PLUGIN_NAME}
+  ${PLUGIN_ACTOR_NAME}
+#   ${PLATFORMSDL2_PLUGIN_NAME}
   ${ENGINE_NAME}
 )
 
 # ゲームアプリがリンクするライブラリ
 # 設定プロジェクトのライブラリ・インクルードディレクトリ登録
-target_link_libraries(${APP_NAME} ${PLUGIN_LIBRARIES})
+# target_link_libraries(${APP_NAME} ${PLUGIN_LIBRARIES})
 
 # TODO: デバッグのみ
 # テストプロジェクト作成
-add_subdirectory(Test)
+# add_subdirectory(Test)
 
 # アプリディレクトリのみをインクルード
-set(APP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Game)
-target_include_directories(${TEST_APP_NAME} PRIVATE
- ${APP_INCLUDE_DIR})
+# set(APP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Game)
+# target_include_directories(${TEST_APP_NAME} PRIVATE ${APP_INCLUDE_DIR})
 
 # デバッグ実行時に参照する作業ディレクトリ.
 # バイナリ出力先のディレクトリ
-set_target_properties(${TEST_APP_NAME} PROPERTIES
-  VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bin/Test/${CMAKE_CFG_INTDIR}
-  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bin/Test
-)
+# set_target_properties(${TEST_APP_NAME} PROPERTIES
+#   VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bin/Test/${CMAKE_CFG_INTDIR}
+#   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bin/Test
+# )
 
 # テストしたいライブラリを設定
 # 設定プロジェクトのライブラリ・インクルードディレクトリ登録
-target_link_libraries(${TEST_APP_NAME} ${PLUGIN_LIBRARIES})
-
-# ループで全てのターゲットに対してプリプロセッサ定義を設定
-# foreach(lib ${PLUGIN_LIBRARIES})
-#  target_compile_definitions(${lib} PRIVATE
-#    $<$<CONFIG:UnitTest>:HE_USE_STD_UNIQUE_PTR>
-#  )
-#endforeach()
+# target_link_libraries(${TEST_APP_NAME} ${PLUGIN_LIBRARIES})
 
 # アプリのビルド前にバッチファイルを実行させるターゲットに依存させて
 # アプリのビルド前にバッチファイルを実行させている
 # TODO: TEST_APP_NAMEはデバッグのみ
-add_dependencies(${TEST_APP_NAME} RunBatch)
-
-add_dependencies(${APP_NAME} RunBatch)
+# add_dependencies(${TEST_APP_NAME} RunBatch)

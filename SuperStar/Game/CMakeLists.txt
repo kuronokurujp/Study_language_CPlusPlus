@@ -30,3 +30,24 @@ target_compile_options(${APP_NAME} PRIVATE /DUNICODE /D_UNICODE)
 # ファイルのフィルタリング設定.
 # VSプロジェクト上で見やすくするため.
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TARGET_FILES})
+
+# スタートプロジェクトの設定.
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
+
+if (MSVC)
+  # デバッグ実行時に参照する作業ディレクトリ.
+  set_target_properties(${APP_NAME} PROPERTIES
+    VS_DEBUGGER_WORKING_DIRECTORY
+      ${CMAKE_CURRENT_SOURCE_DIR}/Bin/${WORKSPACE_NAME}/${CMAKE_CFG_INTDIR}
+  )
+endif()
+
+# バッチファイルを実行するカスタムターゲットを作成
+add_custom_target(
+  # 必ず実行されるように設定
+    RunBatch ALL
+    COMMAND cmd /c "${CMAKE_CURRENT_SOURCE_DIR}/UpdateAsset.bat"
+    COMMENT "Running UpdateAsset.bat during build."
+)
+
+add_dependencies(${APP_NAME} RunBatch)

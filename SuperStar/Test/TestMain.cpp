@@ -74,7 +74,7 @@ int main(int argc, char* const argv[])
 
 // TODO: 現在はコメントアウトでどのテストON/OFFにしている
 // TODO: テスト追加や削除などはコード上で行うのではなく設定上でするとかしたい
-#if 1
+#if 0
 // エンジンのテスト一覧
 
 // マクロテストコード
@@ -132,11 +132,11 @@ int main(int argc, char* const argv[])
 // GUIテスト
 // SDL2のテスト
 // #include "PlatformSDL2Test/PlatformSDL2ModuleTest.hpp"
-// #include "GameDevGUITest/GameDevGUIModuleTest.hpp"
+#include "GameDevGUITest/GameDevGUIModuleTest.hpp"
 
-// #include "UITest/UIModuleTest.hpp"
+#include "UITest/UIModuleTest.hpp"
 
-#if 1
+#if 0
 // ゲーム用のテスト一覧
 
 // Lambdaテストコード

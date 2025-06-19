@@ -14,8 +14,8 @@ TEST_CASE("GameDevGUI Test Open / Close")
     Core::Common::Handle sceneHandle;
     Core::Common::Handle debugWindowHandle;
 
-    UnitTestRunnerByModuleOnly<PlatformSDL2::PlatformSDL2Module, Render::RenderModule,
-                               GameDevGUI::GameDevGUIModule>(
+    StartupEngineByUnitTest<PlatformSDL2::PlatformSDL2Module, Render::RenderModule,
+                            GameDevGUI::GameDevGUIModule>(
         [&uStep, &sceneHandle, &debugWindowHandle]()
         {
             auto pPlatformModule = HE_ENGINE.PlatformModule();
