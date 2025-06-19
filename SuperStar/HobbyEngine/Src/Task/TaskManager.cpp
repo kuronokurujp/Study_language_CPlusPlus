@@ -130,7 +130,7 @@ namespace Core
             // 死亡フラグが付いてたら消す
             if (pTask->_bKill)
             {
-                this->RemoveTask(&pTask->_handle);
+                this->RemoveTask(pTask->_handle);
             }
 
             // 逃がしておいた次のポインタを得る
@@ -169,11 +169,11 @@ namespace Core
         }
         */
 
-    void TaskManager::RemoveTask(Common::Handle* in_pHandle)
+    void TaskManager::RemoveTask(Common::Handle in_handle)
     {
         // タスクのインスタンスを取得
         // 既に削除済みのハンドルだったらNULLが返される
-        Task* pTask = this->GetTask(*in_pHandle);
+        Task* pTask = this->GetTask(in_handle);
         if (pTask == NULL) return;
 
         // 終了を呼ぶ
@@ -189,7 +189,7 @@ namespace Core
 
         // ハンドルを返却する + メモリから削除するかしないか
         const HE::Bool bCache = pTask->_bReleaseMem == FALSE;
-        this->Free(*in_pHandle, bCache);
+        this->Free(in_handle, bCache);
     }
 
     void TaskManager::RemoveGroup(HE::Uint32 in_uGroupId)
@@ -206,7 +206,7 @@ namespace Core
             // RemoveでタスクのpPrev/pNextの入れ替えが起きてしまうので,
             // 次に実行するタスクを事前に取得しておく
             Task* pNextTask = pTask->_pNext;
-            this->RemoveTask(&pTask->_handle);
+            this->RemoveTask(pTask->_handle);
 
             // 逃がしておいた次のポインタを得る
             pTask = pNextTask;

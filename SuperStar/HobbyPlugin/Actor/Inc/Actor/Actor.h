@@ -161,7 +161,7 @@ namespace Actor
         /// <summary>
         /// Removes the component.
         /// </summary>
-        HE::Bool RemoveComponent(Core::Common::Handle*);
+        HE::Bool RemoveComponent(Core::Common::Handle);
 
         /// <summary>
         /// 親アクターがあればその親アクターのコンポーネントを取得
@@ -272,7 +272,7 @@ namespace Actor
         /// </summary>
         void _RemoveAllComponent(Core::TaskManager*);
 
-        HE::Bool _RemoveComponent(Core::Common::Handle*, Core::TaskManager*);
+        HE::Bool _RemoveComponent(Core::Common::Handle, Core::TaskManager*);
 
         void _Clear()
         {

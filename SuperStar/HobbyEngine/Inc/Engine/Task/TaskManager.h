@@ -99,7 +99,7 @@ namespace Core
         /// <summary>
         /// タスクの削除
         /// </summary>
-        void RemoveTask(Common::Handle*);
+        void RemoveTask(Common::Handle);
 
         /// <summary>
         /// グループ丸ごとタスクを削除

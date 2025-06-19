@@ -101,14 +101,14 @@ namespace Actor
         this->_RemoveAllComponent(&this->_lateComponents);
     }
 
-    HE::Bool Object::RemoveComponent(Core::Common::Handle* in_pHandle)
+    HE::Bool Object::RemoveComponent(Core::Common::Handle in_handle)
     {
-        if (this->_RemoveComponent(in_pHandle, &this->_components))
+        if (this->_RemoveComponent(in_handle, &this->_components))
         {
             return TRUE;
         }
 
-        if (this->_RemoveComponent(in_pHandle, &this->_lateComponents))
+        if (this->_RemoveComponent(in_handle, &this->_lateComponents))
         {
             return TRUE;
         }
@@ -261,23 +261,21 @@ namespace Actor
         in_pComponents->RemoveAll();
     }
 
-    HE::Bool Object::_RemoveComponent(Core::Common::Handle* in_pHandle,
+    HE::Bool Object::_RemoveComponent(Core::Common::Handle in_handle,
                                       Core::TaskManager* in_pComponents)
     {
-        HE_ASSERT(in_pHandle);
-        HE_ASSERT(in_pHandle->Null() == FALSE);
+        HE_ASSERT(in_handle.Null() == FALSE);
 
         // コンポーネント解除をオーナーに通知
-        auto pComponent = reinterpret_cast<Component*>(in_pComponents->GetTask(*in_pHandle));
+        auto pComponent = reinterpret_cast<Component*>(in_pComponents->GetTask(in_handle));
         if (pComponent == NULL)
         {
-            in_pHandle->Null();
             return FALSE;
         }
 
         this->_componentFunction(pComponent, EComponentState::EComponentState_UnRegist);
 
-        in_pComponents->RemoveTask(in_pHandle);
+        in_pComponents->RemoveTask(in_handle);
 
         return TRUE;
     }

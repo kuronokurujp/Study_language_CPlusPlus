@@ -54,13 +54,12 @@ namespace Actor
     /// <summary>
     /// Removes the actor.
     /// </summary>
-    void ActorManager::Remove(Core::Common::Handle* in_pActorHandle)
+    void ActorManager::Remove(Core::Common::Handle in_handle)
     {
-        HE_ASSERT_RETURN(in_pActorHandle);
-        HE_ASSERT_RETURN((in_pActorHandle->Null() == FALSE) && "アクターを破棄するハンドルがない");
+        HE_ASSERT_RETURN((in_handle.Null() == FALSE) && "アクターを破棄するハンドルがない");
 
         // 入力コンポーネントがついている場合は登録リストから外す
-        auto pObject = this->Get(*in_pActorHandle);
+        auto pObject = this->Get(in_handle);
         if (pObject != NULL)
         {
             pObject->ForeachComponents(
@@ -72,19 +71,17 @@ namespace Actor
                     return TRUE;
                 });
 
-            this->_taskManager.RemoveTask(in_pActorHandle);
+            this->_taskManager.RemoveTask(in_handle);
             return;
         }
 
         // タスクの全削除処理ですでにタスクが存在しないケースがある
         // ペンディングマップにあるかチェック
-        // if (this->_mPendingActor.Contains(*in_pActorHandle))
+        // if (this->_mPendingActor.Contains(*in_handle))
         {
             // ペンディングマップから外す
-            //   this->_mPendingActor.Erase(*in_pActorHandle);
+            //   this->_mPendingActor.Erase(*in_handle);
         }
-
-        in_pActorHandle->Clear();
     }
 
     Object* ActorManager::Get(const Core::Common::Handle& in_rActorHandle)

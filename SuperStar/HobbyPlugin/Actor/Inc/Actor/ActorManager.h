@@ -123,7 +123,8 @@ namespace Actor
             // 作成したActorのセットアップ
             if (this->_SetupObject(handle) == FALSE)
             {
-                this->_taskManager.RemoveTask(&handle);
+                this->_taskManager.RemoveTask(handle);
+                return NullHandle;
             }
 
             return handle;
@@ -132,7 +133,7 @@ namespace Actor
         /// <summary>
         /// Removes the actor.
         /// </summary>
-        void Remove(Core::Common::Handle*);
+        void Remove(Core::Common::Handle);
 
         /// <summary>
         /// アクター取得

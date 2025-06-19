@@ -22,7 +22,7 @@ namespace Core
 
             // 親から外すのと同時にタスク破棄
             pTask->Kill();
-            this->RemoveChildTask(&it->GetHandle());
+            this->RemoveChildTask(it->GetHandle());
         }
     }
 
@@ -54,7 +54,7 @@ namespace Core
             auto pParentTask = this->_GetTaskTree(pTaskTree->_chainNode.GetParentHandle());
             auto pParentTaskTree = reinterpret_cast<TaskTree*>(pParentTask);
 
-            pParentTaskTree->RemoveChildTask(&pTaskTree->_chainNode.GetHandle());
+            pParentTaskTree->RemoveChildTask(pTaskTree->_chainNode.GetHandle());
         }
 
         // 子のタスク情報を作成してリストに追加
@@ -67,12 +67,11 @@ namespace Core
     }
 
     const TaskTree::ChildTaskNodeIterator TaskTree::RemoveChildTask(
-        Core::Common::Handle* in_pHandle)
+        Core::Common::Handle in_handle)
     {
-        HE_ASSERT(in_pHandle);
-        HE_ASSERT(in_pHandle->Null() == FALSE);
+        HE_ASSERT(in_handle.Null() == FALSE);
 
-        auto pTaskTree = this->_GetTaskTree(*in_pHandle);
+        auto pTaskTree = this->_GetTaskTree(in_handle);
         if (pTaskTree->_chainNode.Empty()) return ChildTaskNodeIterator();
 
         HE_ASSERT(pTaskTree->_chainNode.GetParentHandle() == this->_handle);
@@ -85,7 +84,7 @@ namespace Core
         // 破棄フラグがあればタスク管理で消去
         if (pTaskTree->_bKill)
         {
-            this->_pTaskManager->RemoveTask(in_pHandle);
+            this->_pTaskManager->RemoveTask(in_handle);
         }
         else
         {

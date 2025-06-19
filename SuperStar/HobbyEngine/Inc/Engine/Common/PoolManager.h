@@ -244,19 +244,19 @@ namespace Core::Common
         /// <summary>
         /// 割り当てデータを解放
         /// </summary>
-        HE::Bool Free(Handle& in_rHandle, const HE::Bool in_bCache)
+        HE::Bool Free(Handle in_handle, const HE::Bool in_bCache)
         {
             HE_ASSERT_RETURN_VALUE(FALSE,
-                                   in_rHandle.Null() == FALSE && "解放するデータがないとだめ");
+                                   in_handle.Null() == FALSE && "解放するデータがないとだめ");
 
-            T* pRemoveObj = this->_upUserSlot->at(in_rHandle);
+            T* pRemoveObj = this->_upUserSlot->at(in_handle);
             if (pRemoveObj == NULL)
             {
-                in_rHandle.Clear();
+                in_handle.Clear();
                 return TRUE;
             }
 
-            this->_upUserSlot->erase(in_rHandle);
+            this->_upUserSlot->erase(in_handle);
 
             if (in_bCache)
             {
@@ -268,8 +268,6 @@ namespace Core::Common
                 // キャッシュしたのを破棄する
                 HE_SAFE_DELETE_MEM(pRemoveObj);
             }
-            // 割り当てを解除
-            in_rHandle.Clear();
 
             return TRUE;
         }

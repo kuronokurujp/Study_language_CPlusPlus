@@ -80,7 +80,7 @@ namespace Core
         /// <summary>
         /// 子タスクを外す
         /// </summary>
-        const ChildTaskNodeIterator RemoveChildTask(Core::Common::Handle*);
+        const ChildTaskNodeIterator RemoveChildTask(Core::Common::Handle);
 
         /// <summary>
         /// 子タスクのループ

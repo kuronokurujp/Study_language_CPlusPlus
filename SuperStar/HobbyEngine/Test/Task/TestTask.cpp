@@ -371,12 +371,12 @@ namespace Core
         // タスクの利用数が意図通りか
         EXPECT_EQ(manager.UseCount(), 3);
 
-        manager.RemoveTask(&h1);
+        manager.RemoveTask(h1);
         EXPECT_EQ(manager.UseCount(), 2);
         EXPECT_EQ(manager.GetTask(h1), NULL);
         EXPECT_EQ(manager.CacheCount(), 0);
 
-        manager.RemoveTask(&h3);
+        manager.RemoveTask(h3);
         EXPECT_EQ(manager.CacheCount(), 1);
         EXPECT_EQ(manager.UseCount(), 1);
 
@@ -498,7 +498,7 @@ namespace Core
         HE_LOG(HE_STR_TEXT(" (%d / %d)\n"), manager.UseCount(), manager.Max());
 
         // 親タスクが外したのだから子タスクも同時に外れているはず
-        manager.RemoveTask(&h1);
+        manager.RemoveTask(h1);
         EXPECT_EQ(manager.UseCount(), 1);
         EXPECT_EQ(manager.GetTask(h1), NULL);
         EXPECT_EQ(manager.GetTask(h2), NULL);
