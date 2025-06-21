@@ -24,7 +24,7 @@ namespace InGame
         // 座標情報を持つコンポーネントのハンドルを取得
         // このコンポーネントがないと処理できない
         auto [h, c] =
-            this->Owner()->GetComponentHandleAndComponent(&Actor::TransformComponent::CLASS_RTTI);
+            this->Owner()->GetComponentHandleAndComponent(&Actor::TransformComponent::StaticRTTI());
         HE_ASSERT(h.Null() == FALSE);
         this->_transformHandle = h;
 

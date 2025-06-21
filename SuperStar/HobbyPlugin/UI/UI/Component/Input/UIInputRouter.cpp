@@ -24,7 +24,7 @@ namespace UI
 
         // Widgetアクターに設定しているUIWidgetコンポーネントを全て取得
         Core::Common::FixedStack<Actor::Component*, 128> sWidgetComponent;
-        pWidget->OutputChildrenComponent(&sWidgetComponent, &UIWidgetComponent::CLASS_RTTI);
+        pWidget->OutputChildrenComponent(&sWidgetComponent, &UIWidgetComponent::StaticRTTI());
 
         HE::Uint32 uSize = sWidgetComponent.Size();
         HE_ASSERT_RETURN(0 < uSize);

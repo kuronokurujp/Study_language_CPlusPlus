@@ -23,7 +23,7 @@ namespace EnhancedInput
     {
         HE_ASSERT(in_pComponent);
 
-        if (in_pComponent->VGetRTTI().DerivesFrom(&InputComponent::CLASS_RTTI) == FALSE) return;
+        if (in_pComponent->VGetRTTI().DerivesFrom(&InputComponent::StaticRTTI()) == FALSE) return;
 
         auto pInputComponent = reinterpret_cast<InputComponent*>(in_pComponent);
         this->_lstInputComponent.PushBack(*pInputComponent);
@@ -33,7 +33,7 @@ namespace EnhancedInput
         Actor::Component* in_pComponent)
     {
         HE_ASSERT(in_pComponent);
-        if (in_pComponent->VGetRTTI().DerivesFrom(&InputComponent::CLASS_RTTI) == FALSE) return;
+        if (in_pComponent->VGetRTTI().DerivesFrom(&InputComponent::StaticRTTI()) == FALSE) return;
 
         auto pInputComponent = reinterpret_cast<InputComponent*>(in_pComponent);
         this->_lstInputComponent.Erase(pInputComponent);
