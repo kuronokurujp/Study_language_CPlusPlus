@@ -16,7 +16,7 @@ namespace Core
     {
         HE_CLASS_COPY_NG(TaskTree);
         HE_CLASS_MOVE_NG(TaskTree);
-        HE_GENERATED_CLASS_BASE_BODY_HEADER(TaskTree);
+        // HE_GENERATED_CLASS_BASE_BODY_HEADER(TaskTree);
 
     public:
         // 子タスクのリストノード
@@ -59,14 +59,11 @@ namespace Core
             Core::Common::CustomList<TaskTree::ChildTaskNode>::IteratorChar;
 
     public:
-        TaskTree() : Task() { this->_Clear(); }
+        TaskTree();
 
         virtual void VSetup(const HE::Bool in_bAutoDelete);
-
         virtual void VUpdate(const HE::Float32) override;
-        //virtual void VEvent(const TaskData& in_rEvent) override;
 
-        //inline const ChildTaskNode& GetChildTaskNode() const { return this->_chainNode; }
         // 親タスクのハンドル
         Core::Common::Handle GetParentHandle() const { return this->_chainNode.GetParentHandle(); }
 
@@ -74,6 +71,8 @@ namespace Core
 
         /// <summary>
         /// 子タスクの追加
+        /// 子タスクに追加できるのはTaskTreeかTaskTreeの派生クラスのみ
+        /// Taskが追加できると管理が複雑になるため
         /// </summary>
         HE::Bool AddChildTask(const Core::Common::Handle&);
 
@@ -85,7 +84,13 @@ namespace Core
         /// <summary>
         /// 子タスクのループ
         /// </summary>
-        void ForeachChildTask(std::function<void(Task*)>);
+        void ForeachChildTask(std::function<void(TaskTree*)>);
+
+        /// <summary>
+        /// 親タスクからつながっているタスクへループ
+        /// </summary>
+        /// <param name=""></param>
+        void ForeachParentTask(std::function<HE::Bool(TaskTree*)>);
 
     protected:
         /// <summary>
@@ -94,7 +99,7 @@ namespace Core
         virtual void _VDestory() override;
 
     private:
-        TaskTree* _GetTaskTree(const Core::Common::Handle& in_rHandle);
+        TaskTree* _GetTaskTree(const Core::Common::Handle&);
 
         void _Clear()
         {

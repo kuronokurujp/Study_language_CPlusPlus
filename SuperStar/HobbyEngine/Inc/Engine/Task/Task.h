@@ -10,19 +10,6 @@ namespace Core
     // 前方宣言
     class TaskManager;
 
-    /*
-        /// <summary>
-        /// タスクデータ
-        /// Updateメソッドを呼び出した側がデータを渡す場合に使う
-        /// </summary>
-        struct TaskData
-        {
-        public:
-            HE::Uint32 uId = 0;
-            void* pData    = NULL;
-        };
-        */
-
     /// <summary>
     /// オブジェクトのタスクを作る時の継承用のクラス
     /// </summary>
@@ -39,9 +26,18 @@ namespace Core
         static const HE::Uint32 uNoneId      = 0;
         static const HE::Uint32 uNoneGroupId = 0xffffffff;
 
-        // タスクは生成したインスタンスが再利用されるのでコンストラクタで初期化はできない
-        Task() { this->_Clear(); }
+        /// <summary>
+        /// タスクのタイプ
+        /// タスクの派生クラスが出来たら追加してGetType()で取得できるようにする
+        /// </summary>
+        enum class EType
+        {
+            EType_Base = 0,
+            EType_Tree
+        };
 
+        // タスクは生成したインスタンスが再利用されるのでコンストラクタで初期化はできない
+        Task();
         virtual ~Task() = default;
 
         /// <summary>
@@ -80,6 +76,11 @@ namespace Core
         /// </summary>
         inline HE::Sint32 GetGropuId() const { return this->_uGroupId; }
 
+        /// <summary>
+        /// タスクのタイプ
+        /// </summary>
+        inline EType GetType() const { return this->_eType; }
+
     protected:
         /// <summary>
         /// タスク破棄
@@ -98,10 +99,13 @@ namespace Core
             this->_bReleaseMem = FALSE;
             this->_handle.Clear();
             this->_pTaskManager = NULL;
+            this->_eType        = EType::EType_Base;
         }
 
     protected:
         TaskManager* _pTaskManager = NULL;
+
+        EType _eType = EType::EType_Base;
 
     private:
         HE::Uint32 _uGroupId = Task::uNoneGroupId;
@@ -118,7 +122,3 @@ namespace Core
     };
 
 };  // namespace Core
-
-// タスクデータのデフォルト
-// タスクデータの引数でデフォルト設定する場合に利用
-// extern const Core::TaskData NullTaskData;

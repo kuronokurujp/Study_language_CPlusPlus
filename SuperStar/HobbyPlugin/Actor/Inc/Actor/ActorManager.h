@@ -83,7 +83,7 @@ namespace Actor
         /// <summary>
         /// タスクイベント
         /// </summary>
-        //void Event(const Core::TaskData&);
+        // void Event(const Core::TaskData&);
 
         void ForeachActor(std::function<void(Object*)> in_func);
 
@@ -102,9 +102,8 @@ namespace Actor
             if (this->_bUpdatingActors) uGroupId = this->_GetPendingGroupId();
 
             auto handle = this->_taskManager.CreateAndAdd<T>(
-                uGroupId, TRUE,
-                in_uGroupId,
-                // TODO: コンポーネント登録と解除の受信
+                uGroupId, TRUE, in_uGroupId,
+                // コンポーネント登録と解除の受信
                 [this](Component* in_pComp, const Object::EComponentState in_eState)
                 {
                     if (in_eState == Object::EComponentState::EComponentState_Regist)
@@ -116,8 +115,6 @@ namespace Actor
 
                     HE_ASSERT(NULL);
                 },
-                // TODO: ハンドル受信して管理しているアクターを返す
-                [this](const Core::Common::Handle in_handle) { return this->Get(in_handle); },
                 std::forward<TArgs>(in_args)...);
 
             // 作成したActorのセットアップ
@@ -184,7 +181,7 @@ namespace Actor
         /// <summary>
         /// 更新保留アクターのデータ
         /// </summary>
-        //Core::Common::FixedMap<HE::Uint64, PendingData, 256> _mPendingActor;
+        // Core::Common::FixedMap<HE::Uint64, PendingData, 256> _mPendingActor;
     };
 
 // Startメソッドの実行箇所を特定するマクロ

@@ -234,6 +234,7 @@ namespace Core
                 {
                     Local::ObjectTask* pPlayer =
                         dynamic_cast<Local::ObjectTask*>(manager.GetTask(hPlayer));
+                    EXPECT_EQ(pPlayer->GetType(), Task::EType::EType_Base);
                     EXPECT_NE(pPlayer, NULL);
                 }
             }
@@ -399,8 +400,6 @@ namespace Core
     // テスト用のタスクたち
     class EffectTaskTree final : public TaskTree
     {
-        HE_GENERATED_CLASS_BODY_HEADER(EffectTaskTree, TaskTree)
-
     public:
         EffectTaskTree() : TaskTree() {}
 
@@ -421,7 +420,6 @@ namespace Core
 
     class ObjectTaskTree : public TaskTree
     {
-        HE_GENERATED_CLASS_BODY_HEADER(ObjectTaskTree, TaskTree)
     public:
         ObjectTaskTree() : TaskTree() {}
 
@@ -488,9 +486,9 @@ namespace Core
         // タスクの利用数が意図通りか
         EXPECT_EQ(manager.UseCount(), 3);
         auto pTask = manager.GetTask(h1);
-        // EXPECT_EQ(HE_GENERATED_CHECK_RTTI(*pTask, Core::TaskTree), TRUE);
 
         auto pTaskTree = reinterpret_cast<TaskTree*>(pTask);
+        EXPECT_EQ(pTaskTree->GetType(), Task::EType::EType_Tree);
         EXPECT_EQ(pTaskTree->AddChildTask(h1), FALSE);
         EXPECT_EQ(pTaskTree->AddChildTask(h2), TRUE);
         EXPECT_EQ(manager.UseCount(), 3);
@@ -512,13 +510,11 @@ namespace Core
         EXPECT_EQ(h5.Null(), FALSE);
 
         pTask = manager.GetTask(h3);
-        // EXPECT_EQ(HE_GENERATED_CHECK_RTTI(*pTask, Core::TaskTree), TRUE);
 
         pTaskTree = reinterpret_cast<TaskTree*>(pTask);
         pTaskTree->AddChildTask(h4);
 
         pTask = manager.GetTask(h4);
-        //        EXPECT_EQ(HE_GENERATED_CHECK_RTTI(*pTask, Core::TaskTree), TRUE);
 
         pTaskTree = reinterpret_cast<TaskTree*>(pTask);
         pTaskTree->AddChildTask(h5);

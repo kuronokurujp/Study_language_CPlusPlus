@@ -19,13 +19,13 @@ namespace Platform
 namespace Actor
 {
     /// <summary>
-    /// ゲームアクター
+    /// アクターオブジェクト
     /// </summary>
     class Object : public Core::TaskTree
     {
         HE_CLASS_COPY_NG(Object);
         HE_CLASS_MOVE_NG(Object);
-        HE_GENERATED_CLASS_BODY_HEADER(Object, Core::TaskTree);
+        HE_GENERATED_CLASS_BASE_BODY_HEADER(Object);
 
     public:
         // アクターのプライベートな点まで管理アクターは参照できるようにする
@@ -48,17 +48,15 @@ namespace Actor
         };
 
         using SenderFunctionComponent = std::function<void(Component*, const EComponentState)>;
-        using SenderFunctionObject    = std::function<Object*(const Core::Common::Handle)>;
 
     public:
-        Object(const HE::Uint32 in_uGroupId, SenderFunctionComponent in_CompFunc,
-               SenderFunctionObject in_objFunc);
+        Object(const HE::Uint32 in_uGroupId, SenderFunctionComponent in_compFunc);
         virtual ~Object();
 
         /// <summary>
         /// ハンドルからオーナーに所属しているアクターを取得
         /// </summary>
-        Object* GetActor(const Core::Common::Handle&);
+        // Object* GetActor(const Core::Common::Handle&);
 
         /// <summary>
         /// 生成直後の設定処理
@@ -281,7 +279,6 @@ namespace Actor
             this->_components.RemoveAll();
             this->_lateComponents.RemoveAll();
             this->_componentFunction = NULL;
-            this->_objectFunction    = NULL;
             this->_uGroupId          = Task::uNoneGroupId;
         }
 
@@ -293,7 +290,6 @@ namespace Actor
         Core::TaskManager _lateComponents;
 
         SenderFunctionComponent _componentFunction;
-        SenderFunctionObject _objectFunction;
 
         HE::Uint32 _uGroupId;
     };

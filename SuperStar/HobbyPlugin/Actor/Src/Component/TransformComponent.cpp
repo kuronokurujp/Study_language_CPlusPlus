@@ -12,6 +12,22 @@ namespace Actor
         if (pOwnerActor->IsChild() == FALSE) return pos;
 
         // 親アクターがあれば座標を取得
+        pOwnerActor->ForeachParentTask(
+            [&pos](Core::TaskTree* in_pTask)
+            {
+                Object* pParentActor = reinterpret_cast<Object*>(in_pTask);
+                if (pParentActor == NULL) return FALSE;
+
+                auto pTrans = pParentActor->GetComponent<TransformComponent>();
+                if (pTrans == NULL) return FALSE;
+
+                // 親の座標を加算
+                pos += pTrans->_pos;
+
+                return FALSE;
+            });
+
+/*
         Core::Common::Handle handle = pOwnerActor->GetParentHandle();
         while (handle.Null() == FALSE)
         {
@@ -30,6 +46,7 @@ namespace Actor
             else
                 handle.Clear();
         }
+        */
 
         return pos;
     }

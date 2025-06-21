@@ -2,15 +2,12 @@
 
 namespace Actor
 {
-    Object::Object(const HE::Uint32 in_uGroupId, SenderFunctionComponent in_CompFunc,
-                   SenderFunctionObject in_objFunc)
-        : TaskTree()
+    Object::Object(const HE::Uint32 in_uGroupId, SenderFunctionComponent in_CompFunc) : TaskTree()
     {
         this->_Clear();
 
         this->_uGroupId          = in_uGroupId;
         this->_componentFunction = std::move(in_CompFunc);
-        this->_objectFunction    = std::move(in_objFunc);
     }
 
     Object::~Object()
@@ -18,13 +15,14 @@ namespace Actor
         this->_components.End();
         this->_lateComponents.End();
         this->_componentFunction = NULL;
-        this->_objectFunction    = NULL;
     }
 
-    Object* Object::GetActor(const Core::Common::Handle& in_rHandle)
-    {
-        return this->_objectFunction(in_rHandle);
-    }
+    /*
+        Object* Object::GetActor(const Core::Common::Handle& in_rHandle)
+        {
+            return this->_objectFunction(in_rHandle);
+        }
+        */
 
     void Object::VSetup(const HE::Bool in_bAutoDelete)
     {

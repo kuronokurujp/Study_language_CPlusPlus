@@ -1,13 +1,14 @@
 ﻿#include "Engine/Task/Task.h"
 
-//const Core::TaskData NullTaskData;
-
 namespace Core
 {
-    void Task::VSetup(const HE::Bool in_bReleaseMem)
+    Task::Task()
     {
         this->_Clear();
+    }
 
+    void Task::VSetup(const HE::Bool in_bReleaseMem)
+    {
         // パラメータはタスク管理に登録された時に設定される
         this->_bReleaseMem = in_bReleaseMem;
     }

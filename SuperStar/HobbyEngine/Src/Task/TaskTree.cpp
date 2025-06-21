@@ -4,13 +4,6 @@
 
 namespace Core
 {
-/*
-    void TaskTree::VEvent(const TaskData& in_rEvent)
-    {
-        this->ForeachChildTask([this, in_rEvent](Task* in_pTask) { in_pTask->VEvent(in_rEvent); });
-    }
-    */
-
     void TaskTree::_VDestory()
     {
         // 子タスクを全て破棄
@@ -33,14 +26,18 @@ namespace Core
         if (in_rHandle == this->_handle) return FALSE;
 
         auto pTaskTree = this->_GetTaskTree(in_rHandle);
+        HE_ASSERT_RETURN_VALUE(FALSE, pTaskTree != NULL);
+
+        // グループIDが違うタスクを子タスクにできないようにする
+        HE_ASSERT_RETURN_VALUE(FALSE, pTaskTree->GetGropuId() == this->GetGropuId());
+
         // 管理側でつながっているのであれば外す
         if (pTaskTree->_bChild == FALSE)
         {
             // タスクが子タスクを持っていると対応しないようにしている
             if (pTaskTree->_lstChildTask.Empty() == FALSE)
             {
-                HE_ASSERT(FALSE &&
-                          "タスクに子タスクがあるのこのタスクは子タスクにはできない");
+                HE_ASSERT(FALSE && "タスクに子タスクがあるのこのタスクは子タスクにはできない");
                 return FALSE;
             }
 
@@ -51,9 +48,7 @@ namespace Core
         else
         {
             // すでに子タスクとなっているのであれば親タスクから外す
-            auto pParentTask = this->_GetTaskTree(pTaskTree->_chainNode.GetParentHandle());
-            auto pParentTaskTree = reinterpret_cast<TaskTree*>(pParentTask);
-
+            auto pParentTaskTree = this->_GetTaskTree(pTaskTree->_chainNode.GetParentHandle());
             pParentTaskTree->RemoveChildTask(pTaskTree->_chainNode.GetHandle());
         }
 
@@ -66,8 +61,7 @@ namespace Core
         return TRUE;
     }
 
-    const TaskTree::ChildTaskNodeIterator TaskTree::RemoveChildTask(
-        Core::Common::Handle in_handle)
+    const TaskTree::ChildTaskNodeIterator TaskTree::RemoveChildTask(Core::Common::Handle in_handle)
     {
         HE_ASSERT(in_handle.Null() == FALSE);
 
@@ -93,6 +87,12 @@ namespace Core
         }
 
         return nextItr;
+    }
+
+    TaskTree::TaskTree() : Task()
+    {
+        this->_Clear();
+        this->_eType = EType::EType_Tree;
     }
 
     void TaskTree::VSetup(const HE::Bool in_bAutoDelete)
@@ -124,13 +124,13 @@ namespace Core
     {
         auto pTask = this->_pTaskManager->GetTask(in_rHandle);
         HE_ASSERT_RETURN_VALUE(NULL, pTask);
-//        HE_ASSERT_RETURN_VALUE(NULL, HE_GENERATED_CHECK_RTTI(*pTask, TaskTree));
+        HE_ASSERT_RETURN_VALUE(NULL, pTask->GetType() == Task::EType::EType_Tree);
 
         auto pTaskTree = reinterpret_cast<TaskTree*>(pTask);
         return pTaskTree;
     }
 
-    void TaskTree::ForeachChildTask(std::function<void(Task*)> in_action)
+    void TaskTree::ForeachChildTask(std::function<void(TaskTree*)> in_action)
     {
         for (auto it = this->_lstChildTask.BeginItr(); it != this->_lstChildTask.EndItr(); ++it)
         {
@@ -141,7 +141,25 @@ namespace Core
                 continue;
             }
 
-            in_action(pTask);
+            HE_ASSERT_RETURN(pTask->GetType() == Task::EType::EType_Tree);
+            in_action(reinterpret_cast<TaskTree*>(pTask));
+        }
+    }
+
+    void TaskTree::ForeachParentTask(std::function<HE::Bool(TaskTree*)> in_action)
+    {
+        Core::Common::Handle handle = this->GetParentHandle();
+        while (handle.Null() == FALSE)
+        {
+            auto pTaskTree = this->_GetTaskTree(handle);
+            if (pTaskTree == NULL) break;
+
+            HE_ASSERT_RETURN(pTaskTree->GetType() == Task::EType::EType_Tree);
+            if (in_action(reinterpret_cast<TaskTree*>(pTaskTree)) == FALSE) break;
+
+            if (pTaskTree->IsChild() == FALSE) break;
+
+            handle = pTaskTree->GetParentHandle();
         }
     }
 }  // namespace Core
