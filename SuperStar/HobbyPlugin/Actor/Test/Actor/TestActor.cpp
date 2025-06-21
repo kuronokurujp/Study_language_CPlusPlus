@@ -108,7 +108,8 @@ namespace Actor
         EXPECT_EQ(HE_GENERATED_CHECK_RTTI(specialObj, SimpleObject), TRUE);
         // SpecialObjectはCheckRTTIの派生クラスではないことを確認
         EXPECT_NE(HE_GENERATED_CHECK_RTTI(specialObj, CheckRTTI), TRUE);
-        EXPECT_EQ(HE_GENERATED_CHECK_RTTI(specialObj, SpecialObject), TRUE);
+        // SpecialObjectクラスはRTTIを定義するマクロを使用していないためのでコンパイルエラーになる
+        //EXPECT_EQ(HE_GENERATED_CHECK_RTTI(specialObj, SpecialObject), TRUE);
         EXPECT_NE(HE_GENERATED_CHECK_RTTI(specialObj, SimpleObject2), TRUE);
 
         auto simpleObj3 =

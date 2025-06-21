@@ -19,14 +19,14 @@ namespace Core::Common
             HE_LOG_LINE(HE_STR_TEXT("RTTI BaseClassName: %s"), in_szClass);
         }
 
-        RTTI(const HE::Char* in_szClass, const RTTI& in_rBaseRTTI)
-            : _szClass(in_szClass), _pBaseRTTI(&in_rBaseRTTI)
+        RTTI(const HE::Char* in_szClass, const RTTI* in_pBaseRTTI)
+            : _szClass(in_szClass), _pBaseRTTI(in_pBaseRTTI)
         {
             HE_LOG_LINE(HE_STR_TEXT("RTTI InheritClassName: %s BaseClassName: %s"), in_szClass,
-                        in_rBaseRTTI.GetName().Str());
+                        in_pBaseRTTI->GetName().Str());
         }
 
-        const FixedString128& GetName() const HE_NOEXCEPT { return this->_szClass; }
+        const StringBase& GetName() const HE_NOEXCEPT { return this->_szClass; }
         HE::Bool IsExactly(const RTTI& in_rRtti) const HE_NOEXCEPT
         {
             return (this->_pBaseRTTI == &in_rRtti);

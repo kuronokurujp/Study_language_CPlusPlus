@@ -223,7 +223,7 @@ namespace Actor
             HE_STATIC_ASSERT(std::is_base_of<Component, T>::value,
                              "TクラスはComponentクラスを継承していない");
 
-            auto [handle, p] = this->GetComponentHandleAndComponent(&T::CLASS_RTTI);
+            auto [handle, p] = this->GetComponentHandleAndComponent(T:: StaticRTTI());
             if (handle.Null()) return NULL;
 
             return reinterpret_cast<T*>(p);

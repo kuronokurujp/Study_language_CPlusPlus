@@ -18,7 +18,7 @@ namespace Actor
     void Component::VSetup(const HE::Bool in_bAutoDelete)
     {
         HE_LOG_LINE(HE_STR_TEXT("初期化したコンポーネントは(%s)"),
-                    this->VGetRTTI().GetName().Str());
+                    this->GetRTTI().GetName().Str());
 
         Core::Task::VSetup(in_bAutoDelete);
 
