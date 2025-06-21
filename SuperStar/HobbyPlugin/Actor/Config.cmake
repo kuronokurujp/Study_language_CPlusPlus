@@ -18,8 +18,6 @@ set(PLUGIN_ACTOR_TARGET_INC_FILES
     Inc/Actor/Component/TransformComponent.h
 )
 
-# プロジェクトに登録するファイル群
-# ここに全て記載する
 set(PLUGIN_ACTOR_TARGET_SRC_FILES
     Src/ActorModule.cpp
 
