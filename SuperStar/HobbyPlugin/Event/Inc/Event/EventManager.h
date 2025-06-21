@@ -7,7 +7,7 @@
 #include "Engine/Common/CustomVector.h"
 #include "Engine/Common/PoolManager.h"
 #include "Engine/MiniEngine.h"
-#include "EventInterface.h"
+#include "Event/EventInterface.h"
 
 namespace Event
 {

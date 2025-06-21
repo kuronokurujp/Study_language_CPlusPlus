@@ -29,7 +29,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Actor/Config.cmake NO_POLICY_SCO
 # EnhancedInputプラグイン
 # include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/EnhancedInput/Config.cmake NO_POLICY_SCOPE)
 # Eventプラグイン
-# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Event/Config.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Event/Config.cmake NO_POLICY_SCOPE)
 # Luaプラグイン
 # include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Lua/Config.cmake NO_POLICY_SCOPE)
 # TODO: 以下はデバッグのみ利用(リリース版では含めないようにする)
@@ -92,7 +92,7 @@ add_subdirectory(HobbyPlugin/Actor)
 # add_subdirectory(HobbyPlugin/Localization)
 # add_subdirectory(HobbyPlugin/UI)
 # add_subdirectory(HobbyPlugin/EnhancedInput)
-# add_subdirectory(HobbyPlugin/Event)
+add_subdirectory(HobbyPlugin/Event)
 # add_subdirectory(HobbyPlugin/Lua)
 # TODO: 以下のはデバッグのみ利用(リリース版では含めないようにする)
 # add_subdirectory(HobbyPlugin/RuntimeDebug)

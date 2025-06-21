@@ -1,8 +1,26 @@
 # プラグインビルドの共通処理.
-include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICY_SCOPE)
-# プラグインの共通情報.
-include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
-# 共有ライブラリとして生成するためのオプションの定義.
-option(EVENT_PLUGIN_BUILD_SHARED_LIBS "build shared library" OFF)
-# プラグイン共通ビルド処理.
-common_build_plugin("${EVENT_PLUGIN_NAME}" "${EVENT_PLUGIN_TARGET_FILES}" "$CACHE{CACHE_ENGINE_INCLUDE_CODE}" ${EVENT_PLUGIN_BUILD_SHARED_LIBS})
+include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/Project.cmake NO_POLICY_SCOPE)
+# エンジン設定
+include(${CMAKE_SOURCE_DIR}/HobbyEngine/Config.cmake NO_POLICY_SCOPE)
+
+# 静的ライブラリの設定
+project_configure_static_lib_target(${PLUGIN_EVENT_NAME})
+
+# プロジェクトの設定
+project_configure_target(${PLUGIN_EVENT_NAME})
+
+# ターゲットへファイル群の設定
+project_configure_files_target(${PLUGIN_EVENT_NAME}
+    ${PLUGIN_EVENT_TARGET_COMMON_FILES}
+    ${PLUGIN_EVENT_TARGET_SRC_FILES}
+    ${PLUGIN_EVENT_TARGET_INC_FILES}
+)
+
+# エンジンのインクルードパス
+target_include_directories(${PLUGIN_EVENT_NAME} PUBLIC ${ENGINE_INC_DIR})
+
+# プロジェクトが参照できるインクルードディレクトリのパス
+target_include_directories(${PLUGIN_EVENT_NAME} PUBLIC ${PLUGIN_EVENT_INC_DIR})
+
+# テスト用サブディレクトリを追加
+add_subdirectory(Test)

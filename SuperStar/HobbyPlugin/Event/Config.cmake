@@ -1,15 +1,22 @@
-set(EVENT_PLUGIN_NAME HobbyEnginePlugin_Event)
-# プロジェクトに登録するファイル群
-# ここに全て記載する
-set(EVENT_PLUGIN_TARGET_FILES
+set(PLUGIN_EVENT_NAME HobbyPlugin_Event)
+set(PLUGIN_EVENT_INC_DIR ${CMAKE_CURRENT_LIST_DIR}/Inc)
+
+set(PLUGIN_EVENT_TARGET_COMMON_FILES
     .editorconfig
     LICENSE.txt
     README.md
-    EventModule.cpp
-    EventModule.h
-    
-    Event/EventData.h
-    Event/EventInterface.h
-    Event/EventManager.h
-    Event/EventManager.cpp
+
 )
+set(PLUGIN_EVENT_TARGET_INC_FILES
+    Inc/EventModule.h
+
+    Inc/Event/EventData.h
+    Inc/Event/EventInterface.h
+    Inc/Event/EventManager.h
+)
+
+set(PLUGIN_EVENT_TARGET_SRC_FILES
+    Src/EventModule.cpp
+    Src/EventManager.cpp
+)
+
