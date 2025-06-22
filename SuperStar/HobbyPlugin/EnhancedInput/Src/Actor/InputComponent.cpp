@@ -1,4 +1,4 @@
-﻿#include "InputComponent.h"
+﻿#include "EnhancedInput/Actor/InputComponent.h"
 
 namespace EnhancedInput
 {
@@ -29,11 +29,4 @@ namespace EnhancedInput
 
         this->_spStrategy->VProcessInput(in_mInputMap, this->_pOwner);
     }
-    /*
-        void InputComponent::SetStrategy(std::shared_ptr<InputStrategyBase> in_pStrategy)
-        {
-            this->_spStrategy = in_pStrategy;
-        }
-        */
-
 }  // namespace EnhancedInput

@@ -1,0 +1,13 @@
+{
+    "name": "unittest",
+    "version-string": "1.0.0",
+    "dependencies": [
+        "gtest"
+    ],
+    "overrides": [
+        {
+            "name": "gtest",
+            "version": "1.17.0#1"
+        }
+    ]
+}

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+// 最小エンジンインクルード
+#include "Engine/Common/CustomVector.h"
 #include "Engine/MiniEngine.h"
 #include "Engine/Module/Module.h"
 #include "Engine/Platform/PlatformInput.h"
@@ -11,17 +13,6 @@
 
 namespace EnhancedInput
 {
-    /// <summary>
-    /// 入力タイプ
-    /// </summary>
-    /*
-    enum EInputType
-    {
-        EInputType_Keyboard = 0,
-        EInputType_Touch,
-    };
-    */
-
     /// <summary>
     /// 入力アクションデータ
     /// </summary>
@@ -64,33 +55,7 @@ namespace EnhancedInput
         /// マウスやタッチ入力データ
         /// </summary>
         Core::Common::FixedVector<Platform::EInputMouseType, 4> aTouchs;
-        // Core::Common::CustomArray<Uint32, 4> aButtons;
-        // Core::Common::CustomArray<Uint32, 4> aSticks;
     };
-
-    /// <summary>
-    /// アクションを入力したデータ
-    /// </summary>
-    /*
-    struct InputData
-    {
-        EInputType eType;
-
-        union Item
-        {
-            struct Key
-            {
-                Platform::EKeyboard eKey;
-            } keyboard;
-
-            struct Touch
-            {
-                Platform::EInputMouseType eType;
-                HE::Float32 _fX, _fY;
-            } touch;
-        } item;
-    };
-    */
 
     /// <summary>
     /// アクションデータのマップ型
@@ -98,19 +63,14 @@ namespace EnhancedInput
     using ActionMap = Core::Common::FixedMap<Core::Common::FixedString64, ActionData, 32>;
 
     /// <summary>
-    /// 入力データのマップ型
-    /// </summary>
-    /*
-    using InputMap = Core::Common::FixedMap<Core::Common::FixedString64,
-                                            Core::Common::FixedVector<InputData, 32>, 32>;
-                                            */
-
-    /// <summary>
     /// インプット用の追加モジュール
     /// </summary>
     class EnhancedInputModule final : public Module::ModuleBase
     {
         HE_MODULE_GENRATE_DECLARATION(EnhancedInputModule);
+
+    public:
+        using EventInputSharedPtr = Core::Memory::SharedPtr<EventInput>;
 
     public:
         EnhancedInputModule();
@@ -143,8 +103,10 @@ namespace EnhancedInput
         void RemoveAction(const ActionMap&);
         void RemoveAction(const HE::Char*);
 
-        // TODO: これは削除してイベントクラスとする
-        // const InputMap& GetInputMap() const { return this->_mInputAction; }
+        /// <summary>
+        /// 登録アクションの入力検出・格納処理
+        /// </summary>
+        void DetectInputActions(Platform::InputObject* pInputObj, EventInputSharedPtr& spEventInput);
 
     protected:
         /// <summary>
@@ -174,7 +136,7 @@ namespace EnhancedInput
         Core::Common::Handle _inputHandle;
         Core::Common::Handle _eventHandle;
 
-        Core::Memory::SharedPtr<EventInput> _spEventInput;
+        EventInputSharedPtr _spEventInput;
     };
 
 }  // namespace EnhancedInput

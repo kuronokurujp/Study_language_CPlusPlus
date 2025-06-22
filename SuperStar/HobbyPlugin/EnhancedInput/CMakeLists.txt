@@ -1,19 +1,40 @@
 # プラグインビルドの共通処理.
-include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICY_SCOPE)
-# Renderプラグインの共通情報.
-include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
+include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/Project.cmake NO_POLICY_SCOPE)
+# エンジン設定
+include(${CMAKE_SOURCE_DIR}/HobbyEngine/Config.cmake NO_POLICY_SCOPE)
+# Actorモジュール設定
+include(${CMAKE_SOURCE_DIR}/HobbyPlugin/Actor/Config.cmake NO_POLICY_SCOPE)
+# Eventモジュール設定
+include(${CMAKE_SOURCE_DIR}/HobbyPlugin/Event/Config.cmake NO_POLICY_SCOPE)
 
 message("build enchancde input plugin lib!")
 
-# 共有ライブラリとして生成するためのオプションの定義.
-option(ENHANCED_INPUT_PLUGIN_BUILD_SHARED_LIBS "build shared library" OFF)
+# 静的ライブラリの設定
+project_configure_static_lib_target(${PLUGIN_ENHANCED_INPUT_NAME})
 
-# プラグイン共通ビルド処理.
-common_build_plugin("${ENHANCED_INPUT_PLUGIN_NAME}" "${ENHANCED_INPUT_PLUGIN_TARGET_FILES}" "$CACHE{CACHE_ENGINE_INCLUDE_CODE}" ${ENHANCED_INPUT_PLUGIN_BUILD_SHARED_LIBS})
+# プロジェクトの設定
+project_configure_target(${PLUGIN_ENHANCED_INPUT_NAME})
 
-target_include_directories(${ENHANCED_INPUT_PLUGIN_NAME}
-    PRIVATE
-        # プラグインに依存しているプラグインコード
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Event/
-        ${CMAKE_CURRENT_SOURCE_DIR}/../Actor/
+# ターゲットへファイル群の設定
+project_configure_files_target(${PLUGIN_ENHANCED_INPUT_NAME}
+    ${PLUGIN_ENHANCED_INPUT_TARGET_COMMON_FILES}
+    ${PLUGIN_ENHANCED_INPUT_TARGET_SRC_FILES}
+    ${PLUGIN_ENHANCED_INPUT_TARGET_INC_FILES}
 )
+
+# 利用するモジュールのインクルードパス
+target_include_directories(${PLUGIN_ENHANCED_INPUT_NAME}
+    PUBLIC
+        ${ENGINE_INC_DIR}
+        ${PLUGIN_EVENT_INC_DIR}
+        ${PLUGIN_ACTOR_INC_DIR}
+)
+
+# プロジェクトが参照できるインクルードディレクトリのパス
+target_include_directories(${PLUGIN_ENHANCED_INPUT_NAME}
+    PUBLIC
+        ${PLUGIN_ENHANCED_INPUT_INC_DIR}
+)
+
+# テスト用サブディレクトリを追加
+add_subdirectory(Test)

@@ -37,7 +37,7 @@ namespace EnhancedInput
         HE_GENERATED_CLASS_BODY_HEADER(InputComponent, Component);
 
     public:
-        InputComponent(Core::Memory::SharedPtr<InputStrategyBase>);  // : Actor::Component() {}
+        InputComponent(Core::Memory::SharedPtr<InputStrategyBase>);
         virtual ~InputComponent();
 
         /// <summary>

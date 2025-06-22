@@ -72,28 +72,9 @@ namespace EnhancedInput
     {
     }
 
-    void EnhancedInputModule::_VUpdate(const HE::Float32 in_fDeltaTime)
+    void EnhancedInputModule::DetectInputActions(Platform::InputObject* pInputObj,
+                                                 EventInputSharedPtr& spEventInput)
     {
-        this->_spEventInput->_mInputAction.Clear();
-
-        // this->_mInputAction.Clear();
-
-        auto pPlatformModule = this->GetDependenceModule<Platform::PlatformModule>();
-        HE_ASSERT(pPlatformModule);
-
-        auto pInput = pPlatformModule->VInput();
-        HE_ASSERT(pInput);
-
-        // 入力処理をする
-        if (this->_mMappingAction.Empty()) return;
-
-        if (this->_inputHandle.Null()) return;
-
-        // 扱う入力オブジェクトを取得
-        auto pInputObj = pInput->GetObj(this->_inputHandle);
-        HE_ASSERT_RETURN(pInputObj);
-
-        // 登録した入力アクションが発生しているかチェック
         for (auto it = this->_mMappingAction.Begin(); it != this->_mMappingAction.End(); ++it)
         {
             InputData inputData;
@@ -107,8 +88,7 @@ namespace EnhancedInput
                     inputData.eType              = EInputType_Keyboard;
                     inputData.item.keyboard.eKey = eKey;
 
-                    // this->_mInputAction[it->_key].PushBack(inputData);
-                    this->_spEventInput->_mInputAction[it->_key].PushBack(inputData);
+                    spEventInput->_mInputAction[it->_key].PushBack(inputData);
                 }
             }
 
@@ -126,12 +106,34 @@ namespace EnhancedInput
                     inputData.item.touch._fY   = pos._fY;
                     inputData.item.touch.eType = eTouch;
 
-                    // auto& r = this->_mInputAction[it->_key];
-                    auto& r = this->_spEventInput->_mInputAction[it->_key];
+                    auto& r = spEventInput->_mInputAction[it->_key];
                     r.PushBack(inputData);
                 }
             }
         }
+    }
+
+    void EnhancedInputModule::_VUpdate(const HE::Float32 in_fDeltaTime)
+    {
+        auto pPlatformModule = this->GetDependenceModule<Platform::PlatformModule>();
+        HE_ASSERT(pPlatformModule);
+
+        auto pInput = pPlatformModule->VInput();
+        HE_ASSERT(pInput);
+
+        // 入力処理をする
+        if (this->_mMappingAction.Empty()) return;
+
+        if (this->_inputHandle.Null()) return;
+
+        // 扱う入力オブジェクトを取得
+        auto pInputObj = pInput->GetObj(this->_inputHandle);
+        HE_ASSERT_RETURN(pInputObj);
+
+        this->_spEventInput->_mInputAction.Clear();
+
+        // 入力アクション検出処理を呼び出し
+        this->DetectInputActions(pInputObj, this->_spEventInput);
 
         // 入力結果をイベント送信
         if (this->_spEventInput->Empty() == FALSE)
@@ -140,5 +142,4 @@ namespace EnhancedInput
             pEventModule->QueueEvent(this->_spEventInput, EVENT_TYPE_ENHANCEDINPUT);
         }
     }
-
 }  // namespace EnhancedInput
