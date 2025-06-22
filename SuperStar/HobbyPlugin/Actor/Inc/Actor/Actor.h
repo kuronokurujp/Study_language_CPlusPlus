@@ -47,16 +47,11 @@ namespace Actor
             EComponentState_UnRegist,
         };
 
-        using SenderFunctionComponent = std::function<void(Component*, const EComponentState)>;
+        using EventComponent = std::function<void(Component*, const EComponentState)>;
 
     public:
-        Object(const HE::Uint32 in_uGroupId, SenderFunctionComponent in_compFunc);
+        Object(const HE::Uint32 in_uGroupId);
         virtual ~Object();
-
-        /// <summary>
-        /// ハンドルからオーナーに所属しているアクターを取得
-        /// </summary>
-        // Object* GetActor(const Core::Common::Handle&);
 
         /// <summary>
         /// 生成直後の設定処理
@@ -137,14 +132,14 @@ namespace Actor
                 pCurrentComponents = &this->_lateComponents;
             }
 
-            HE_ASSERT(in_uUpdateOrder < static_cast<HE::Uint32>(pCurrentComponents->GetMaxGroup()));
+            HE_ASSERT(in_uUpdateOrder < static_cast<HE::Uint32>(pCurrentComponents->GetGroupNum()));
 
             auto handle     = pCurrentComponents->CreateAndAdd<T>(in_uUpdateOrder, FALSE,
                                                                   std::forward<TArgs>(in_args)...);
             auto pComponent = this->GetComponent<T>(handle);
             if (this->_VSetupComponent(pComponent) == FALSE)
             {
-                pCurrentComponents->RemoveTask(&handle);
+                pCurrentComponents->RemoveTask(handle);
                 return std::make_tuple(NullHandle, pComponent);
             }
 
@@ -197,6 +192,17 @@ namespace Actor
         /// </summary>
         void SetState(const EState in_eState) { this->_eState = in_eState; }
 
+        void SetEventComponent(EventComponent in_func)
+        {
+            if (in_func == NULL)
+            {
+                this->_componentFunction = NULL;
+                return;
+            }
+
+            this->_componentFunction = std::move(in_func);
+        }
+
         /// <summary>
         /// コンポーネントのアドレスを取得(ハンドル)
         /// </summary>
@@ -223,7 +229,7 @@ namespace Actor
             HE_STATIC_ASSERT(std::is_base_of<Component, T>::value,
                              "TクラスはComponentクラスを継承していない");
 
-            auto [handle, p] = this->GetComponentHandleAndComponent(T:: StaticRTTI());
+            auto [handle, p] = this->GetComponentHandleAndComponent(T::StaticRTTI());
             if (handle.Null()) return NULL;
 
             return reinterpret_cast<T*>(p);
@@ -289,7 +295,7 @@ namespace Actor
         Core::TaskManager _components;
         Core::TaskManager _lateComponents;
 
-        SenderFunctionComponent _componentFunction;
+        EventComponent _componentFunction;
 
         HE::Uint32 _uGroupId;
     };

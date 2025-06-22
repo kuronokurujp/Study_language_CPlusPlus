@@ -45,8 +45,8 @@ namespace Actor
         HE_GENERATED_CLASS_BODY_HEADER(SimpleObject, Object);
 
     public:
-        SimpleObject(const HE::Uint32 in_uGroupId, SenderFunctionComponent in_compFunc)
-            : Object(in_uGroupId, in_compFunc)
+        SimpleObject(const HE::Uint32 in_uGroupId)
+            : Object(in_uGroupId)
         {
         }
     };
@@ -57,8 +57,8 @@ namespace Actor
         HE_GENERATED_CLASS_BODY_HEADER(SimpleObject2, Object);
 
     public:
-        SimpleObject2(const HE::Uint32 in_uGroupId, SenderFunctionComponent in_compFunc)
-            : Object(in_uGroupId, in_compFunc)
+        SimpleObject2(const HE::Uint32 in_uGroupId)
+            : Object(in_uGroupId)
         {
         }
     };
@@ -66,8 +66,8 @@ namespace Actor
     class SimpleObject3 : public Object
     {
     public:
-        SimpleObject3(const HE::Uint32 in_uGroupId, SenderFunctionComponent in_compFunc)
-            : Object(in_uGroupId, in_compFunc)
+        SimpleObject3(const HE::Uint32 in_uGroupId)
+            : Object(in_uGroupId)
         {
         }
     };
@@ -76,14 +76,14 @@ namespace Actor
     TEST(HobbyPlugin_Actor, ActorSimpleObject)
     {
         auto simpleObj =
-            SimpleObject(0, [](Component* in_pComp, const Object::EComponentState in_eState) {});
+            SimpleObject(0);
         // SimpleObjectはObjectの派生クラスであることを確認
         EXPECT_EQ(HE_GENERATED_CHECK_RTTI(simpleObj, Object), TRUE);
         // SimpleObjectはObjectの派生クラスであるが, SimpleObject2の派生クラスではないことを確認
         EXPECT_NE(HE_GENERATED_CHECK_RTTI(simpleObj, SimpleObject2), TRUE);
 
         auto simpleObj2 =
-            SimpleObject2(0, [](Component* in_pComp, const Object::EComponentState in_eState) {});
+            SimpleObject2(0);
         // SimpleObject2はObjectの派生クラスであるが、SimpleObjectの派生クラスではないことを確認
         EXPECT_NE(HE_GENERATED_CHECK_RTTI(simpleObj2, SimpleObject), TRUE);
         EXPECT_EQ(HE_GENERATED_CHECK_RTTI(simpleObj2, Object), TRUE);
@@ -92,15 +92,15 @@ namespace Actor
         {
             // RTTIを生成するためのマクロを入れなくても良いが
         public:
-            SpecialObject(const HE::Uint32 in_uGroupId, SenderFunctionComponent in_compFunc)
-                : SimpleObject(in_uGroupId, in_compFunc)
+            SpecialObject(const HE::Uint32 in_uGroupId)
+                : SimpleObject(in_uGroupId)
             {
             }
         };
 
         // SpecialObjectはSimpleObjectの派生クラスであることを確認
         auto specialObj =
-            SpecialObject(0, [](Component* in_pComp, const Object::EComponentState in_eState) {});
+            SpecialObject(0);
 
         // SpecialObjectはObjectの派生クラスであることを確認
         EXPECT_EQ(HE_GENERATED_CHECK_RTTI(specialObj, Object), TRUE);
@@ -113,7 +113,7 @@ namespace Actor
         EXPECT_NE(HE_GENERATED_CHECK_RTTI(specialObj, SimpleObject2), TRUE);
 
         auto simpleObj3 =
-            SimpleObject3(0, [](Component* in_pComp, const Object::EComponentState in_eState) {});
+            SimpleObject3(0);
 
         EXPECT_EQ(HE_GENERATED_CHECK_RTTI(simpleObj3, Object), TRUE);
         EXPECT_NE(HE_GENERATED_CHECK_RTTI(simpleObj3, SimpleObject), TRUE);

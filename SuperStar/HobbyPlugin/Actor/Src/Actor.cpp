@@ -2,12 +2,11 @@
 
 namespace Actor
 {
-    Object::Object(const HE::Uint32 in_uGroupId, SenderFunctionComponent in_CompFunc) : TaskTree()
+    Object::Object(const HE::Uint32 in_uGroupId) : TaskTree()
     {
         this->_Clear();
 
-        this->_uGroupId          = in_uGroupId;
-        this->_componentFunction = std::move(in_CompFunc);
+        this->_uGroupId = in_uGroupId;
     }
 
     Object::~Object()
@@ -16,13 +15,6 @@ namespace Actor
         this->_lateComponents.End();
         this->_componentFunction = NULL;
     }
-
-    /*
-        Object* Object::GetActor(const Core::Common::Handle& in_rHandle)
-        {
-            return this->_objectFunction(in_rHandle);
-        }
-        */
 
     void Object::VSetup(const HE::Bool in_bAutoDelete)
     {
@@ -238,7 +230,8 @@ namespace Actor
 
         // コンポーネントを付けた自身を設定
         in_pComp->SetOwner(this);
-        this->_componentFunction(in_pComp, EComponentState::EComponentState_Regist);
+        if (this->_componentFunction != NULL)
+            this->_componentFunction(in_pComp, EComponentState::EComponentState_Regist);
 
         return TRUE;
     }
@@ -247,7 +240,7 @@ namespace Actor
     {
         // コンポーネント解除をオーナーに通知
         auto components = in_pComponents->GetUserDataList();
-        if (components)
+        if (components && this->_componentFunction != NULL)
         {
             for (auto itr = components->begin(); itr != components->end(); ++itr)
             {
@@ -271,7 +264,8 @@ namespace Actor
             return FALSE;
         }
 
-        this->_componentFunction(pComponent, EComponentState::EComponentState_UnRegist);
+        if (this->_componentFunction != NULL)
+            this->_componentFunction(pComponent, EComponentState::EComponentState_UnRegist);
 
         in_pComponents->RemoveTask(in_handle);
 

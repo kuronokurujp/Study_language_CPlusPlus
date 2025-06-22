@@ -101,21 +101,8 @@ namespace Actor
             HE::Uint32 uGroupId = in_uGroupId;
             if (this->_bUpdatingActors) uGroupId = this->_GetPendingGroupId();
 
-            auto handle = this->_taskManager.CreateAndAdd<T>(
-                uGroupId, TRUE, in_uGroupId,
-                // コンポーネント登録と解除の受信
-                [this](Component* in_pComp, const Object::EComponentState in_eState)
-                {
-                    if (in_eState == Object::EComponentState::EComponentState_Regist)
-                        this->VOnActorRegistComponent(in_pComp);
-                    else if (in_eState == Object::EComponentState::EComponentState_UnRegist)
-                    {
-                        this->VOnActorUnRegistComponent(in_pComp);
-                    }
-
-                    HE_ASSERT(NULL);
-                },
-                std::forward<TArgs>(in_args)...);
+            auto handle = this->_taskManager.CreateAndAdd<T>(uGroupId, TRUE, in_uGroupId,
+                                                             std::forward<TArgs>(in_args)...);
 
             // 作成したActorのセットアップ
             if (this->_SetupObject(handle) == FALSE)

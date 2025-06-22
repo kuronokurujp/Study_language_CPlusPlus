@@ -180,8 +180,18 @@ namespace Actor
         Object* pObject = this->_taskManager.GetTask<Object>(in_handle);
         HE_ASSERT(pObject != NULL);
 
-        // if (this->_bUpdatingActors) this->_mPendingActor.Add(in_handle, PendingData{in_handle,
-        // 0});
+        pObject->SetEventComponent(
+            // コンポーネント登録と解除の受信
+            [this](Component* in_pComp, const Object::EComponentState in_eState)
+            {
+                if (in_eState == Object::EComponentState::EComponentState_Regist)
+                    this->VOnActorRegistComponent(in_pComp);
+                else if (in_eState == Object::EComponentState::EComponentState_UnRegist)
+                {
+                    this->VOnActorUnRegistComponent(in_pComp);
+                }
+            }
+        );
 
         return TRUE;
     }
