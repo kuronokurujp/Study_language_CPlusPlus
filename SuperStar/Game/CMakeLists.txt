@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.26)
 # Makeに必要な情報をインストール
 include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
 
