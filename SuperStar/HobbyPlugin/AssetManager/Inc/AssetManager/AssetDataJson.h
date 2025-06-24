@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "AssetDataBase.h"
+#include "AssetManager/AssetDataBase.h"
 #include "Engine/Memory/Memory.h"
 
 // エンジンの最小インクルード

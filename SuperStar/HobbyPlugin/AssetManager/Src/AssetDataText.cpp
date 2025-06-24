@@ -1,4 +1,4 @@
-﻿#include "AssetDataText.h"
+﻿#include "AssetManager/AssetDataText.h"
 
 // 依存モジュール
 #include "Engine/Platform/PlatformFile.h"

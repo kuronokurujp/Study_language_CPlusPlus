@@ -1,7 +1,5 @@
-﻿#pragma once
-
-#include "./AssetManagerModule.h"
-#include "./PlatformSDL2Module.h"
+﻿#include "./AssetManagerModule.h"
+// #include "./PlatformSDL2Module.h"
 #include "Engine/Engine.h"
 
 #if 0

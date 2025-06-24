@@ -1,6 +1,6 @@
-set(PLUGIN_ASSET_MANGER_TEST_NAME HobbyPlugin_Actor_UnitTests)
+set(PLUGIN_ASSET_MANAGER_TEST_NAME HobbyPlugin_AssetManager_UnitTests)
 
 # テストソースをまとめる（複数ファイルがあればここに追加）
-set(PLUGIN_ASSET_MANGER_TARGET_TEST_SRC_FILES
+set(PLUGIN_ASSET_MANAGER_TARGET_TEST_SRC_FILES
     AssetManager/TestAssetManager.cpp
 )

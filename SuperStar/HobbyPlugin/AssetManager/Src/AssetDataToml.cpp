@@ -1,9 +1,9 @@
-﻿#include "AssetDataToml.h"
+﻿#include "AssetManager/AssetDataToml.h"
 
 //  tomlライブラリ内の例外処理をOFF
 //  こちらでエラー処理をする
 #define TOML_EXCEPTIONS 0
-#include "AssetManager/ThirdParty/tomlplusplus/toml.hpp"
+#include "tomlplusplus/toml.hpp"
 
 // 依存モジュール
 #include "Engine/Platform/PlatformFile.h"

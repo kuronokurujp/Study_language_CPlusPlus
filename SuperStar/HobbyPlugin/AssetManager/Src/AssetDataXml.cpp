@@ -1,7 +1,7 @@
-﻿#include "AssetDataXml.h"
+﻿#include "AssetManager/AssetDataXml.h"
 
 // サードパーティーのxmlライブラリ
-#include "AssetManager/ThirdParty/pugixml/pugixml.hpp"
+#include "pugixml/pugixml.hpp"
 
 // 依存モジュール
 #include "Engine/Platform/PlatformFile.h"

@@ -1,10 +1,10 @@
-﻿#include "AssetDataJson.h"
+﻿#include "AssetManager/AssetDataJson.h"
 
 // 依存モジュール
 #include "Engine/Platform/PlatformFile.h"
 
 // サードパーティーのjsonライブラリ
-#include "AssetManager/ThirdParty/simidjson/simdjson.h"
+#include "simidjson/simdjson.h"
 
 namespace AssetManager
 {

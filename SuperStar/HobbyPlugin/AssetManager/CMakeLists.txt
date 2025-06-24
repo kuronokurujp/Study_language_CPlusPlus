@@ -27,6 +27,8 @@ target_include_directories(${PLUGIN_ASSET_MANAGER_NAME} PUBLIC ${ENGINE_INC_DIR}
 
 # プロジェクトが参照できるインクルードディレクトリのパス
 target_include_directories(${PLUGIN_ASSET_MANAGER_NAME} PUBLIC ${PLUGIN_ASSET_MANAGER_INC_DIR})
+# プロジェクトのみが参照できるインクルードディレクトリのパス
+target_include_directories(${PLUGIN_ASSET_MANAGER_NAME} PRIVATE ${PLUGIN_ASSET_MANAGER_THIRD_PARTY_DIR})
 
 # テスト用サブディレクトリを追加
 add_subdirectory(Test)

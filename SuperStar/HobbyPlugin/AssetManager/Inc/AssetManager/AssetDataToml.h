@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "AssetDataBase.h"
+#include "AssetManager/AssetDataBase.h"
 #include "Engine/Common/CustomMap.h"
 
 // エンジンの最小インクルード
