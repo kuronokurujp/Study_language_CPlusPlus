@@ -24,5 +24,11 @@ target_include_directories(${PLUGIN_EVENT_NAME} PUBLIC ${ENGINE_INC_DIR})
 # プロジェクトが参照できるインクルードディレクトリのパス
 target_include_directories(${PLUGIN_EVENT_NAME} PUBLIC ${PLUGIN_EVENT_INC_DIR})
 
+# 依存ライブラリのリンク
+target_link_libraries(${PLUGIN_EVENT_NAME}
+    PUBLIC
+        ${ENGINE_NAME}
+)
+
 # テスト用サブディレクトリを追加
 add_subdirectory(Test)

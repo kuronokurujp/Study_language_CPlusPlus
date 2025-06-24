@@ -28,6 +28,5 @@ vcpkg_install_package(${CMAKE_CURRENT_SOURCE_DIR} "x64-windows-static")
 test_congigure_target(
 	${PLUGIN_ACTOR_TEST_NAME}
 	${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/VcPkg/x64-windows-static
-	${ENGINE_NAME}
 	${PLUGIN_ACTOR_NAME}
 )

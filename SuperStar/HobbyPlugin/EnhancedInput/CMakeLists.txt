@@ -32,6 +32,15 @@ target_include_directories(${PLUGIN_ENHANCED_INPUT_NAME}
         ${PLUGIN_ACTOR_INC_DIR}
 )
 
+# 依存ライブラリのリンク
+target_link_libraries(${PLUGIN_ENHANCED_INPUT_NAME}
+    PUBLIC
+        ${ENGINE_NAME}
+        ${PLUGIN_EVENT_NAME}
+        ${PLUGIN_ACTOR_NAME}
+)
+
+
 # プロジェクトが参照できるインクルードディレクトリのパス
 target_include_directories(${PLUGIN_ENHANCED_INPUT_NAME}
     PUBLIC
