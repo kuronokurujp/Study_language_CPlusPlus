@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.26)
 include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/Project.cmake NO_POLICY_SCOPE)
 # エンジン設定
 include(${CMAKE_SOURCE_DIR}/HobbyEngine/Config.cmake NO_POLICY_SCOPE)
+# プラグインビルドの共通処理
+include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
 
 # 静的ライブラリの設定
 project_configure_static_lib_target(${PLUGIN_EVENT_NAME})
