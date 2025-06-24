@@ -25,6 +25,12 @@ function(test_congigure_target target vcpkg_dir)
                 ${target_test_libs}
         )
 
+        # テスト実行ファイルの出力先をTestフォルダに設定
+        set_target_properties(${target} PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY
+                "${CMAKE_SOURCE_DIR}/Bin/Test/$<CONFIG>"
+        )
+
         # CTest に登録
         add_test(NAME ${target} COMMAND ${target})
 
