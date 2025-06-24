@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.26)
 # プラグインビルドの共通処理.
 include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICY_SCOPE)
 # プラグインの共通情報.

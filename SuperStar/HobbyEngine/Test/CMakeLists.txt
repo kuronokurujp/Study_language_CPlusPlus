@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.26)
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/VCPkg.cmake NO_POLICY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/Project.cmake NO_POLICY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/Test.cmake NO_POLICY_SCOPE)

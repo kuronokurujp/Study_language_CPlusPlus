@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.26)
+
 # 共通情報を取得.
 include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Project.cmake NO_POLICY_SCOPE)

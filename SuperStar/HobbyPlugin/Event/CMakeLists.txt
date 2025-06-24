@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.26)
+
 # プラグインビルドの共通処理.
 include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/Project.cmake NO_POLICY_SCOPE)
 # エンジン設定

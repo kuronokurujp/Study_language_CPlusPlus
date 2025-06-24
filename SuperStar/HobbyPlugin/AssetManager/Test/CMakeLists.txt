@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.26)
+
 # Engineが用意したcmake共通をインクルード
 include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/VCPkg.cmake NO_POLICY_SCOPE)
 include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/Project.cmake NO_POLICY_SCOPE)
