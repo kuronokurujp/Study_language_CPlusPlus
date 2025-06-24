@@ -1,17 +1,30 @@
-# プラグインビルドの共通処理.
-include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICY_SCOPE)
-# Renderプラグインの共通情報.
+# プロジェクトの共通処理
+include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/Project.cmake NO_POLICY_SCOPE)
+# エンジン設定
+include(${CMAKE_SOURCE_DIR}/HobbyEngine/Config.cmake NO_POLICY_SCOPE)
+# プラグインビルドの共通処理
 include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
 
 message("build asset manager plugin lib!")
 
-# 共有ライブラリとして生成するためのオプションの定義.
-option(ASSET_MANAGER_PLUGIN_BUILD_SHARED_LIBS "build shared library" OFF)
+# 静的ライブラリの設定
+project_configure_static_lib_target(${PLUGIN_ASSET_MANAGER_NAME})
 
-# プラグイン共通ビルド処理.
-common_build_plugin(
-    "${ASSET_MANAGER_PLUGIN_NAME}"
-    "${ASSET_MANAGER_PLUGIN_TARGET_FILES}"
-    "$CACHE{CACHE_ENGINE_INCLUDE_CODE}"
-    ${ASSET_MANAGER_PLUGIN_BUILD_SHARED_LIBS}
+# プロジェクトの設定
+project_configure_target(${PLUGIN_ASSET_MANAGER_NAME})
+
+# ターゲットへファイル群の設定
+project_configure_files_target(${PLUGIN_ASSET_MANAGER_NAME}
+    ${PLUGIN_ASSET_MANAGER_TARGET_COMMON_FILES}
+    ${PLUGIN_ASSET_MANAGER_TARGET_SRC_FILES}
+    ${PLUGIN_ASSET_MANAGER_TARGET_INC_FILES}
 )
+
+# エンジンのインクルードパス
+target_include_directories(${PLUGIN_ASSET_MANAGER_NAME} PUBLIC ${ENGINE_INC_DIR})
+
+# プロジェクトが参照できるインクルードディレクトリのパス
+target_include_directories(${PLUGIN_ASSET_MANAGER_NAME} PUBLIC ${PLUGIN_ASSET_MANAGER_INC_DIR})
+
+# テスト用サブディレクトリを追加
+add_subdirectory(Test)
