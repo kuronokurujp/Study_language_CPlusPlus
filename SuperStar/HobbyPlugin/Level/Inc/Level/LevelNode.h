@@ -1,11 +1,10 @@
 ﻿#pragma once
 
-#include "Actor/Actor.h"
-#include "Actor/ActorInterface.h"
-#include "Actor/ActorManager.h"
 // エンジン最小インクルード
 #include "Engine/MiniEngine.h"
+
 // 利用モジュール
+#include "ActorModule.h"
 #include "EnhancedInputModule.h"
 
 namespace Level
@@ -20,14 +19,6 @@ namespace Level
         HE_CLASS_MOVE_NG(Node);
 
     public:
-        /*
-            enum ETaskUpdateId
-            {
-                // 入力更新
-                ETaskUpdateId_Input = Task::uNoneId + 1,
-            };
-            */
-
         Node();
         virtual ~Node() = default;
 
@@ -56,11 +47,6 @@ namespace Level
         /// </summary>
         void VLateUpdate(const HE::Float32 in_fDt) override final;
 
-        /// <summary>
-        /// イベント
-        /// </summary>
-        // void VEvent(const Core::TaskData&) override final;
-
         virtual void VProcessInput(const EnhancedInput::InputMap&);
 
         /// <summary>
@@ -80,7 +66,7 @@ namespace Level
         }
 
         // レベルに追加されたアクターを削除
-        void RemoveActor(Core::Common::Handle*);
+        void RemoveActor(const Core::Common::Handle);
 
         /// <summary>
         /// レベルを追加
@@ -126,11 +112,6 @@ namespace Level
         /// タスク破棄
         /// </summary>
         void _VDestory() override final;
-
-        /// <summary>
-        /// 追加したコンポーネントのセットアップ
-        /// </summary>
-        HE::Bool _VSetupComponent(Actor::Component*) override final;
 
     private:
         /// <summary>

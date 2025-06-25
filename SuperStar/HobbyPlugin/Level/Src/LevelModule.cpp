@@ -98,7 +98,10 @@ namespace Level
             pNode->SetState(Actor::Object::EState::EState_Active);
 
             if (this->_currentLevelHandle.Null() == FALSE)
-                this->_upNodeManager->Remove(&this->_currentLevelHandle);
+            {
+                this->_upNodeManager->Remove(this->_currentLevelHandle);
+                this->_currentLevelHandle.Clear();
+            }
 
             this->_currentLevelHandle = this->_nextLevelHandle;
             this->_nextLevelHandle.Clear();

@@ -19,9 +19,9 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyEngine/cmake/UTF8.cmake NO_POLICY_SCOPE
 # アクタープラグイン
 include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Actor/Config.cmake NO_POLICY_SCOPE)
 # アセット管理プラグイン
-# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/AssetManager/Config.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/AssetManager/Config.cmake NO_POLICY_SCOPE)
 # レベルプラグイン
-# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Level/Config.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Level/Config.cmake NO_POLICY_SCOPE)
 # ローカライズプラグイン
 # include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Localization/Config.cmake NO_POLICY_SCOPE)
 # UIプラグイン
@@ -87,8 +87,8 @@ add_subdirectory(HobbyEngine)
 # add_subdirectory(HobbyPlugin/PlatformSDL2)
 # add_subdirectory(HobbyPlugin/Render)
 add_subdirectory(HobbyPlugin/Actor)
-# add_subdirectory(HobbyPlugin/AssetManager)
-# add_subdirectory(HobbyPlugin/Level)
+add_subdirectory(HobbyPlugin/AssetManager)
+add_subdirectory(HobbyPlugin/Level)
 # add_subdirectory(HobbyPlugin/Localization)
 # add_subdirectory(HobbyPlugin/UI)
 add_subdirectory(HobbyPlugin/EnhancedInput)
@@ -133,7 +133,7 @@ set(PLUGIN_LIBRARIES
 #   ${ENHANCED_INPUT_PLUGIN_NAME}
 #   ${UI_PLUGIN_NAME}
 #   ${LOCALIZATION_PLUGIN_NAME}
-#   ${LEVEL_PLUGIN_NAME}
+  ${PLUGIN_LEVEL_NAME}
 #   ${ASSET_MANAGER_PLUGIN_NAME}
 #   ${RENDER_PLUGIN_NAME}
   ${PLUGIN_ACTOR_NAME}

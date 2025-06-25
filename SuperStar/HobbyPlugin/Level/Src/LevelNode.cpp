@@ -1,6 +1,4 @@
-﻿#include "LevelNode.h"
-
-#include "Level/Component/LevelBaseComponent.h"
+﻿#include "Level/LevelNode.h"
 
 // 利用モジュール一覧
 #include "EnhancedInputModule.h"
@@ -8,7 +6,7 @@
 namespace Level
 {
     Node::Node()
-        : Actor::Object(),
+        : Actor::Object(0),
           _actorManager(
               HE_MAKE_CUSTOM_UNIQUE_PTR((EnhancedInput::ActorManagerDecoraterWithInputSystem)))
     {
@@ -63,34 +61,13 @@ namespace Level
             this->_actorManager.GetDecorater());
         pDecotrater->ProcessInput(in_pInputMap);
     }
-    /*
-        void Node::VEvent(const Core::TaskData& in_rTaskData)
-        {
-            Actor::Object::VEvent(in_rTaskData);
 
-            switch (in_rTaskData.uId)
-            {
-                // 入力送信
-                case Node::ETaskUpdateId_Input:
-                {
-                    HE_ASSERT(in_rTaskData.pData);
-                    const auto pInputMap =
-                        reinterpret_cast<EnhancedInput::InputMap*>(in_rTaskData.pData);
-
-                    this->_VProcessInput(pInputMap);
-
-                    break;
-                }
-            }
-        }
-        */
     // レベルに追加されたアクターを削除
-    void Node::RemoveActor(Core::Common::Handle* in_pActor)
+    void Node::RemoveActor(const Core::Common::Handle in_actorHandle)
     {
-        HE_ASSERT(in_pActor);
-        if (in_pActor->Null()) return;
+        if (in_actorHandle.Null()) return;
 
-        this->_actorManager.Remove(in_pActor);
+        this->_actorManager.Remove(in_actorHandle);
     }
 
     HE::Bool Node::ChainActor(const Core::Common::Handle& in_rChildActor,
@@ -108,22 +85,6 @@ namespace Level
     {
         this->_actorManager.Release();
         Actor::Object::_VDestory();
-    }
-
-    /// <summary>
-    /// 追加したコンポーネントのセットアップ
-    /// </summary>
-    HE::Bool Node::_VSetupComponent(Actor::Component* in_pComp)
-    {
-        HE_ASSERT(in_pComp);
-
-        if (HE_GENERATED_CHECK_RTTI((*in_pComp), LevelBaseComponent) == FALSE)
-        {
-            HE_ASSERT(0 && "レベル専用のコンポーネントではない");
-            return FALSE;
-        }
-
-        return Actor::Object::_VSetupComponent(in_pComp);
     }
 
 }  // namespace Level

@@ -1,0 +1,10 @@
+# .gitignore for Level/Test
+# Actor/Test/.gitignoreを参考に作成
+*.obj
+*.exe
+*.log
+*.pdb
+*.ilk
+*.user
+*.suo
+*.vcxproj*

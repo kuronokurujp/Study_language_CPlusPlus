@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <memory>
-
 #include "Engine/MiniEngine.h"
 #include "Engine/Module/Module.h"
 
@@ -10,9 +8,6 @@
 #include "Engine/Platform/PlatformModule.h"
 
 // モジュールのヘッダーファイルは全てインクルードする
-#include "Level/Component/LevelBaseComponent.h"
-#include "Level/Component/LevelUserInputReceive.h"
-// #include "Level/LevelManager.h"
 #include "Level/LevelNode.h"
 
 namespace Level
