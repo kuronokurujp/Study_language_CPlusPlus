@@ -1,13 +1,25 @@
 cmake_minimum_required(VERSION 3.26)
 
-# プラグインビルドの共通処理.
-include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICY_SCOPE)
-# プラグインの共通情報.
+# Engine common cmake
+include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/Project.cmake NO_POLICY_SCOPE)
+
+# Plugin common info
 include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
-# 共有ライブラリとして生成するためのオプションの定義.
-option(PLATFORMSDL2_PLUGIN_BUILD_SHARED_LIBS "build shared library" OFF)
-# プラグイン共通ビルド処理.
-common_build_plugin("${PLATFORMSDL2_PLUGIN_NAME}" "${PLATFORMSDL2_PLUGIN_TARGET_FILES}" "$CACHE{CACHE_ENGINE_INCLUDE_CODE}" ${PLATFORMSDL2_PLUGIN_BUILD_SHARED_LIBS})
+
+message("build PlatformSDL2 plugin lib!")
+
+# Static library target
+project_configure_static_lib_target(${PLATFORMSDL2_PLUGIN_NAME})
+
+# Project configuration
+project_configure_target(${PLATFORMSDL2_PLUGIN_NAME})
+
+# Files for the target
+project_configure_files_target(${PLATFORMSDL2_PLUGIN_NAME}
+    ${PLATFORMSDL2_PLUGIN_TARGET_COMMON_FILES}
+    ${PLATFORMSDL2_PLUGIN_TARGET_SRC_FILES}
+    ${PLATFORMSDL2_PLUGIN_TARGET_INC_FILES}
+)
 
 # プラグインが利用するパッケージをvcpkgから取得
 vcpkg_install_package($CACHE{CHACHE_VCPKG_ROOT} ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}" $CACHE{CACHE_PROJECT_VCPKG_STATIC_LIB_TYPE})
@@ -66,7 +78,10 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH})
             # 相対パス設定ならうまくいった
             ./${VCPKG_DIR_PATH}/include/
     )
+    target_include_directories(${PLATFORMSDL2_PLUGIN_NAME} PUBLIC ${PLATFORMSDL2_PLUGIN_INC_DIR})
 else()
     message(STATUS "Non VcpkgDir ${VCPKG_DIR_PATH}")
 endif()
+
+add_subdirectory(Test)
 

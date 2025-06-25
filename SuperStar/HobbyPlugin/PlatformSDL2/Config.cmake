@@ -1,39 +1,49 @@
 set(PLATFORMSDL2_PLUGIN_NAME HobbyEnginePlugin_PlatformSDL2)
-# プロジェクトに登録するファイル群
-# ここに全て記載する
-set(PLATFORMSDL2_PLUGIN_TARGET_FILES
+set(PLATFORMSDL2_PLUGIN_INC_DIR ${CMAKE_CURRENT_LIST_DIR}/Inc)
+
+set(PLATFORMSDL2_PLUGIN_TARGET_COMMON_FILES
     .editorconfig
     LICENSE.txt
     README.md
-    PlatformSDL2Module.cpp
-    PlatformSDL2Module.h
+    ThirdPartyNotices.txt
+)
 
-    PlatformSDL2/SDL2File.cpp
-    PlatformSDL2/SDL2File.h
-    PlatformSDL2/SDL2Input.cpp
-    PlatformSDL2/SDL2Input.h
-    PlatformSDL2/SDL2Time.cpp
-    PlatformSDL2/SDL2Time.h
-    PlatformSDL2/SDL2Screen.h
-    PlatformSDL2/SDL2Screen.cpp
-    PlatformSDL2/SDL2System.h
-    PlatformSDL2/SDL2System.cpp
-    PlatformSDL2/SDL2Font.cpp
-    PlatformSDL2/SDL2Font.h
+set(PLATFORMSDL2_PLUGIN_TARGET_INC_FILES
+    Inc/PlatformSDL2Module.h
 
-    PlatformSDL2/Screen/Window.cpp
-    PlatformSDL2/Screen/Window.h
-    PlatformSDL2/Screen/ViewPort.h
-    PlatformSDL2/Screen/ViewPort.cpp
-    PlatformSDL2/Screen/Scene.h
-    PlatformSDL2/Screen/Scene.cpp
+    Inc/PlatformSDL2/SDL2File.h
+    Inc/PlatformSDL2/SDL2Font.h
+    Inc/PlatformSDL2/SDL2Input.h
+    Inc/PlatformSDL2/SDL2Screen.h
+    Inc/PlatformSDL2/SDL2System.h
+    Inc/PlatformSDL2/SDL2Time.h
 
-    PlatformSDL2/Screen/Draw/Material.cpp
-    PlatformSDL2/Screen/Draw/Material.h
-    PlatformSDL2/Screen/Draw/Mesh.cpp
-    PlatformSDL2/Screen/Draw/Mesh.h
-    PlatformSDL2/Screen/Draw/Texture.cpp
-    PlatformSDL2/Screen/Draw/Texture.h
+    Inc/PlatformSDL2/Screen/Window.h
+    Inc/PlatformSDL2/Screen/ViewPort.h
+    Inc/PlatformSDL2/Screen/Scene.h
+
+    Inc/PlatformSDL2/Screen/Draw/Material.h
+    Inc/PlatformSDL2/Screen/Draw/Mesh.h
+    Inc/PlatformSDL2/Screen/Draw/Texture.h
+)
+
+set(PLATFORMSDL2_PLUGIN_TARGET_SRC_FILES
+    Src/PlatformSDL2Module.cpp
+
+    Src/PlatformSDL2/SDL2File.cpp
+    Src/PlatformSDL2/SDL2Font.cpp
+    Src/PlatformSDL2/SDL2Input.cpp
+    Src/PlatformSDL2/SDL2Screen.cpp
+    Src/PlatformSDL2/SDL2System.cpp
+    Src/PlatformSDL2/SDL2Time.cpp
+
+    Src/PlatformSDL2/Screen/Window.cpp
+    Src/PlatformSDL2/Screen/ViewPort.cpp
+    Src/PlatformSDL2/Screen/Scene.cpp
+
+    Src/PlatformSDL2/Screen/Draw/Material.cpp
+    Src/PlatformSDL2/Screen/Draw/Mesh.cpp
+    Src/PlatformSDL2/Screen/Draw/Texture.cpp
 )
 
 function(setup_sdl2)
