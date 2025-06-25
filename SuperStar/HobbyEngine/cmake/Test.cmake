@@ -1,5 +1,5 @@
 # テスト専用のプロジェクト設定
-function(test_congigure_target target vcpkg_dir)
+function(test_configure_target target vcpkg_dir)
     # ARGN に渡されたすべての引数（ライブラリ一覧）が入る
     set(target_test_libs ${ARGN})
 
