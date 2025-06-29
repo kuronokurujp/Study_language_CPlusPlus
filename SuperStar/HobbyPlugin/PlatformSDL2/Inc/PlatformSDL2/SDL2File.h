@@ -14,6 +14,9 @@ namespace PlatformSDL2
     class File final : public Platform::FileInterface
     {
     public:
+        using BinaryData = std::tuple<void*, HE::Uint32>;
+
+    public:
         void SetCurrentDir(const Core::File::Path&);
 
         virtual const Core::Common::Handle VFileOpen(const Core::File::Path& in_rPath) override;
@@ -25,7 +28,7 @@ namespace PlatformSDL2
 
         // TODO: ファイルを開いて一気にバイナルデータを出力するのが必要かも
         // ファイルを開いてバイナルヒープを返す
-        std::tuple<void*, HE::Uint32> VLoadBinary(const Core::File::Path&) override final;
+        BinaryData VLoadBinary(const Core::File::Path&) override final;
         // テキストファイルをロードしてテキストデータを出力
         std::tuple<HE::Char*, HE::Uint32> VLoadText(const Core::File::Path&) override final;
 

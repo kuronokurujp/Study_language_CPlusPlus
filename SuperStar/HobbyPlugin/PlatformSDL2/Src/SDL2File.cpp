@@ -1,4 +1,4 @@
-﻿#include "SDL2File.h"
+﻿#include "PlatformSDL2/SDL2File.h"
 
 #include <fstream>
 #include <iostream>
@@ -79,11 +79,11 @@ namespace PlatformSDL2
         return TRUE;
     }
 
-    std::tuple<void*, HE::Uint32> File::VLoadBinary(const Core::File::Path& in_rPath)
+    File::BinaryData File::VLoadBinary(const Core::File::Path& in_rPath)
     {
         // ファイルをバイナル形式でロード
         auto handle = this->VFileOpen(in_rPath.Str());
-        HE_ASSERT_RETURN_VALUE((std::tuple<void*, HE::Uint32>(NULL, 0)), handle.Null() == FALSE);
+        HE_ASSERT_RETURN_VALUE((BinaryData(NULL, 0)), handle.Null() == FALSE);
 
         auto uSize = this->VFileSize(handle);
 
@@ -109,7 +109,7 @@ namespace PlatformSDL2
 
         this->VFileClose(handle);
 
-        return std::tuple<void*, HE::Uint32>(pData, uSize);
+        return BinaryData(pData, uSize);
     }
 
     std::tuple<HE::Char*, HE::Uint32> File::VLoadText(const Core::File::Path& in_rPath)

@@ -116,10 +116,10 @@ namespace EnhancedInput
     void EnhancedInputModule::_VUpdate(const HE::Float32 in_fDeltaTime)
     {
         auto pPlatformModule = this->GetDependenceModule<Platform::PlatformModule>();
-        HE_ASSERT(pPlatformModule);
+        HE_ASSERT_RETURN(pPlatformModule);
 
-        auto pInput = pPlatformModule->VInput();
-        HE_ASSERT(pInput);
+        auto pInput = pPlatformModule->Input();
+        HE_ASSERT_RETURN(pInput);
 
         // 入力処理をする
         if (this->_mMappingAction.Empty()) return;
@@ -138,8 +138,8 @@ namespace EnhancedInput
         // 入力結果をイベント送信
         if (this->_spEventInput->Empty() == FALSE)
         {
-            auto* pEventModule = this->GetDependenceModule<Event::EventModule>();
-            pEventModule->QueueEvent(this->_spEventInput, EVENT_TYPE_ENHANCEDINPUT);
+            auto spEventModule = this->GetDependenceModule<Event::EventModule>();
+            spEventModule->QueueEvent(this->_spEventInput, EVENT_TYPE_ENHANCEDINPUT);
         }
     }
 }  // namespace EnhancedInput

@@ -33,8 +33,12 @@ set(ENGINE_TARGET_SRC_FILES
     Src/Task/TaskManager.cpp
     Src/Time/FPS.cpp
     Src/Module/Module.cpp
+    Src/Platform/PlatformModule.cpp
     Src/Platform/PlatformInput.cpp
     Src/Platform/PlatformScreen.cpp
+    Src/Platform/Screen/Window.cpp
+    Src/Platform/Screen/ViewPort.cpp
+    Src/Platform/Screen/Scene.cpp
     Src/AsyncTask/AsyncTask.cpp
     Src/AsyncTask/AsyncTaskManager.cpp
 )
@@ -85,6 +89,10 @@ set(ENGINE_TARGET_INC_FILES
     Inc/Engine/Platform/PlatformFont.h
     Inc/Engine/Platform/PlatformInput.h
     Inc/Engine/Platform/PlatformScreen.h
+    Inc/Engine/Platform/Screen/Scene.h
+    Inc/Engine/Platform/Screen/ViewPort.h
+    Inc/Engine/Platform/Screen/Window.h
+    Inc/Engine/Platform/Screen/Render.h
     Inc/Engine/Platform/PlatformSystem.h
     Inc/Engine/Platform/PlatformTime.h
     Inc/Engine/Platform/PlatformModule.h

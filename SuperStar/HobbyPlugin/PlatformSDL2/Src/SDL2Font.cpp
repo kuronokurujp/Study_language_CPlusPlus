@@ -1,14 +1,11 @@
-﻿#include "SDL2Font.h"
+﻿#include "PlatformSDL2/SDL2Font.h"
 
-#include "./Screen/Draw/Material.h"
-#include "./Screen/Draw/Texture.h"
+#include "PlatformSDL2/Screen/Draw/Material.h"
+#include "PlatformSDL2/Screen/Draw/Texture.h"
 #include "GL/glew.h"
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_ttf.h"
 #include "freetype/freetype.h"
-
-// 依存モジュール
-#include "PlatformSDL2Module.h"
 
 namespace PlatformSDL2
 {
@@ -159,8 +156,9 @@ namespace PlatformSDL2
         }
     }  // namespace Local
 
-    Font::Font(PlatformSDL2::PlatformSDL2Module* in_pModule) : _pModule(in_pModule)
+    Font::Font(FileBinaryDataFunc in_fileBinaryDataFunc)
     {
+        this->_fileBinaryDataFunc = std::move(in_fileBinaryDataFunc);
     }
 
     void Font::VRelease()
@@ -172,7 +170,7 @@ namespace PlatformSDL2
                          const Core::File::Path& in_rTTFFilePath)
     {
         // ttfファイルロード
-        auto [pFontBinary, uFontBinarySize] = this->_pModule->VFile()->VLoadBinary(in_rTTFFilePath);
+        auto [pFontBinary, uFontBinarySize] = this->_fileBinaryDataFunc(in_rTTFFilePath);
         HE_ASSERT_RETURN_VALUE(NullHandle, pFontBinary);
 
         // 描画処理でプロパティ名を直指定しているので外部ファイル化はしない

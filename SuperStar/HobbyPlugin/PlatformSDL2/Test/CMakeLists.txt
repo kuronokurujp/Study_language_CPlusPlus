@@ -7,20 +7,30 @@ include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/Test.cmake NO_POLICY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../Config.cmake NO_POLICY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
 
-add_executable(${PLATFORMSDL2_PLUGIN_TEST_NAME}
-    ${PLATFORMSDL2_PLUGIN_TARGET_TEST_SRC_FILES}
+add_executable(${PLUGIN_PLATFORMSDL2_TEST_NAME}
+    ${PLUGIN_PLATFORMSDL2_TARGET_TEST_SRC_FILES}
 )
 
-project_configure_target(${PLATFORMSDL2_PLUGIN_TEST_NAME})
+project_configure_target(${PLUGIN_PLATFORMSDL2_TEST_NAME})
 
-project_configure_files_target(${PLATFORMSDL2_PLUGIN_TEST_NAME}
-    ${PLATFORMSDL2_PLUGIN_TARGET_TEST_SRC_FILES}
+project_configure_files_target(${PLUGIN_PLATFORMSDL2_TEST_NAME}
+    ${PLUGIN_PLATFORMSDL2_TARGET_TEST_SRC_FILES}
 )
 
 vcpkg_install_package(${CMAKE_CURRENT_SOURCE_DIR} "x64-windows-static")
 
 test_configure_target(
-    ${PLATFORMSDL2_PLUGIN_TEST_NAME}
+    ${PLUGIN_PLATFORMSDL2_TEST_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/VcPkg/x64-windows-static
-    ${PLATFORMSDL2_PLUGIN_NAME}
+    ${PLUGIN_PLATFORMSDL2_NAME}
+)
+
+# POST_BUILD で Resources フォルダをコピー
+add_custom_command(
+    TARGET ${PLUGIN_PLATFORMSDL2_TEST_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/Resources"
+            "$<TARGET_FILE_DIR:${PLUGIN_PLATFORMSDL2_TEST_NAME}>/Resources"
+    COMMENT "Copying Resources to output dir"
 )

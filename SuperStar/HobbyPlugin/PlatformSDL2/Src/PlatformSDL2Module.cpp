@@ -1,6 +1,6 @@
 ﻿#include "PlatformSDL2Module.h"
 
-#include "Engine/Memory/Memory.h"
+// SDL2プラットフォームの機能
 #include "PlatformSDL2/SDL2File.h"
 #include "PlatformSDL2/SDL2Font.h"
 #include "PlatformSDL2/SDL2Input.h"
@@ -29,6 +29,25 @@ namespace PlatformSDL2
 
     PlatformSDL2Module::PlatformSDL2Module() : PlatformModule()
     {
+    }
+
+    HE::Bool PlatformSDL2Module::VIsQuit()
+    {
+        if (this->_bMainWindowInitialized == FALSE)
+        {
+            // メインウィンドウの処理が終わっている場合は終了状態
+            return FALSE;
+        }
+
+        auto pScreen = reinterpret_cast<PlatformSDL2::Screen*>(this->_spScreen.get());
+        if (pScreen->IsMainWindowActive())
+        {
+            // メインスクリーンは終了状態ではない
+            // ここでTRUEを返すとエンジンが終了してしまう
+            return FALSE;
+        }
+
+        return TRUE;
     }
 
     /// <summary>
@@ -84,9 +103,14 @@ namespace PlatformSDL2
             this->_spTime   = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Time));
             this->_spInput  = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Input));
             this->_spFile   = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::File));
-            this->_spScreen = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Screen), this);
+            this->_spScreen = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Screen),
+                                                        [this]() { return this->_spFont.get(); },
+                                                        [this]() { return this->_spInput.get(); });
             this->_spSysmte = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::System));
-            this->_spFont   = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Font), this);
+            this->_spFont =
+                HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Font),
+                                          [this](const Core::File::Path& in_rFilePath)
+                                          { return this->_spFile->VLoadBinary(in_rFilePath); });
         }
 
         // ウィンドウズのWinAPIを使えるようにする
@@ -127,17 +151,7 @@ namespace PlatformSDL2
     /// </summary>
     HE::Bool PlatformSDL2Module::_VRelease()
     {
-        // 各機能の解放
-        this->_spInput->VRelease();
-        this->_spFont->VRelease();
-        this->_spScreen->VRelease();
-
-        this->_spTime.reset();
-        this->_spInput.reset();
-        this->_spFile.reset();
-        this->_spScreen.reset();
-        this->_spSysmte.reset();
-        this->_spFont.reset();
+        PlatformModule::_VRelease();
 
         ::TTF_Quit();
         ::SDL_Quit();
@@ -148,6 +162,18 @@ namespace PlatformSDL2
     void PlatformSDL2Module::_VBeforeUpdate(const HE::Float32 in_fDeltaTime)
     {
         this->_spInput->VUpdate(in_fDeltaTime);
+    }
+
+    void PlatformSDL2Module::_VLateUpdate(const HE::Float32 in_fDeltaTime)
+    {
+        if (this->_bMainWindowInitialized)
+        {
+            auto pScreen = reinterpret_cast<PlatformSDL2::Screen*>(this->_spScreen.get());
+            if (pScreen->IsMainWindowActive())
+            {
+                this->_bMainWindowInitialized = TRUE;
+            }
+        }
     }
 
 }  // namespace PlatformSDL2

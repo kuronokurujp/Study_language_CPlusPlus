@@ -10,7 +10,7 @@ namespace Module
     {
     }
 
-    ModuleBase* ModuleBase::_GetModule(Core::Common::StringBase& in_szName)
+    Core::Memory::SharedPtr<ModuleBase> ModuleBase::_GetModule(Core::Common::StringBase& in_szName)
     {
         auto pTargetModule = HE_ENGINE.ModuleManager().Get(in_szName.Str());
         if (pTargetModule == NULL)
@@ -46,7 +46,7 @@ namespace Module
     }
 #endif
 
-    ModuleBase* ModuleManager::Get(const HE::Char* in_szName) const
+    Core::Memory::SharedPtr<ModuleBase> ModuleManager::Get(const HE::Char* in_szName) const
     {
         if (this->_mAppModule.Contains(in_szName))
         {
@@ -63,7 +63,6 @@ namespace Module
             return this->_mViewModule.FindKey(in_szName)->_data;
         }
 
-        // HE_ASSERT(FALSE);
         return NULL;
     }
 
@@ -72,42 +71,42 @@ namespace Module
         // 全モジュール解放
         // TODO: 依存関係に応じてモジュールを破棄する順序を変える事はできないか？
         {
-            for (HE::Uint32 i = 0; i < this->_vViewModule.Size(); ++i)
+            for (HE::Uint32 i = 0; i < this->_vViewModuleProcess.Size(); ++i)
             {
-                this->_vViewModule[i]->_VRelease();
+                this->_vViewModuleProcess[i]->_VRelease();
             }
-            this->_vViewModule.Clear();
+            this->_vViewModuleProcess.Clear();
 
-            for (HE::Uint32 i = 0; i < this->_vLogicModule.Size(); ++i)
+            for (HE::Uint32 i = 0; i < this->_vLogicModuleProcess.Size(); ++i)
             {
-                this->_vLogicModule[i]->_VRelease();
+                this->_vLogicModuleProcess[i]->_VRelease();
             }
-            this->_vLogicModule.Clear();
+            this->_vLogicModuleProcess.Clear();
 
-            for (HE::Uint32 i = 0; i < this->_vAppModule.Size(); ++i)
+            for (HE::Uint32 i = 0; i < this->_vAppModuleProcess.Size(); ++i)
             {
-                this->_vAppModule[i]->_VRelease();
+                this->_vAppModuleProcess[i]->_VRelease();
             }
-            this->_vAppModule.Clear();
+            this->_vAppModuleProcess.Clear();
         }
 
-        // 全モジュール破棄
+        // 全モジュールメモリ破棄
         {
             for (auto b = this->_mViewModule.Begin(); b != this->_mViewModule.End(); ++b)
             {
-                HE_SAFE_DELETE_MEM(b->_data);
+                b->_data.reset();
             }
             this->_mViewModule.Clear();
 
             for (auto b = this->_mLogicModule.Begin(); b != this->_mLogicModule.End(); ++b)
             {
-                HE_SAFE_DELETE_MEM(b->_data);
+                b->_data.reset();
             }
             this->_mLogicModule.Clear();
 
             for (auto b = this->_mAppModule.Begin(); b != this->_mAppModule.End(); ++b)
             {
-                HE_SAFE_DELETE_MEM(b->_data);
+                b->_data.reset();
             }
             this->_mAppModule.Clear();
         }
@@ -117,140 +116,145 @@ namespace Module
 
     void ModuleManager::BeforeUpdate(const HE::Float32 in_fDeltaTime)
     {
-        for (HE::Uint32 i = 0; i < this->_vAppModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vAppModuleProcess.Size(); ++i)
         {
-            this->_vAppModule[i]->_VBeforeUpdate(in_fDeltaTime);
+            this->_vAppModuleProcess[i]->_VBeforeUpdate(in_fDeltaTime);
         }
 
-        for (HE::Uint32 i = 0; i < this->_vLogicModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vLogicModuleProcess.Size(); ++i)
         {
-            this->_vLogicModule[i]->_VBeforeUpdate(in_fDeltaTime);
+            this->_vLogicModuleProcess[i]->_VBeforeUpdate(in_fDeltaTime);
         }
 
-        for (HE::Uint32 i = 0; i < this->_vViewModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vViewModuleProcess.Size(); ++i)
         {
-            this->_vViewModule[i]->_VBeforeUpdate(in_fDeltaTime);
+            this->_vViewModuleProcess[i]->_VBeforeUpdate(in_fDeltaTime);
         }
     }
 
     void ModuleManager::Update(const HE::Float32 in_fDeltaTime)
     {
-        for (HE::Uint32 i = 0; i < this->_vLogicModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vLogicModuleProcess.Size(); ++i)
         {
-            this->_vLogicModule[i]->_VUpdate(in_fDeltaTime);
+            this->_vLogicModuleProcess[i]->_VUpdate(in_fDeltaTime);
         }
 
-        for (HE::Uint32 i = 0; i < this->_vViewModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vViewModuleProcess.Size(); ++i)
         {
-            this->_vViewModule[i]->_VUpdate(in_fDeltaTime);
+            this->_vViewModuleProcess[i]->_VUpdate(in_fDeltaTime);
         }
 
         // ロジックとビューのモジュール更新結果を元にアプリモジュールは更新される
-        for (HE::Uint32 i = 0; i < this->_vAppModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vAppModuleProcess.Size(); ++i)
         {
-            this->_vAppModule[i]->_VUpdate(in_fDeltaTime);
+            this->_vAppModuleProcess[i]->_VUpdate(in_fDeltaTime);
         }
     }
 
     void ModuleManager::LateUpdate(const HE::Float32 in_fDeltaTime)
     {
-        for (HE::Uint32 i = 0; i < this->_vViewModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vViewModuleProcess.Size(); ++i)
         {
-            this->_vViewModule[i]->_VLateUpdate(in_fDeltaTime);
+            this->_vViewModuleProcess[i]->_VLateUpdate(in_fDeltaTime);
         }
 
-        for (HE::Uint32 i = 0; i < this->_vLogicModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vLogicModuleProcess.Size(); ++i)
         {
-            this->_vLogicModule[i]->_VLateUpdate(in_fDeltaTime);
+            this->_vLogicModuleProcess[i]->_VLateUpdate(in_fDeltaTime);
         }
 
-        for (HE::Uint32 i = 0; i < this->_vAppModule.Size(); ++i)
+        for (HE::Uint32 i = 0; i < this->_vAppModuleProcess.Size(); ++i)
         {
-            this->_vAppModule[i]->_VLateUpdate(in_fDeltaTime);
+            this->_vAppModuleProcess[i]->_VLateUpdate(in_fDeltaTime);
         }
     }
 
     /// <summary>
-    /// ヒープ作成したモジュールを登録
+    /// モジュールを追加
     /// </summary>
-    HE::Bool ModuleManager::RegistHeapModule(ModuleBase* in_pModule)
+    HE::Bool ModuleManager::AddModule(Core::Memory::SharedPtr<ModuleBase> in_upModule)
     {
-        HE_ASSERT(in_pModule);
         // モジュールレイヤーに応じたリストに登録
-        const auto eLayer = in_pModule->Layer();
+        const auto eLayer = in_upModule->Layer();
         if (eLayer == ELayer_App)
         {
-            this->_mAppModule.Add(in_pModule->_szName, in_pModule);
+            this->_mAppModule.Add(in_upModule->Name(), in_upModule);
             return TRUE;
         }
 
         if (eLayer == ELayer_Logic)
         {
-            this->_mLogicModule.Add(in_pModule->_szName, in_pModule);
+            this->_mLogicModule.Add(in_upModule->Name(), in_upModule);
             return TRUE;
         }
 
         if (eLayer == ELayer_View)
         {
-            this->_mViewModule.Add(in_pModule->_szName, in_pModule);
+            this->_mViewModule.Add(in_upModule->Name(), in_upModule);
             return TRUE;
         }
 
         return FALSE;
     }
 
-    HE::Bool ModuleManager::Start(const ELayer in_eLayer)
+    HE::Bool ModuleManager::Start()
     {
-        switch (in_eLayer)
+        for (HE::Uint32 i = Module::ELayer::ELayer_App; i <= Module::ELayer::ELayer_Logic; ++i)
         {
-            case ELayer_App:
+            switch (i)
             {
-                // AppモジュールはプラットフォームなどのOS関連のモジュール
-                // newでメモリ確保とかもあり得る
-                // ゲーム特有処理の前段となる
-                for (auto b = this->_mAppModule.Begin(); b != this->_mAppModule.End(); ++b)
+                case ELayer_App:
                 {
-                    if (this->_StartModule(*b->_data))
+                    // AppモジュールはプラットフォームなどのOS関連のモジュール
+                    // newでメモリ確保とかもあり得る
+                    // ゲーム特有処理の前段となる
+                    for (auto b = this->_mAppModule.Begin(); b != this->_mAppModule.End(); ++b)
                     {
-                        this->_vAppModule.PushBack(b->_data);
+                        if (this->_StartModule(*b->_data))
+                        {
+                            // モジュールはこの管理クラスのみで扱っていて外部参照で壊す事がないアドレスを直接参照しても問題ない
+                            this->_vAppModuleProcess.PushBack(b->_data.get());
+                        }
                     }
-                }
-                this->_SortModuleVector(&this->_vAppModule);
+                    this->_SortModuleVector(&this->_vAppModuleProcess);
 
-                break;
-            }
-            case ELayer_Logic:
-            {
-                for (auto b = this->_mLogicModule.Begin(); b != this->_mLogicModule.End(); ++b)
+                    break;
+                }
+                case ELayer_Logic:
                 {
-                    if (this->_StartModule(*b->_data))
+                    for (auto b = this->_mLogicModule.Begin(); b != this->_mLogicModule.End(); ++b)
                     {
-                        this->_vLogicModule.PushBack(b->_data);
+                        if (this->_StartModule(*b->_data))
+                        {
+                            // モジュールはこの管理クラスのみで扱っていて外部参照で壊す事がないアドレスを直接参照しても問題ない
+                            this->_vLogicModuleProcess.PushBack(b->_data.get());
+                        }
                     }
-                }
 
-                this->_SortModuleVector(&this->_vLogicModule);
-                break;
-            }
-            case ELayer_View:
-            {
-                for (auto b = this->_mViewModule.Begin(); b != this->_mViewModule.End(); ++b)
+                    this->_SortModuleVector(&this->_vLogicModuleProcess);
+                    break;
+                }
+                case ELayer_View:
                 {
-                    if (this->_StartModule(*b->_data))
+                    for (auto b = this->_mViewModule.Begin(); b != this->_mViewModule.End(); ++b)
                     {
-                        this->_vViewModule.PushBack(b->_data);
+                        if (this->_StartModule(*b->_data))
+                        {
+                            // モジュールはこの管理クラスのみで扱っていて外部参照で壊す事がないアドレスを直接参照しても問題ない
+                            this->_vViewModuleProcess.PushBack(b->_data.get());
+                        }
                     }
-                }
 
-                this->_SortModuleVector(&this->_vViewModule);
-                break;
+                    this->_SortModuleVector(&this->_vViewModuleProcess);
+                    break;
+                }
             }
         }
 
         return TRUE;
     }
 
-    void ModuleManager::_SortModuleVector(Core::Common::VectorBase<ModuleBase*>* out)
+    void ModuleManager::_SortModuleVector(ModuleProcessBaseVector* out)
     {
         if (out->Size() <= 1) return;
 
@@ -286,12 +290,12 @@ namespace Module
             // 依存しているモジュールリストを作成
             for (HE::Uint32 i = 0; i < vDependenceModuleNames.Size(); ++i)
             {
-                auto szName            = vDependenceModuleNames[i];
-                auto pDependenceModule = this->Get(szName.Str());
-                if (pDependenceModule == NULL) continue;
+                auto szName             = vDependenceModuleNames[i];
+                auto spDependenceModule = this->Get(szName.Str());
+                if (spDependenceModule == NULL) continue;
 
 #ifdef HE_ENGINE_DEBUG
-                in_rModule._vDependenceModule.PushBack(pDependenceModule);
+                in_rModule._vDependenceModule.PushBack(spDependenceModule.get());
 #endif
             }
 #ifdef HE_ENGINE_DEBUG

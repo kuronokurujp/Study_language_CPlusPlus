@@ -2,6 +2,7 @@
 
 #include "Engine/Common/CustomMap.h"
 #include "Engine/MiniEngine.h"
+#include "Engine/Platform/PlatformInput.h"
 #include "Engine/Platform/PlatformScreen.h"
 
 namespace PlatformSDL2
@@ -12,11 +13,22 @@ namespace PlatformSDL2
     class SDL2WindowStrategy final : public Platform::WindowStrategy
     {
     public:
-        using Context = std::tuple<void*, void*>;
+        enum EMenuItemID
+        {
+            EMenuItemID_Exit = 999,
+        };
 
     public:
-        SDL2WindowStrategy(const Core::Common::Handle in_handle,
-                           const Platform::WindowConfig& in_rConfig, Context in_pContext);
+        using Context = std::tuple<void*, void*>;
+        using EventMenuCallback =
+            std::function<void(const HE::Uint32, const Platform::WindowConfig& in_rConfig)>;
+
+        using EventInputObjectGetter = std::function<Platform::InputObject*(Core::Common::Handle)>;
+
+    public:
+        SDL2WindowStrategy(const Platform::WindowConfig& in_rConfig,
+                           EventInputObjectGetter in_inputInterfaceGetterFunc,
+                           EventMenuCallback in_eventMenuCallback, Context in_pContext);
         void VRelease() override final;
 
         void VBegin() override final;
@@ -39,15 +51,17 @@ namespace PlatformSDL2
 
         const HE::Bool VIsClose() const override final { return this->_bClose; }
 
-        void VRegistEventMenuCallback(EventMenuCallback in_callback) override final
-        {
-            this->_eventMenuCallback = std::move(in_callback);
-        }
-
-        const Core::Common::Handle VGetHandle() const override final { return this->_handle; }
-        const Platform::WindowConfig& VGetConfig() const override final { return *this->_pConfig; }
+        /*
+                void VRegistEventMenuCallback(EventMenuCallback in_callback) override final
+                {
+                    this->_eventMenuCallback = std::move(in_callback);
+                }
+                */
 
     private:
+        Core::Memory::UniquePtr<Platform::ViewPortStrategy> _VCreateViewPort(
+            const Platform::ViewPortConfig& in_rConfig) override final;
+
         /// <summary>
         /// ウィンドウにメニューアイテムを追加
         /// </summary>
@@ -62,14 +76,13 @@ namespace PlatformSDL2
     private:
         Context _context;
         HE::Uint32 _windowID = 0;
+        EventInputObjectGetter _inputInterfaceGetterFunc;
 
-        Core::Common::Handle _handle;
-        Platform::WindowConfig* _pConfig = NULL;
-        HE::Bool _bClose                 = FALSE;
+        HE::Bool _bClose = FALSE;
         // メニューに関するイベントコールバック
         EventMenuCallback _eventMenuCallback;
 
-        // ウィンドウのメニュバーハンドル
+// ウィンドウのメニュバーハンドル
 #ifdef HE_WIN
         void* _hMenuBar = NULL;
 #endif

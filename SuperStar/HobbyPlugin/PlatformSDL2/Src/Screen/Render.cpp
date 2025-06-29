@@ -1,14 +1,13 @@
-﻿#include "SDL2Screen.h"
+﻿#include "PlatformSDL2/Screen/Render.h"
 
-#include "./../PlatformSDL2Module.h"
-#include "./SDL2Font.h"
-#include "./Screen/Draw/Material.h"
-#include "./Screen/Draw/Mesh.h"
-#include "./Screen/Draw/Texture.h"
-#include "./Screen/Scene.h"
-#include "./Screen/ViewPort.h"
-#include "./Screen/Window.h"
 #include "Engine/Common/PoolManager.h"
+#include "Engine/Platform/Screen/ViewPort.h"
+#include "PlatformSDL2/SDL2Font.h"
+#include "PlatformSDL2/Screen/Draw/Material.h"
+#include "PlatformSDL2/Screen/Draw/Mesh.h"
+#include "PlatformSDL2/Screen/Draw/Texture.h"
+
+// SDL2のヘッダーファイル
 #include "GL/glew.h"
 #include "SDL2/SDL.h"
 
@@ -16,60 +15,16 @@ namespace PlatformSDL2
 {
     namespace Local
     {
-        static SDL_Window* s_pDummyWindow    = NULL;
-        static SDL_GLContext s_pShareContext = NULL;
-
         using PoolParticleMesh = Core::Common::RuntimePoolManager<ParticleMesh>;
 
     }  // namespace Local
 
-    Screen::Screen(PlatformSDL2::PlatformSDL2Module* in_pSDL2Module)
+    DefaultRender::DefaultRender()
     {
-        HE_ASSERT(in_pSDL2Module);
+    }
 
-        this->_pSDL2Module = in_pSDL2Module;
-
-        // ダミーのウィンドウとコンテキスト生成
-        // なぜこうしているのか？
-        // 利用するウィンドウを生成する前にOpenGLの命令が呼ぶケースがあるから
-        // 利用するウィンドウが生成されたら消す
-        Local::s_pDummyWindow =
-            SDL_CreateWindow("", 0, 0, 0, 0, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
-        Local::s_pShareContext =
-            SDL_GL_CreateContext(reinterpret_cast<SDL_Window*>(Local::s_pDummyWindow));
-        {
-            // OpenGLの拡張を有効に
-            glewExperimental  = GL_TRUE;
-            GLenum glewResult = glewInit();
-            if (glewResult != GLEW_OK)
-            {
-                HE_ASSERT(0);
-                HE_LOG_LINE(HE_STR_TEXT("Unable to initialize GLEW: %s"),
-                            ::glewGetErrorString(glewResult));
-            }
-
-            // 拡張機能の確認
-            if (GLEW_ARB_texture_non_power_of_two)
-            {
-                HE_LOG_LINE(HE_STR_TEXT("GL_ARB_texture_non_power_of_two is supported!"));
-            }
-            else
-            {
-                HE_LOG_LINE(HE_STR_TEXT("GL_ARB_texture_non_power_of_two is NOT supported."));
-            }
-
-            GLint samples;
-            glGetIntegerv(GL_SAMPLES, &samples);
-            if (0 < samples)
-            {
-                HE_LOG_LINE(HE_STR_TEXT("Antialiasing supported with %d samples"), samples);
-            }
-            else
-            {
-                HE_LOG_LINE(HE_STR_TEXT("Antialiasing not supported."));
-            }
-        }
-
+    void DefaultRender::VStart()
+    {
         // フォント用のメッシュは常に使うので常駐
         {
             auto pFontMesh = HE_NEW_MEM(Mesh, 0)();
@@ -355,110 +310,11 @@ namespace PlatformSDL2
         }
     }
 
-    void Screen::VRelease()
+    void DefaultRender::VRelease()
     {
-        {
-            auto pWhiteTex = reinterpret_cast<TextureSurface*>(this->_pWhiteTex);
-            pWhiteTex->Release();
-            HE_SAFE_DELETE_MEM(pWhiteTex);
-        }
-
-        {
-            auto pMesh = reinterpret_cast<Mesh*>(this->_p2DTriangleMesh);
-            pMesh->Release();
-            HE_SAFE_DELETE_MEM(this->_p2DTriangleMesh);
-        }
-
-        {
-            auto p2DCircleMesh = reinterpret_cast<Mesh*>(this->_p2DCircleMesh);
-            p2DCircleMesh->Release();
-            HE_SAFE_DELETE_MEM(this->_p2DCircleMesh);
-        }
-
-        {
-            auto pFontMesh = reinterpret_cast<Mesh*>(this->_pFontMesh);
-            pFontMesh->Release();
-            HE_SAFE_DELETE_MEM(this->_pFontMesh);
-        }
-
-        {
-            auto p2DQuadMesh = reinterpret_cast<Mesh*>(this->_p2DQuadMesh);
-            p2DQuadMesh->Release();
-            HE_SAFE_DELETE_MEM(this->_p2DQuadMesh);
-        }
-
-        {
-            auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
-            pPool->ReleasePool([](ParticleMesh* in_pParticleMesh) { in_pParticleMesh->Release(); });
-            HE_SAFE_DELETE_MEM(this->_pPoolParticleMesh);
-        }
-
-        {
-            auto pMat = reinterpret_cast<Material*>(this->_pParticleMat);
-            pMat->VRelease();
-            HE_SAFE_DELETE_MEM(this->_pParticleMat);
-        }
-
-        {
-            auto pMat = reinterpret_cast<Material*>(this->_p2DGeometoryMat);
-            pMat->VRelease();
-            HE_SAFE_DELETE_MEM(this->_p2DGeometoryMat);
-        }
-
-        {
-            auto pMat = reinterpret_cast<Material*>(this->_p2DQuadMat);
-            pMat->VRelease();
-            HE_SAFE_DELETE_MEM(this->_p2DQuadMat);
-        }
-
-        {
-            if (Local::s_pDummyWindow)
-            {
-                ::SDL_DestroyWindow(reinterpret_cast<SDL_Window*>(Local::s_pDummyWindow));
-                Local::s_pDummyWindow = NULL;
-            }
-
-            if (Local::s_pShareContext)
-            {
-                ::SDL_GL_DeleteContext(Local::s_pShareContext);
-                Local::s_pShareContext = NULL;
-            }
-        }
     }
 
-    Core::Memory::UniquePtr<Platform::WindowStrategy> Screen::VCreateWindowStrategy(
-        const Core::Common::Handle in_handle, const Platform::WindowConfig& in_rConfig)
-    {
-        auto spSt = HE_MAKE_CUSTOM_UNIQUE_PTR((SDL2WindowStrategy), in_handle, in_rConfig,
-                                              SDL2WindowStrategy::Context(Local::s_pShareContext,
-                                                                          Local::s_pDummyWindow));
-        Local::s_pDummyWindow  = NULL;
-        Local::s_pShareContext = NULL;
-
-        return std::move(spSt);
-    }
-
-    Core::Memory::UniquePtr<Platform::ViewPortStrategy> Screen::VCreateViewPortStrategy(
-        const Platform::ViewPortConfig& in_rConfig)
-    {
-        auto spSt = HE_MAKE_CUSTOM_UNIQUE_PTR((SDL2ViewPortStrategy), in_rConfig);
-
-        return std::move(spSt);
-    }
-
-    Core::Memory::UniquePtr<Platform::SceneStrategyInterface> Screen::VCreateSceneUIStrategy()
-    {
-        auto spSt = HE_MAKE_CUSTOM_UNIQUE_PTR((SDL2SceneStrategyUI));
-        return std::move(spSt);
-    }
-
-    Core::Memory::UniquePtr<Platform::SceneStrategyInterface> Screen::VCreateScene2DStrategy()
-    {
-        auto spSt = HE_MAKE_CUSTOM_UNIQUE_PTR((SDL2SceneStrategy2D));
-        return std::move(spSt);
-    }
-
-    Core::Common::Handle Screen::VParticalCreate(const HE::Uint32 in_uCount)
+    Core::Common::Handle DefaultRender::ParticalCreate(const HE::Uint32 in_uCount)
     {
         // パーティクル用のメッシュを生成
         auto pPool           = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
@@ -470,9 +326,9 @@ namespace PlatformSDL2
         return handle;
     }
 
-    void Screen::VParticalDelete(Core::Common::Handle in_handle)
+    void DefaultRender::ParticalDelete(Core::Common::Handle in_handle)
     {
-        // 生成したパーティクルを削除
+        // パーティクルの削除処理
         auto pPool         = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
         auto pParticleMesh = pPool->Ref(in_handle);
         HE_ASSERT_RETURN(pParticleMesh);
@@ -481,37 +337,34 @@ namespace PlatformSDL2
         pPool->Free(in_handle, FALSE);
     }
 
-    void Screen::VParticalSetPositions(
-        const Core::Common::Handle in_rParticleHandle,
-        const Core::Common::ArrayBase<Core::Math::Vector3>& in_rPositions)
+    void DefaultRender::ParticalSetPositions(
+        const Core::Common::Handle in_handle,
+        const Core::Common::ArrayBase<Core::Math::Vector3>& in_rPos)
     {
+        // パーティクルの位置設定処理
         auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
 
-        auto pParticleMesh = pPool->Ref(in_rParticleHandle);
+        auto pParticleMesh = pPool->Ref(in_handle);
         HE_ASSERT_RETURN(pParticleMesh);
 
-        pParticleMesh->SetPositions(in_rPositions);
+        pParticleMesh->SetPositions(in_rPos);
     }
 
-    void Screen::VParticalSetVelocitys(
-        const Core::Common::Handle in_rParticleHandle,
-        const Core::Common::ArrayBase<Core::Math::Vector3>& in_rVelocitys)
+    void DefaultRender::ParticalSetVelocitys(
+        const Core::Common::Handle in_handle,
+        const Core::Common::ArrayBase<Core::Math::Vector3>& in_rVec)
     {
+        // パーティクルの速度設定処理
         auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
 
-        auto pParticleMesh = pPool->Ref(in_rParticleHandle);
+        auto pParticleMesh = pPool->Ref(in_handle);
         HE_ASSERT_RETURN(pParticleMesh);
-        pParticleMesh->SetVelocitys(in_rVelocitys);
+        pParticleMesh->SetVelocitys(in_rVec);
     }
 
-    Platform::RenderInterface* Screen::VGetRenderer()
-    {
-        return this;
-    }
-
-    void Screen::V2DDrawPartical(const Platform::ViewPortConfig& in_rViewConfig,
-                                 const Core::Common::Handle in_rParticleHandle,
-                                 const Core::Math::Vector3& in_rPos)
+    void DefaultRender::Draw2DPartical(const Platform::ViewPortConfig& in_rViewConfig,
+                                       const Core::Common::Handle in_rParticleHandle,
+                                       const Core::Math::Vector3& in_rPos)
     {
         // 事前に生成したパーティクル用のメッシュを使って描画
         auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
@@ -552,7 +405,7 @@ namespace PlatformSDL2
         //        pMat->Disable();
     }
 
-    void Screen::VCls(const HE::Uint32 in_uR, const HE::Uint32 in_uG, const HE::Uint32 in_uB)
+    void DefaultRender::Cls(const HE::Uint32 in_uR, const HE::Uint32 in_uG, const HE::Uint32 in_uB)
     {
         HE::Float32 fR = static_cast<HE::Float32>(in_uR) * Core::Math::fInvert255;
         HE::Float32 fG = static_cast<HE::Float32>(in_uG) * Core::Math::fInvert255;
@@ -562,20 +415,23 @@ namespace PlatformSDL2
         ::glClearColor(fR, fG, fB, 1.0f);
     }
 
-    void Screen::V2DDrawText(const Platform::ViewPortConfig& in_rViewConfig,
-                             const Core::Math::Vector2& in_rPos,
-                             const Core::Math::EAnchor in_eAnchor, const HE::Char* in_szText,
-                             const HE::Uint32 in_uTextSize, const HE::Uint32 in_uSpace,
-                             const Core::Math::Color in_color)
+    void DefaultRender::Draw2DText(const Platform::ViewPortConfig& in_rViewConfig,
+                                   Platform::FontInterface* in_pFont,
+                                   const Core::Math::Vector2& in_rPos,
+                                   const Core::Math::EAnchor in_eAnchor, const HE::Char* in_szText,
+                                   const HE::Uint32 in_uTextSize, const HE::Uint32 in_uSpace,
+                                   const Core::Math::Color in_color)
     {
         if (in_uTextSize <= 0) return;
 
         Core::Common::g_szTempFixedString1024 = in_szText;
         if (Core::Common::g_szTempFixedString1024.Length() <= 0) return;
 
-        auto pFontInterface = this->_pSDL2Module->VFont();
-        Font* pFont         = reinterpret_cast<Font*>(pFontInterface.get());
-        HE_ASSERT_RETURN(pFont);
+        // TODO: フォントは事前に生成しておく
+        // TODO: フォントの入れ替えもあるから
+        HE_ASSERT_RETURN(in_pFont);
+        HE_ASSERT_RETURN(HE_GENERATED_CHECK_RTTI(*in_pFont, Platform::FontInterface));
+        Font* pFont = reinterpret_cast<Font*>(in_pFont);
 
         // フォントのマテリアルを取得
         auto pFontMat = pFont->GetMaterial();
@@ -831,8 +687,9 @@ namespace PlatformSDL2
         pMesh->Free();
     }
 
-    void Screen::V2DDrawQuad(const Platform::ViewPortConfig& in_rViewConfig,
-                             const Core::Math::Rect2& in_rRect2D, const Core::Math::Color in_color)
+    void DefaultRender::Draw2DQuad(const Platform::ViewPortConfig& in_rViewConfig,
+                                   const Core::Math::Rect2& in_rRect2D,
+                                   const Core::Math::Color in_color)
     {
         auto p2DQuadMat = reinterpret_cast<Material*>(this->_p2DQuadMat);
         p2DQuadMat->Enable();
@@ -898,10 +755,10 @@ namespace PlatformSDL2
         // p2DQuadMat->Disable();
     }
 
-    void Screen::V2DDrawCircle(const Platform::ViewPortConfig& in_rViewConfig,
-                               const Core::Math::Vector2& in_rPos,
-                               const Core::Math::EAnchor in_eAchor, const HE::Float32 in_fSize,
-                               const Core::Math::Color in_color)
+    void DefaultRender::Draw2DCircle(const Platform::ViewPortConfig& in_rViewConfig,
+                                     const Core::Math::Vector2& in_rPos,
+                                     const Core::Math::EAnchor in_eAchor,
+                                     const HE::Float32 in_fSize, const Core::Math::Color in_color)
     {
         auto pMat = reinterpret_cast<Material*>(this->_p2DGeometoryMat);
         pMat->Enable();
@@ -976,11 +833,11 @@ namespace PlatformSDL2
         //        pMat->Disable();
     }
 
-    void Screen::V2DDrawTriangle(const Platform::ViewPortConfig& in_rViewConfig,
-                                 const Core::Math::Vector2& in_rPos,
-                                 const Core::Math::EAnchor in_eAchor,
-                                 const HE::Float32 in_fAngleDegress, const HE::Float32 in_fSize,
-                                 const Core::Math::Color in_color)
+    void DefaultRender::Draw2DTriangle(const Platform::ViewPortConfig& in_rViewConfig,
+                                       const Core::Math::Vector2& in_rPos,
+                                       const Core::Math::EAnchor in_eAchor,
+                                       const HE::Float32 in_fAngleDegress,
+                                       const HE::Float32 in_fSize, const Core::Math::Color in_color)
     {
         auto pMat = reinterpret_cast<Material*>(this->_p2DGeometoryMat);
         pMat->Enable();

@@ -26,7 +26,7 @@ namespace Platform
 
     public:
         // プラットフォームモジュールはOS固有なのでモジュールレイヤーはアプリに
-        PlatformModule() : ModuleBase(ModuleName(), Module::ELayer_App) {}
+        PlatformModule();
         virtual ~PlatformModule() = default;
 
 #ifdef HE_USE_SDL2
@@ -36,46 +36,58 @@ namespace Platform
         /// <summary>
         /// 時間関連の処理
         /// </summary>
-        virtual Core::Memory::SharedPtr<Platform::TimeInterface> VTime() = 0;
+        Core::Memory::SharedPtr<Platform::TimeInterface> Time() { return this->_spTime; }
 
         /// <summary>
         /// 入力関連
         /// </summary>
-        virtual Core::Memory::SharedPtr<Platform::InputInterface> VInput() = 0;
+        Core::Memory::SharedPtr<Platform::InputInterface> Input() { return this->_spInput; }
 
         /// <summary>
         /// ファイル関連
         /// </summary>
-        virtual Core::Memory::SharedPtr<Platform::FileInterface> VFile() = 0;
+        Core::Memory::SharedPtr<Platform::FileInterface> File() { return this->_spFile; }
 
         /// <summary>
         /// スクリーン関連
         /// </summary>
-        virtual Core::Memory::SharedPtr<Platform::SceneInterface> VScreen() = 0;
+        Core::Memory::SharedPtr<Platform::ScreenInterface> Screen() { return this->_spScreen; }
 
         /// <summary>
         /// システム関連
         /// </summary>
-        virtual Core::Memory::SharedPtr<Platform::SystemInterface> VSystem() = 0;
+        Core::Memory::SharedPtr<Platform::SystemInterface> System() { return this->_spSysmte; }
 
         /// <summary>
         /// フォント関連
         /// </summary>
-        virtual Core::Memory::SharedPtr<Platform::FontInterface> VFont() = 0;
+        Core::Memory::SharedPtr<Platform::FontInterface> Font() { return this->_spFont; }
+
+        /// <summary>
+        /// プラットフォームの終了状態か
+        /// </summary>
+        /// <returns></returns>
+        virtual HE::Bool VIsQuit() = 0;
 
     protected:
-        /// <summary>
-        /// モジュール開始
-        /// </summary>
-        virtual HE::Bool _VStart() override
-        {
-            HE_ASSERT(FALSE);
-            return FALSE;
-        }
 
         /// <summary>
-        /// 前更新
+        /// モジュールの解放
+        /// インスタンス破棄時に呼ばれる
         /// </summary>
-        virtual void _VBeforeUpdate(const HE::Float32 in_fDeltaTime) override = 0;
+        virtual HE::Bool _VRelease() override;
+
+        /// <summary>
+        /// モジュール後更新
+        /// </summary>
+        virtual void _VLateUpdate(const HE::Float32 in_fDeltaTime) override;
+
+    protected:
+        Core::Memory::SharedPtr<Platform::TimeInterface> _spTime;
+        Core::Memory::SharedPtr<Platform::InputInterface> _spInput;
+        Core::Memory::SharedPtr<Platform::FileInterface> _spFile;
+        Core::Memory::SharedPtr<Platform::ScreenInterface> _spScreen;
+        Core::Memory::SharedPtr<Platform::SystemInterface> _spSysmte;
+        Core::Memory::SharedPtr<Platform::FontInterface> _spFont;
     };
 }  // namespace Platform

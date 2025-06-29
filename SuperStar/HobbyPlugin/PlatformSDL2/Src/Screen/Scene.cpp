@@ -1,7 +1,7 @@
-﻿#include "Scene.h"
+﻿#include "PlatformSDL2/Screen/Scene.h"
 
-#include "./Draw/Material.h"
-#include "./Draw/Mesh.h"
+#include "PlatformSDL2/Screen/Draw/Material.h"
+#include "PlatformSDL2/Screen/Draw/Mesh.h"
 
 // SDL2関連
 #include "GL/glew.h"
@@ -14,6 +14,11 @@
 
 namespace PlatformSDL2
 {
+    SDL2SceneStrategy2D::SDL2SceneStrategy2D(const Platform::SceneConfig& in_rConfig)
+        : Platform::SceneStrategy(in_rConfig)
+    {
+    }
+
     HE::Bool SDL2SceneStrategy2D::VBegin()
     {
         return TRUE;
@@ -40,13 +45,5 @@ namespace PlatformSDL2
 
     void SDL2SceneStrategy2D::VEndRender()
     {
-    }
-
-    Platform::RenderInterface* SDL2SceneStrategy2D::VGetRenderer()
-    {
-        auto pPlatformModule = HE_ENGINE.PlatformModule();
-        HE_ASSERT(pPlatformModule);
-
-        return pPlatformModule->VScreen()->VGetRenderer();
     }
 }  // namespace PlatformSDL2

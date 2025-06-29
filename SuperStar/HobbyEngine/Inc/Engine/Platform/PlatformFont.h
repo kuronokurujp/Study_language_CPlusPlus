@@ -14,6 +14,8 @@ namespace Platform
 
     class FontInterface
     {
+        HE_GENERATED_CLASS_BASE_BODY_HEADER(FontInterface);
+
     public:
         virtual ~FontInterface() = default;
 

@@ -1,9 +1,10 @@
-﻿#include "SDL2System.h"
+﻿#include "PlatformSDL2/SDL2System.h"
 
 #include <time.h>
 
 #include <random>
 
+// SDL2のヘッダーファイル
 #include "SDL2/SDL.h"
 
 namespace PlatformSDL2

@@ -3,7 +3,8 @@
 #include "Engine/MiniEngine.h"
 #include "Engine/Platform/PlatformModule.h"
 
-// モジュールのヘッダーファイルは全てインクルードする
+#include "PlatformSDL2/Screen/Render.h"
+
 namespace PlatformSDL2
 {
     /// <summary>
@@ -23,35 +24,11 @@ namespace PlatformSDL2
         }
 #endif
 
-        Core::Memory::SharedPtr<Platform::TimeInterface> VTime() override final
-        {
-            return this->_spTime;
-        }
-
-        Core::Memory::SharedPtr<Platform::InputInterface> VInput() override final
-        {
-            return this->_spInput;
-        }
-
-        Core::Memory::SharedPtr<Platform::FileInterface> VFile() override final
-        {
-            return this->_spFile;
-        }
-
-        Core::Memory::SharedPtr<Platform::SceneInterface> VScreen() override final
-        {
-            return this->_spScreen;
-        }
-
-        Core::Memory::SharedPtr<Platform::SystemInterface> VSystem() override final
-        {
-            return this->_spSysmte;
-        }
-
-        Core::Memory::SharedPtr<Platform::FontInterface> VFont() override final
-        {
-            return this->_spFont;
-        }
+        /// <summary>
+        /// プラットフォームの終了状態か
+        /// </summary>
+        /// <returns></returns>
+        HE::Bool VIsQuit() override final;
 
     protected:
         /// <summary>
@@ -69,12 +46,13 @@ namespace PlatformSDL2
         /// </summary>
         void _VBeforeUpdate(const HE::Float32 in_fDeltaTime) override final;
 
+        /// <summary>
+        /// モジュール後更新
+        /// </summary>
+        void _VLateUpdate(const HE::Float32 in_fDeltaTime) override final;
+
+
     private:
-        Core::Memory::SharedPtr<Platform::TimeInterface> _spTime;
-        Core::Memory::SharedPtr<Platform::InputInterface> _spInput;
-        Core::Memory::SharedPtr<Platform::FileInterface> _spFile;
-        Core::Memory::SharedPtr<Platform::SceneInterface> _spScreen;
-        Core::Memory::SharedPtr<Platform::SystemInterface> _spSysmte;
-        Core::Memory::SharedPtr<Platform::FontInterface> _spFont;
+        HE::Bool _bMainWindowInitialized = TRUE;
     };
 }  // namespace PlatformSDL2

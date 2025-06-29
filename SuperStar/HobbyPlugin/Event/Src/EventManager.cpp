@@ -341,7 +341,8 @@ namespace Event
         // リスナーに登録されていない場合は登録する
         if (itr == in_mpListener->End())
         {
-            itr = in_mpListener->Add(in_hash, HE_NEW_MEM(EventListenerTable, 0)());
+            auto pTable = HE_NEW_MEM(EventListenerTable, 0)();
+            itr         = in_mpListener->Add(in_hash, pTable);
             if (itr.IsValid() == FALSE) return NullHandle;
         }
 

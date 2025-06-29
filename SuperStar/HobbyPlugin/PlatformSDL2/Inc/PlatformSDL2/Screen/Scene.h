@@ -8,25 +8,16 @@ namespace PlatformSDL2
     /// <summary>
     /// 2D用のシーン
     /// </summary>
-    class SDL2SceneStrategy2D : public Platform::SceneStrategyInterface
+    class SDL2SceneStrategy2D : public Platform::SceneStrategy
     {
     public:
+        SDL2SceneStrategy2D(const Platform::SceneConfig&);
+
         HE::Bool VBegin() override;
-
-        void VEnd() override final;
-
         void VUpdate(const HE::Float32) override final;
+        void VEnd() override final;
 
         void VBeginRender() override final;
         void VEndRender() override final;
-
-        Platform::RenderInterface* VGetRenderer() override final;
-    };
-
-    /// <summary>
-    /// UI用のシーン
-    /// </summary>
-    class SDL2SceneStrategyUI final : public SDL2SceneStrategy2D
-    {
     };
 }  // namespace PlatformSDL2

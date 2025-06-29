@@ -1,6 +1,6 @@
-﻿#include "Material.h"
+﻿#include "PlatformSDL2/Screen/Draw/Material.h"
 
-#include "./Texture.h"
+#include "PlatformSDL2/Screen/Draw/Texture.h"
 #include "Engine/Math/Math.h"
 #include "GL/glew.h"
 #include "SDL2/SDL.h"
