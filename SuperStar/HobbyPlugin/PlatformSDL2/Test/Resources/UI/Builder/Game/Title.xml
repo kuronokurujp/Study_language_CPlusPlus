@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui id="root">
+  <layer id="Layer" style="color: black;">
+    <label id="TitleLabel" x="300" y ="200" loc="1" text="default.GameTitle" anchor="center" style="color: white; size: 30;"/>
+    <label id="PushBtnLabel" x="300" y="400" loc="1" text="default.GameTitleInputHelp" anchor="center" style="color: white; size: 20;"/>
+  </layer>
+</ui>

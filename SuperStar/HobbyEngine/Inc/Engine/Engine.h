@@ -46,14 +46,8 @@ public:
     {
         HE_ASSERT(this->_bInit);
 
-        T* pModule = HE_NEW_MEM_LAST(T, 0);
-        if (this->_AddModule(pModule) == FALSE)
-        {
-            HE_SAFE_DELETE_MEM(pModule);
-            return FALSE;
-        }
-
-        return TRUE;
+        auto spModule = HE_MAKE_CUSTOM_SHARED_PTR(T);
+        return this->_upModuleManager->Add(spModule);
     }
 
     /// <summary>
@@ -83,7 +77,7 @@ public:
     /// windows / android / iosなどのプラットフォームが扱える予定
     /// 現在はwindowsのみ
     /// </summary>
-    Platform::PlatformModule* PlatformModule();
+    Core::Memory::SharedPtr<Platform::PlatformModule> PlatformModule();
 
     /// <summary>
     /// １フレームの差分時間を秒で取得
@@ -104,12 +98,6 @@ public:
     /// エンジン終了設定
     /// </summary>
     void Quit();
-
-private:
-    /// <summary>
-    /// モジュール追加
-    /// </summary>
-    HE::Bool _AddModule(Module::ModuleBase* in_pModule);
 
 private:
     HE::Bool _bInit  = FALSE;

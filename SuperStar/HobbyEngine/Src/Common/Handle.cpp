@@ -11,15 +11,19 @@ namespace Core::Common
     /// </summary>
     void Handle::SetIndex(const HE::Uint32 in_uIndex)
     {
+        // TODO: 絶対枯渇しない方法を考える必要はあるだろうか?
+        ++s_uMagicNumber;
+        this->SetIndex(in_uIndex, s_uMagicNumber);
+    }
+
+    void Handle::SetIndex(const HE::Uint32 in_uIndex, const HE::Uint32 in_uMagicNumber)
+    {
         HE_ASSERT(this->Null());
         HE_ASSERT(in_uIndex <= EMax_Index);
 
-        // TODO: 絶対枯渇しない方法を考える必要はあるだろうか?
-        ++s_uMagicNumber;
-
         // インデックスとマジックナンバーを割り当て
         this->_handleField._uIndex = in_uIndex;
-        this->_handleField._uMagic = s_uMagicNumber;
+        this->_handleField._uMagic = in_uMagicNumber;
     }
 }  // namespace Core::Common
 

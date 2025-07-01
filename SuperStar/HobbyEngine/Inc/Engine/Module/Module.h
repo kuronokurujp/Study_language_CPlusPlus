@@ -2,7 +2,7 @@
 
 #include "Engine/Common/CustomMap.h"
 #include "Engine/Common/CustomVector.h"
-#include "Engine/Common/Singleton.h"
+#include "Engine/Memory/Memory.h"
 
 namespace Module
 {
@@ -26,26 +26,27 @@ namespace Module
     class ModuleManager
     {
     public:
-        ModuleBase* Get(const HE::Char* in_szName) const;
+        Core::Memory::SharedPtr<ModuleBase> Get(const HE::Char* in_szName) const;
 
         template <class T>
-        T* Get() const
+        Core::Memory::SharedPtr<T> Get() const
         {
             Core::Common::FixedString128 szName(T::ModuleName());
-            auto pModule = reinterpret_cast<T*>(this->Get(szName.Str()));
+            auto pModule = this->Get(szName.Str());
+
             HE_ASSERT(pModule && "モジュールが存在しない");
-            return pModule;
+            return std::static_pointer_cast<T>(pModule);
         }
 
         /// <summary>
-        /// ヒープ作成したモジュールを登録
+        /// モジュールを登録
         /// </summary>
-        HE::Bool RegistHeapModule(ModuleBase* in_pModule);
+        HE::Bool AddModule(Core::Memory::SharedPtr<ModuleBase>);
 
         /// <summary>
         /// モジュールの利用開始
         /// </summary>
-        HE::Bool Start(const ELayer);
+        HE::Bool Start();
 
         /// <summary>
         /// 解放
@@ -68,17 +69,23 @@ namespace Module
         void LateUpdate(const HE::Float32 in_fDeltaTime);
 
     private:
-        HE::Bool _StartModule(ModuleBase&);
-        void _SortModuleVector(Core::Common::VectorBase<ModuleBase*>* out);
+        using ModuleProcessBaseVector  = Core::Common::VectorBase<ModuleBase*>;
+        using ModuleProcessFixedVector = Core::Common::FixedVector<ModuleBase*, 16>;
+        using ModuleFixedMap           = Core::Common::FixedMap<Core::Common::FixedString128,
+                                                                Core::Memory::SharedPtr<ModuleBase>, 16>;
 
     private:
-        Core::Common::FixedVector<ModuleBase*, 16> _vAppModule;
-        Core::Common::FixedVector<ModuleBase*, 32> _vLogicModule;
-        Core::Common::FixedVector<ModuleBase*, 16> _vViewModule;
+        HE::Bool _StartModule(ModuleBase&);
+        void _SortModuleVector(ModuleProcessBaseVector* out);
 
-        Core::Common::FixedMap<Core::Common::FixedString128, ModuleBase*, 16> _mAppModule;
-        Core::Common::FixedMap<Core::Common::FixedString128, ModuleBase*, 32> _mLogicModule;
-        Core::Common::FixedMap<Core::Common::FixedString128, ModuleBase*, 16> _mViewModule;
+    private:
+        ModuleProcessFixedVector _vAppModuleProcess;
+        ModuleProcessFixedVector _vLogicModuleProcess;
+        ModuleProcessFixedVector _vViewModuleProcess;
+
+        ModuleFixedMap _mAppModule;
+        ModuleFixedMap _mLogicModule;
+        ModuleFixedMap _mViewModule;
     };
 
     // アプリ層とロジック層とビュー層で種類を分けるべきか
@@ -96,11 +103,11 @@ namespace Module
         virtual ~ModuleBase() = default;
 
         template <typename T>
-        T* GetDependenceModule()
+        Core::Memory::SharedPtr<T> GetDependenceModule()
         {
             Core::Common::FixedString64 szName(T::ModuleName());
-            auto pTargetModule = reinterpret_cast<T*>(this->_GetModule(szName));
-            HE_ASSERT_RETURN_VALUE(NULL, pTargetModule && "モジュールとして登録していないのでだめ");
+            Core::Memory::SharedPtr<T> spTargetModule = std::static_pointer_cast<T>(this->_GetModule(szName));
+            HE_ASSERT_RETURN_VALUE(NULL, spTargetModule && "モジュールとして登録していないのでだめ");
 
             // 依存対象のモジュールかどうかチェック
             HE::Bool bHit = FALSE;
@@ -114,9 +121,8 @@ namespace Module
             }
 
             HE_ASSERT_RETURN_VALUE(NULL, bHit && "依存モジュールが存在しないのはまずい");
-            // if (bHit == FALSE) return NULL;
 
-            return pTargetModule;
+            return spTargetModule;
         }
 
         /// <summary>
@@ -173,7 +179,7 @@ namespace Module
         }
 
     private:
-        ModuleBase* _GetModule(Core::Common::StringBase&);
+        Core::Memory::SharedPtr<ModuleBase> _GetModule(Core::Common::StringBase&);
 
 #ifdef HE_ENGINE_DEBUG
         HE::Bool _ValidateDependenceModule();
@@ -190,6 +196,7 @@ namespace Module
         Core::Common::FixedVector<Core::Common::FixedString64, 64> _vDependenceModuleName;
 
     private:
+        // モジュールはモジュールマネージャーからのみアクセス可能
         friend class ModuleManager;
     };
 

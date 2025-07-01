@@ -13,7 +13,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyEngine/cmake/UTF8.cmake NO_POLICY_SCOPE
 # ゲームエンジン
 # include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyEngine/Config.cmake NO_POLICY_SCOPE)
 # SDL2プラットフォーム
-# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/PlatformSDL2/Config.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/PlatformSDL2/Config.cmake NO_POLICY_SCOPE)
 # 描画プラグイン
 # include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Render/Config.cmake NO_POLICY_SCOPE)
 # アクタープラグイン
@@ -84,7 +84,7 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release
 # 各プロジェクトを設定
 # TODO: ファイルを構成を大幅に変更で一つ一つ対応
 add_subdirectory(HobbyEngine)
-# add_subdirectory(HobbyPlugin/PlatformSDL2)
+add_subdirectory(HobbyPlugin/PlatformSDL2)
 # add_subdirectory(HobbyPlugin/Render)
 add_subdirectory(HobbyPlugin/Actor)
 add_subdirectory(HobbyPlugin/AssetManager)
@@ -119,7 +119,7 @@ add_subdirectory(HobbyPlugin/Event)
 # common_check_variable(ASSET_MANAGER_PLUGIN_NAME)
 # common_check_variable(PLUGIN_ACTOR_NAME)
 # common_check_variable(RENDER_PLUGIN_NAME)
-# common_check_variable(PLATFORMSDL2_PLUGIN_NAME)
+# common_check_variable(PLUGIN_PLATFORMSDL2_NAME)
 # common_check_variable(ENGINE_NAME)
 
 # ライブラリ名をリストにまとめる
@@ -129,15 +129,15 @@ set(PLUGIN_LIBRARIES
 # TODO: デバッグのみ入れる
 #   ${RUNTIMEDEBUG_PLUGIN_NAME}
 #   ${LUA_PLUGIN_NAME}
-#   ${EVENT_PLUGIN_NAME}
-#   ${ENHANCED_INPUT_PLUGIN_NAME}
+  ${EVENT_PLUGIN_NAME}
+  ${ENHANCED_INPUT_PLUGIN_NAME}
 #   ${UI_PLUGIN_NAME}
 #   ${LOCALIZATION_PLUGIN_NAME}
   ${PLUGIN_LEVEL_NAME}
-#   ${ASSET_MANAGER_PLUGIN_NAME}
+  ${ASSET_MANAGER_PLUGIN_NAME}
 #   ${RENDER_PLUGIN_NAME}
   ${PLUGIN_ACTOR_NAME}
-#   ${PLATFORMSDL2_PLUGIN_NAME}
+  ${PLUGIN_PLATFORMSDL2_NAME}
   ${ENGINE_NAME}
 )
 

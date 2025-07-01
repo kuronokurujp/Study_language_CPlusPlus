@@ -77,19 +77,15 @@ HE::Bool Engine::Start()
 
     HE_LOG_LINE(HE_STR_TEXT("エンジンの起動"));
 
-    // OS固有のモジュールは先に開始させる
-    this->_upModuleManager->Start(Module::ELayer_App);
-
-    // ゲーム用のモジュールを開始
-    this->_upModuleManager->Start(Module::ELayer_Logic);
-    this->_upModuleManager->Start(Module::ELayer_View);
+    // モジュール管理を使えるようにする
+    this->_upModuleManager->Start();
 
     // FPSタイマーを作成
     // ゲームを固定フレームレートにするため
     auto pPlatformModule = this->PlatformModule();
     if (pPlatformModule)
     {
-        this->_spFPS = HE_MAKE_CUSTOM_SHARED_PTR((Core::Time::FPS), pPlatformModule->VTime());
+        this->_spFPS = HE_MAKE_CUSTOM_SHARED_PTR((Core::Time::FPS), pPlatformModule->Time());
         // TODO: FPSは固定にして60にいったんしている
         this->_spFPS->EnableFixedMode(60);
     }
@@ -150,21 +146,21 @@ void Engine::WaitFrameLoop()
         // 指定したFPSまで待機
         do
         {
-            if (this->_spFPS->IsWaitFrameFixedMode(pPlatform->VTime()))
+            if (this->_spFPS->IsWaitFrameFixedMode(pPlatform->Time()))
             {
                 // TODO: 待機中は何か処理をした方がいい?
-                pPlatform->VTime()->VSleepMSec(1);
+                pPlatform->Time()->VSleepMSec(1);
             }
             else
             {
-                this->_spFPS->UpdateTime(pPlatform->VTime());
+                this->_spFPS->UpdateTime(pPlatform->Time());
                 break;
             }
         } while (TRUE);
     }
     else
     {
-        this->_spFPS->UpdateTime(pPlatform->VTime());
+        this->_spFPS->UpdateTime(pPlatform->Time());
     }
 
     HE::Uint64 ulEndMSec = this->_spFPS->GetLastTimeMSec();
@@ -183,6 +179,14 @@ void Engine::LateUpdateLoop(const HE::Float32 in_fDt)
     HE_ASSERT(this->_upModuleManager);
 
     this->_upModuleManager->LateUpdate(in_fDt);
+
+    // TODO: ここでプラットフォームの状態を確認して終了する
+    auto spPlatform = this->PlatformModule();
+    if (spPlatform == NULL) return;
+    if (spPlatform->VIsQuit())
+    {
+        this->Quit();
+    }
 }
 
 HE::Float32 Engine::GetDeltaTimeSec()
@@ -211,18 +215,11 @@ void Engine::Quit()
     this->_bQuit = TRUE;
 }
 
-Platform::PlatformModule* Engine::PlatformModule()
+Core::Memory::SharedPtr<Platform::PlatformModule> Engine::PlatformModule()
 {
     HE_ASSERT(this->_upModuleManager);
 
     Core::Common::FixedString128 szName(Platform::PlatformModule::ModuleName());
-    return reinterpret_cast<Platform::PlatformModule*>(this->_upModuleManager->Get(szName.Str()));
-}
-
-HE::Bool Engine::_AddModule(class Module::ModuleBase* in_pModule)
-{
-    HE_ASSERT(in_pModule);
-    HE_ASSERT(this->_upModuleManager);
-
-    return this->_upModuleManager->RegistHeapModule(in_pModule);
+    return std::static_pointer_cast<Platform::PlatformModule>(
+        this->_upModuleManager->Get(szName.Str()));
 }

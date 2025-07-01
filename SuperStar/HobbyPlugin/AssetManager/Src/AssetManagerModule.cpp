@@ -18,7 +18,7 @@ namespace AssetManager
     {
         // TODO: プラットフォームにファイル参照のカレントディレクトリを設定
         auto pPlatform = this->GetDependenceModule<Platform::PlatformModule>();
-        pPlatform->VFile()->SetCurrentDir(in_szMountDir);
+        pPlatform->File()->SetCurrentDir(in_szMountDir);
     }
 
     HE::Bool AssetManagerModule::_VStart()
@@ -65,7 +65,7 @@ namespace AssetManager
         auto pPlatformModule = this->GetDependenceModule<Platform::PlatformModule>();
         HE_ASSERT(pPlatformModule);
 
-        auto spFileSystem = pPlatformModule->VFile();
+        auto spFileSystem = pPlatformModule->File();
         if (out->_VLoad(*spFileSystem) == FALSE)
         {
             return FALSE;

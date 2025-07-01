@@ -6,3 +6,9 @@
 
 ## 参考サイト
 - [OpenGLのデバッグを快適にするDebug Output](https://zenn.dev/yumcyawiz/articles/e3c21b662fca6d)
+
+## Directory Layout
+
+- `Inc/` : Public header files
+- `Src/` : Source files
+- `Test/` : Unit tests

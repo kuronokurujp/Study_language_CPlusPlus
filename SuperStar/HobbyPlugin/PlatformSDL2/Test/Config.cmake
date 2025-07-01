@@ -1,0 +1,5 @@
+set(PLUGIN_PLATFORMSDL2_TEST_NAME HobbyPlugin_Platform_SDL2_UnitTests)
+
+set(PLUGIN_PLATFORMSDL2_TARGET_TEST_SRC_FILES
+    PlatformSDL2/TestSDL2.cpp
+)

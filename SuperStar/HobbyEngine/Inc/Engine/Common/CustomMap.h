@@ -160,7 +160,7 @@ namespace Core::Common
         /// キーとデータを追加
         /// DATAがムーブセマンティック用
         /// </summary>
-        Iterator AddByMoveData(const TKey& in_rKey, TData&& in_rData)
+        Iterator Add(const TKey& in_rKey, TData&& in_rData)
         {
             // 赤ノードを作る
             Node* pNode = this->_NewNode();
@@ -170,14 +170,17 @@ namespace Core::Common
             {
                 // 添え字アクセスで作る場合はデータが無い
                 // コピーして渡す
-                if constexpr (IsUniquePtrByTemplateType<TData>::value)
+                // TODO: ムーブセマンティック対応以外のデータは事前にエラーにしたい
+                //if constexpr (IsUniquePtrByTemplateType<TData>::value)
                 {
                     pNode->_pair._data = std::move(in_rData);
                 }
+                /*
                 else
                 {
                     HE_STATIC_ASSERT(0);
                 }
+                */
             }
 
             // ルートを親として追加

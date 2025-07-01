@@ -27,6 +27,10 @@ namespace Core::Common
         /// 管理するindexを設定
         /// </summary>
         void SetIndex(const HE::Uint32 in_uIndex);
+        /// <summary>
+        /// 重複しないマジックナンバーを使う側で管理する時に使用
+        /// </summary>
+        void SetIndex(const HE::Uint32 in_uIndex, const HE::Uint32 in_uMagicNumber);
 
         inline void Clear() HE_NOEXCEPT { this->_ulHandle = HE::ulInvalidUint64; }
         inline HE::Uint32 Index() const HE_NOEXCEPT { return this->_handleField._uIndex; }

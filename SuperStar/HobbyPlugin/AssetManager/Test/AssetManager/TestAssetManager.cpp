@@ -1,6 +1,12 @@
-﻿#include "./AssetManagerModule.h"
-// #include "./PlatformSDL2Module.h"
+﻿#include <gtest/gtest.h>
+
+#include "AssetManagerModule.h"
+#include "PlatformSDL2Module.h"
 #include "Engine/Engine.h"
+
+namespace AssetManager
+{
+}
 
 #if 0
 // Tomlファイルテスト
