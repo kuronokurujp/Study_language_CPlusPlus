@@ -3,8 +3,6 @@
 #include "Engine/MiniEngine.h"
 #include "Engine/Platform/PlatformModule.h"
 
-#include "PlatformSDL2/Screen/Render.h"
-
 namespace PlatformSDL2
 {
     /// <summary>
@@ -50,7 +48,6 @@ namespace PlatformSDL2
         /// モジュール後更新
         /// </summary>
         void _VLateUpdate(const HE::Float32 in_fDeltaTime) override final;
-
 
     private:
         HE::Bool _bMainWindowInitialized = TRUE;

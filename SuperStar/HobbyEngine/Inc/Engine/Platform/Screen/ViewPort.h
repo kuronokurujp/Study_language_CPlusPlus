@@ -4,13 +4,10 @@
 #include "Engine/Memory/Memory.h"
 #include "Engine/MiniEngine.h"
 #include "Engine/Platform/Screen/Render.h"
+#include "Engine/Platform/Screen/Scene.h"
 
 namespace Platform
 {
-    // 前方宣言
-    class SceneStrategy;
-    struct SceneConfig;
-
     struct ViewPortConfig
     {
         HE::Uint32 _uWidth  = 0;
@@ -27,9 +24,7 @@ namespace Platform
                                                   Core::Memory::UniquePtr<SceneStrategy>, 32>;
 
         using MapRender = Core::Common::FixedMap<const Core::Common::RTTI*,
-                                                 Core::Memory::UniquePtr<RenderInterface>, 32>;
-
-        using EventRender = std::function<void(RenderInterface*, const ViewPortConfig&)>;
+                                                 Core::Memory::SharedPtr<RenderInterface>, 32>;
 
     public:
         ViewPortStrategy(const ViewPortConfig&);
@@ -37,40 +32,34 @@ namespace Platform
         virtual void VBegin();
         virtual void VEnd();
 
-        virtual void VBeginRender() = 0;
-        virtual void VEndRender()   = 0;
+        void Render();
 
         // TODO: レンダリングインターフェイスを継承しているかチェックを入れる
+        // TODO: シーン個別で設定するのが今はない
         template <class T>
-        Core::Common::Handle CreateScene(const SceneConfig& in_rConfig, EventRender in_eventRender)
+        Core::Common::Handle CreateScene(SceneStrategy::EventRender in_eventRender)
         {
             HE_STATIC_ASSERT(std::is_base_of<RenderInterface, T>::value,
                              "TクラスはRenderInterfaceクラスを継承していない");
 
             // TODO:レンダリングがすでに存在しているかチェックをしてあれば再利用なければ新規生成
+            Core::Memory::SharedPtr<RenderInterface> spNewRender = NULL;
             {
                 auto pAddr = T::StaticRTTI();
-                if (this->_mRender.Contains(pAddr))
+                if (this->_mRender.Contains(pAddr) == FALSE)
                 {
+                    spNewRender = HE_MAKE_CUSTOM_SHARED_PTR((T));
+                    this->_mRender.Add(pAddr, spNewRender);
                 }
                 else
                 {
-                    this->_mRender.Add(pAddr, std::move(HE_MAKE_CUSTOM_UNIQUE_PTR((T))));
+                    spNewRender = this->_mRender.FindKey(pAddr)->_data;
                 }
             }
 
             // TODO: シーンにレンダリングを渡す
-
-            auto upScene =
-                this->_VCreateScene(in_rConfig);
-                /*
-                                    [this, std::move(in_eventRender)]()
-                                    {
-                                        auto pRender =
-                                            this->_mRender.FindKey(T::StaticRTTI()).data->get();
-                                        in_eventRender(pRender, this->_config);
-                                    });
-                                    */
+            SceneConfig config = {this->_config._uWidth, this->_config._uHeight};
+            auto upScene       = this->_VCreateScene(config, spNewRender, std::move(in_eventRender));
 
             Core::Common::Handle handle;
             handle.SetIndex(++this->_uScenetStCount, 0);
@@ -81,15 +70,20 @@ namespace Platform
         inline const ViewPortConfig& GetConfig() const { return this->_config; }
 
     protected:
+        virtual void _VBeginRender() = 0;
+        virtual void _VEndRender()   = 0;
+
         /// <summary>
         /// TODO: Sceneの生成は継承先へ
         /// </summary>
         virtual Core::Memory::UniquePtr<Platform::SceneStrategy> _VCreateScene(
-            const SceneConfig&) = 0;
+            const SceneConfig&, Core::Memory::SharedPtr<RenderInterface>,
+            SceneStrategy::EventRender) = 0;
 
     protected:
         ViewPortConfig _config;
 
+    private:
         MapSceneSt _mSceneSt;
         MapRender _mRender;
         HE::Uint32 _uScenetStCount = 0;

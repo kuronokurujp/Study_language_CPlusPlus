@@ -5,12 +5,12 @@
 #include "Engine/Module/Module.h"
 
 // プラットフォームのインターフェイス
-#include "PlatformFile.h"
-#include "PlatformFont.h"
-#include "PlatformInput.h"
-#include "PlatformScreen.h"
-#include "PlatformSystem.h"
-#include "PlatformTime.h"
+#include "Engine/Platform/PlatformFile.h"
+#include "Engine/Platform/PlatformFont.h"
+#include "Engine/Platform/PlatformInput.h"
+#include "Engine/Platform/PlatformScreen.h"
+#include "Engine/Platform/PlatformSystem.h"
+#include "Engine/Platform/PlatformTime.h"
 
 namespace Platform
 {
@@ -76,6 +76,11 @@ namespace Platform
         /// インスタンス破棄時に呼ばれる
         /// </summary>
         virtual HE::Bool _VRelease() override;
+
+        /// <summary>
+        /// モジュール更新
+        /// </summary>
+        virtual void _VUpdate(const HE::Float32 in_fDeltaTime) override final;
 
         /// <summary>
         /// モジュール後更新

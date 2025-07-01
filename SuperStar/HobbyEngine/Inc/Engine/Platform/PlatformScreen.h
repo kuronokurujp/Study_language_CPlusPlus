@@ -25,11 +25,12 @@ namespace Platform
         virtual ~ScreenInterface() = default;
         virtual void VRelease()    = 0;
 
+        virtual void VUpdate(const HE::Float32)                                  = 0;
+
         virtual Core::Common::Handle VCreateWindowStrategy(const WindowConfig&) = 0;
         virtual WindowStrategy* VGetWindow(const Core::Common::Handle)          = 0;
 
-        virtual void VRendering() = 0;
-        //        virtual RenderInterface* VGetRenderer() = 0;
+        virtual void VRender() = 0;
     };
 
 #if 0

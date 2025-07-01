@@ -13,15 +13,16 @@ namespace PlatformSDL2
     public:
         SDL2ViewPortStrategy(const Platform::ViewPortConfig& in_rConfig);
 
-        void VBeginRender() override final;
-        void VEndRender() override final;
-
     private:
+        void _VBeginRender() override final;
+        void _VEndRender() override final;
+
         /// <summary>
         /// シーンの生成は継承先へ
         /// </summary>
         Core::Memory::UniquePtr<Platform::SceneStrategy> _VCreateScene(
-            const Platform::SceneConfig&) override final;
+            const Platform::SceneConfig&, Core::Memory::SharedPtr<Platform::RenderInterface>,
+            Platform::SceneStrategy::EventRender) override final;
     };
 
 }  // namespace PlatformSDL2

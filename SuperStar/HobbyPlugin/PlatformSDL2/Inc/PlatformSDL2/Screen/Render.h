@@ -6,7 +6,7 @@
 
 namespace Platform
 {
-    struct ViewPortConfig;
+    struct SceneConfig;
     class FontInterface;
 }  // namespace Platform
 
@@ -22,8 +22,8 @@ namespace PlatformSDL2
     public:
         DefaultRender();
 
-        void VStart() override final;
-        void VRelease() override final;
+        void VBegin() override final;
+        void VEnd() override final;
 
         /// <summary>
         /// 指定された数のパーティクルを作成
@@ -49,14 +49,14 @@ namespace PlatformSDL2
         void Cls(const HE::Uint32 in_uR, const HE::Uint32 in_uG, const HE::Uint32 in_uB);
 
         // パーティクルの描画
-        void Draw2DPartical(const Platform::ViewPortConfig& in_rViewConfig,
+        void Draw2DPartical(const Platform::SceneConfig& in_rViewConfig,
                             const Core::Common::Handle in_rParticleHandle,
                             const Core::Math::Vector3&);
 
         /// <summary>
         /// 2Dのテキスト描画
         /// </summary>
-        void Draw2DText(const Platform::ViewPortConfig&, Platform::FontInterface* in_pFont,
+        void Draw2DText(const Platform::SceneConfig&, Platform::FontInterface* in_pFont,
                         const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAnchor,
                         const HE::Char* in_szText, const HE::Uint32 in_uTextSize,
                         const HE::Uint32 in_uSpace, const Core::Math::Color);
@@ -64,20 +64,20 @@ namespace PlatformSDL2
         /// <summary>
         /// 2Dの矩形描画
         /// </summary>
-        void Draw2DQuad(const Platform::ViewPortConfig& in_rViewConfig,
+        void Draw2DQuad(const Platform::SceneConfig& in_rViewConfig,
                         const Core::Math::Rect2& in_rRect2D, const Core::Math::Color);
 
         /// <summary>
         /// 2Dの円描画
         /// </summary>
-        void Draw2DCircle(const Platform::ViewPortConfig& in_rViewConfig,
+        void Draw2DCircle(const Platform::SceneConfig& in_rViewConfig,
                           const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAchor,
                           const HE::Float32 in_fSize, const Core::Math::Color);
 
         /// <summary>
         /// 2Dの三角形描画
         /// </summary>
-        void Draw2DTriangle(const Platform::ViewPortConfig& in_rViewConfig,
+        void Draw2DTriangle(const Platform::SceneConfig& in_rViewConfig,
                             const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAchor,
                             const HE::Float32 in_rAngleDegress, const HE::Float32 in_fSize,
                             const Core::Math::Color);

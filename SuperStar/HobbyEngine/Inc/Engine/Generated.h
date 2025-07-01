@@ -14,7 +14,7 @@ public:                                                        \
     }                                                          \
                                                                \
 public:                                                        \
-    const Core::Common::RTTI& GetRTTI()                        \
+    virtual const Core::Common::RTTI& VGetRTTI()               \
     {                                                          \
         return *(StaticRTTI());                                \
     }
@@ -31,10 +31,10 @@ public:                                                                      \
     }                                                                        \
                                                                              \
 public:                                                                      \
-    const Core::Common::RTTI& GetRTTI()                                      \
+    const Core::Common::RTTI& VGetRTTI() override                            \
     {                                                                        \
         return *(StaticRTTI());                                              \
     }
 
 #define HE_GENERATED_CHECK_RTTI(rtti, checkRtti) \
-    ((rtti).GetRTTI().DerivesFrom(checkRtti::StaticRTTI()))
+    ((rtti).VGetRTTI().DerivesFrom(checkRtti::StaticRTTI()))

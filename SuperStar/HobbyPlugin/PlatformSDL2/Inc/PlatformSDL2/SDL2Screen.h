@@ -24,14 +24,10 @@ namespace PlatformSDL2
                EventInputInterfaceGetter);
         void VRelease() override final;
 
+        void VUpdate(const HE::Float32) override final;
+
         HE::Bool IsMainWindowActive() const { return this->_bMainWindowActive; }
 
-        /// <summary>
-        /// スクリーン描画インターフェイス
-        /// </summary>
-        //RenderInterface* VGetRenderer() override final;
-
-        /// <summary>
         /// ウィンドウロジックを生成
         /// プラットフォーム固有のウィンドウ生成などをする
         /// </summary>
@@ -39,7 +35,7 @@ namespace PlatformSDL2
 
         virtual Platform::WindowStrategy* VGetWindow(const Core::Common::Handle) override final;
 
-        virtual void VRendering() override final;
+        virtual void VRender() override final;
 
     private:
         using MapWindowSt =

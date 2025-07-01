@@ -1,6 +1,7 @@
 ﻿#include <gtest/gtest.h>
 
 #include "Engine/Engine.h"
+#include "PlatformSDL2/Screen/Render.h"
 #include "PlatformSDL2Module.h"
 
 namespace PlatformSDL2
@@ -31,10 +32,11 @@ namespace PlatformSDL2
 
         // TODO: ウィンドウ追加
         {
+            auto inputHandle = spPlatformModule->Input()->VCreateObject();
             // TODO: ウィンドウの設定
             auto windowConfig =
-                Platform::WindowConfig{640,  480,        1,
-                                       TRUE, NullHandle, Platform::WindowConfig::EFlags_None};
+                Platform::WindowConfig{640,  480,         1,
+                                       TRUE, inputHandle, Platform::WindowConfig::EFlags_None};
 
             // TODO: 設定に基づいたウィンドウを生成
             auto handle  = spPlatformModule->Screen()->VCreateWindowStrategy(windowConfig);
@@ -44,11 +46,9 @@ namespace PlatformSDL2
             auto viewPortHandle = pWindow->CreateViewPort(viewPortConfig);
             auto pViewPort      = pWindow->GetViewPort(viewPortHandle);
             // TODO: 描画するシーンの追加
-            auto sceneConfig = Platform::SceneConfig{};
             auto sceneHandle = pViewPort->CreateScene<PlatformSDL2::DefaultRender>(
-                sceneConfig,
                 [spPlatformModule](Platform::RenderInterface* in_pRender,
-                                   const Platform::ViewPortConfig& in_rViewPortConfig)
+                                   const Platform::SceneConfig& in_rSceneConfig)
                 {
                     // シーンの渡したレンダリングを利用して描画する
                     HE_ASSERT_RETURN(
@@ -56,15 +56,17 @@ namespace PlatformSDL2
                     auto pRender = reinterpret_cast<PlatformSDL2::DefaultRender*>(in_pRender);
 
                     // TODO: テキストで使うフォントを指定
-                    pRender->Draw2DText(in_rViewPortConfig, spPlatformModule->Font().get(),
+                    pRender->Draw2DText(in_rSceneConfig, spPlatformModule->Font().get(),
                                         Core::Math::Vector2(0.0f, 0.0f),
                                         Core::Math::EAnchor::EAnchor_Left, HE_STR_TEXT("Test"), 32,
                                         1, Core::Math::RGB::White);
                 });
+
+            pWindow->VShow();
         }
 
         // TODO: フォント表示
-        while (spPlatformModule->VIsQuit())
+        while (spPlatformModule->VIsQuit() == FALSE)
         {
             moduleManager.BeforeUpdate(0);
             moduleManager.Update(0);

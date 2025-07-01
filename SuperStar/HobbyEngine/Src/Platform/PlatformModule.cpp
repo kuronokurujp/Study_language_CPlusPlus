@@ -24,9 +24,14 @@ namespace Platform
         return TRUE;
     }
 
+    void PlatformModule::_VUpdate(const HE::Float32 in_fDeltaTime)
+    {
+        this->_spScreen->VUpdate(in_fDeltaTime);
+    }
+
     void PlatformModule::_VLateUpdate(const HE::Float32 in_fDeltaTime)
     {
         // TODO: レンダリングをする
-        this->_spScreen->VRendering();
+        this->_spScreen->VRender();
     }
 }  // namespace Platform

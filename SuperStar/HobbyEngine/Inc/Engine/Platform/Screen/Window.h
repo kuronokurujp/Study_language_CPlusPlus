@@ -83,22 +83,19 @@ namespace Platform
         using EventMenuCallback = std::function<void(HE::Uint32)>;
 
     public:
-        WindowStrategy(const WindowConfig& in_rConfig) : _config(in_rConfig) {}
-        virtual void VRelease() = 0;
+        WindowStrategy(const WindowConfig& in_rConfig);  //
 
         virtual void VSetPos(const HE::Uint32 in_uX, const HE::Uint32 in_uY) = 0;
 
-        virtual void VActive()                  = 0;
-        virtual void VShow()                    = 0;
-        virtual void VHide()                    = 0;
-        virtual const HE::Bool VIsClose() const = 0;
+        virtual void VActive() = 0;
+        virtual void VShow()   = 0;
+        virtual void VHide()   = 0;
 
-        virtual void VBegin()                         = 0;
-        virtual void VEnd()                           = 0;
+        void Begin();
+        void End();
         virtual void VUpdate(const HE::Float32 in_dt) = 0;
 
-        virtual void VBeginRender();
-        virtual void VEndRender();
+        void Render();
 
         /// <summary>
         /// TODO: 引数にストラテジーを設定できるようにする
@@ -110,12 +107,16 @@ namespace Platform
         virtual void* VGetWindowBySDL2() const  = 0;
         virtual void* VGetContentBySDL2() const = 0;
 #endif
+        inline HE::Bool IsBegin() const { return this->_bBegin; }
 
         inline const WindowConfig& GetConfig() const { return this->_config; }
 
     protected:
-        void _BeginViewPort();
-        void _EndViewPort();
+        virtual void _VBeginWindow() = 0;
+        virtual void _VEndWindow()   = 0;
+
+        virtual void _VBeginRender() = 0;
+        virtual void _VEndRender()   = 0;
 
         /// <summary>
         /// TODO: ViewPortの生成は継承先へ
@@ -124,6 +125,11 @@ namespace Platform
             const Platform::ViewPortConfig& in_rConfig) = 0;
 
     private:
+        void _BeginViewPort();
+        void _EndViewPort();
+
+    private:
+        HE::Bool _bBegin = FALSE;
         Platform::WindowConfig _config;
 
         MapViewPortSt _mViewPortSt;

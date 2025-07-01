@@ -38,14 +38,7 @@ namespace PlatformSDL2
         this->_eventMenuCallback        = std::move(in_eventMenuCallback);
     }
 
-    void SDL2WindowStrategy::VRelease()
-    {
-        // TODO: 解放処理が解放
-        this->_inputInterfaceGetterFunc = NULL;
-        this->_eventMenuCallback        = NULL;
-    }
-
-    void SDL2WindowStrategy::VBegin()
+    void SDL2WindowStrategy::_VBeginWindow()
     {
         // windowを作成
         // openglを扱うようにする
@@ -63,7 +56,12 @@ namespace PlatformSDL2
 
         // ウィンドウは最初は非表示にしておく
 
-        Uint32 uFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN;
+        Uint32 uFlags = SDL_WINDOW_OPENGL;
+        if (this->_bShow == FALSE)
+        {
+            uFlags |= SDL_WINDOW_HIDDEN;
+        }
+
         // 設定フラグに応じてウィンドウフラグを設定
         {
             auto eConfigFlags = rConfig.Flags();
@@ -168,7 +166,7 @@ namespace PlatformSDL2
                         // でもウィンドウが複数あるとよばれない
                         case SDL_QUIT:
                         {
-                            this->_bClose = TRUE;
+                            this->_OnMenuItem(EMenuItemID::EMenuItemID_Exit);
                             break;
                         }
                         case SDL_WINDOWEVENT:
@@ -180,7 +178,6 @@ namespace PlatformSDL2
                                 {
                                     if (pSDLEvent->window.windowID == this->_windowID)
                                         this->_OnMenuItem(EMenuItemID::EMenuItemID_Exit);
-                                    this->_bClose = TRUE;
                                     break;
                                 }
                             }
@@ -211,14 +208,10 @@ namespace PlatformSDL2
                     }
                 });
         }
-
-        WindowStrategy::VBegin();
     }
 
-    void SDL2WindowStrategy::VEnd()
+    void SDL2WindowStrategy::_VEndWindow()
     {
-        WindowStrategy::VEnd();
-
         // ウィンドウのメニューを削除
 #ifdef HE_WIN
         if (this->_hMenuBar)
@@ -241,6 +234,9 @@ namespace PlatformSDL2
 
         this->_context  = Context(NULL, NULL);
         this->_windowID = 0;
+        // TODO: 解放処理が解放
+        this->_inputInterfaceGetterFunc = NULL;
+        this->_eventMenuCallback        = NULL;
     }
 
     void SDL2WindowStrategy::VUpdate(const HE::Float32 in_dt)
@@ -256,12 +252,18 @@ namespace PlatformSDL2
     void SDL2WindowStrategy::VActive()
     {
         auto [pGLContext, pWindow] = this->_context;
+        HE_ASSERT_RETURN(pWindow);
+
         ::SDL_GL_MakeCurrent(reinterpret_cast<SDL_Window*>(pWindow), pGLContext);
     }
 
     void SDL2WindowStrategy::VShow()
     {
         auto [pGLContext, pWindow] = this->_context;
+        HE_ASSERT_RETURN(pWindow);
+
+        this->_bShow = TRUE;
+        if (this->_windowID == 0) return;
 
         ::SDL_ShowWindow(reinterpret_cast<SDL_Window*>(pWindow));
     }
@@ -269,11 +271,15 @@ namespace PlatformSDL2
     void SDL2WindowStrategy::VHide()
     {
         auto [pGLContext, pWindow] = this->_context;
+        HE_ASSERT_RETURN(pWindow);
+
+        this->_bShow = TRUE;
+        if (this->_windowID == 0) return;
 
         ::SDL_HideWindow(reinterpret_cast<SDL_Window*>(pWindow));
     }
 
-    void SDL2WindowStrategy::VBeginRender()
+    void SDL2WindowStrategy::_VBeginRender()
     {
         auto [pGLContext, pWindow] = this->_context;
 
@@ -286,14 +292,10 @@ namespace PlatformSDL2
         //::glDepthFunc(GL_LEQUAL);
         //::glDepthRange(0.0, 1.0);  // 深度範囲の設定
         //::glDisable(GL_BLEND);
-
-        WindowStrategy::VBeginRender();
     }
 
-    void SDL2WindowStrategy::VEndRender()
+    void SDL2WindowStrategy::_VEndRender()
     {
-        WindowStrategy::VEndRender();
-
         auto [pGLContext, pWindow] = this->_context;
 
         // ウィンドウの描画バッファを切り替える
@@ -352,12 +354,7 @@ namespace PlatformSDL2
     /// </summary>
     void SDL2WindowStrategy::_OnMenuItem(const HE::Uint32 in_uID)
     {
-        auto& rConfig     = this->GetConfig();
-        auto mMenuItemMap = rConfig.GetMenuItemMap();
-        if (mMenuItemMap.Contains(in_uID))
-        {
-            auto itr = mMenuItemMap.FindKey(in_uID);
-            this->_eventMenuCallback(in_uID, rConfig);
-        }
+        auto& rConfig = this->GetConfig();
+        this->_eventMenuCallback(in_uID, rConfig);
     }
 }  // namespace PlatformSDL2

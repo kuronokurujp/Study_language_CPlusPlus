@@ -23,7 +23,7 @@ namespace PlatformSDL2
     {
     }
 
-    void DefaultRender::VStart()
+    void DefaultRender::VBegin()
     {
         // フォント用のメッシュは常に使うので常駐
         {
@@ -310,8 +310,61 @@ namespace PlatformSDL2
         }
     }
 
-    void DefaultRender::VRelease()
+    void DefaultRender::VEnd()
     {
+        {
+            auto pWhiteTex = reinterpret_cast<TextureSurface*>(this->_pWhiteTex);
+            pWhiteTex->Release();
+            HE_SAFE_DELETE_MEM(pWhiteTex);
+        }
+
+        {
+            auto pMesh = reinterpret_cast<Mesh*>(this->_p2DTriangleMesh);
+            pMesh->Release();
+            HE_SAFE_DELETE_MEM(this->_p2DTriangleMesh);
+        }
+
+        {
+            auto p2DCircleMesh = reinterpret_cast<Mesh*>(this->_p2DCircleMesh);
+            p2DCircleMesh->Release();
+            HE_SAFE_DELETE_MEM(this->_p2DCircleMesh);
+        }
+
+        {
+            auto pFontMesh = reinterpret_cast<Mesh*>(this->_pFontMesh);
+            pFontMesh->Release();
+            HE_SAFE_DELETE_MEM(this->_pFontMesh);
+        }
+
+        {
+            auto p2DQuadMesh = reinterpret_cast<Mesh*>(this->_p2DQuadMesh);
+            p2DQuadMesh->Release();
+            HE_SAFE_DELETE_MEM(this->_p2DQuadMesh);
+        }
+
+        {
+            auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
+            pPool->ReleasePool([](ParticleMesh* in_pParticleMesh) { in_pParticleMesh->Release(); });
+            HE_SAFE_DELETE_MEM(this->_pPoolParticleMesh);
+        }
+
+        {
+            auto pMat = reinterpret_cast<Material*>(this->_pParticleMat);
+            pMat->VRelease();
+            HE_SAFE_DELETE_MEM(this->_pParticleMat);
+        }
+
+        {
+            auto pMat = reinterpret_cast<Material*>(this->_p2DGeometoryMat);
+            pMat->VRelease();
+            HE_SAFE_DELETE_MEM(this->_p2DGeometoryMat);
+        }
+
+        {
+            auto pMat = reinterpret_cast<Material*>(this->_p2DQuadMat);
+            pMat->VRelease();
+            HE_SAFE_DELETE_MEM(this->_p2DQuadMat);
+        }
     }
 
     Core::Common::Handle DefaultRender::ParticalCreate(const HE::Uint32 in_uCount)
@@ -362,7 +415,7 @@ namespace PlatformSDL2
         pParticleMesh->SetVelocitys(in_rVec);
     }
 
-    void DefaultRender::Draw2DPartical(const Platform::ViewPortConfig& in_rViewConfig,
+    void DefaultRender::Draw2DPartical(const Platform::SceneConfig& in_rViewConfig,
                                        const Core::Common::Handle in_rParticleHandle,
                                        const Core::Math::Vector3& in_rPos)
     {
@@ -415,7 +468,7 @@ namespace PlatformSDL2
         ::glClearColor(fR, fG, fB, 1.0f);
     }
 
-    void DefaultRender::Draw2DText(const Platform::ViewPortConfig& in_rViewConfig,
+    void DefaultRender::Draw2DText(const Platform::SceneConfig& in_rViewConfig,
                                    Platform::FontInterface* in_pFont,
                                    const Core::Math::Vector2& in_rPos,
                                    const Core::Math::EAnchor in_eAnchor, const HE::Char* in_szText,
@@ -687,7 +740,7 @@ namespace PlatformSDL2
         pMesh->Free();
     }
 
-    void DefaultRender::Draw2DQuad(const Platform::ViewPortConfig& in_rViewConfig,
+    void DefaultRender::Draw2DQuad(const Platform::SceneConfig& in_rViewConfig,
                                    const Core::Math::Rect2& in_rRect2D,
                                    const Core::Math::Color in_color)
     {
@@ -755,7 +808,7 @@ namespace PlatformSDL2
         // p2DQuadMat->Disable();
     }
 
-    void DefaultRender::Draw2DCircle(const Platform::ViewPortConfig& in_rViewConfig,
+    void DefaultRender::Draw2DCircle(const Platform::SceneConfig& in_rViewConfig,
                                      const Core::Math::Vector2& in_rPos,
                                      const Core::Math::EAnchor in_eAchor,
                                      const HE::Float32 in_fSize, const Core::Math::Color in_color)
@@ -833,7 +886,7 @@ namespace PlatformSDL2
         //        pMat->Disable();
     }
 
-    void DefaultRender::Draw2DTriangle(const Platform::ViewPortConfig& in_rViewConfig,
+    void DefaultRender::Draw2DTriangle(const Platform::SceneConfig& in_rViewConfig,
                                        const Core::Math::Vector2& in_rPos,
                                        const Core::Math::EAnchor in_eAchor,
                                        const HE::Float32 in_fAngleDegress,

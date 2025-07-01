@@ -11,35 +11,28 @@ namespace PlatformSDL2
     {
     }
 
-    void SDL2ViewPortStrategy::VBeginRender()
+    void SDL2ViewPortStrategy::_VBeginRender()
     {
         ::glViewport(0, 0, this->_config._uWidth, this->_config._uHeight);
         ::glEnable(GL_DEPTH_TEST);
         ::glDisable(GL_BLEND);
 
         //::glEnable(GL_MULTISAMPLE);
-
-        for (auto it = this->_mSceneSt.Begin(); it != this->_mSceneSt.End(); ++it)
-        {
-            it->_data->VBeginRender();
-        }
     }
 
-    void SDL2ViewPortStrategy::VEndRender()
+    void SDL2ViewPortStrategy::_VEndRender()
     {
-        for (auto it = this->_mSceneSt.Begin(); it != this->_mSceneSt.End(); ++it)
-        {
-            it->_data->VEndRender();
-        }
-
         //::glDisable(GL_MULTISAMPLE);
     }
 
     Core::Memory::UniquePtr<Platform::SceneStrategy> SDL2ViewPortStrategy::_VCreateScene(
-        const Platform::SceneConfig& in_rConfig)
+        const Platform::SceneConfig& in_rConfig,
+        Core::Memory::SharedPtr<Platform::RenderInterface> in_spRenderInterface,
+        Platform::SceneStrategy::EventRender in_eventRender)
     {
         // TODO: 2D/3Dでシーンを切り替えるかも
-        auto upScene = HE_MAKE_CUSTOM_UNIQUE_PTR((SDL2SceneStrategy2D), in_rConfig);
+        auto upScene = HE_MAKE_CUSTOM_UNIQUE_PTR((SDL2SceneStrategy2D), in_rConfig,
+                                                 in_spRenderInterface, std::move(in_eventRender));
         return std::move(upScene);
     }
 

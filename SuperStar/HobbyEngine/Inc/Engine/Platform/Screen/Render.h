@@ -12,8 +12,8 @@ namespace Platform
         HE_GENERATED_CLASS_BASE_BODY_HEADER(RenderInterface);
 
     public:
-        RenderInterface()       = default;
-        virtual void VStart()   = 0;
-        virtual void VRelease() = 0;
+        RenderInterface()     = default;
+        virtual void VBegin() = 0;
+        virtual void VEnd()   = 0;
     };
 }  // namespace Platform

@@ -63,20 +63,34 @@ namespace Platform
         }
     }
 
-    void WindowStrategy::VBeginRender()
+    WindowStrategy::WindowStrategy(const WindowConfig& in_rConfig) : _config(in_rConfig)
     {
-        for (auto it = this->_mViewPortSt.Begin(); it != this->_mViewPortSt.End(); ++it)
-        {
-            it->_data->VBeginRender();
-        }
+        this->_bBegin = TRUE;
     }
 
-    void WindowStrategy::VEndRender()
+    void WindowStrategy::Begin()
     {
+        this->_VBeginWindow();
+        this->_BeginViewPort();
+
+        this->_bBegin = FALSE;
+    }
+
+    void WindowStrategy::End()
+    {
+        this->_EndViewPort();
+        this->_VEndWindow();
+    }
+
+    void WindowStrategy::Render()
+    {
+        this->_VBeginRender();
+        // TODO: ビューポートのレンダリング
         for (auto it = this->_mViewPortSt.Begin(); it != this->_mViewPortSt.End(); ++it)
         {
-            it->_data->VEndRender();
+            it->_data->Render();
         }
+        this->_VEndRender();
     }
 
     Core::Common::Handle WindowStrategy::CreateViewPort(const Platform::ViewPortConfig& in_rConfig)

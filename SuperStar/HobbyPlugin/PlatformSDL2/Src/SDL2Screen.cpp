@@ -77,7 +77,7 @@ namespace PlatformSDL2
         for (auto it = this->_mWindowStrategy.Begin(); it != this->_mWindowStrategy.End(); ++it)
         {
             // ウィンドウの戦略を削除
-            it->_data->VRelease();
+            it->_data->End();
         }
         this->_mWindowStrategy.Clear();
 
@@ -93,6 +93,16 @@ namespace PlatformSDL2
                 ::SDL_GL_DeleteContext(Local::s_pShareContext);
                 Local::s_pShareContext = NULL;
             }
+        }
+    }
+
+    void Screen::VUpdate(const HE::Float32)
+    {
+        // TODO: ウィンドウの開始処理をしていないならばする
+        // ウィンドウはランタイム中に生成されるのでシステムが起動したとき開始処理を実行することができない
+        for (auto it = this->_mWindowStrategy.Begin(); it != this->_mWindowStrategy.End(); ++it)
+        {
+            if (it->_data->IsBegin()) it->_data->Begin();
         }
     }
 
@@ -141,16 +151,17 @@ namespace PlatformSDL2
         return NULL;
     }
 
-    void Screen::VRendering()
+    void Screen::VRender()
     {
         ::glClearColor(0, 0, 0, 1.0f);
 
-        // TODO: ウィンドウのレンダリングを行う
+        // ウィンドウのレンダリングを行う
         for (auto it = this->_mWindowStrategy.Begin(); it != this->_mWindowStrategy.End(); ++it)
         {
-            it->_data->VBeginRender();
+            // TODO: ウィンドウが開始されていないのでスキップ
+            if (it->_data->IsBegin()) continue;
 
-            it->_data->VEndRender();
+            it->_data->Render();
         }
     }
 

@@ -166,6 +166,8 @@ namespace PlatformSDL2
 
     void PlatformSDL2Module::_VLateUpdate(const HE::Float32 in_fDeltaTime)
     {
+        PlatformModule::_VLateUpdate(in_fDeltaTime);
+
         if (this->_bMainWindowInitialized)
         {
             auto pScreen = reinterpret_cast<PlatformSDL2::Screen*>(this->_spScreen.get());

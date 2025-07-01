@@ -133,7 +133,7 @@ namespace Actor
             pChildActor->ForeachComponents(
                 [in_pRtti, out](const Core::Common::Handle& in_rHandle, Actor::Component* in_pCmp)
                 {
-                    if (in_pCmp->GetRTTI().DerivesFrom(in_pRtti))
+                    if (in_pCmp->VGetRTTI().DerivesFrom(in_pRtti))
                     {
                         out->PushBack(in_pCmp);
                     }
@@ -177,7 +177,7 @@ namespace Actor
         this->ForeachComponents(
             [in_pRtti, &handle, &pCmp](const Core::Common::Handle& in_rHandle, Component* in_pCmp)
             {
-                if (in_pCmp->GetRTTI().DerivesFrom(in_pRtti))
+                if (in_pCmp->VGetRTTI().DerivesFrom(in_pRtti))
                 {
                     handle = in_rHandle;
                     pCmp   = in_pCmp;

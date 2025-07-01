@@ -1,11 +1,14 @@
 ﻿#pragma once
 
 #include "Engine/MiniEngine.h"
+#include "Engine/Platform/Screen/Render.h"
 
 namespace Platform
 {
     struct SceneConfig
     {
+        HE::Uint32 _uWidth  = 0;
+        HE::Uint32 _uHeight = 0;
     };
 
     /// <summary>
@@ -14,15 +17,21 @@ namespace Platform
     class SceneStrategy
     {
     public:
-        SceneStrategy(const SceneConfig&);
+        using EventRender = std::function<void(RenderInterface*, const SceneConfig&)>;
+
+    public:
+        SceneStrategy(const SceneConfig&, Core::Memory::SharedPtr<RenderInterface>, EventRender);
         virtual ~SceneStrategy() = default;
 
-        virtual HE::Bool VBegin()               = 0;
-        virtual void VUpdate(const HE::Float32) = 0;
-        virtual void VEnd()                     = 0;
+        virtual HE::Bool VBegin() = 0;
+        virtual void VEnd()       = 0;
 
-        virtual void VBeginRender() = 0;
-        virtual void VEndRender()   = 0;
+        virtual void VRender() = 0;
+
+    protected:
+        SceneConfig _config;
+        Core::Memory::SharedPtr<RenderInterface> _spRender;
+        EventRender _eventRender;
     };
 
 }  // namespace Platform

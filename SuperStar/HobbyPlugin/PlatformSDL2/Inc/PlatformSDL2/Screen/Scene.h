@@ -11,13 +11,12 @@ namespace PlatformSDL2
     class SDL2SceneStrategy2D : public Platform::SceneStrategy
     {
     public:
-        SDL2SceneStrategy2D(const Platform::SceneConfig&);
+        SDL2SceneStrategy2D(const Platform::SceneConfig&,
+                            Core::Memory::SharedPtr<Platform::RenderInterface>, EventRender);
 
         HE::Bool VBegin() override;
-        void VUpdate(const HE::Float32) override final;
         void VEnd() override final;
 
-        void VBeginRender() override final;
-        void VEndRender() override final;
+        void VRender() override final;
     };
 }  // namespace PlatformSDL2
