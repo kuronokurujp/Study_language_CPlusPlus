@@ -27,27 +27,6 @@ namespace Actor
                 return FALSE;
             });
 
-/*
-        Core::Common::Handle handle = pOwnerActor->GetParentHandle();
-        while (handle.Null() == FALSE)
-        {
-            Object* pParentActor = this->_pOwner->GetActor(handle);
-            if (pParentActor == NULL) break;
-
-            auto pTrans = pParentActor->GetComponent<TransformComponent>();
-            if (pTrans == NULL) break;
-
-            // 親の座標を加算
-            pos += pTrans->_pos;
-
-            // 親アクターに更に親アクターがあれば処理を続ける
-            if (pParentActor->IsChild())
-                handle = pParentActor->GetParentHandle();
-            else
-                handle.Clear();
-        }
-        */
-
         return pos;
     }
 

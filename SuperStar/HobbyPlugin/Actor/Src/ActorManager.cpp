@@ -154,13 +154,6 @@ namespace Actor
         }
     }
 
-    /*
-        void ActorManager::Event(const Core::TaskData& in_rTaskData)
-        {
-            this->_taskManager.EventAll(in_rTaskData);
-        }
-        */
-
     void ActorManager::ForeachActor(std::function<void(Object*)> in_func)
     {
         const HE::Uint32 uMax = this->_GetUpdateGroupMax();
@@ -190,8 +183,7 @@ namespace Actor
                 {
                     this->VOnActorUnRegistComponent(in_pComp);
                 }
-            }
-        );
+            });
 
         return TRUE;
     }
@@ -206,15 +198,5 @@ namespace Actor
                                               this->_taskManager.MoveGropuTask(pObj->Handle(),
                                                                                pObj->GetGropuId());
                                           });
-        /*
-        for (auto b = this->_mPendingActor.Begin(); b != this->_mPendingActor.End(); ++b)
-        {
-            const auto pData = &b->_data;
-            const HE::Bool bRet =
-                this->_taskManager.MoveGropuTask(pData->handle, pData->sMoveGroupId);
-            HE_ASSERT(bRet && "保留中のタスクを稼働中に切り替え失敗した");
-        }
-        this->_mPendingActor.Clear();
-        */
     }
 }  // namespace Actor
