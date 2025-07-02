@@ -180,10 +180,10 @@ void Engine::LateUpdateLoop(const HE::Float32 in_fDt)
 
     this->_upModuleManager->LateUpdate(in_fDt);
 
-    // TODO: ここでプラットフォームの状態を確認して終了する
+    // ここでプラットフォームの状態を確認して終了する
     auto spPlatform = this->PlatformModule();
-    if (spPlatform == NULL) return;
-    if (spPlatform->VIsQuit())
+    // エンジンを動かすにはプラットフォームが必要
+    if ((spPlatform == NULL) || spPlatform->VIsQuit())
     {
         this->Quit();
     }
@@ -220,6 +220,5 @@ Core::Memory::SharedPtr<Platform::PlatformModule> Engine::PlatformModule()
     HE_ASSERT(this->_upModuleManager);
 
     Core::Common::FixedString128 szName(Platform::PlatformModule::ModuleName());
-    return std::static_pointer_cast<Platform::PlatformModule>(
-        this->_upModuleManager->Get(szName.Str()));
+    return HE_SHADER_PTR_CAST(Platform::PlatformModule, this->_upModuleManager->Get(szName.Str()));
 }

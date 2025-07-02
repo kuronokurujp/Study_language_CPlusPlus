@@ -35,7 +35,7 @@ namespace Module
             auto pModule = this->Get(szName.Str());
 
             HE_ASSERT(pModule && "モジュールが存在しない");
-            return std::static_pointer_cast<T>(pModule);
+            return HE_SHADER_PTR_CAST(T, pModule);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Module
         Core::Memory::SharedPtr<T> GetDependenceModule()
         {
             Core::Common::FixedString64 szName(T::ModuleName());
-            Core::Memory::SharedPtr<T> spTargetModule = std::static_pointer_cast<T>(this->_GetModule(szName));
+            Core::Memory::SharedPtr<T> spTargetModule = HE_SHADER_PTR_CAST(T, this->_GetModule(szName));
             HE_ASSERT_RETURN_VALUE(NULL, spTargetModule && "モジュールとして登録していないのでだめ");
 
             // 依存対象のモジュールかどうかチェック
