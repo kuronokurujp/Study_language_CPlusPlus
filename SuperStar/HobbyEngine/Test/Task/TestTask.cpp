@@ -28,8 +28,6 @@ namespace Core
         // テスト用のタスクたち
         class EffectTask : public Task
         {
-            // HE_GENERATED_CLASS_BODY_HEADER(EffectTask, Task);
-
         public:
             EffectTask() : Task() {}
 
@@ -51,8 +49,6 @@ namespace Core
 
         class ObjectTask : public Task
         {
-            // HE_GENERATED_CLASS_BODY_HEADER(ObjectTask, Task);
-
         public:
             ObjectTask() : Task() {}
 
@@ -75,8 +71,6 @@ namespace Core
 
         class EnemyTask : public ObjectTask
         {
-            // HE_GENERATED_CLASS_BODY_HEADER(EnemyTask, Task);
-
         public:
             EnemyTask() : ObjectTask() {}
 
@@ -92,8 +86,6 @@ namespace Core
 
         class DummySystemTask : public Task
         {
-            // HE_GENERATED_CLASS_BODY_HEADER(DummySystemTask, Task);
-
         public:
             DummySystemTask() {}
 
@@ -114,22 +106,6 @@ namespace Core
 
     TEST(HobbyEngine_Task, TaskInitAndEnd)
     {
-        Core::Memory::Manager memoryManager;
-
-        EXPECT_EQ(memoryManager.Start(0x1000000), TRUE);
-        // ページ確保テスト
-        {
-            // メモリサイズのイニシャライズ
-            Core::Memory::Manager::PageSetupInfo memoryPageSetupInfoArray[] = {
-                // 複数ページのサイズ
-                {0, 3 * 1024 * 1024}};
-
-            EXPECT_EQ(memoryManager.SetupMemoryPage(memoryPageSetupInfoArray,
-                                                    HE_ARRAY_NUM(memoryPageSetupInfoArray)),
-                      TRUE);
-            EXPECT_EQ(memoryManager.CheckAllMemoryBlock(), TRUE);
-        }
-
         static TaskManager manager;
         static const HE::Uint32 taskNum = 256;
 
@@ -144,28 +120,10 @@ namespace Core
 
         // タスクシステムの終了
         manager.End();
-
-        EXPECT_EQ(memoryManager.VRelease(), TRUE);
-        memoryManager.Reset();
     }
 
     TEST(HobbyEngine_Task, TaskAddAndRemove)
     {
-        Core::Memory::Manager memoryManager;
-        EXPECT_EQ(memoryManager.Start(0x1000000), TRUE);
-        // ページ確保テスト
-        {
-            // メモリサイズのイニシャライズ
-            Core::Memory::Manager::PageSetupInfo memoryPageSetupInfoArray[] = {
-                // 複数ページのサイズ
-                {0, 3 * 1024 * 1024}};
-
-            EXPECT_EQ(memoryManager.SetupMemoryPage(memoryPageSetupInfoArray,
-                                                    HE_ARRAY_NUM(memoryPageSetupInfoArray)),
-                      TRUE);
-            EXPECT_EQ(memoryManager.CheckAllMemoryBlock(), TRUE);
-        }
-
         static TaskManager manager;
         static const HE::Uint32 taskNum = 256;
 
@@ -251,28 +209,10 @@ namespace Core
             Local::ObjectTask* pPlayer = dynamic_cast<Local::ObjectTask*>(manager.GetTask(hPlayer));
             EXPECT_EQ(pPlayer, NULL);
         }
-
-        EXPECT_EQ(memoryManager.VRelease(), TRUE);
-        memoryManager.Reset();
     }
 
     TEST(HobbyEngine_Task, TaskMoveTask)
     {
-        Core::Memory::Manager memoryManager;
-        EXPECT_EQ(memoryManager.Start(0x1000000), TRUE);
-
-        // ページ確保テスト
-        {
-            // メモリサイズのイニシャライズ
-            Core::Memory::Manager::PageSetupInfo memoryPageSetupInfoArray[] = {
-                // 複数ページのサイズ
-                {0, 3 * 1024 * 1024}};
-
-            EXPECT_EQ(memoryManager.SetupMemoryPage(memoryPageSetupInfoArray,
-                                                    HE_ARRAY_NUM(memoryPageSetupInfoArray)),
-                      TRUE);
-            EXPECT_EQ(memoryManager.CheckAllMemoryBlock(), TRUE);
-        }
         static TaskManager manager;
         static const HE::Uint32 taskNum = 256;
 
@@ -329,27 +269,10 @@ namespace Core
 
         // タスクシステムが終了しているので解放されているか
         EXPECT_EQ(manager.UseCount(), 0);
-
-        EXPECT_EQ(memoryManager.VRelease(), TRUE);
-        memoryManager.Reset();
     }
 
     TEST(HobbyEngine_Task, TaskCreateOrDelete)
     {
-        Core::Memory::Manager memoryManager;
-        EXPECT_EQ(memoryManager.Start(0x1000000), TRUE);
-        // ページ確保テスト
-        {
-            // メモリサイズのイニシャライズ
-            Core::Memory::Manager::PageSetupInfo memoryPageSetupInfoArray[] = {
-                // 複数ページのサイズ
-                {0, 3 * 1024 * 1024}};
-
-            EXPECT_EQ(memoryManager.SetupMemoryPage(memoryPageSetupInfoArray,
-                                                    HE_ARRAY_NUM(memoryPageSetupInfoArray)),
-                      TRUE);
-            EXPECT_EQ(memoryManager.CheckAllMemoryBlock(), TRUE);
-        }
         static TaskManager manager;
         static const HE::Uint32 taskNum = 256;
 
@@ -392,9 +315,6 @@ namespace Core
 
         // タスクシステムが終了しているので解放されているか
         EXPECT_EQ(manager.UseCount(), 0);
-
-        EXPECT_EQ(memoryManager.VRelease(), TRUE);
-        memoryManager.Reset();
     }
 
     // テスト用のタスクたち
@@ -440,20 +360,6 @@ namespace Core
     {
         HE_LOG_LINE(HE_STR_TEXT("Test Task Tree: start"));
 
-        Core::Memory::Manager memoryManager;
-        EXPECT_EQ(memoryManager.Start(0x1000000), TRUE);
-        // ページ確保テスト
-        {
-            // メモリサイズのイニシャライズ
-            Core::Memory::Manager::PageSetupInfo memoryPageSetupInfoArray[] = {
-                // 複数ページのサイズ
-                {0, 3 * 1024 * 1024}};
-
-            EXPECT_EQ(memoryManager.SetupMemoryPage(memoryPageSetupInfoArray,
-                                                    HE_ARRAY_NUM(memoryPageSetupInfoArray)),
-                      TRUE);
-            EXPECT_EQ(memoryManager.CheckAllMemoryBlock(), TRUE);
-        }
         /// <summary>
         /// タスクグループ一覧
         /// </summary>
@@ -532,9 +438,6 @@ namespace Core
 
         // タスクシステムが終了しているので解放されているか
         EXPECT_EQ(manager.UseCount(), 0);
-
-        EXPECT_EQ(memoryManager.VRelease(), TRUE);
-        memoryManager.Reset();
 
         HE_LOG_LINE(HE_STR_TEXT("Test Task Tree: end"));
     }
