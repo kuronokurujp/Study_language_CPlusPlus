@@ -91,16 +91,7 @@ namespace Core
 
         // 非同期タスクがあるか
         auto pTask = this->_vTaskQueue.PopBack();
-        if (*pTask)
-        {
-            // 初期化が失敗したらスレッド休止
-            if ((*pTask)->_VBeginWithThread()) return *pTask;
-
-            // 失敗なので即終了処理を呼び出す
-            (*pTask)->_VEndWithThread();
-        }
-
-        return NULL;
+        return *pTask;
     }
 
     void AsyncTaskManager::_WorkerThread()
@@ -111,11 +102,15 @@ namespace Core
             auto pTask = this->_PopWithThread();
             if (pTask)
             {
-                // 非同期タスクを実行
-                while (pTask->_VUpdateWithThread())
+                // 初期化が失敗したらスレッド休止
+                if (pTask->_VBeginWithThread())
                 {
-                    // 一定時間待機
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    // 非同期タスクを実行
+                    while (pTask->_VUpdateWithThread())
+                    {
+                        // 一定時間待機
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    }
                 }
 
                 pTask->_VEndWithThread();

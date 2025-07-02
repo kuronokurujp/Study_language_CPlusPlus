@@ -48,83 +48,69 @@ namespace Core
             HE::Uint32 _count = 0;
         };
 
-        // テストするためには専用アロケーターが必要なので作成
-        Core::Memory::Manager memoryManager;
-        EXPECT_EQ(memoryManager.Start(0x1000000), TRUE);
-
-        // ページ確保
-        {
-            // メモリサイズのイニシャライズ
-            Core::Memory::Manager::PageSetupInfo memoryPageSetupInfoArray[] = {
-                // 複数ページのサイズ
-                {0, 3 * 1024 * 1024},
-            };
-
-            EXPECT_EQ(memoryManager.SetupMemoryPage(memoryPageSetupInfoArray,
-                                                HE_ARRAY_NUM(memoryPageSetupInfoArray)), TRUE);
-            EXPECT_EQ(memoryManager.CheckAllMemoryBlock(), TRUE);
-        }
-
         Core::AsyncTaskManager manager(0);
         EXPECT_EQ(manager.Init(32), TRUE);
-        /*
+        {
+            Core::Memory::SharedPtr<AsyncTest> asyncTask =
+                HE_MAKE_CUSTOM_SHARED_PTR((AsyncTest), 100);
+            Core::Memory::SharedPtr<AsyncTest> asyncTask2 =
+                HE_MAKE_CUSTOM_SHARED_PTR((AsyncTest), 2100);
+            Core::Memory::SharedPtr<AsyncTest> asyncTask3 =
+                HE_MAKE_CUSTOM_SHARED_PTR((AsyncTest), 300);
+            manager.Push(asyncTask);
+            manager.Push(asyncTask2);
+            manager.Push(asyncTask3);
+
+            // メインスレッド待機
+            asyncTask->Wait();
             {
-                Core::Memory::SharedPtr<AsyncTest> asyncTask =
-           HE_MAKE_CUSTOM_SHARED_PTR((AsyncTest), 100); Core::Memory::SharedPtr<AsyncTest>
-           asyncTask2 = HE_MAKE_CUSTOM_SHARED_PTR((AsyncTest), 2100);
-           Core::Memory::SharedPtr<AsyncTest> asyncTask3 = HE_MAKE_CUSTOM_SHARED_PTR((AsyncTest),
-           300); manager.Push(asyncTask); manager.Push(asyncTask2); manager.Push(asyncTask3);
+                HE_LOG_LINE(HE_STR_TEXT("End AsyncTask"));
 
-                // メインスレッド待機
-                asyncTask->Wait();
+                EXPECT_EQ(asyncTask->IsSuccess(), TRUE);
+                if (asyncTask->IsSuccess())
                 {
-                    HE_LOG_LINE(HE_STR_TEXT("End AsyncTask"));
-
-                    CHECK(asyncTask->IsSuccess());
-                    if (asyncTask->IsSuccess())
-                    {
-                        auto pResult = asyncTask->GetResult();
-                        CHECK(*pResult == 100);
-                    }
-                }
-
-                asyncTask2->Wait();
-                {
-                    HE_LOG_LINE(HE_STR_TEXT("End AsyncTask2"));
-
-                    CHECK(asyncTask2->IsSuccess());
-                    if (asyncTask2->IsSuccess())
-                    {
-                        auto pResult = asyncTask2->GetResult();
-                        CHECK(*pResult == 2100);
-                    }
-                }
-
-                asyncTask3->Wait();
-                {
-                    HE_LOG_LINE(HE_STR_TEXT("End AsyncTask3"));
-
-                    CHECK(asyncTask3->IsSuccess());
-                    if (asyncTask3->IsSuccess())
-                    {
-                        auto pResult = asyncTask3->GetResult();
-                        CHECK(*pResult == 300);
-                    }
+                    auto pResult = asyncTask->GetResult();
+                    EXPECT_EQ(*pResult, 100);
                 }
             }
 
-            // 一定時間を得てtask破棄されても問題なく動作するか
+            asyncTask2->Wait();
             {
-                Core::Memory::SharedPtr<AsyncTest> asyncTask4 =
-                    HE_MAKE_CUSTOM_SHARED_PTR((AsyncTest), 1200);
-                manager.Push(asyncTask4);
-                Uint32 count = 10;
-                while (0 < count)
+                HE_LOG_LINE(HE_STR_TEXT("End AsyncTask2"));
+
+                EXPECT_EQ(asyncTask2->IsSuccess(), TRUE);
+                if (asyncTask2->IsSuccess())
                 {
-                    --count;
+                    auto pResult = asyncTask2->GetResult();
+                    EXPECT_EQ(*pResult, 2100);
                 }
             }
-        */
+
+            asyncTask3->Wait();
+            {
+                HE_LOG_LINE(HE_STR_TEXT("End AsyncTask3"));
+
+                EXPECT_EQ(asyncTask3->IsSuccess(), TRUE);
+                if (asyncTask3->IsSuccess())
+                {
+                    auto pResult = asyncTask3->GetResult();
+                    EXPECT_EQ(*pResult, 300);
+                }
+            }
+        }
+
+        // 一定時間を得てtask破棄されても問題なく動作するか
+        {
+            Core::Memory::SharedPtr<AsyncTest> asyncTask4 =
+                HE_MAKE_CUSTOM_SHARED_PTR((AsyncTest), 1200);
+            manager.Push(asyncTask4);
+            HE::Uint32 count = 10;
+            while (0 < count)
+            {
+                --count;
+            }
+        }
+
         // 一定時間毎にメインスレッドを動くか
         {
             Core::Memory::SharedPtr<AsyncTest> asyncTask4 =
@@ -139,8 +125,5 @@ namespace Core
         }
 
         manager.End();
-
-        EXPECT_EQ(memoryManager.VRelease(), TRUE);
-        memoryManager.Reset();
     }
 }  // namespace Core
