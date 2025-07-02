@@ -17,7 +17,7 @@ namespace Platform
     class SceneStrategy
     {
     public:
-        using EventRender = std::function<void(RenderInterface*, const SceneConfig&)>;
+        using EventRender = std::function<void(Core::Memory::SharedPtr<RenderInterface>, const SceneConfig&)>;
 
     public:
         SceneStrategy(const SceneConfig&, Core::Memory::SharedPtr<RenderInterface>, EventRender);

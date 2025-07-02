@@ -20,7 +20,7 @@ namespace PlatformSDL2
 
         EXPECT_EQ(moduleManager.Start(), TRUE);
 
-        // TODO: フォントデータのバイナリアセットを作成
+        // フォントデータのバイナリアセットを作成
         auto spPlatformModule = moduleManager.Get<Platform::PlatformModule>();
         {
             // ロードするフォントファイルパスを渡す
@@ -30,32 +30,32 @@ namespace PlatformSDL2
             EXPECT_EQ(bRet, TRUE);
         }
 
-        // TODO: ウィンドウ追加
+        // ウィンドウ追加
         {
             auto inputHandle = spPlatformModule->Input()->VCreateObject();
-            // TODO: ウィンドウの設定
+            // ウィンドウの設定
             auto windowConfig =
                 Platform::WindowConfig{640,  480,         1,
                                        TRUE, inputHandle, Platform::WindowConfig::EFlags_None};
 
-            // TODO: 設定に基づいたウィンドウを生成
+            // 設定に基づいたウィンドウを生成
             auto handle  = spPlatformModule->Screen()->VCreateWindowStrategy(windowConfig);
             auto pWindow = spPlatformModule->Screen()->VGetWindow(handle);
-            // TODO: ビューポートの追加
+            // ビューポートの追加
             auto viewPortConfig = Platform::ViewPortConfig{640, 480};
             auto viewPortHandle = pWindow->CreateViewPort(viewPortConfig);
             auto pViewPort      = pWindow->GetViewPort(viewPortHandle);
-            // TODO: 描画するシーンの追加
+            // 描画するシーンの追加
             auto sceneHandle = pViewPort->CreateScene<PlatformSDL2::DefaultRender>(
-                [spPlatformModule](Platform::RenderInterface* in_pRender,
+                [spPlatformModule](Core::Memory::SharedPtr<Platform::RenderInterface> in_spRender,
                                    const Platform::SceneConfig& in_rSceneConfig)
                 {
                     // シーンの渡したレンダリングを利用して描画する
                     HE_ASSERT_RETURN(
-                        HE_GENERATED_CHECK_RTTI(*in_pRender, PlatformSDL2::DefaultRender));
-                    auto pRender = reinterpret_cast<PlatformSDL2::DefaultRender*>(in_pRender);
+                        HE_GENERATED_CHECK_RTTI(*in_spRender, PlatformSDL2::DefaultRender));
+                    auto pRender = HE_SHADER_PTR_CAST(PlatformSDL2::DefaultRender, in_spRender);
 
-                    // TODO: テキストで使うフォントを指定
+                    // テキストで使うフォントを指定
                     pRender->Draw2DText(in_rSceneConfig, spPlatformModule->Font().get(),
                                         Core::Math::Vector2(0.0f, 0.0f),
                                         Core::Math::EAnchor::EAnchor_Left, HE_STR_TEXT("Test"), 32,

@@ -14,7 +14,6 @@
 
 namespace PlatformSDL2
 {
-
     SDL2SceneStrategy2D::SDL2SceneStrategy2D(
         const Platform::SceneConfig& in_rConfig,
         Core::Memory::SharedPtr<Platform::RenderInterface> in_spRenderInterface,
@@ -42,9 +41,9 @@ namespace PlatformSDL2
         // srcFactor * srcAlpha + (1 - srcAlpha) * dstFactor
         ::glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // TODO: ユーザーの描画処理を呼び出す
+        // ユーザーの描画処理を呼び出す
         HE_ASSERT(this->_eventRender);
         HE_ASSERT(this->_spRender);
-        this->_eventRender(this->_spRender.get(), this->_config);
+        this->_eventRender(this->_spRender, this->_config);
     }
 }  // namespace PlatformSDL2
