@@ -408,6 +408,9 @@ namespace Core::Memory
 
 #endif
 
+// ShaderPtrの型をキャストするマクロ
+#define HE_SHADER_PTR_CAST(T, S) std::static_pointer_cast<T>((S));
+
 // is_unique_ptr の安全な定義
 // テンプレート型がUniquePtr型かどうかを判定
 template <typename T, typename = void>
