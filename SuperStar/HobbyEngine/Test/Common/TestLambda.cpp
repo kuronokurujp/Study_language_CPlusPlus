@@ -7,8 +7,7 @@
 
 namespace Core
 {
-    // TODO: 関数システムのテストコードを実装する
-#if FALSE
+    // 関数システムのテストコードを実装する
     // 関数ヘルパー構造体の前方宣言
     template <class>
     struct FuncHelper;
@@ -52,5 +51,4 @@ namespace Core
             HE_LOG_LINE(HE_STR_TEXT("%s"), name.c_str());
         }
     }
-#endif
 }  // namespace Core
