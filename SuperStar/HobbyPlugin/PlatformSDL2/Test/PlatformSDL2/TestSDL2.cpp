@@ -32,7 +32,7 @@ namespace PlatformSDL2
                 spPlatformModule->Font()->VLoad(Platform::EFontSize_64,
                                                 HE_STR_TEXT("Resources/SDL2/Font/TestFont.ttf"));
             EXPECT_EQ(bRet, TRUE);
-        }
+}
 
         // ウィンドウ追加
         {
@@ -384,5 +384,59 @@ namespace PlatformSDL2
         }
 
         EXPECT_EQ(moduleManager.Release(), TRUE);
+    }
+
+    /// <summary>
+    /// SDL2File basic load tests
+    /// </summary>
+    TEST(HobbyPlugin_PlatformSDL2, FileLoad)
+    {
+        PlatformSDL2::File file;
+        file.SetCurrentDir(HE_STR_TEXT("Resources/SDL2/File"));
+
+        {
+            auto [pData, size] = file.VLoadBinary(HE_STR_TEXT("Test.json"));
+            EXPECT_NE(pData, nullptr);
+            EXPECT_LT(0u, size);
+            HE_SAFE_DELETE_MEM(pData);
+        }
+
+        {
+            auto [pText, size] = file.VLoadText(HE_STR_TEXT("Test.xml"));
+            EXPECT_NE(pText, nullptr);
+            EXPECT_LT(0u, size);
+            std::string str(pText, size);
+            EXPECT_NE(str.find("<ui"), std::string::npos);
+            HE_SAFE_DELETE_MEM(pText);
+        }
+    }
+
+    /// <summary>
+    /// SDL2System random number tests
+    /// </summary>
+    TEST(HobbyPlugin_PlatformSDL2, SystemRand)
+    {
+        PlatformSDL2::System sys;
+        EXPECT_EQ(sys.VSetSeedRand(12345), TRUE);
+        auto a = sys.VGetRand(1000);
+        EXPECT_EQ(sys.VSetSeedRand(12345), TRUE);
+        auto b = sys.VGetRand(1000);
+        EXPECT_EQ(a, b);
+
+        auto f = sys.VGetRandByFloat(0.0f, 1.0f);
+        EXPECT_LE(0.0f, f);
+        EXPECT_GE(1.0f, f);
+    }
+
+    /// <summary>
+    /// SDL2Time functions
+    /// </summary>
+    TEST(HobbyPlugin_PlatformSDL2, TimeNowSleep)
+    {
+        PlatformSDL2::Time time;
+        auto start = time.VNowMSec();
+        time.VSleepMSec(10);
+        auto end = time.VNowMSec();
+        EXPECT_LE(10u, end - start);
     }
 }  // namespace PlatformSDL2
