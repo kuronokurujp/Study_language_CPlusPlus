@@ -81,7 +81,7 @@ namespace Platform
         /// 2Dの矩形描画
         /// </summary>
         virtual void V2DDrawQuad(const ViewPortConfig& in_rViewConfig,
-                                 const Core::Math::Rect2& in_rRect2D, const Core::Math::Color) = 0;
+                                 const Core::Math::CenteredRect2D& in_rRect2D, const Core::Math::Color) = 0;
 
         /// <summary>
         /// 2Dの円描画

@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Engine/Common/PoolManager.h"
 #include "Engine/Math/Math.h"
 #include "Engine/MiniEngine.h"
 #include "Engine/Platform/Screen/Render.h"
@@ -10,10 +11,17 @@ namespace Platform
     class FontInterface;
 }  // namespace Platform
 
+/// <summary>
+/// 座標系は右手座標系
+/// 2D/3Dの原点は画面の中心
+/// </summary>
 namespace PlatformSDL2
 {
+    // 前方宣言
+    class ParticleMesh;
+
     /// <summary>
-    /// レンダリングのインターフェイス
+    /// SDL2レンダリング
     /// </summary>
     class DefaultRender : public Platform::RenderInterface
     {
@@ -31,17 +39,17 @@ namespace PlatformSDL2
         /// </summary>
         /// <param name="in_uCount">作成するパーティクルの数</param>
         /// <returns>作成されたパーティクルを識別するハンドル</returns>
-        Core::Common::Handle ParticalCreate(const HE::Uint32 in_uCount);
+        Core::Common::Handle CreateParticleObject(const HE::Uint32 in_uCount);
 
         /// <summary>
         /// 生成したパーティクルを削除
         /// </summary>
-        void ParticalDelete(Core::Common::Handle);
+        void DeleteParticalObject(Core::Common::Handle);
 
-        void ParticalSetPositions(const Core::Common::Handle,
-                                  const Core::Common::ArrayBase<Core::Math::Vector3>&);
-        void ParticalSetVelocitys(const Core::Common::Handle,
-                                  const Core::Common::ArrayBase<Core::Math::Vector3>&);
+        void SetArrayPosParticleObject(const Core::Common::Handle,
+                                       const Core::Common::ArrayBase<Core::Math::Vector3>&);
+        void SetArrtyVelocityParticelObject(const Core::Common::Handle,
+                                            const Core::Common::ArrayBase<Core::Math::Vector3>&);
 
         /// <summary>
         /// 画面を色クリア
@@ -49,8 +57,7 @@ namespace PlatformSDL2
         void Cls(const HE::Uint32 in_uR, const HE::Uint32 in_uG, const HE::Uint32 in_uB);
 
         // パーティクルの描画
-        void Draw2DPartical(const Platform::SceneConfig& in_rViewConfig,
-                            const Core::Common::Handle in_rParticleHandle,
+        void Draw2DPartical(const Platform::SceneConfig&, const Core::Common::Handle,
                             const Core::Math::Vector3&);
 
         /// <summary>
@@ -63,9 +70,12 @@ namespace PlatformSDL2
 
         /// <summary>
         /// 2Dの矩形描画
+        /// 座標は右手座標系で原点は画面の中心
+        /// 矩形のアンカーは中央を基準にしている
+        /// パラメータで矩形のアンカーを変える事が出来る
         /// </summary>
-        void Draw2DQuad(const Platform::SceneConfig& in_rViewConfig,
-                        const Core::Math::Rect2& in_rRect2D, const Core::Math::Color);
+        void Draw2DQuad(const Platform::SceneConfig&, const Core::Math::RC::Rect2D& in_rRect2D,
+                        Core::Math::EAnchor in_eAnchor, const Core::Math::Color);
 
         /// <summary>
         /// 2Dの円描画
@@ -83,6 +93,10 @@ namespace PlatformSDL2
                             const Core::Math::Color);
 
     private:
+        using PoolParticleMesh              = Core::Common::RuntimePoolManager<ParticleMesh>;
+        using CatchParticleMeshHandleVector = Core::Common::FixedVector<Core::Common::Handle, 256>;
+
+    private:
         void* _pFontMesh = NULL;
 
         void* _p2DQuadMesh     = NULL;
@@ -95,7 +109,10 @@ namespace PlatformSDL2
         void* _pWhiteTex = NULL;
 
         // パーティクルのマテリアルとメッシュプール
-        void* _pParticleMat      = NULL;
-        void* _pPoolParticleMesh = NULL;
+        void* _pParticleMat = NULL;
+        PoolParticleMesh _poolParticleMesh;
+        CatchParticleMeshHandleVector _vCatchParticleMeshHandle;
+
+        HE::Bool _bBegin = FALSE;
     };
 }  // namespace PlatformSDL2

@@ -74,7 +74,7 @@ namespace AssetManager
         /// <summary>
         /// アセット格納ディレクトリ設定
         /// </summary>
-        void SetCurrentDir(const HE::Char* in_szMountDir);
+        void SetCurrentDir(const Core::File::Path&);
 
     protected:
         /// <summary>

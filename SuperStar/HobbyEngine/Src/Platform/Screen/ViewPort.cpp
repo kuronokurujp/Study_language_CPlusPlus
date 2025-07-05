@@ -27,7 +27,7 @@ namespace Platform
         for (auto it = this->_mSceneSt.Begin(); it != this->_mSceneSt.End(); ++it)
         {
             it->_data->VEnd();
-            HE_SAFE_DELETE_UNIQUE_PTR(it->_data);
+            it->_data.reset();
         }
         this->_mSceneSt.Clear();
 
@@ -54,5 +54,10 @@ namespace Platform
 
         // レンダリング後
         this->_VEndRender();
+    }
+
+    Core::Memory::SharedPtr<Platform::SceneStrategy> ViewPortStrategy::GetScene(const Core::Common::Handle in_handle)
+    {
+        return this->_mSceneSt.FindKey(in_handle)->_data;
     }
 }  // namespace Platform

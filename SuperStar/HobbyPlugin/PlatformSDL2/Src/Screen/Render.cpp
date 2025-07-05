@@ -13,18 +13,16 @@
 
 namespace PlatformSDL2
 {
-    namespace Local
-    {
-        using PoolParticleMesh = Core::Common::RuntimePoolManager<ParticleMesh>;
-
-    }  // namespace Local
-
     DefaultRender::DefaultRender()
     {
+        // パーティクルのメッシュプールを作成
+        this->_poolParticleMesh.POOL_RESERVE_POOL(1024);
     }
 
     void DefaultRender::VBegin()
     {
+        this->_bBegin = TRUE;
+
         // フォント用のメッシュは常に使うので常駐
         {
             auto pFontMesh = HE_NEW_MEM(Mesh, 0)();
@@ -39,6 +37,8 @@ namespace PlatformSDL2
             // 描画処理でプロパティ名を直指定しているので外部ファイル化はしない
             // TODO: シェーダーを差し替える機能もいずれ考える
             // 頂点シェーダーのコード
+            // メッシュの頂点は2x2の正方形を描画する
+            // 原点は中央にしている
             constexpr HE::UTF8* szVertShaderText =
                 " \
             #version 330 \n \
@@ -48,9 +48,11 @@ namespace PlatformSDL2
             out vec2 fragTexCoord; \
             void main() \
             {\
-                fragTexCoord = vec2(gl_VertexID % 2, gl_VertexID / 2); \
-                vec4 pos     = vec4(fragTexCoord.x, -fragTexCoord.y, 0.0, 1.0);\
-                gl_Position  = pos * uWorldTransform * uViewProj;\
+                int x = gl_VertexID % 2;\
+                int y = gl_VertexID / 2;\
+                fragTexCoord = vec2(x, y);\
+                vec2 pos = fragTexCoord * 2.0 - 1.0;\
+                gl_Position  = vec4(pos, 0.0, 1.0) * uWorldTransform * uViewProj;\
             }";
 
             // ピクセルシェーダーのコード
@@ -175,8 +177,10 @@ namespace PlatformSDL2
                 const auto fSin  = Core::Math::Sin(fRad);
                 const auto fCos  = Core::Math::Cos(fRad);
 
-                vec._fX = 0.5f + fCos * 0.5f;
-                vec._fY = -0.5f + fSin * 0.5f;
+                //                vec._fX = 0.5f + fCos * 0.5f;
+                //               vec._fY = -0.5f + fSin * 0.5f;
+                vec._fX = fCos;
+                vec._fY = fSin;
                 vec._fZ = 0.0f;
 
                 uv._fX = 0.5f + 0.5f * fCos;
@@ -227,9 +231,9 @@ namespace PlatformSDL2
             std::vector<LocalVertex> vertices;
 
             vertices.push_back(
-                {Core::Math::Vector3(0.5f, 0.0f, 0.0f), Core::Math::Vector2(0.5f, 0.f)});
+                {Core::Math::Vector3(0.f, 1.0f, 0.0f), Core::Math::Vector2(0.5f, 0.f)});
             vertices.push_back(
-                {Core::Math::Vector3(0.0f, -1.0f, 0.0f), Core::Math::Vector2(0.f, 1.f)});
+                {Core::Math::Vector3(-1.0f, -1.0f, 0.0f), Core::Math::Vector2(0.f, 1.f)});
             vertices.push_back(
                 {Core::Math::Vector3(1.0f, -1.0f, 0.0f), Core::Math::Vector2(1.f, 1.f)});
 
@@ -302,11 +306,13 @@ namespace PlatformSDL2
             this->_pParticleMat = pMat;
         }
 
-        // パーティクルのメッシュプールを作成
         {
-            auto pPool = HE_NEW_MEM(Local::PoolParticleMesh, 0);
-            pPool->POOL_RESERVE_POOL(1024);
-            this->_pPoolParticleMesh = pPool;
+            for (HE::Uint32 i = 0; i < this->_vCatchParticleMeshHandle.Size(); ++i)
+            {
+                ParticleMesh* p = this->_poolParticleMesh.Ref(this->_vCatchParticleMeshHandle[i]);
+                p->Init();
+            }
+            this->_vCatchParticleMeshHandle.Clear();
         }
     }
 
@@ -343,9 +349,8 @@ namespace PlatformSDL2
         }
 
         {
-            auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
-            pPool->ReleasePool([](ParticleMesh* in_pParticleMesh) { in_pParticleMesh->Release(); });
-            HE_SAFE_DELETE_MEM(this->_pPoolParticleMesh);
+            this->_poolParticleMesh.ReleasePool([](ParticleMesh* in_pParticleMesh)
+                                                { in_pParticleMesh->Release(); });
         }
 
         {
@@ -367,62 +372,62 @@ namespace PlatformSDL2
         }
     }
 
-    Core::Common::Handle DefaultRender::ParticalCreate(const HE::Uint32 in_uCount)
+    Core::Common::Handle DefaultRender::CreateParticleObject(const HE::Uint32 in_uCount)
     {
         // パーティクル用のメッシュを生成
-        auto pPool           = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
-        auto [handle, pMesh] = pPool->Alloc<ParticleMesh>();
+        auto [handle, pMesh] = this->_poolParticleMesh.Alloc<ParticleMesh>(in_uCount);
         HE_ASSERT(handle.Null() == FALSE);
 
-        pMesh->Init(in_uCount);
+        // TODO:
+        // 開始処理をしていないならパーティクルの初期化はせずにキャッシュにためて開始処理で一括で初期化する
+        if (this->_bBegin)
+            pMesh->Init();
+        else
+            this->_vCatchParticleMeshHandle.PushBack(handle);
 
         return handle;
     }
 
-    void DefaultRender::ParticalDelete(Core::Common::Handle in_handle)
+    void DefaultRender::DeleteParticalObject(Core::Common::Handle in_handle)
     {
+        HE_ASSERT_RETURN(in_handle.Null() == FALSE);
+
         // パーティクルの削除処理
-        auto pPool         = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
-        auto pParticleMesh = pPool->Ref(in_handle);
+        auto pParticleMesh = this->_poolParticleMesh.Ref(in_handle);
         HE_ASSERT_RETURN(pParticleMesh);
         pParticleMesh->Release();
 
-        pPool->Free(in_handle, FALSE);
+        this->_poolParticleMesh.Free(in_handle, FALSE);
     }
 
-    void DefaultRender::ParticalSetPositions(
+    void DefaultRender::SetArrayPosParticleObject(
         const Core::Common::Handle in_handle,
         const Core::Common::ArrayBase<Core::Math::Vector3>& in_rPos)
     {
         // パーティクルの位置設定処理
-        auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
 
-        auto pParticleMesh = pPool->Ref(in_handle);
+        auto pParticleMesh = this->_poolParticleMesh.Ref(in_handle);
         HE_ASSERT_RETURN(pParticleMesh);
 
         pParticleMesh->SetPositions(in_rPos);
     }
 
-    void DefaultRender::ParticalSetVelocitys(
+    void DefaultRender::SetArrtyVelocityParticelObject(
         const Core::Common::Handle in_handle,
         const Core::Common::ArrayBase<Core::Math::Vector3>& in_rVec)
     {
         // パーティクルの速度設定処理
-        auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
-
-        auto pParticleMesh = pPool->Ref(in_handle);
+        auto pParticleMesh = this->_poolParticleMesh.Ref(in_handle);
         HE_ASSERT_RETURN(pParticleMesh);
         pParticleMesh->SetVelocitys(in_rVec);
     }
 
-    void DefaultRender::Draw2DPartical(const Platform::SceneConfig& in_rViewConfig,
-                                       const Core::Common::Handle in_rParticleHandle,
+    void DefaultRender::Draw2DPartical(const Platform::SceneConfig& in_rSceneConfig,
+                                       const Core::Common::Handle in_handle,
                                        const Core::Math::Vector3& in_rPos)
     {
         // 事前に生成したパーティクル用のメッシュを使って描画
-        auto pPool = reinterpret_cast<Local::PoolParticleMesh*>(this->_pPoolParticleMesh);
-
-        auto pParticleMesh = pPool->Ref(in_rParticleHandle);
+        auto pParticleMesh = this->_poolParticleMesh.Ref(in_handle);
         HE_ASSERT_RETURN(pParticleMesh);
 
         auto pMat = reinterpret_cast<Material*>(this->_pParticleMat);
@@ -439,10 +444,8 @@ namespace PlatformSDL2
             HE::Float32 fY = static_cast<HE::Float32>(in_rPos._fY);
 
             // -1 から 1に座標変換
-            if (fX != 0.0f) fX /= static_cast<HE::Float32>(in_rViewConfig._uWidth);
-            if (fY != 0.0f) fY /= static_cast<HE::Float32>(in_rViewConfig._uHeight);
-            fX = 2.0f * fX - 1.0f;
-            fY = -2.0f * fY + 1.0f;
+            if (fX != 0.0f) fX /= in_rSceneConfig.GetWidthHalf();
+            if (fY != 0.0f) fY /= in_rSceneConfig.GetHeightHalf();
 
             Core::Math::Matrix4 transMat;
             Core::Math::Matrix4::OutputTranslation(&transMat, Core::Math::Vector3(fX, fY, 0.0f));
@@ -454,7 +457,6 @@ namespace PlatformSDL2
         }
 
         pParticleMesh->Draw();
-
         //        pMat->Disable();
     }
 
@@ -685,7 +687,7 @@ namespace PlatformSDL2
                 }
                 case Core::Math::EAnchor_Center:
                 {
-                    fObjectWidth *= 0.5f;
+                    fObjectWidth *= -0.5f;
                     fObjectHeight *= 0.5f;
                     break;
                 }
@@ -695,12 +697,10 @@ namespace PlatformSDL2
             Core::Math::Matrix4::OutputScale(&scaleMat, in_uTextSize, in_uTextSize, 1.0f);
 
             Core::Math::Matrix4 transMat;
-            // 原点を画面の左上にする
-            Core::Math::Matrix4::OutputTranslation(
-                &transMat,
-                Core::Math::Vector3((in_rPos._fX - fObjectWidth) - (in_rViewConfig._uWidth >> 1),
-                                    -(in_rPos._fY - fObjectHeight) + (in_rViewConfig._uHeight >> 1),
-                                    0.0f));
+            const auto pos = Core::Math::Vector3((in_rPos._fX + fObjectWidth),
+                                                 (in_rPos._fY + fObjectHeight), 0.0f);
+
+            Core::Math::Matrix4::OutputTranslation(&transMat, pos);
 
             Core::Math::Matrix4 world;
             world.Set(scaleMat);
@@ -740,8 +740,9 @@ namespace PlatformSDL2
         pMesh->Free();
     }
 
-    void DefaultRender::Draw2DQuad(const Platform::SceneConfig& in_rViewConfig,
-                                   const Core::Math::Rect2& in_rRect2D,
+    void DefaultRender::Draw2DQuad(const Platform::SceneConfig& in_rSceneConfig,
+                                   const Core::Math::RC::Rect2D& in_rRect2D,
+                                   const Core::Math::EAnchor in_eAnchor,
                                    const Core::Math::Color in_color)
     {
         auto p2DQuadMat = reinterpret_cast<Material*>(this->_p2DQuadMat);
@@ -755,23 +756,27 @@ namespace PlatformSDL2
                 Core::Math::Matrix4 viewProj;
                 Core::Math::Matrix4::OutputSimpleViewProj(&viewProj,
                                                           static_cast<HE::Float32>(
-                                                              in_rViewConfig._uWidth),
+                                                              in_rSceneConfig._uWidth),
                                                           static_cast<HE::Float32>(
-                                                              in_rViewConfig._uHeight));
+                                                              in_rSceneConfig._uHeight));
                 p2DQuadMat->SetPropertyMatrix("uViewProj", viewProj);
             }
 
             // 座標を設定
             {
-                const auto pos = in_rRect2D.Pos();
+                // アンカーを考慮した矩形を取得
+                const auto rect =
+                    Core::Math::RC::Rect2D::ConvertFromAnchor(in_rRect2D.GetPos(),
+                                                              in_rRect2D.GetSize(), in_eAnchor);
+                const auto pos = rect.GetPos();
 
                 HE::Float32 x = pos._fX;
-                HE::Float32 y = -pos._fY;
-                x -= static_cast<HE::Float32>(in_rViewConfig._uWidth >> 1);
-                y += static_cast<HE::Float32>(in_rViewConfig._uHeight >> 1);
+                HE::Float32 y = pos._fY;
+                // x -= static_cast<HE::Float32>(in_rSceneConfig._uWidth >> 1);
+                // y += static_cast<HE::Float32>(in_rSceneConfig._uHeight >> 1);
 
-                const auto fW = in_rRect2D.Width();
-                const auto fH = in_rRect2D.Height();
+                const auto fW = rect.WidthHalf();
+                const auto fH = rect.HeightHalf();
 
                 Core::Math::Matrix4 scaleMat;
                 Core::Math::Matrix4::OutputScale(&scaleMat, fW, fH, 1.0f);
@@ -832,30 +837,32 @@ namespace PlatformSDL2
 
             // 座標を設定
             {
-                HE::Float32 fOffset = 0.0f;
+                HE::Float32 fOffsetX = 0.0f;
+                HE::Float32 fOffsetY = 0.0f;
+                const auto fRadus    = in_fSize * 0.5f;
                 switch (in_eAchor)
                 {
                     case Core::Math::EAnchor_Left:
                     {
+                        fOffsetX = -fRadus;
+                        fOffsetY = fRadus;
                         break;
                     }
 
                     case Core::Math::EAnchor_Center:
                     {
-                        fOffset = in_fSize * 0.5f;
                         break;
                     }
                 }
 
                 Core::Math::Matrix4 scaleMat;
-                Core::Math::Matrix4::OutputScale(&scaleMat, in_fSize, in_fSize, 1.0f);
+                Core::Math::Matrix4::OutputScale(&scaleMat, fRadus, fRadus, 1.0f);
 
                 Core::Math::Matrix4 transMat;
-                Core::Math::Matrix4::OutputTranslation(
-                    &transMat,
-                    Core::Math::Vector3((in_rPos._fX - fOffset) - (in_rViewConfig._uWidth >> 1),
-                                        -(in_rPos._fY - fOffset) + (in_rViewConfig._uHeight >> 1),
-                                        0.0f));
+                Core::Math::Matrix4::OutputTranslation(&transMat,
+                                                       Core::Math::Vector3((in_rPos._fX + fOffsetX),
+                                                                           (in_rPos._fY + fOffsetY),
+                                                                           0.0f));
 
                 Core::Math::Matrix4 world;
                 world.Set(scaleMat);
@@ -911,34 +918,36 @@ namespace PlatformSDL2
 
             // 座標を設定
             {
-                HE::Float32 fOffset = 0.0f;
+                HE::Float32 fOffsetX = 0.0f;
+                HE::Float32 fOffsetY = 0.0f;
+                const auto fRadius   = in_fSize * 0.5f;
                 switch (in_eAchor)
                 {
                     case Core::Math::EAnchor_Left:
                     {
+                        fOffsetX = -fRadius;
+                        fOffsetY = fRadius;
                         break;
                     }
 
                     case Core::Math::EAnchor_Center:
                     {
-                        fOffset = in_fSize * 0.5f;
                         break;
                     }
                 }
 
                 Core::Math::Matrix4 scaleMat;
-                Core::Math::Matrix4::OutputScale(&scaleMat, in_fSize, in_fSize, 1.0f);
+                Core::Math::Matrix4::OutputScale(&scaleMat, fRadius, fRadius, 1.0f);
 
                 Core::Math::Matrix4 rotZMat;
                 Core::Math::Matrix4::OutputRotationZ(&rotZMat, Core::Math::DegreesToRadians(
                                                                    in_fAngleDegress));
 
                 Core::Math::Matrix4 transMat;
-                Core::Math::Matrix4::OutputTranslation(
-                    &transMat,
-                    Core::Math::Vector3((in_rPos._fX - fOffset) - (in_rViewConfig._uWidth >> 1),
-                                        -(in_rPos._fY - fOffset) + (in_rViewConfig._uHeight >> 1),
-                                        0.0f));
+                Core::Math::Matrix4::OutputTranslation(&transMat,
+                                                       Core::Math::Vector3(in_rPos._fX + fOffsetX,
+                                                                           in_rPos._fY + fOffsetY,
+                                                                           0.0f));
 
                 Core::Math::Matrix4 world;
                 world.Set(scaleMat);

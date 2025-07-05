@@ -33,3 +33,13 @@ test_configure_target(
 	${PLUGIN_ASSET_MANAGER_NAME}
 	${PLUGIN_PLATFORMSDL2_NAME}
 )
+
+# POST_BUILD で Resources フォルダをコピー
+add_custom_command(
+    TARGET ${PLUGIN_ASSET_MANAGER_TEST_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/Resources"
+            "$<TARGET_FILE_DIR:${PLUGIN_ASSET_MANAGER_TEST_NAME}>/Resources"
+    COMMENT "Copying Resources to output dir"
+)

@@ -42,8 +42,8 @@ namespace Actor
         (*out) += in_rOffsetPos;
     }
 
-    void TransformComponent::TransformLocalToWorldRect2D(Core::Math::Rect2* out,
-                                                         const Core::Math::Rect2& in_rOffsetRect)
+    void TransformComponent::TransformLocalToWorldRect2D(Core::Math::RC::Rect2D* out,
+                                                         const Core::Math::RC::Rect2D& in_rOffsetRect)
     {
         HE_ASSERT(out != NULL);
 

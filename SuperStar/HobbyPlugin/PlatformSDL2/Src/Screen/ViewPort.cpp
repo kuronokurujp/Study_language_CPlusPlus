@@ -25,15 +25,15 @@ namespace PlatformSDL2
         //::glDisable(GL_MULTISAMPLE);
     }
 
-    Core::Memory::UniquePtr<Platform::SceneStrategy> SDL2ViewPortStrategy::_VCreateScene(
+    Core::Memory::SharedPtr<Platform::SceneStrategy> SDL2ViewPortStrategy::_VCreateScene(
         const Platform::SceneConfig& in_rConfig,
         Core::Memory::SharedPtr<Platform::RenderInterface> in_spRenderInterface,
         Platform::SceneStrategy::EventRender in_eventRender)
     {
         // TODO: 2D/3Dでシーンを切り替えるかも
-        auto upScene = HE_MAKE_CUSTOM_UNIQUE_PTR((SDL2SceneStrategy2D), in_rConfig,
+        auto upScene = HE_MAKE_CUSTOM_SHARED_PTR((SDL2SceneStrategy2D), in_rConfig,
                                                  in_spRenderInterface, std::move(in_eventRender));
-        return std::move(upScene);
+        return upScene;
     }
 
 }  // namespace PlatformSDL2

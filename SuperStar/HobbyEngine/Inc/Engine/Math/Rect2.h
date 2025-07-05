@@ -4,30 +4,44 @@
 #include "MathCore.h"
 #include "Vector2.h"
 
-namespace Core::Math
+/// <summary>
+/// 原点中心
+/// 右手座標系
+/// </summary>
+namespace Core::Math::RC
 {
-    // 2Dの矩形クラス
-    class Rect2 final
+    /// <summary>
+    /// 2Dの矩形クラス
+    /// </summary>
+    class Rect2D final
     {
     public:
-        Rect2() { this->Clear(); }
+        /// <summary>
+        /// 原点が左上など中心以外で作成した矩形情報から中心矩形に変換して出力
+        /// パラメータはEAnchorで指定されたアンカーを基準にしている
+        /// コピーコンストラクタは許容
+        /// </summary>
+        static Rect2D ConvertFromAnchor(const Vector2& in_rPos, const Vector2& in_rSize,
+                                        const EAnchor);
 
-        void SetPosition(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
-                         const HE::Float32 in_fH, const EAnchor in_eAnchor);
+    public:
+        Rect2D() { this->Clear(); }
+        Rect2D(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
+               const HE::Float32 in_fH);
 
-        void SetRect(const HE::Float32 in_fLeft, const HE::Float32 in_fRight,
-                     const HE::Float32 in_fTop, const HE::Float32 in_fBottom,
-                     const EAnchor in_eAnchor);
+        void Set(const HE::Float32 in_fX, const HE::Float32 in_fY, const HE::Float32 in_fW,
+                 const HE::Float32 in_fH);
 
         /// <summary>
         /// Gets the position.
         /// </summary>
-        const Vector2 Pos() const;
+        const Vector2 GetPos() const;
+        inline const Vector2 GetSize() const { return Vector2(this->_fW, this->_fH); }
 
         /// <summary>
-        /// Widthes this instance.
+        /// Gets the Width
         /// </summary>
-        inline HE::Float32 Width() const HE_NOEXCEPT { return fabsf(this->_fRight - this->_fLeft); }
+        inline HE::Float32 Width() const HE_NOEXCEPT { return this->_fW; }
 
         /// <summary>
         /// Widthes the half.
@@ -37,10 +51,7 @@ namespace Core::Math
         /// <summary>
         /// Heights this instance.
         /// </summary>
-        inline HE::Float32 Height() const HE_NOEXCEPT
-        {
-            return fabsf(this->_fBottom - this->_fTop);
-        }
+        inline HE::Float32 Height() const HE_NOEXCEPT { return this->_fH; }
 
         /// <summary>
         /// Heights the half.
@@ -48,22 +59,26 @@ namespace Core::Math
         inline HE::Float32 HeightHalf() const HE_NOEXCEPT { return (this->Height() * 0.5f); }
 
         /// <summary>
-        /// 引数の矩形が中にあるかどうか.
+        /// 矩形同士が交差しているかどうか
+        /// 矩形の縁の交差も交差として扱う
         /// </summary>
-        HE::Bool InSideRect(const Rect2& in_rOrderRect) const;
+        HE::Bool IsRectIntersect(const Rect2D& in_rOrderRect) const;
 
         /// <summary>
         /// 座標が矩形の中に入っているか
+        /// 矩形の縁に触れた場合も中に入っていると扱う
         /// </summary>
-        HE::Bool InSidePoint(const Vector2& in_rPos) const;
+        HE::Bool IsPointInside(const Vector2& in_rPos) const;
 
         /// <summary>
         /// Clears this instance.
         /// </summary>
         inline void Clear() HE_NOEXCEPT
         {
-            this->_fLeft = this->_fRight = this->_fTop = this->_fBottom = 0.0f;
-            this->_eAnchor                                              = EAnchor_Left;
+            this->_fX = 0.0f;
+            this->_fY = 0.0f;
+            this->_fW = 0.0f;
+            this->_fH = 0.0f;
         }
 
         /// <summary>
@@ -71,7 +86,8 @@ namespace Core::Math
         /// </summary>
         inline void operator=(const Vector2& in_rVec) HE_NOEXCEPT
         {
-            this->_SetPos(in_rVec._fX, in_rVec._fY);
+            this->_fX = in_rVec._fX;
+            this->_fY = in_rVec._fY;
         }
 
         /// <summary>
@@ -79,23 +95,13 @@ namespace Core::Math
         /// </summary>
         inline void operator+=(const Vector2& in_rVec) HE_NOEXCEPT
         {
-            this->_fLeft += in_rVec._fX;
-            this->_fRight += in_rVec._fX;
-
-            this->_fTop += in_rVec._fY;
-            this->_fBottom += in_rVec._fY;
+            this->_fX += in_rVec._fX;
+            this->_fY += in_rVec._fY;
         }
 
-        HE::Float32 _fLeft   = 0.0f;
-        HE::Float32 _fTop    = 0.0f;
-        HE::Float32 _fRight  = 0.0f;
-        HE::Float32 _fBottom = 0.0f;
-        EAnchor _eAnchor     = EAnchor_Left;
-
-    private:
-        /// <summary>
-        /// Sets the position.
-        /// </summary>
-        void _SetPos(const HE::Float32 in_fX, const HE::Float32 in_fY);
+        HE::Float32 _fX = 0.0f;
+        HE::Float32 _fY = 0.0f;
+        HE::Float32 _fW = 0.0f;
+        HE::Float32 _fH = 0.0f;
     };
-}  // namespace Core::Math
+}  // namespace Core::Math::RC

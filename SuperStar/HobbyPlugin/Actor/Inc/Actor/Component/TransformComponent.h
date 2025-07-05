@@ -39,8 +39,8 @@ namespace Actor
         // 座標変換一覧
         void TransformLocalToWorldPos2D(Core::Math::Vector2* out,
                                         const Core::Math::Vector2& in_rOffsetPos);
-        void TransformLocalToWorldRect2D(Core::Math::Rect2* out,
-                                         const Core::Math::Rect2& in_rOffsetRect);
+        void TransformLocalToWorldRect2D(Core::Math::RC::Rect2D* out,
+                                         const Core::Math::RC::Rect2D& in_rOffsetRect);
 
         /// <summary>
         /// 座標や回転,スケールを加えた最新のワールド行列を作る

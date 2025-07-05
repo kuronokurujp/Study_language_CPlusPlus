@@ -179,6 +179,9 @@ namespace Module
         }
 
     private:
+        using EventModuleGetter = std::function<Core::Memory::SharedPtr<ModuleBase>(const HE::Char*)>;
+
+    private:
         Core::Memory::SharedPtr<ModuleBase> _GetModule(Core::Common::StringBase&);
 
 #ifdef HE_ENGINE_DEBUG
@@ -194,6 +197,8 @@ namespace Module
         Core::Common::FixedVector<ModuleBase*, 64> _vDependenceModule;
 #endif
         Core::Common::FixedVector<Core::Common::FixedString64, 64> _vDependenceModuleName;
+
+        EventModuleGetter _eventModuleGetter = NULL;
 
     private:
         // モジュールはモジュールマネージャーからのみアクセス可能

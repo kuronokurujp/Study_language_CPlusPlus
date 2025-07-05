@@ -106,63 +106,14 @@ typename std::enable_if<std::is_integral<T>::value, T>::type HE_LOOP_IN_RANGE(T 
 // 処理が入らないプロパティのゲッターやセッターで使うのがいいと思う
 #define HE_NOEXCEPT noexcept
 
-// デバッグとリリースで切り替えるマクロ
+// デバッグ専用処理
 #ifdef HE_ENGINE_DEBUG
 
-#include <cassert>
-
-// アサートマクロ
-// TODO: アサート起きた場合はログを出す専用マクロが必要かな
-#define HE_ASSERT(...) assert(__VA_ARGS__)
-#define HE_ASSERT_RETURN(...) \
-    {                         \
-        assert(__VA_ARGS__);  \
-        if (__VA_ARGS__)      \
-        {                     \
-        }                     \
-        else                  \
-        {                     \
-            return;           \
-        }                     \
-    }
-
-// TODO: アサート条件を第一引数にして...にして_x_のその後の引数にできないか
-#define HE_ASSERT_RETURN_VALUE(_x_, ...) \
-    {                                    \
-        assert(__VA_ARGS__);             \
-        if (__VA_ARGS__)                 \
-        {                                \
-        }                                \
-        else                             \
-        {                                \
-            return (_x_);                \
-        }                                \
-    }
-
-#else
-
-#define HE_PG_LOG_LINE(format, ...) ((void)0)
-
-#define HE_LOG(...) ((void)0)
-#define HE_LOG_LINE(format, ...) ((void)0)
-
-#define HE_ASSERT(...) ((void)0)
-
-#endif
-
-#ifdef HE_ENGINE_DEBUG
-
+// プラットフォームがWindows専用
 #ifdef HE_WIN
 #include <Windows.h>
-#endif
 
-// ログ表示
-// TODO: ログはプラットフォーム毎に用意するのがいいかも
-// リリース時には無効化
-// #if !defined(HE_CHARACTER_CODE_UTF8) && defined(HE_WIN)
-
-#if defined(HE_WIN)
-
+// ログ処理
 #define HE_LOG_MSG_SIZE (2046)
 #define HE_FILE __FILEW__
 
@@ -213,12 +164,17 @@ HE::Bool HE_LOG_CREATE_FORMATERD_STRING(HE::WChar* out, const HE::Char* in_szFor
         HE::Sint32 iUseSize =
             MultiByteToWideChar(CP_UTF8, 0, szUTF8Format, HE_LOG_MSG_SIZE, NULL, 0);
         // 利用する文字数が制限を超えていないかチェック
-        HE_ASSERT_RETURN_VALUE(FALSE, iUseSize <= HE_LOG_MSG_SIZE);
+        if (iUseSize < 0)
+        {
+            // エラーが発生した場合は何もしない
+            return FALSE;
+        }
 
         // HE::UTF8文字列からUTF16の文字列に変える
         MultiByteToWideChar(CP_UTF8, 0, szUTF8Format, HE_LOG_MSG_SIZE, out, iUseSize);
     }
     // std::wstring szDynamicFormat = szFormat;
+// #ifdef HE_CHARACTER_CODE_UTF8
 #else
     std::wstring szDynamicFormat = in_szFormat;
     size_t pos                   = szDynamicFormat.find(L"%");
@@ -329,6 +285,7 @@ void HE_LOG_LINE(const HE::Char* in_szFormat, TArgs... in_args)
         }                                                                                       \
     } while (0)
 
+// #ifdef HE_WIN
 #else
 // TODO: win以外の対応は不十分
 
@@ -357,6 +314,79 @@ void HE_LOG_LINE(const HE::Char* in_szFormat, TArgs... in_args)
 
 #endif
 
+// アサート処理
+#include <cassert>
+
+// アサートマクロ
+// TODO: アサート起きた場合はログを出す専用マクロが必要かな
+#define HE_ASSERT(...) assert(__VA_ARGS__)
+#define HE_ASSERT_RETURN(...)         \
+    {                                 \
+        assert(__VA_ARGS__);          \
+        if (__VA_ARGS__)              \
+        {                             \
+        }                             \
+        else                          \
+        {                             \
+            return;                   \
+        }                             \
+    }
+
+// TODO: アサート条件を第一引数にして...にして_x_のその後の引数にできないか
+#define HE_ASSERT_RETURN_VALUE(_x_, ...) \
+    {                                    \
+        assert(__VA_ARGS__);             \
+        if (__VA_ARGS__)                 \
+        {                                \
+        }                                \
+        else                             \
+        {                                \
+            return (_x_);                \
+        }                                \
+    }
+
+// #ifdef HE_ENGINE_DEBUG
+// リリース版ではデバッグ命令はすべて空にする
 #else
+
+// ログ処理
+// 書式指定子の更新処理
+template <typename T>
+void HE_LOG_UPDATE_FORMAT_STRING(std::wstring& in_szFormat, size_t& in_rPos, const T& in_arg)
+{
+}
+// 共通処理を行う関数の作成
+// 文字列書式で%sが使える
+template <typename... TArgs>
+HE::Bool HE_LOG_CREATE_FORMATERD_STRING(HE::WChar* out, const HE::Char* in_szFormat,
+                                        TArgs... in_args)
+{
+}
+// 文字列のローカル変数を利用するのでwhile文で囲っている
+// ログ出力(改行なし)
+// format引数は必ず文字列リテラルを設定する
+// 文字列型の変数を入れるとコンパイルエラーになる
+// コンソールにも出力
+template <typename... TArgs>
+void HE_LOG(const HE::Char* in_szFormat, TArgs... in_args)
+{
+}
+
+// ログ出力(改行をする)
+// format引数は必ず文字列リテラルを設定する
+// 文字列型の変数を入れるとコンパイルエラーになる
+// コンソールにも出力
+template <typename... TArgs>
+void HE_LOG_LINE(const HE::Char* in_szFormat, TArgs... in_args)
+{
+}
+
+// プログラムが把握する情報を付与したログ出力
+// ファイルパスが長く長文になる可能性があるのでログサイズ2倍の文字列サイズを確保
+// コンソールにも出力
+#define HE_PG_LOG_LINE(format, ...) ((void)0)
+
+// アサート処理
+#define HE_ASSERT(...) ((void)0)
 
 #endif

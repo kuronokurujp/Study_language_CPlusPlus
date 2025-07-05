@@ -285,7 +285,7 @@ namespace Platform
         EInputState GetTouchState(const EInputMouseType) const;
 
         // 指定した矩形がタッチ範囲かどうか
-        HE::Bool IsTouchInRect(const Core::Math::Rect2&) const;
+        HE::Bool IsTouchInRect(const Core::Math::RC::Rect2D&) const;
 
     public:
         Core::Math::Vector2 _pos;

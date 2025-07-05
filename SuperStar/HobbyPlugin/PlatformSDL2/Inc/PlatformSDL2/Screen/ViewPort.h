@@ -20,7 +20,7 @@ namespace PlatformSDL2
         /// <summary>
         /// シーンの生成は継承先へ
         /// </summary>
-        Core::Memory::UniquePtr<Platform::SceneStrategy> _VCreateScene(
+        Core::Memory::SharedPtr<Platform::SceneStrategy> _VCreateScene(
             const Platform::SceneConfig&, Core::Memory::SharedPtr<Platform::RenderInterface>,
             Platform::SceneStrategy::EventRender) override final;
     };

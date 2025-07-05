@@ -63,8 +63,8 @@ namespace Platform
         return EInputState::EInputState_NONE;
     }
 
-    HE::Bool TouchInput::IsTouchInRect(const Core::Math::Rect2& in_rRect) const
+    HE::Bool TouchInput::IsTouchInRect(const Core::Math::RC::Rect2D& in_rRect) const
     {
-        return in_rRect.InSidePoint(this->GetWorldPos());
+        return in_rRect.IsPointInside(this->GetWorldPos());
     }
 }  // namespace Platform

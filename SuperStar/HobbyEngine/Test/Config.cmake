@@ -16,7 +16,7 @@ set(ENGINE_TARGET_TEST_SRC_FILES
     Common/TestUUID.cpp
     Common/TestVector.cpp
 
-    Math/TestRandom.cpp
+    Math/TestMath.cpp
 
     Memory/TestMemory.cpp
 

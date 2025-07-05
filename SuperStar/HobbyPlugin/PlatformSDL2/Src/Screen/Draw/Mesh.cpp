@@ -192,7 +192,13 @@ namespace PlatformSDL2
         pMeshLayout->Disable();
     }
 
-    void ParticleMesh::Init(const HE::Uint32 in_uCount)
+    ParticleMesh::ParticleMesh(const HE::Uint32 in_uCount)
+    {
+        this->_uCount = in_uCount;
+        this->_pItems = reinterpret_cast<Item*>(HE_ALLOC_MEM(sizeof(Item) * this->_uCount, 0));
+    }
+
+    void ParticleMesh::Init()
     {
         this->_pMeshLayout = HE_NEW_MEM(Local::MeshLayout, 0)();
         auto pMeshLayout   = reinterpret_cast<Local::MeshLayout*>(this->_pMeshLayout);
@@ -205,7 +211,7 @@ namespace PlatformSDL2
             {
                 // ポイント描画なので頂点情報は不要
                 bindMeshVertexData._pVertices      = NULL;
-                bindMeshVertexData._uVerticesCount = in_uCount;
+                bindMeshVertexData._uVerticesCount = this->_uCount;
                 bindMeshVertexData._uVertSize      = sizeof(Item);
                 bindMeshVertexData._aBindLayout    = {MeshLayoutData(3, sizeof(Item::position)),
                                                       MeshLayoutData(3, sizeof(Item::velocity))};
@@ -215,10 +221,6 @@ namespace PlatformSDL2
             pMeshLayout->WriteVertexAndLayout(bindMeshVertexData);
         }
         pMeshLayout->EndWrite();
-
-        this->_pItems = reinterpret_cast<Item*>(HE_ALLOC_MEM(sizeof(Item) * in_uCount, 0));
-
-        this->_uCount = in_uCount;
     }
 
     void ParticleMesh::Release()

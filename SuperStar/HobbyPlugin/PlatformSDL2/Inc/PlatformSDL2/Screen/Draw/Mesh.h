@@ -86,7 +86,9 @@ namespace PlatformSDL2
         };
 
     public:
-        void Init(const HE::Uint32);
+        ParticleMesh(const HE::Uint32 in_uCount);
+
+        void Init();
         void Release();
 
         void Draw();

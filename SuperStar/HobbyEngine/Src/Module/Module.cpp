@@ -12,7 +12,9 @@ namespace Module
 
     Core::Memory::SharedPtr<ModuleBase> ModuleBase::_GetModule(Core::Common::StringBase& in_szName)
     {
-        auto pTargetModule = HE_ENGINE.ModuleManager().Get(in_szName.Str());
+        // auto pTargetModule = HE_ENGINE.ModuleManager().Get(in_szName.Str());
+        HE_ASSERT_RETURN_VALUE(NULL, this->_eventModuleGetter);
+        auto pTargetModule = this->_eventModuleGetter(in_szName.Str());
         if (pTargetModule == NULL)
         {
             HE_PG_LOG_LINE(HE_STR_TEXT("指定したモジュール(%s)が存在しない"), in_szName.Str());
@@ -172,29 +174,32 @@ namespace Module
     /// <summary>
     /// モジュールを追加
     /// </summary>
-    HE::Bool ModuleManager::AddModule(Core::Memory::SharedPtr<ModuleBase> in_upModule)
+    HE::Bool ModuleManager::AddModule(Core::Memory::SharedPtr<ModuleBase> in_spModule)
     {
         // モジュールレイヤーに応じたリストに登録
-        const auto eLayer = in_upModule->Layer();
+        const auto eLayer = in_spModule->Layer();
         if (eLayer == ELayer_App)
         {
-            this->_mAppModule.Add(in_upModule->Name(), in_upModule);
-            return TRUE;
+            this->_mAppModule.Add(in_spModule->Name(), in_spModule);
         }
-
-        if (eLayer == ELayer_Logic)
+        else if (eLayer == ELayer_Logic)
         {
-            this->_mLogicModule.Add(in_upModule->Name(), in_upModule);
-            return TRUE;
+            this->_mLogicModule.Add(in_spModule->Name(), in_spModule);
         }
-
-        if (eLayer == ELayer_View)
+        else if (eLayer == ELayer_View)
         {
-            this->_mViewModule.Add(in_upModule->Name(), in_upModule);
-            return TRUE;
+            this->_mViewModule.Add(in_spModule->Name(), in_spModule);
+        }
+        else
+        {
+            return FALSE;
         }
 
-        return FALSE;
+        // TODO: モジュール内で依存しているモジュールを呼び出すためにモジュール取得するイベントを設定
+        in_spModule->_eventModuleGetter =
+            std::move([this](const HE::Char* in_szName) { return this->Get(in_szName); });
+
+        return TRUE;
     }
 
     HE::Bool ModuleManager::Start()

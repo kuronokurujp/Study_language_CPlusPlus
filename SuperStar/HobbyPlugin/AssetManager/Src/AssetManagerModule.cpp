@@ -14,11 +14,11 @@ namespace AssetManager
     /// <summary>
     /// アセット格納ディレクトリ設定
     /// </summary>
-    void AssetManagerModule::SetCurrentDir(const HE::Char* in_szMountDir)
+    void AssetManagerModule::SetCurrentDir(const Core::File::Path& in_rMountDirPath)
     {
         // TODO: プラットフォームにファイル参照のカレントディレクトリを設定
         auto pPlatform = this->GetDependenceModule<Platform::PlatformModule>();
-        pPlatform->File()->SetCurrentDir(in_szMountDir);
+        pPlatform->File()->SetCurrentDir(in_rMountDirPath);
     }
 
     HE::Bool AssetManagerModule::_VStart()

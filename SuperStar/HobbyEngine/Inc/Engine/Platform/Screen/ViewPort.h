@@ -21,7 +21,7 @@ namespace Platform
     {
     private:
         using MapSceneSt = Core::Common::FixedMap<Core::Common::Handle,
-                                                  Core::Memory::UniquePtr<SceneStrategy>, 32>;
+                                                  Core::Memory::SharedPtr<SceneStrategy>, 32>;
 
         using MapRender = Core::Common::FixedMap<const Core::Common::RTTI*,
                                                  Core::Memory::SharedPtr<RenderInterface>, 32>;
@@ -59,15 +59,17 @@ namespace Platform
 
             // TODO: シーンにレンダリングを渡す
             SceneConfig config = {this->_config._uWidth, this->_config._uHeight};
-            auto upScene       = this->_VCreateScene(config, spNewRender, std::move(in_eventRender));
+            auto upScene = this->_VCreateScene(config, spNewRender, std::move(in_eventRender));
 
             Core::Common::Handle handle;
             handle.SetIndex(++this->_uScenetStCount, 0);
-            this->_mSceneSt.Add(handle, std::move(upScene));
+            this->_mSceneSt.Add(handle, upScene);
             return handle;
         }
 
         inline const ViewPortConfig& GetConfig() const { return this->_config; }
+
+        Core::Memory::SharedPtr<Platform::SceneStrategy> GetScene(const Core::Common::Handle);
 
     protected:
         virtual void _VBeginRender() = 0;
@@ -76,7 +78,7 @@ namespace Platform
         /// <summary>
         /// TODO: Sceneの生成は継承先へ
         /// </summary>
-        virtual Core::Memory::UniquePtr<Platform::SceneStrategy> _VCreateScene(
+        virtual Core::Memory::SharedPtr<Platform::SceneStrategy> _VCreateScene(
             const SceneConfig&, Core::Memory::SharedPtr<RenderInterface>,
             SceneStrategy::EventRender) = 0;
 
