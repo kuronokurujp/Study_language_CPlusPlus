@@ -318,31 +318,39 @@ void HE_LOG_LINE(const HE::Char* in_szFormat, TArgs... in_args)
 #include <cassert>
 
 // アサートマクロ
-// TODO: アサート起きた場合はログを出す専用マクロが必要かな
-#define HE_ASSERT(...) assert(__VA_ARGS__)
-#define HE_ASSERT_RETURN(...)         \
-    {                                 \
-        assert(__VA_ARGS__);          \
-        if (__VA_ARGS__)              \
-        {                             \
-        }                             \
-        else                          \
-        {                             \
-            return;                   \
-        }                             \
+#define HE_ASSERT(...)                                     \
+    do                                                     \
+    {                                                      \
+        if (!(__VA_ARGS__))                                \
+        {                                                  \
+            HE_PG_LOG_LINE(HE_STR_TEXT("Assert: %s"),      \
+                           HE_STR_TEXT(#__VA_ARGS__));     \
+            assert(__VA_ARGS__);                           \
+        }                                                  \
+    } while (0)
+
+// 条件が偽の場合に return するアサートマクロ
+#define HE_ASSERT_RETURN(...)                              \
+    {                                                      \
+        if (!(__VA_ARGS__))                                \
+        {                                                  \
+            HE_PG_LOG_LINE(HE_STR_TEXT("Assert: %s"),      \
+                           HE_STR_TEXT(#__VA_ARGS__));     \
+            assert(__VA_ARGS__);                           \
+            return;                                        \
+        }                                                  \
     }
 
-// TODO: アサート条件を第一引数にして...にして_x_のその後の引数にできないか
-#define HE_ASSERT_RETURN_VALUE(_x_, ...) \
-    {                                    \
-        assert(__VA_ARGS__);             \
-        if (__VA_ARGS__)                 \
-        {                                \
-        }                                \
-        else                             \
-        {                                \
-            return (_x_);                \
-        }                                \
+// 条件が偽の場合に指定値を返すアサートマクロ
+#define HE_ASSERT_RETURN_VALUE(_x_, ...)                   \
+    {                                                      \
+        if (!(__VA_ARGS__))                                \
+        {                                                  \
+            HE_PG_LOG_LINE(HE_STR_TEXT("Assert: %s"),      \
+                           HE_STR_TEXT(#__VA_ARGS__));     \
+            assert(__VA_ARGS__);                           \
+            return (_x_);                                  \
+        }                                                  \
     }
 
 // #ifdef HE_ENGINE_DEBUG
