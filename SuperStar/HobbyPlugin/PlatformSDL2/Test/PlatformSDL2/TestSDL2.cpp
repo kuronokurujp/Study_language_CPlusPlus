@@ -4,12 +4,17 @@
 #include "PlatformSDL2/Screen/Render.h"
 #include "PlatformSDL2Module.h"
 
+#include "PlatformSDL2/SDL2File.h"
+#include "PlatformSDL2/SDL2Time.h"
+#include "PlatformSDL2/SDL2System.h"
+
 // GUIテストをしている
 // CIでテストする時には一定時間経過したらGUIを閉じる仕組みが必要
 // OpenGLなので座標系は右手座標系で座標設定
 // また原点は画面の中心
 namespace PlatformSDL2
 {
+    // TODO: モジュールテストとフォントや画面の表示テストを分けるべき
     /// <summary>
     /// フォント表示のテスト
     /// </summary>
@@ -345,7 +350,7 @@ namespace PlatformSDL2
                 auto spRender        = spScene->GetRender();
                 auto spDefaultRender = HE_SHADER_PTR_CAST(PlatformSDL2::DefaultRender, spRender);
 
-                // TODO: パーティクルオブジェクト作成
+                // パーティクルオブジェクト作成
                 particleObjHandle = spDefaultRender->CreateParticleObject(1000);
 
                 // 各パーティクル位置と速度と色のデータ作成
@@ -391,7 +396,7 @@ namespace PlatformSDL2
     /// </summary>
     TEST(HobbyPlugin_PlatformSDL2, FileLoad)
     {
-        PlatformSDL2::File file;
+        File file;
         file.SetCurrentDir(HE_STR_TEXT("Resources/SDL2/File"));
 
         {
@@ -416,7 +421,7 @@ namespace PlatformSDL2
     /// </summary>
     TEST(HobbyPlugin_PlatformSDL2, SystemRand)
     {
-        PlatformSDL2::System sys;
+        System sys;
         EXPECT_EQ(sys.VSetSeedRand(12345), TRUE);
         auto a = sys.VGetRand(1000);
         EXPECT_EQ(sys.VSetSeedRand(12345), TRUE);
@@ -433,7 +438,7 @@ namespace PlatformSDL2
     /// </summary>
     TEST(HobbyPlugin_PlatformSDL2, TimeNowSleep)
     {
-        PlatformSDL2::Time time;
+        Time time;
         auto start = time.VNowMSec();
         time.VSleepMSec(10);
         auto end = time.VNowMSec();
