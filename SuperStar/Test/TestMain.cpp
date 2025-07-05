@@ -117,7 +117,7 @@ int main(int argc, char* const argv[])
 // エンジンのモジュール用のテスト一覧
 
 // Luaモジュールテスト
-#include "LuaTest/LuaModuleTest.hpp"
+#include "Test/Lua/LuaModuleTest.hpp"
 
 // AssetManagerモジュールテスト
 #include "AssetManagerTest/AssetManagerModuleTest.hpp"

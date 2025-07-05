@@ -10,6 +10,12 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
 # Static library target
 project_configure_static_lib_target(${PLUGIN_LUA_NAME})
 
+# プラグインのインクルードディレクトリを公開
+target_include_directories(${LUA_PLUGIN_NAME}
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/Inc/Lua
+)
+
 # Project configuration
 project_configure_target(${PLUGIN_LUA_NAME})
 
