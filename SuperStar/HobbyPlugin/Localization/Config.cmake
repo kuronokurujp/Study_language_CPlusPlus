@@ -7,6 +7,6 @@ set(LOCALIZATION_PLUGIN_TARGET_FILES
     LICENSE.txt
     README.md
 
-    LocalizationModule.cpp
-    LocalizationModule.h
+    Src/LocalizationModule.cpp
+    Inc/LocalizationModule.h
 )
