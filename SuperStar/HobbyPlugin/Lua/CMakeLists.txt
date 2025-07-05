@@ -1,42 +1,32 @@
 cmake_minimum_required(VERSION 3.26)
 
-# プラグインビルドの共通処理.
-include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICY_SCOPE)
-# プラグインの共通情報.
+# Engine common cmake
+include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/Project.cmake NO_POLICY_SCOPE)
+# Engine configuration
+include(${CMAKE_SOURCE_DIR}/HobbyEngine/Config.cmake NO_POLICY_SCOPE)
+# Plugin configuration
 include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
-# 共有ライブラリとして生成するためのオプションの定義.
-option(LUA_PLUGIN_BUILD_SHARED_LIBS "build shared library" OFF)
-# プラグイン共通ビルド処理.
-common_build_plugin("${LUA_PLUGIN_NAME}" "${LUA_PLUGIN_TARGET_FILES}" "$CACHE{CACHE_ENGINE_INCLUDE_CODE}" ${LUA_PLUGIN_BUILD_SHARED_LIBS})
 
-# プラグインが利用するパッケージをvcpkgから取得
-vcpkg_install_package($CACHE{CHACHE_VCPKG_ROOT} ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}" $CACHE{CACHE_PROJECT_VCPKG_STATIC_LIB_TYPE})
+# Static library target
+project_configure_static_lib_target(${PLUGIN_LUA_NAME})
 
-# インストールしたパッケージのディレクトリパス
-set(VCPKG_DIR_PATH ThirdParty/VcPkg/$CACHE{CACHE_PROJECT_VCPKG_STATIC_LIB_TYPE})
+# Project configuration
+project_configure_target(${PLUGIN_LUA_NAME})
 
-if(EXISTS ${VCPKG_DIR_PATH})
-    # vcpkgの取り扱い設定処理
-    # 使う場合はコメントを外して書き換えてください
+# Files for the target
+project_configure_files_target(${PLUGIN_LUA_NAME}
+    ${PLUGIN_LUA_TARGET_COMMON_FILES}
+    ${PLUGIN_LUA_TARGET_SRC_FILES}
+    ${PLUGIN_LUA_TARGET_INC_FILES}
+)
 
-    # プラグイン用のパッケージディレクトリを設定
-    # list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${VCPKG_DIR_PATH}/share/インストールしたパッケージ名のディレクトリ")
-    # SDL2のパッケージを探す
-    # find_package(インストールしたパッケージ名 REQUIRED CONFIG)
+# Engine include path
+target_include_directories(${PLUGIN_LUA_NAME} PUBLIC ${ENGINE_INC_DIR})
+# Plugin include path
+target_include_directories(${PLUGIN_LUA_NAME} PUBLIC ${PLUGIN_LUA_INC_DIR})
 
-    # プラグインをリンク
-    # target_link_libraries(${__MODULE_UPPER_NAME___PLUGIN_NAME}
-    #     PRIVATE
-    #     # SDL2関連のライブラリを設定
-    #     vcpkgのパッケージのライブラリファイルを指定
-    # )
-    # プラグインのインクルード
-    # target_include_directories(${__MODULE_UPPER_NAME___PLUGIN_NAME}
-    #     PRIVATE
-            # ここは書き換えない
-    #         ./${VCPKG_DIR_PATH}/include/
-            # 他にもインクルードしたいディレクトリがあれば追加
-    # )
-else()
-    message(STATUS "Non VcpkgDir ${VCPKG_DIR_PATH}")
-endif()
+# Link libraries
+target_link_libraries(${PLUGIN_LUA_NAME}
+    PUBLIC
+        ${ENGINE_NAME}
+)
