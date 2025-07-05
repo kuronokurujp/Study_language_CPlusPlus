@@ -12,7 +12,6 @@ namespace Module
 
     Core::Memory::SharedPtr<ModuleBase> ModuleBase::_GetModule(Core::Common::StringBase& in_szName)
     {
-        // auto pTargetModule = HE_ENGINE.ModuleManager().Get(in_szName.Str());
         HE_ASSERT_RETURN_VALUE(NULL, this->_eventModuleGetter);
         auto pTargetModule = this->_eventModuleGetter(in_szName.Str());
         if (pTargetModule == NULL)

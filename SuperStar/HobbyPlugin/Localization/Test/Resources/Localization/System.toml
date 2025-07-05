@@ -1,6 +1,6 @@
 # 共通設定
 [config]
-current_dir="Locate"
+current_dir=""
 
 # 各言語のテキスト情報
 # 日本語の各テキストグループ

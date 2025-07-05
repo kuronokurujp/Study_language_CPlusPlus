@@ -139,7 +139,11 @@ namespace Localization
         Core::Common::FixedString128 locateStr;
         HE::Sint32 sLocateLevel = 0;
 
-        Core::Common::FixedMap<Core::Common::FixedString128, LocateData, 32> mData;
+        // TODO: 作業のローカル変数だが、スタックだとメモリを沢山使うのでstaticした
+        // ヒープに切り替えた方がいいかも
+        static Core::Common::FixedMap<Core::Common::FixedString128, LocateData, 32> mData;
+        mData.Clear();
+
         while (1)
         {
             auto spLocateNode = this->VGetNodeByLevel({HE_STR_U8_TEXT("locate")}, sLocateLevel);
@@ -203,7 +207,7 @@ namespace Localization
         return spNode->VGetUInt32();
     }
 
-    const Core::Common::FixedString1024& LocateAssetData::GetText(const HE::UTF8* in_szKey)
+    const Core::Common::StringBase& LocateAssetData::GetText(const HE::UTF8* in_szKey)
     {
         // キャッシュしているテキストがなければデータからテキストを取る
         if (this->_textBuffMap.Contains(in_szKey) == FALSE)

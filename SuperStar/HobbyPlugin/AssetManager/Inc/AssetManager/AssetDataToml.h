@@ -19,9 +19,6 @@ namespace AssetManager
     public:
         AssetDataToml() : AssetDataBase() {}
 
-        virtual HE::Bool _VLoad(Platform::FileInterface&) override;
-        virtual void _VUnload() override;
-
         virtual NodeSharedPtr VGetNodeByName(
             const std::initializer_list<const HE::UTF8*>& in_aName);
 
@@ -35,6 +32,10 @@ namespace AssetManager
 
         virtual NodeSharedPtr VGetNodeByLevel(AbstractTreeNode& in_rCurrentNode,
                                               const HE::Sint32 in_uLevel) override;
+
+    protected:
+        virtual HE::Bool _VLoad(Platform::FileInterface&) override;
+        virtual void _VUnload() override;
 
     private:
         void* _pResult   = NULL;

@@ -36,14 +36,15 @@ namespace Localization
         using LocateMap =
             Core::Common::FixedMap<Core::Common::FixedString128, SystemAssetData::LocateData, 32>;
 
-        virtual HE::Bool _VLoad(Platform::FileInterface&) override;
-
         /// <summary>
         /// ロケートマップデータを探して取得
         /// 常駐しているメンバー変数を参照するようにしている
         /// 呼び出し側が参照したメンバー変数の書き換えたをできないようにするためにconstにしている
         /// </summary>
         const LocateMap& FindLocate(const HE::Char*);
+
+    protected:
+        virtual HE::Bool _VLoad(Platform::FileInterface&) override;
 
     private:
         /// <summary>
@@ -71,7 +72,7 @@ namespace Localization
         /// <summary>
         /// テキスト
         /// </summary>
-        const Core::Common::FixedString1024& GetText(const HE::UTF8*);
+        const Core::Common::StringBase& GetText(const HE::UTF8*);
 
     private:
         // 一度読み込んだテキストをキャッシュするテキストバッファ

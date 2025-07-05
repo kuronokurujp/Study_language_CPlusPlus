@@ -1,12 +1,19 @@
-set(LOCALIZATION_PLUGIN_NAME HobbyEnginePlugin_Localization)
+set(PLUGIN_LOCALIZATION_NAME HobbyPlugin_Localization)
+set(PLUGIN_LOCALIZATION_INC_DIR ${CMAKE_CURRENT_LIST_DIR}/Inc)
 
 # プロジェクトに登録するファイル群
 # ここに全て記載する
-set(LOCALIZATION_PLUGIN_TARGET_FILES
+set(PLUGIN_LOCALIZATION_TARGET_COMMON_FILES
     .editorconfig
     LICENSE.txt
     README.md
+    )
 
-    Src/LocalizationModule.cpp
+set(PLUGIN_LOCALIZATION_TARGET_INC_FILES
     Inc/LocalizationModule.h
 )
+
+set(PLUGIN_LOCALIZATION_TARGET_SRC_FILES
+    Src/LocalizationModule.cpp
+)
+
