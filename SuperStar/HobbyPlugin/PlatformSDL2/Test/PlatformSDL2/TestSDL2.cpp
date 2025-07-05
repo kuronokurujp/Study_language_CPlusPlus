@@ -4,12 +4,17 @@
 #include "PlatformSDL2/Screen/Render.h"
 #include "PlatformSDL2Module.h"
 
+#include "PlatformSDL2/SDL2File.h"
+#include "PlatformSDL2/SDL2Time.h"
+#include "PlatformSDL2/SDL2System.h"
+
 // GUIテストをしている
 // CIでテストする時には一定時間経過したらGUIを閉じる仕組みが必要
 // OpenGLなので座標系は右手座標系で座標設定
 // また原点は画面の中心
 namespace PlatformSDL2
 {
+    // TODO: モジュールテストとフォントや画面の表示テストを分けるべき
     /// <summary>
     /// フォント表示のテスト
     /// </summary>
@@ -32,7 +37,7 @@ namespace PlatformSDL2
                 spPlatformModule->Font()->VLoad(Platform::EFontSize_64,
                                                 HE_STR_TEXT("Resources/SDL2/Font/TestFont.ttf"));
             EXPECT_EQ(bRet, TRUE);
-        }
+}
 
         // ウィンドウ追加
         {
@@ -345,7 +350,7 @@ namespace PlatformSDL2
                 auto spRender        = spScene->GetRender();
                 auto spDefaultRender = HE_SHADER_PTR_CAST(PlatformSDL2::DefaultRender, spRender);
 
-                // TODO: パーティクルオブジェクト作成
+                // パーティクルオブジェクト作成
                 particleObjHandle = spDefaultRender->CreateParticleObject(1000);
 
                 // 各パーティクル位置と速度と色のデータ作成
@@ -384,5 +389,59 @@ namespace PlatformSDL2
         }
 
         EXPECT_EQ(moduleManager.Release(), TRUE);
+    }
+
+    /// <summary>
+    /// SDL2File basic load tests
+    /// </summary>
+    TEST(HobbyPlugin_PlatformSDL2, FileLoad)
+    {
+        File file;
+        file.SetCurrentDir(HE_STR_TEXT("Resources/SDL2/File"));
+
+        {
+            auto [pData, size] = file.VLoadBinary(HE_STR_TEXT("Test.json"));
+            EXPECT_NE(pData, nullptr);
+            EXPECT_LT(0u, size);
+            HE_SAFE_DELETE_MEM(pData);
+        }
+
+        {
+            auto [pText, size] = file.VLoadText(HE_STR_TEXT("Test.xml"));
+            EXPECT_NE(pText, nullptr);
+            EXPECT_LT(0u, size);
+            std::string str(pText, size);
+            EXPECT_NE(str.find("<ui"), std::string::npos);
+            HE_SAFE_DELETE_MEM(pText);
+        }
+    }
+
+    /// <summary>
+    /// SDL2System random number tests
+    /// </summary>
+    TEST(HobbyPlugin_PlatformSDL2, SystemRand)
+    {
+        System sys;
+        EXPECT_EQ(sys.VSetSeedRand(12345), TRUE);
+        auto a = sys.VGetRand(1000);
+        EXPECT_EQ(sys.VSetSeedRand(12345), TRUE);
+        auto b = sys.VGetRand(1000);
+        EXPECT_EQ(a, b);
+
+        auto f = sys.VGetRandByFloat(0.0f, 1.0f);
+        EXPECT_LE(0.0f, f);
+        EXPECT_GE(1.0f, f);
+    }
+
+    /// <summary>
+    /// SDL2Time functions
+    /// </summary>
+    TEST(HobbyPlugin_PlatformSDL2, TimeNowSleep)
+    {
+        Time time;
+        auto start = time.VNowMSec();
+        time.VSleepMSec(10);
+        auto end = time.VNowMSec();
+        EXPECT_LE(10u, end - start);
     }
 }  // namespace PlatformSDL2
