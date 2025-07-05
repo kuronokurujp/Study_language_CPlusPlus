@@ -28,5 +28,5 @@ vcpkg_install_package(${CMAKE_CURRENT_SOURCE_DIR} "x64-windows-static")
 test_configure_target(
         ${PLUGIN_LUA_TEST_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/VcPkg/x64-windows-static
-        ${LUA_PLUGIN_NAME}
+        ${PLUGIN_LUA_NAME}
 )
