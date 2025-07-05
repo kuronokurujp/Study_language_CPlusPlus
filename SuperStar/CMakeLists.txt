@@ -31,7 +31,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/EnhancedInput/Config.cmake NO_PO
 # Eventプラグイン
 include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Event/Config.cmake NO_POLICY_SCOPE)
 # Luaプラグイン
-# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Lua/Config.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Lua/Config.cmake NO_POLICY_SCOPE)
 # TODO: 以下はデバッグのみ利用(リリース版では含めないようにする)
 # ランタイムのDebugプラグイン
 # include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/RuntimeDebug/Config.cmake NO_POLICY_SCOPE)
@@ -93,7 +93,7 @@ add_subdirectory(HobbyPlugin/Localization)
 # add_subdirectory(HobbyPlugin/UI)
 add_subdirectory(HobbyPlugin/EnhancedInput)
 add_subdirectory(HobbyPlugin/Event)
-# add_subdirectory(HobbyPlugin/Lua)
+add_subdirectory(HobbyPlugin/Lua)
 # TODO: 以下のはデバッグのみ利用(リリース版では含めないようにする)
 # add_subdirectory(HobbyPlugin/RuntimeDebug)
 # add_subdirectory(HobbyPlugin/GameDevGUI)
@@ -128,7 +128,7 @@ set(PLUGIN_LIBRARIES
 #   ${GAMEDEVGUI_PLUGIN_NAME}
 # TODO: デバッグのみ入れる
 #   ${RUNTIMEDEBUG_PLUGIN_NAME}
-#   ${LUA_PLUGIN_NAME}
+  ${LUA_PLUGIN_NAME}
   ${EVENT_PLUGIN_NAME}
   ${ENHANCED_INPUT_PLUGIN_NAME}
 #   ${UI_PLUGIN_NAME}
