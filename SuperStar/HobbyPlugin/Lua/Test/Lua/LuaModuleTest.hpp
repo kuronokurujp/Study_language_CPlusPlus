@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 // テストをする
-#include "../LuaModule.h"
+#include "../../Inc/Lua/LuaModule.h"
 #include "Engine/Common/Function.h"
 #include "Engine/Engine.h"
 

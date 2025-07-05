@@ -4,7 +4,7 @@
 #include "Engine/Memory/Memory.h"
 
 // Luaエンジン
-#include "Lua/ThirdParty/lua/src/lua.hpp"
+#include "ThirdParty/lua/src/lua.hpp"
 
 namespace Lua
 {
