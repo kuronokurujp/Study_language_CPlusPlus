@@ -1,14 +1,48 @@
-set(LUA_PLUGIN_NAME HobbyEnginePlugin_Lua)
-set(LUA_THIRD_PARTY_SRC_PATH ThirdParty/lua/src)
+set(PLUGIN_LUA_NAME HobbyPlugin_Lua)
+set(PLUGIN_LUA_INC_DIR ${CMAKE_CURRENT_LIST_DIR})
+set(PLUGIN_LUA_THIRD_PARTY_DIR ${CMAKE_CURRENT_LIST_DIR}/Lua/ThirdParty/lua/src)
 
-# プロジェクトに登録するファイル群
-# ここに全て記載する
-set(LUA_PLUGIN_TARGET_FILES
+set(PLUGIN_LUA_TARGET_COMMON_FILES
     .editorconfig
     LICENSE.txt
     README.md
+    ThirdPartyNotices.txt
+)
+
+set(PLUGIN_LUA_TARGET_INC_FILES
+    Inc/LuaModule.h
+)
+
+set(PLUGIN_LUA_TARGET_SRC_FILES
     Src/LuaModule.cpp
-    Inc/Lua/LuaModule.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lapi.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lauxlib.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lcode.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lctype.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/ldebug.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/ldo.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lfunc.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lgc.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/ljumptab.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/llex.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/llimits.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lmem.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lobject.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lopcodes.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lopnames.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lparser.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lprefix.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lstate.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lstring.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/ltable.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/ltm.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lua.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lua.hpp
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/luaconf.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lualib.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lundump.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lvm.h
+    ${PLUGIN_LUA_THIRD_PARTY_DIR}/lzio.h
     ${LUA_THIRD_PARTY_SRC_PATH}/lapi.c
     ${LUA_THIRD_PARTY_SRC_PATH}/lapi.h
     ${LUA_THIRD_PARTY_SRC_PATH}/lauxlib.c
