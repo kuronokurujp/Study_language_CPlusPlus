@@ -1,5 +1,5 @@
 set(LUA_PLUGIN_NAME HobbyEnginePlugin_Lua)
-set(LUA_THIRD_PARTY_SRC_PATH Lua/ThirdParty/lua/src)
+set(LUA_THIRD_PARTY_SRC_PATH ThirdParty/lua/src)
 
 # プロジェクトに登録するファイル群
 # ここに全て記載する
@@ -7,8 +7,8 @@ set(LUA_PLUGIN_TARGET_FILES
     .editorconfig
     LICENSE.txt
     README.md
-    LuaModule.cpp
-    LuaModule.h
+    Src/LuaModule.cpp
+    Inc/Lua/LuaModule.h
     ${LUA_THIRD_PARTY_SRC_PATH}/lapi.c
     ${LUA_THIRD_PARTY_SRC_PATH}/lapi.h
     ${LUA_THIRD_PARTY_SRC_PATH}/lauxlib.c

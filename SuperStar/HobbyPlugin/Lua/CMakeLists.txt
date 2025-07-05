@@ -9,6 +9,12 @@ option(LUA_PLUGIN_BUILD_SHARED_LIBS "build shared library" OFF)
 # プラグイン共通ビルド処理.
 common_build_plugin("${LUA_PLUGIN_NAME}" "${LUA_PLUGIN_TARGET_FILES}" "$CACHE{CACHE_ENGINE_INCLUDE_CODE}" ${LUA_PLUGIN_BUILD_SHARED_LIBS})
 
+# プラグインのインクルードディレクトリを公開
+target_include_directories(${LUA_PLUGIN_NAME}
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/Inc/Lua
+)
+
 # プラグインが利用するパッケージをvcpkgから取得
 vcpkg_install_package($CACHE{CHACHE_VCPKG_ROOT} ${CMAKE_CURRENT_SOURCE_DIR} "${CMAKE_CURRENT_SOURCE_DIR}" $CACHE{CACHE_PROJECT_VCPKG_STATIC_LIB_TYPE})
 
