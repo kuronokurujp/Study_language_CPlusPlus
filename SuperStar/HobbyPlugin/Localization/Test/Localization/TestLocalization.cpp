@@ -1,17 +1,15 @@
-﻿#pragma once
+#include <gtest/gtest.h>
 
 #include "AssetManagerModule.h"
 #include "LocalizationModule.h"
 #include "PlatformSDL2Module.h"
 #include "Engine/Engine.h"
 
-// テキスト取得
-TEST_CASE("Localization Module Text")
+TEST(HobbyPlugin_Localization, Text)
 {
     StartupEngineByUnitTest<AssetManager::AssetManagerModule, PlatformSDL2::PlatformSDL2Module,
-                               Localization::LocalizationModule>(
-        []()
-        {
+                           Localization::LocalizationModule>(
+        []() {
             auto pAssetManagerModule =
                 HE_ENGINE.ModuleManager().Get<AssetManager::AssetManagerModule>();
             pAssetManagerModule->SetCurrentDir(HE_STR_TEXT("Assets"));
@@ -25,8 +23,7 @@ TEST_CASE("Localization Module Text")
                 pLocateModule->Text(HE_STR_TEXT("JP"), HE_STR_TEXT("debug"),
                                     HE_STR_TEXT("TitleLevelName"));
 
-            CHECK(Core::Common::g_szTempFixedString1024 == HE_STR_TEXT("タイトル"));
-
+            EXPECT_TRUE(Core::Common::g_szTempFixedString1024 == HE_STR_TEXT("タイトル"));
             return TRUE;
         });
 }
