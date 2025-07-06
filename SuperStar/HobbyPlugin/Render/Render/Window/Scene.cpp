@@ -22,7 +22,7 @@ namespace Render
         HE_SAFE_DELETE_UNIQUE_PTR(this->_upSt);
     }
 
-    const Render::Prticle::Blob& SceneViewBase::GetPrticle(const Core::Common::Handle in_handle)
+    const Render::Particle::Blob& SceneViewBase::GetPrticle(const Core::Common::Handle in_handle)
     {
         return *(this->_runtimePoolPrticleBlob.Ref(in_handle));
     }

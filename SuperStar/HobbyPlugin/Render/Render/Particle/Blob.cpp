@@ -2,7 +2,7 @@
 
 #include "./../Command/Command.h"
 
-namespace Render::Prticle
+namespace Render::Particle
 {
     Blob::Blob(Core::Common::Handle in_renderHandle,
                Core::Memory::UniquePtr<CreateFunctionType> in_upCreateFunc,
@@ -61,4 +61,4 @@ namespace Render::Prticle
         // TODO: パーティクルの色を書き込む
     }
 
-}  // namespace Render::Prticle
+}  // namespace Render::Particle
