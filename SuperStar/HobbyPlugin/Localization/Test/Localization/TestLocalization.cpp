@@ -33,6 +33,6 @@ namespace Localization
 
         EXPECT_TRUE(Core::Common::g_szTempFixedString1024 == HE_STR_TEXT("タイトル"));
 
-        EXPECT_TRUE(moduleManager.Release(), TRUE);
+        EXPECT_TRUE(moduleManager.Release());
     }
 }  // namespace Localization
