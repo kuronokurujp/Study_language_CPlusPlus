@@ -3,6 +3,12 @@ NOTICES
 This repository incorporates material as listed below or described in the code.
 
 ---------------------------------------------------------
+GoogleTest - Google Testing and Mocking Framework
+
+https://github.com/google/googletest
+
+BSD-3-Clause license
+
 Copyright 2008, Google Inc.
 All rights reserved.
 
