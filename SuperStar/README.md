@@ -36,7 +36,7 @@
 
 | Name                                                                      | Version | 用途                       |
 | ------------------------------------------------------------------------- | ------- | -------------------------- |
-| [Catch2](https://github.com/catchorg/Catch2)                              | 2.13.10 | コードの単体テスト         |
+| [gtest](https://github.com/google/googletest)                               | 1.17.0  | コードの単体テスト         |
 | [SDL2](https://www.libsdl.org/index.php)                                  | 2.30.9  | プラットフォームライブラリ |
 | [tomlplusplus](https://github.com/marzer/tomlplusplus?tab=readme-ov-file) | 3.4.0   | toml ファイル制御          |
 | [simdjson](https://github.com/simdjson/simdjson)                          | 3.9.4   | json ファイル制御          |
