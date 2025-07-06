@@ -186,7 +186,7 @@ namespace Render
 
         // パーティクル描画ハンドルを生成
         auto upCreateParticlaHandler =
-            HE_MAKE_CUSTOM_UNIQUE_PTR((Render::Prticle::Blob::CreateFunctionType),
+            HE_MAKE_CUSTOM_UNIQUE_PTR((Render::Particle::Blob::CreateFunctionType),
                                       [this](HE::Uint32 in_uCount)
                                       {
                                           auto pPlatform =
@@ -195,7 +195,7 @@ namespace Render
                                       });
 
         auto upDeleteParticleHandler =
-            HE_MAKE_CUSTOM_UNIQUE_PTR((Render::Prticle::Blob::DeleteFunctionType),
+            HE_MAKE_CUSTOM_UNIQUE_PTR((Render::Particle::Blob::DeleteFunctionType),
                                       [this](Core::Common::Handle in_rHandle)
                                       {
                                           auto pPlatform =
@@ -204,7 +204,7 @@ namespace Render
                                       });
 
         auto upPositionHandler = HE_MAKE_CUSTOM_UNIQUE_PTR(
-            (Render::Prticle::Blob::PositionFunctionType),
+            (Render::Particle::Blob::PositionFunctionType),
             [this](const Core::Common::Handle in_handle,
                    const Core::Common::ArrayBase<Core::Math::Vector3>& in_arPosition)
             {
@@ -213,7 +213,7 @@ namespace Render
             });
 
         auto upVelocityHandler = HE_MAKE_CUSTOM_UNIQUE_PTR(
-            (Render::Prticle::Blob::VelocityFunctionType),
+            (Render::Particle::Blob::VelocityFunctionType),
             [this](const Core::Common::Handle in_handle,
                    const Core::Common::ArrayBase<Core::Math::Vector3>& in_arVelocity)
             {
@@ -221,7 +221,7 @@ namespace Render
                 pPlatform->VScreen()->VParticalSetVelocitys(in_handle, in_arVelocity);
             });
 
-        auto [handle, pBlob] = pScene->_runtimePoolPrticleBlob.Alloc<Render::Prticle::Blob>(
+        auto [handle, pBlob] = pScene->_runtimePoolPrticleBlob.Alloc<Render::Particle::Blob>(
             in_renderHandle, std::move(upCreateParticlaHandler), std::move(upDeleteParticleHandler),
             std::move(upPositionHandler), std::move(upVelocityHandler));
         this->_mParticleHandle[handle] = pBlob;
@@ -247,7 +247,7 @@ namespace Render
         pScene->_runtimePoolPrticleBlob.Free(in_rPrticleHandle, FALSE);
     }
 
-    Render::Prticle::Blob& RenderModule::GetPrticle(const Core::Common::Handle in_prticleHandle)
+    Render::Particle::Blob& RenderModule::GetPrticle(const Core::Common::Handle in_prticleHandle)
     {
         HE_ASSERT(in_prticleHandle.Null() == FALSE);
 

@@ -5,7 +5,7 @@
 #include "Engine/Math/Math.h"
 #include "Engine/MiniEngine.h"
 
-namespace Render::Prticle
+namespace Render::Particle
 {
     /// <summary>
     /// 粒子データ
@@ -73,4 +73,4 @@ namespace Render::Prticle
         Core::Memory::UniquePtr<PositionFunctionType> _upPositionFunc;
         Core::Memory::UniquePtr<VelocityFunctionType> _upVelocityFunc;
     };
-}  // namespace Render::Prticle
+}  // namespace Render::Particle

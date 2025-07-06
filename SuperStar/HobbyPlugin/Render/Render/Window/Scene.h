@@ -11,7 +11,7 @@ namespace Platform
     struct ViewPortConfig;
 }  // namespace Platform
 
-namespace Render::Prticle
+namespace Render::Particle
 {
     class Blob;
 }
@@ -28,7 +28,7 @@ namespace Render
         friend class Window;
         friend class RenderModule;
 
-        using RuntimePoolPricleBlob = Core::Common::RuntimePoolManager<Render::Prticle::Blob>;
+        using RuntimePoolPricleBlob = Core::Common::RuntimePoolManager<Render::Particle::Blob>;
 
     public:
         SceneViewBase();
@@ -37,7 +37,7 @@ namespace Render
         HE::Bool Init(Core::Memory::UniquePtr<Platform::SceneStrategyInterface>);
         void Release();
 
-        const Render::Prticle::Blob& GetPrticle(const Core::Common::Handle);
+        const Render::Particle::Blob& GetPrticle(const Core::Common::Handle);
 
     protected:
         void _Begin();

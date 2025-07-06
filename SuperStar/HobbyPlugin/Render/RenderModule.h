@@ -48,7 +48,7 @@ namespace Render
     public:
         using ViewHandleVector   = Core::Common::FixedVector<Core::Common::Handle, 32>;
         using WindowHandleKeyMap = Core::Common::FixedMap<HE::Uint64, Core::Common::Handle, 32>;
-        using ParticleBlobObject = std::tuple<Core::Common::Handle, Render::Prticle::Blob*>;
+        using ParticleBlobObject = std::tuple<Core::Common::Handle, Render::Particle::Blob*>;
 
         using OnFactoryWindowStrategyCallback =
             std::function<Core::Memory::UniquePtr<Platform::WindowStrategy>(
@@ -119,7 +119,7 @@ namespace Render
         /// <summary>
         /// 生成したパーティクルを取得
         /// </summary>
-        Render::Prticle::Blob& GetPrticle(const Core::Common::Handle);
+        Render::Particle::Blob& GetPrticle(const Core::Common::Handle);
 
         /// <summary>
         /// レンダリングするコマンド追加
@@ -165,7 +165,7 @@ namespace Render
 
         Core::Common::FixedStack<Core::Common::Handle, 32> _sStandupWindow;
         // TODO: 自前のを作ったら差し替える
-        std::unordered_map<Core::Common::Handle, Render::Prticle::Blob*> _mParticleHandle;
+        std::unordered_map<Core::Common::Handle, Render::Particle::Blob*> _mParticleHandle;
     };
 
 }  // namespace Render
