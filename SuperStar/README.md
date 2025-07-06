@@ -1,17 +1,42 @@
-# ゲーム「SuperStar」開発プロジェクト(未完成)
+> ⚠️ このリポジトリは現在開発中であり、内容は予告なく変更される場合があります。
+
+# ゲーム「SuperStar」開発プロジェクト
 
 ## 免責事項
 
 このソフトウェアの使用または使用不可によって、いかなる問題が生じた場合も、著作者はその責任を負いません。バージョンアップや不具合に対する対応の責任も負わないものとします。
 
--   update: 2024/12/05
+## 更新
+
+-   update: 2025/07/06
 -   version: 0.4.0
+
+## 開発目的
+
+-   C++を用いたゲーム開発経験を積むため
+-   自作エンジン開発の経験を積むため
+-   最新技術を試す環境づくり
+
+## 📘 目次
+
+- [ゲーム概要](#ゲーム)
+- [開発環境](#開発環境)
+- [ライブラリ一覧](#利用ライブラリ一覧)
+- [自作ツール](#自作ツール一覧)
+- [環境構築](#開発環境構築)
+- [コード整形](#コードフォーマットにclang-format-ツールを利用)
+- [モジュール追加](#モジュール追加手順)
+- [コーディング規約](#コーディング規約)
+- [トラブルシューティング](#開発時のトラブルシューティング)
+- [グラフィックスのレギュレーション](#グラフィックスのレギュレーション)
+- [参考サイト](#参考サイト)
 
 ## ゲーム
 
-| ジャンル             | 描画 |
-| -------------------- | ---- |
-| シューティングゲーム | 2D   |
+- ジャンル：2Dシューティングゲーム
+- 描画方式：OpenGLベースの2Dレンダリング
+
+[↑ 目次へ戻る](#📘-目次)
 
 ## 開発環境
 
@@ -21,7 +46,7 @@
 
 | IDE              | バージョン |
 | ---------------- | ---------- |
-| VisualStdio 2022 | 17.8.6     |
+| Visual Studio 2022 | 17.8.6     |
 
 | 言語 | バージョン |
 | ---- | ---------- |
@@ -29,8 +54,10 @@
 
 | ツール                                                                | バージョン | 説明                                               |
 | --------------------------------------------------------------------- | ---------- | -------------------------------------------------- |
-| [CMake](https://cmake.org/)                                           | 3.30.0     | プロジェクト構築に利用                             |
+| [cmake](https://cmake.org/)                                           | 3.30.0     | プロジェクト構築に利用                             |
 | [vcpkg](https://learn.microsoft.com/ja-jp/vcpkg/get_started/overview) | ---        | プロジェクトで利用する C/C++ライブラリの管理に利用 |
+
+[↑ 目次へ戻る](#📘-目次)
 
 ## 利用ライブラリ一覧
 
@@ -43,26 +70,27 @@
 | [pugixml](https://github.com/simdjson/simdjson)                           | 1.14    | xml ファイル制御           |
 | [Lua](https://www.lua.org/lua-l.html)                                     | 5.4.7   | lua スクリプト活用         |
 
+
+[↑ 目次へ戻る](#📘-目次)
+
 ## 自作ツール一覧
 
 | Name                                                                                           | Version | 説明                     |
 | ---------------------------------------------------------------------------------------------- | ------- | ------------------------ |
 | [GameDataMaker](https://github.com/kuronokurujp/Stduy_language_Python/tree/main/GameDataMaker) | v0.0.1  | ゲームのパラメータ生成   |
-| [FontConveter](https://github.com/kuronokurujp/Stduy_language_Python/tree/main/FontConverter)  | v0.0.1  | ゲームで使うフォント生成 |
+| [FontConverter](https://github.com/kuronokurujp/Stduy_language_Python/tree/main/FontConverter)  | v0.0.1  | ゲームで使うフォント生成 |
 
-## 開発目的
+[↑ 目次へ戻る](#📘-目次)
 
--   C++で利用したゲーム開発経験を詰むため
--   エンジン開発経験を詰むため
--   最新技術を試す環境づくり
+## 開発環境構築
 
-## 開発環境構築手順
+### 環境作成
 
 1. window パッケージ管理ソフト[chocolate](https://chocolatey.org/)をインストール
 
     - 参考サイト
-        - [【絶対わかる】Windows へ Chocolatey のインストール方法と使い方](https://www.geeklibrary.jp/counter-attack/chocolatey/)
-        - [Chocolatey とは、Windows 用のパッケージ管理システムの概要と特徴](https://www.issoh.co.jp/tech/details/3520/)
+        - [【絶対わかる】Windows へ chocolatey のインストール方法と使い方](https://www.geeklibrary.jp/counter-attack/chocolatey/)
+        - [chocolatey とは、Windows 用のパッケージ管理システムの概要と特徴](https://www.issoh.co.jp/tech/details/3520/)
 
 1. EnvBuild.bat を実行
 
@@ -73,26 +101,26 @@
         - chocolate でソフトウェアをインストールするのでバッチファイルは管理者権限で実行してください
 
     - chocolate を使って以下のソフトウェアをインストール
-        - CMake
+        - cmake
         - Visual Studio 2022 Community
-        - Git
+        - git
 
-## 構築した開発環境削除
+### 環境削除
 
 1. EnvClean.bat を実行
 
     - 注意点
         - chocolate でインストールした以下のソフトウェアは継続利用される可能性があるのでアンインストールしません<br>
           必要がなければ申し訳ございませんが、<br>手動アンインストールをしてください。
-            - CMake
+            - cmake
             - Visual Studio 2022 Community
-            - Git
+            - git
     - chocolate でインストールしたソフトウェアをアンインストール方法の参考サイト
-        - [Chocolatey とは、Windows 用のパッケージ管理システムの概要と特徴](https://www.issoh.co.jp/tech/details/3520/)
+        - [chocolatey とは、Windows 用のパッケージ管理システムの概要と特徴](https://www.issoh.co.jp/tech/details/3520/)
 
-## VS2022 プロジェクト作成手順
+### VS2022 プロジェクト作成手順
 
-1. ProjBuild.bat ファイルを実行
+1. **ProjBuild.bat** ファイルを実行
 1. コマンドプロンプトに"All Complete"が表示したら Build ディレクトリが作られているので,<br>
    その中の SuperStar.sln ファイルがあるので開く
 
@@ -100,73 +128,68 @@
     - Visual Studio 2022 Communityを更新したば場合<br>
       ProjClear.batを実行
       - 理由
-        - Visual Studioの古いバージョンでビルドしたのが残っていると更新したバージョンとの違いでProBuild.batが失敗する
+        - Visual Studioの古いバージョンでビルドしたのが残っていると更新したバージョンとの違いでProjBuild.batが失敗する
 
-## clang-format ツールで c++コード整形の環境構築手順
+[↑ 目次へ戻る](#📘-目次)
 
-#### ツール環境構築
+## コードフォーマットにclang-format ツールを利用
+
+### ツール環境構築
 
 1. インストール
 
-    - VisualStudio2022
-        - インストール時に自動整形ツール clang-format.exe / clang-tidy.exe が入っているのでツールインストールは不要
+    - Visual Studio 2022
+        - インストール時に自動フォーマットツール clang-format.exe / clang-tidy.exe が入っているのでツールインストールは不要
         - clang-format.exe がある場所
-            - [VisualStudio2022 のインストールフォルダ]\VC\Tools\Llvm\bin\clang-format.exe
+            - [Visual Studio 2022 のインストールフォルダ]\VC\Tools\Llvm\bin\clang-format.exe
         - clang-tidy.exe がある場所
-            - [VisualStudio2022 のインストールフォルダ]\VC\Tools\Llvm\bin\clang-tidy.exe
-    - CMake
-        - VS2022 のプロジェクト作成に使う
+            - [Visual Studio 2022 のインストールフォルダ]\VC\Tools\Llvm\bin\clang-tidy.exe
+    - cmake
+        - Visual Studio 2022 のプロジェクト作成に使う
         - [インストール先](https://cmake.org/download/)
         - 項目 **Windows x64 Installer:** のインストーラーをダウンロード
         - [参考となるインストール方法](https://qiita.com/matskeng/items/c466c4751e1352f97ce6)
 
-#### コード整形内容をファイルに記述
-
-1. プロジェクトのルートディレクトリにある.clang-format ファイルを編集
+1. 必要であればプロジェクトのルートディレクトリにある.clang-format ファイルを編集
     - どういった編集をするのかは以下のサイトが参考になる
         - [公式ドキュメント](https://clang.llvm.org/docs/ClangFormatStyleOptions.html)
         - [Clang-Format の書式について](https://qiita.com/koyukitukimino/items/9b8f74d1ae307a7017d3)
 
-#### どういった整形内容になっているか
-
--   ファイルの改行コードを LF に統一
--   インデントはスペース
-
-## コード整形方法
+### clang-formatでのコードフォーマット方法
 
 -   手動
 
     ※注意点<br>
-    サードパーティーのコードを整形してはいけない
+    サードパーティーのコードをフォーマットしてはいけない
 
-    1.  VisualStdio2022 のエディターで整形したいファイルを開く
+    1.  Visual Studio 2022 のエディターでフォーマットしたいファイルを開く
     1.  「編集」-> 「詳細」->「ドキュメントのフォーマット」をクリック<br>
         <img width="480" alt="" src="https://github.com/user-attachments/assets/b15b0975-066d-42bb-a886-c3fb318920d7" /><br>
 
--   バッチファイルで一括整形
+-   バッチファイルで一括フォーマット
 
     1. HobbyEngine/Tool/CodeCleanup.bat を実行
 
-        - 例: CodeClenupSample ディレクトリ内の cpp/h/hpp ファイルを全て自動整形
+        - 例: CodeCleanupSample ディレクトリ内の cpp/h/hpp ファイルを全て自動フォーマット
 
             ```
-            >CodeCleanup.bat CodeClenaupSample\
+            >CodeCleanup.bat CodeCleanupSample\
             ```
 
             末尾に\をつけないとディレクトリとして認識されないので注意
 
-## 自動整形の非対象ディレクトリ
+### clang-formatでのフォーマットルール
 
-```
-OSS のライブラリなどサードパーティーのコードは ThirdParty ディレクトリに収めて自動整形しないようにしている
-```
+-   ファイルの改行コードを LF に統一
+-   インデントはスペース
+-   OSS のライブラリなどサードパーティーのコードは ThirdParty ディレクトリに収めて自動フォーマットしないようにしている
 
-#### 自動整形の非対象ディレクトリの作成手順
+### 自動フォーマットの非対象ディレクトリの作成手順
 
 1. ThirdParty ディレクトリを作成
-1. 自動整形したくないファイルを ThirdParty ディレクトリに入れる
+1. 自動フォーマットしたくないファイルを ThirdParty ディレクトリに入れる
 
-#### 自動整形にしない理由
+#### 自動フォーマットにしない理由
 
 1. OSS ライセンスには以下のタイプがある
 
@@ -175,11 +198,13 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
 
     ```
     上記タイプのOSSだとソース改変すると公開義務が発生
-    自動整形してしまうとソース改変して公開義務が発生してしまう
-    なので自動整形しないようにしてソース改変を防いでいる
+    自動フォーマットしてしまうとソース改変して公開義務が発生してしまう
+    なので自動フォーマットしないようにしてソース改変を防いでいる
     ```
 
-2. 自動整形することでコンパイルが通らない可能性をつぶすため
+2. 自動フォーマットすることでコンパイルが通らない可能性をつぶすため
+
+[↑ 目次へ戻る](#📘-目次)
 
 ## モジュール追加手順
 
@@ -192,14 +217,26 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
         - [vcpkg.json の書き方](https://learn.microsoft.com/ja-jp/vcpkg/reference/vcpkg-json)
         - 注意点
             - "builtin-baseline"項目は記述しないでください。
-    1. CMakeLists.txt に vcpkg でインストールしたパッケージを使えるように記述
-        - CMakeLists.txt にはスケルトンコードがあるでそれを書き換える
+    1. cmakeLists.txt に vcpkg でインストールしたパッケージを使えるように記述
+        - cmakeLists.txt にはスケルトンコードがあるでそれを書き換える
+
+[↑ 目次へ戻る](#📘-目次)
 
 ## コーディング規約
 
 ### 目的
 
 **コードを読むだけで処理内容を考えずに理解できるようにするため**
+
+### HE::接頭語
+
+開発の一貫した型表記と、標準型との混同を避けるため、<br>
+基本的な型に対して **HE::** 名前空間を付与した型エイリアスの定義
+
+- 利点:
+    - SDL2 や標準C++ライブラリと名前と衝突対応
+    - 型名を見ただけで、ゲーム固有かの判別
+    - 型定義を切り替えても影響範囲を小さく
 
 ### 変数名
 
@@ -228,8 +265,8 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
     |HE::Char[] or Char\* or std::string などの文字列|sz||
     |ポインタ|p|p の前後に型記号はいれない|
     |参照|r||
-    |std::shared*ptr|sp||
-    |std::unique_ptr*ptr|up||
+    |Core::Memory::SharedPtr|sp||
+    |Core::Memory::UniquePtr|up||
     |配列 または配列機能を持つクラス|a||
     |std::vector または 同様の機能を持つクラス|v||
     |std::list または 同様の機能を持つクラス|lst||
@@ -375,8 +412,8 @@ OSS のライブラリなどサードパーティーのコードは ThirdParty �
     obj.~Object();
     ```
 
-しかしデストラクタはクラスの破棄タイミングで呼ばれるのが仕様なので、
-任意で実行すると意図しないバグを起こすので使用してはいけない
+しかしデストラクタはクラスの破棄タイミングで呼ばれるのが仕様なので、<br>
+オブジェクトのライフサイクルを壊し、未定義動作の原因となるので使用してはいけない。
 
 ### ファイル名 / ディレクトリ名
 
@@ -429,27 +466,31 @@ TaskManager.hpp
 
     ヘッダーファイルにインクルードしてかつそのヘッダーファイルが他プラグインでインクルードされると他プラグインでサードパーティーの機能が利用できてしまうから
 
-## 注意点
+### 1つのcppファイルの全域で利用する変数や関数はLocalというnamespaceでくくる
+#### なぜ?
+    関数内のローカル変数 / static変数を見た目で区別するため
 
--   git の無視ファイルに Debug ディレクトリを指定しているのでディレクトリ名に Debug を使ってはいけない
+[↑ 目次へ戻る](#📘-目次)
 
-# 開発時のトラブルシューティング
+## 開発時のトラブルシューティング
 
-1. char 型配列に入れた UTF8 エンコードの日本語文字列を VisualStudio2022 のデバッガーで確認したら文字列が文字化け
+1. char 型配列に入れた UTF8 エンコードの日本語文字列を **Visual Studio 2022** のデバッガーで確認したら文字列が文字化け
     - 以下のサイトの説明通り対応したら解決した
         - https://qiita.com/m_nai/items/645c7836db27f6d2b436
-    - サイトの説明では VSCode 上での出来事だったが, VisualStudio2022 通用した
+    - サイトの説明では VSCode 上での出来事だったが, **Visual Studio 2022** 通用した
 
-# グラフィックスのレギュレーション
+[↑ 目次へ戻る](#📘-目次)
 
-## 座標系や原点位置の表
+## グラフィックスのレギュレーション
+
+### 座標系や原点位置の表
 | 座標系                | 原点 |  X軸|    Y軸|   Z軸|補足|
 | -------------------- | ---- |---- | ----  | ---- |---- |
 | 2D | 画面の中央 (0, 0)   |左方向: - / 右方向: +|上方向: + / 下方向: -| --- |OpenGLを使うので右手座標系|
 | 3D | 画面の中央 (0, 0)   |左方向: - / 右方向: +|上方向: + / 下方向: -|奥方向: - / 手前方向: +|OpenGLを使うので右手座標系|
 | 数学ライブラリ | 画面の中央 (0, 0)   |左方向: - / 右方向: +|上方向: + / 下方向: -| 奥方向: - / 手前方向: +|矩形など座標計算は右手座標系で原点中央で行う. |
 
-## 座標系や原点位置の命名規則
+### 座標系や原点位置の命名規則
 |             | 略語 |
 | -------------------- | ---- |
 | 右手座標系 | R |
@@ -465,45 +506,57 @@ TaskManager.hpp
     }
     ```
 
+[↑ 目次へ戻る](#📘-目次)
 
-# 参考サイト
+## 注意点
 
-## chocolate(windows のパッケージ管理ツール)
+-   git の無視ファイルに Debug ディレクトリを指定しているのでディレクトリ名に Debug を使ってはいけない
 
--   [【絶対わかる】Windows へ Chocolatey のインストール方法と使い方](https://www.geeklibrary.jp/counter-attack/chocolatey/)
--   [Chocolatey とは、Windows 用のパッケージ管理システムの概要と特徴](https://www.issoh.co.jp/tech/details/3520/)
+[↑ 目次へ戻る](#📘-目次)
 
-## vcpkg
+## 参考サイト
+
+### chocolate(windows のパッケージ管理ツール)
+
+-   [【絶対わかる】Windows へ chocolatey のインストール方法と使い方](https://www.geeklibrary.jp/counter-attack/chocolatey/)
+-   [chocolatey とは、Windows 用のパッケージ管理システムの概要と特徴](https://www.issoh.co.jp/tech/details/3520/)
+
+### vcpkg
 
 -   [vcpkg 公式ドキュメント](https://learn.microsoft.com/ja-jp/vcpkg/)
 -   [vcpkg が取り扱っているライブラリの検索サイト](https://vcpkg.link/)
 -   [vcpkg.json の書き方](https://learn.microsoft.com/ja-jp/vcpkg/reference/vcpkg-json)
 
-## Git
+### git
 
--   [Git で管理しているソースの改行コード対応](https://zenn.dev/gekal/articles/git-line-endings-practices)
+-   [git で管理しているソースの改行コード対応](https://zenn.dev/gekal/articles/git-line-endings-practices)
 
-## CMake
+### cmake
 
--   [C/C++プロジェクトを CMake でビルドする](https://qiita.com/Hiroya_W/items/049bfb4c6ad3dfe6ff0c)
-    -   CMake を使ってプロジェクトを構築方法をシンプルに記載している
+-   [C/C++プロジェクトを cmake でビルドする](https://qiita.com/Hiroya_W/items/049bfb4c6ad3dfe6ff0c)
+    -   cmake を使ってプロジェクトを構築方法をシンプルに記載している
     -   初心者におすすめ
--   [CMake 再入門メモ](https://zenn.dev/rjkuro/articles/054dab5b0e4f40)
-    -   CMake の基本機能説明をしている
+-   [cmake 再入門メモ](https://zenn.dev/rjkuro/articles/054dab5b0e4f40)
+    -   cmake の基本機能説明をしている
     -   初心者におすすめ
--   [CMake: キャッシュ変数と環境変数](https://qiita.com/mrk_21/items/186439952a6665184444)
+-   [cmake: キャッシュ変数と環境変数](https://qiita.com/mrk_21/items/186439952a6665184444)
     -   グローバル変数のようなもの
-    -   複数の CMakeLists.txt から変数を参照できた
--   [Visual Studio 向けに使う CMake](https://hikita12312.hatenablog.com/entry/2018/09/13/101924)
+    -   複数の cmakeLists.txt から変数を参照できた
+-   [Visual Studio 向けに使う cmake](https://hikita12312.hatenablog.com/entry/2018/09/13/101924)
 
-    -   VS のプリコンパイル済みのヘッダーファイルを CMake で作成する方法
+    -   VS のプリコンパイル済みのヘッダーファイルを cmake で作成する方法
 
--   [Visual Studio ユーザーに送る CMake テクニック ☆ (1)](https://elda27.hatenablog.com/entry/2016/11/29/235301)
-    -   VS2022 プロジェクトのフィルタリングを CMake で作成する方法
+-   [Visual Studio ユーザーに送る cmake テクニック ☆ (1)](https://elda27.hatenablog.com/entry/2016/11/29/235301)
+    -   VS2022 プロジェクトのフィルタリングを cmake で作成する方法
     -   プロジェクトのファイルを整理して見やすくするために必要
 
-## Lua
+### Lua
 
 -   [Lua5.4 リファレンスマニュアル(日本語版)](https://inzkyk.xyz/lua_5_4/#gsc.tab=0)
 
+[↑ 目次へ戻る](#📘-目次)
+
 ## 参考書籍
+
+[↑ 目次へ戻る](#📘-目次)
+
