@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
+﻿#include <gtest/gtest.h>
 
+#include "Engine/MiniEngine.h"
 #include "LuaModule.h"
 
 namespace Lua
@@ -17,28 +18,30 @@ namespace Lua
 
         EXPECT_EQ(spLuaModule->RegistScriptFunc(luaHandle, HE_STR_TEXT("NativeFunc")), TRUE);
 
-        bool       called = false;
+        HE::Bool bCalled = FALSE;
         LuaFuncData result{};
         {
-            auto upFunc = HE_MAKE_CUSTOM_UNIQUE_PTR((Core::Common::FunctionObject<void, LuaFuncData&>),
-                                                   [&called, &result](LuaFuncData& d) {
-                                                       called = true;
-                                                       result = d;
-                                                   });
+            auto upFunc =
+                HE_MAKE_CUSTOM_UNIQUE_PTR((Core::Common::FunctionObject<void, LuaFuncData&>),
+                                          [&bCalled, &result](LuaFuncData& d)
+                                          {
+                                              bCalled = TRUE;
+                                              result  = d;
+                                          });
             spLuaModule->AddListenerLuaFunc(std::move(upFunc));
         }
 
-        const HE::Char* script = HE_STR_TEXT(
+        const HE::Char* szScript = HE_STR_TEXT(
             "function LuaEntry()\n"
             "    NativeFunc(11, \"hello\")\n"
             "end\n");
 
-        EXPECT_EQ(spLuaModule->LoadScriptText(luaHandle, script), TRUE);
+        EXPECT_EQ(spLuaModule->LoadScriptText(luaHandle, szScript), TRUE);
         EXPECT_EQ(spLuaModule->CallScriptFunc(luaHandle, HE_STR_TEXT("LuaEntry")), TRUE);
 
         moduleManager.LateUpdate(0.0f);
 
-        EXPECT_EQ(called, true);
+        EXPECT_EQ(bCalled, TRUE);
         EXPECT_EQ(HE_STR_CMP(result.szFuncName, HE_STR_TEXT("NativeFunc")), 0);
         EXPECT_EQ(result.uArgCount, 2u);
         EXPECT_EQ(result.aArg[0].eValType, Lua::ELuaFuncArgType_Uint64);
@@ -50,4 +53,3 @@ namespace Lua
         EXPECT_EQ(moduleManager.Release(), TRUE);
     }
 }  // namespace Lua
-
