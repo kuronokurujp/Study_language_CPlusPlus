@@ -41,7 +41,7 @@ namespace Platform
         this->_mRender.Clear();
     }
 
-    void ViewPortStrategy::Render()
+    void ViewPortStrategy::Draw()
     {
         // レンダリング前
         this->_VBeginRender();
@@ -49,7 +49,7 @@ namespace Platform
         // TODO: シーンのレンダリング
         for (auto it = this->_mSceneSt.Begin(); it != this->_mSceneSt.End(); ++it)
         {
-            it->_data->VRender();
+            it->_data->VRenderScreen();
         }
 
         // レンダリング後

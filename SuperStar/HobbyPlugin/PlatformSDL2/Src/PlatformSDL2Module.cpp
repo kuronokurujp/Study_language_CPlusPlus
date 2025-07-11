@@ -4,7 +4,7 @@
 #include "PlatformSDL2/SDL2File.h"
 #include "PlatformSDL2/SDL2Font.h"
 #include "PlatformSDL2/SDL2Input.h"
-#include "PlatformSDL2/SDL2Screen.h"
+#include "PlatformSDL2/SDL2Graphic.h"
 #include "PlatformSDL2/SDL2System.h"
 #include "PlatformSDL2/SDL2Time.h"
 
@@ -39,8 +39,8 @@ namespace PlatformSDL2
             return FALSE;
         }
 
-        auto pScreen = reinterpret_cast<PlatformSDL2::Screen*>(this->_spScreen.get());
-        if (pScreen->IsMainWindowActive())
+        auto pGraphic = reinterpret_cast<PlatformSDL2::Graphic*>(this->_spGraphic.get());
+        if (pGraphic->IsMainWindowActive())
         {
             // メインスクリーンは終了状態ではない
             // ここでTRUEを返すとエンジンが終了してしまう
@@ -103,7 +103,7 @@ namespace PlatformSDL2
             this->_spTime   = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Time));
             this->_spInput  = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Input));
             this->_spFile   = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::File));
-            this->_spScreen = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Screen),
+            this->_spGraphic = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::Graphic),
                                                         [this]() { return this->_spFont.get(); },
                                                         [this]() { return this->_spInput.get(); });
             this->_spSysmte = HE_MAKE_CUSTOM_SHARED_PTR((::PlatformSDL2::System));
@@ -170,8 +170,8 @@ namespace PlatformSDL2
 
         if (this->_bMainWindowInitialized)
         {
-            auto pScreen = reinterpret_cast<PlatformSDL2::Screen*>(this->_spScreen.get());
-            if (pScreen->IsMainWindowActive())
+            auto pGraphic = reinterpret_cast<PlatformSDL2::Graphic*>(this->_spGraphic.get());
+            if (pGraphic->IsMainWindowActive())
             {
                 this->_bMainWindowInitialized = TRUE;
             }

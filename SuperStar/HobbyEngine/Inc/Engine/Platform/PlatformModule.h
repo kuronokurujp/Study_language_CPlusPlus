@@ -8,7 +8,7 @@
 #include "Engine/Platform/PlatformFile.h"
 #include "Engine/Platform/PlatformFont.h"
 #include "Engine/Platform/PlatformInput.h"
-#include "Engine/Platform/PlatformScreen.h"
+#include "Engine/Platform/PlatformGraphic.h"
 #include "Engine/Platform/PlatformSystem.h"
 #include "Engine/Platform/PlatformTime.h"
 
@@ -51,7 +51,7 @@ namespace Platform
         /// <summary>
         /// スクリーン関連
         /// </summary>
-        Core::Memory::SharedPtr<Platform::ScreenInterface> Screen() { return this->_spScreen; }
+        Core::Memory::SharedPtr<Platform::GraphicInterface> Graphic() { return this->_spGraphic; }
 
         /// <summary>
         /// システム関連
@@ -70,7 +70,6 @@ namespace Platform
         virtual HE::Bool VIsQuit() = 0;
 
     protected:
-
         /// <summary>
         /// モジュールの解放
         /// インスタンス破棄時に呼ばれる
@@ -91,7 +90,7 @@ namespace Platform
         Core::Memory::SharedPtr<Platform::TimeInterface> _spTime;
         Core::Memory::SharedPtr<Platform::InputInterface> _spInput;
         Core::Memory::SharedPtr<Platform::FileInterface> _spFile;
-        Core::Memory::SharedPtr<Platform::ScreenInterface> _spScreen;
+        Core::Memory::SharedPtr<Platform::GraphicInterface> _spGraphic;
         Core::Memory::SharedPtr<Platform::SystemInterface> _spSysmte;
         Core::Memory::SharedPtr<Platform::FontInterface> _spFont;
     };

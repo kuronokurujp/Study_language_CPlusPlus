@@ -3,7 +3,7 @@
 #include "Engine/Common/PoolManager.h"
 #include "Engine/Math/Math.h"
 #include "Engine/MiniEngine.h"
-#include "Engine/Platform/Screen/Render.h"
+#include "Engine/Platform/Graphic/Drawable.h"
 
 namespace Platform
 {
@@ -21,17 +21,24 @@ namespace PlatformSDL2
     class ParticleMesh;
 
     /// <summary>
-    /// SDL2レンダリング
+    /// 2Dの描画
     /// </summary>
-    class DefaultRender : public Platform::RenderInterface
+    class Drawable2D : public Platform::Drawable2DInterface
     {
-        HE_GENERATED_CLASS_BODY_HEADER(DefaultRender, Platform::RenderInterface);
+        HE_GENERATED_CLASS_BODY_HEADER(Drawable2D, Platform::Drawable2DInterface);
 
     public:
-        DefaultRender();
+        Drawable2D();
 
         void VBegin() override final;
         void VEnd() override final;
+
+        void VPreDraw() override final;
+        void VPostDraw() override final;
+
+        void VSetViewSize(const HE::Float32 in_fW, const HE::Float32 in_fH) override final;
+
+        void SetFont(Core::Memory::SharedPtr<Platform::FontInterface>);
 
         /// <summary>
         /// 指定された数のパーティクルを作成
@@ -57,16 +64,15 @@ namespace PlatformSDL2
         void Cls(const HE::Uint32 in_uR, const HE::Uint32 in_uG, const HE::Uint32 in_uB);
 
         // パーティクルの描画
-        void Draw2DPartical(const Platform::SceneConfig&, const Core::Common::Handle,
-                            const Core::Math::Vector3&);
+        void Draw2DPartical(const Core::Common::Handle, const Core::Math::Vector3&);
 
         /// <summary>
         /// 2Dのテキスト描画
         /// </summary>
-        void Draw2DText(const Platform::SceneConfig&, Platform::FontInterface* in_pFont,
-                        const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAnchor,
-                        const HE::Char* in_szText, const HE::Uint32 in_uTextSize,
-                        const HE::Uint32 in_uSpace, const Core::Math::Color);
+        void Draw2DText(const Core::Math::Vector2& in_rPos,
+                        const Core::Math::EAnchor in_eAnchor, const HE::Char* in_szText,
+                        const HE::Uint32 in_uTextSize, const HE::Uint32 in_uSpace,
+                        const Core::Math::Color);
 
         /// <summary>
         /// 2Dの矩形描画
@@ -74,21 +80,19 @@ namespace PlatformSDL2
         /// 矩形のアンカーは中央を基準にしている
         /// パラメータで矩形のアンカーを変える事が出来る
         /// </summary>
-        void Draw2DQuad(const Platform::SceneConfig&, const Core::Math::RC::Rect2D& in_rRect2D,
-                        Core::Math::EAnchor in_eAnchor, const Core::Math::Color);
+        void Draw2DQuad(const Core::Math::RC::Rect2D& in_rRect2D, Core::Math::EAnchor in_eAnchor,
+                        const Core::Math::Color);
 
         /// <summary>
         /// 2Dの円描画
         /// </summary>
-        void Draw2DCircle(const Platform::SceneConfig& in_rViewConfig,
-                          const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAchor,
+        void Draw2DCircle(const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAchor,
                           const HE::Float32 in_fSize, const Core::Math::Color);
 
         /// <summary>
         /// 2Dの三角形描画
         /// </summary>
-        void Draw2DTriangle(const Platform::SceneConfig& in_rViewConfig,
-                            const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAchor,
+        void Draw2DTriangle(const Core::Math::Vector2& in_rPos, const Core::Math::EAnchor in_eAchor,
                             const HE::Float32 in_rAngleDegress, const HE::Float32 in_fSize,
                             const Core::Math::Color);
 
@@ -112,6 +116,9 @@ namespace PlatformSDL2
         void* _pParticleMat = NULL;
         PoolParticleMesh _poolParticleMesh;
         CatchParticleMeshHandleVector _vCatchParticleMeshHandle;
+
+        Core::Math::Vector2 _viewSize;
+        Core::Memory::SharedPtr<Platform::FontInterface> _spFont = NULL;
 
         HE::Bool _bBegin = FALSE;
     };

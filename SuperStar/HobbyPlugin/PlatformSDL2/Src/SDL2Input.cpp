@@ -1,6 +1,6 @@
 ﻿#include "PlatformSDL2/SDL2Input.h"
 
-#include "Engine/Platform/PlatformScreen.h"
+#include "Engine/Platform/PlatformGraphic.h"
 #include "SDL2/SDL.h"
 
 // DxLib用の入力システムの実装

@@ -3,8 +3,8 @@
 namespace Platform
 {
     SceneStrategy::SceneStrategy(const SceneConfig& in_rConfig,
-                                 Core::Memory::SharedPtr<RenderInterface> in_spRenderInterface,
-                                 EventRender in_eventRender)
+                                 Core::Memory::SharedPtr<DrawableInterface> in_spRenderInterface,
+                                 EventDrawable in_eventRender)
     {
         this->_config = in_rConfig;
         this->_eventRender = std::move(in_eventRender);

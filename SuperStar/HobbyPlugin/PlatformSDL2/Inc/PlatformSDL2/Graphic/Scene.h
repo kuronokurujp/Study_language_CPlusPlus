@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Engine/MiniEngine.h"
-#include "Engine/Platform/PlatformScreen.h"
+#include "Engine/Platform/PlatformGraphic.h"
 
 namespace PlatformSDL2
 {

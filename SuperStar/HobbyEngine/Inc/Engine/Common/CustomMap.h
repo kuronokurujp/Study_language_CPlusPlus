@@ -193,6 +193,7 @@ namespace Core::Common
 
         /// <summary>
         /// キーからデータ検索
+        /// FindKeyだとキーを見つけるという意味になるので変える
         /// </summary>
         Iterator FindKey(const TKey& in_trKey) const
         {
@@ -214,6 +215,7 @@ namespace Core::Common
 
         /// <summary>
         /// データからキー検索
+        /// FindDataだとデータを見つけるという意味になるので変える
         /// </summary>
         Iterator FindData(const TData& in_rData)
         {

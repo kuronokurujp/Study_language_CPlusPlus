@@ -14,18 +14,18 @@ set(PLUGIN_PLATFORMSDL2_TARGET_INC_FILES
     Inc/PlatformSDL2/SDL2File.h
     Inc/PlatformSDL2/SDL2Font.h
     Inc/PlatformSDL2/SDL2Input.h
-    Inc/PlatformSDL2/SDL2Screen.h
+    Inc/PlatformSDL2/SDL2Graphic.h
     Inc/PlatformSDL2/SDL2System.h
     Inc/PlatformSDL2/SDL2Time.h
 
-    Inc/PlatformSDL2/Screen/Window.h
-    Inc/PlatformSDL2/Screen/ViewPort.h
-    Inc/PlatformSDL2/Screen/Scene.h
-    Inc/PlatformSDL2/Screen/Render.h
+    Inc/PlatformSDL2/Graphic/Frame.h
+#    Inc/PlatformSDL2/Graphic/ViewPort.h
+#    Inc/PlatformSDL2/Graphic/Scene.h
+    Inc/PlatformSDL2/Graphic/Drawable2D.h
 
-    Inc/PlatformSDL2/Screen/Draw/Material.h
-    Inc/PlatformSDL2/Screen/Draw/Mesh.h
-    Inc/PlatformSDL2/Screen/Draw/Texture.h
+    Inc/PlatformSDL2/Graphic/Draw/Material.h
+    Inc/PlatformSDL2/Graphic/Draw/Mesh.h
+    Inc/PlatformSDL2/Graphic/Draw/Texture.h
 )
 
 set(PLUGIN_PLATFORMSDL2_TARGET_SRC_FILES
@@ -34,17 +34,17 @@ set(PLUGIN_PLATFORMSDL2_TARGET_SRC_FILES
     Src/SDL2File.cpp
     Src/SDL2Font.cpp
     Src/SDL2Input.cpp
-    Src/SDL2Screen.cpp
+    Src/SDL2Graphic.cpp
     Src/SDL2System.cpp
     Src/SDL2Time.cpp
 
-    Src/Screen/Window.cpp
-    Src/Screen/ViewPort.cpp
-    Src/Screen/Scene.cpp
-    Src/Screen/Render.cpp
-    Src/Screen/Draw/Material.cpp
-    Src/Screen/Draw/Mesh.cpp
-    Src/Screen/Draw/Texture.cpp
+    Src/Graphic/Frame.cpp
+#    Src/Graphic/ViewPort.cpp
+#    Src/Graphic/Scene.cpp
+    Src/Graphic/Drawable2D.cpp
+    Src/Graphic/Draw/Material.cpp
+    Src/Graphic/Draw/Mesh.cpp
+    Src/Graphic/Draw/Texture.cpp
 )
 
 function(setup_sdl2)

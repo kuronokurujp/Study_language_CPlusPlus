@@ -35,10 +35,11 @@ set(ENGINE_TARGET_SRC_FILES
     Src/Module/Module.cpp
     Src/Platform/PlatformModule.cpp
     Src/Platform/PlatformInput.cpp
-    Src/Platform/PlatformScreen.cpp
-    Src/Platform/Screen/Window.cpp
-    Src/Platform/Screen/ViewPort.cpp
-    Src/Platform/Screen/Scene.cpp
+    Src/Platform/PlatformGraphic.cpp
+    Src/Platform/Graphic/FrameBase.cpp
+    Src/Platform/Graphic/FrameConfig.cpp
+#    Src/Platform/Graphic/ViewPort.cpp
+#    Src/Platform/Graphic/Scene.cpp
     Src/AsyncTask/AsyncTask.cpp
     Src/AsyncTask/AsyncTaskManager.cpp
 )
@@ -88,11 +89,13 @@ set(ENGINE_TARGET_INC_FILES
     Inc/Engine/Platform/PlatformFile.h
     Inc/Engine/Platform/PlatformFont.h
     Inc/Engine/Platform/PlatformInput.h
-    Inc/Engine/Platform/PlatformScreen.h
-    Inc/Engine/Platform/Screen/Scene.h
-    Inc/Engine/Platform/Screen/ViewPort.h
-    Inc/Engine/Platform/Screen/Window.h
-    Inc/Engine/Platform/Screen/Render.h
+    Inc/Engine/Platform/PlatformGraphic.h
+#    Inc/Engine/Platform/Graphic/Scene.h
+#    Inc/Engine/Platform/Graphic/ViewPort.h
+    Inc/Engine/Platform/Graphic/FrameBase.h
+    Inc/Engine/Platform/Graphic/FrameEvent.h
+    Inc/Engine/Platform/Graphic/FrameConfig.h
+    Inc/Engine/Platform/Graphic/Drawable.h
     Inc/Engine/Platform/PlatformSystem.h
     Inc/Engine/Platform/PlatformTime.h
     Inc/Engine/Platform/PlatformModule.h

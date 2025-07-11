@@ -28,24 +28,24 @@ namespace Platform
     class SceneStrategy
     {
     public:
-        using EventRender =
-            std::function<void(Core::Memory::SharedPtr<RenderInterface>, const SceneConfig&)>;
+        using EventDrawable =
+            std::function<void(Core::Memory::SharedPtr<DrawableInterface>, const SceneConfig&)>;
 
     public:
-        SceneStrategy(const SceneConfig&, Core::Memory::SharedPtr<RenderInterface>, EventRender);
+        SceneStrategy(const SceneConfig&, Core::Memory::SharedPtr<DrawableInterface>, EventDrawable);
         virtual ~SceneStrategy() = default;
 
         virtual HE::Bool VBegin() = 0;
         virtual void VEnd()       = 0;
 
-        virtual void VRender() = 0;
+        virtual void VRenderScreen() = 0;
 
-        Core::Memory::SharedPtr<RenderInterface> GetRender() { return _spRender; }
+        Core::Memory::SharedPtr<DrawableInterface> GetRender() { return _spRender; }
 
     protected:
         SceneConfig _config;
-        Core::Memory::SharedPtr<RenderInterface> _spRender;
-        EventRender _eventRender;
+        Core::Memory::SharedPtr<DrawableInterface> _spRender;
+        EventDrawable _eventRender;
     };
 
 }  // namespace Platform

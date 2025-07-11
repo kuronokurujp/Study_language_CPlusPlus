@@ -2,7 +2,7 @@
 
 namespace Platform
 {
-    WindowConfig::WindowConfig(const HE::Uint32 in_uW, const HE::Uint32 in_uH,
+    ScreenConfig::ScreenConfig(const HE::Uint32 in_uW, const HE::Uint32 in_uH,
                                const HE::Uint32 in_uViewPortCount, const HE::Bool in_bMain,
                                const Core::Common::Handle in_inputHandle, const EFlags in_eFlags)
 
@@ -16,7 +16,7 @@ namespace Platform
         this->_mMenuItem.Clear();
     }
 
-    WindowConfig::WindowConfig(const WindowConfig& in_rOrg)
+    ScreenConfig::ScreenConfig(const ScreenConfig& in_rOrg)
     {
         this->_bMain          = in_rOrg._bMain;
         this->_uWidth         = in_rOrg._uWidth;
@@ -30,13 +30,13 @@ namespace Platform
     /// <summary>
     /// ウィンドウにメニュー項目追加
     /// </summary>
-    const HE::Bool WindowConfig::AddMenuItem(const HE::Uint32 in_uID, const HE::Char* in_szName)
+    const HE::Bool ScreenConfig::AddMenuItem(const HE::Uint32 in_uID, const HE::Char* in_szName)
     {
         if (this->_mMenuItem.Contains(in_uID)) return FALSE;
 
         // メニュー項目を追加
         {
-            auto item = WindowMenuItem();
+            auto item = MenuItem();
 
             Core::Common::g_szTempFixedString128 = in_szName;
             Core::Common::g_szTempFixedString128.Output(item.szName, HE_ARRAY_NUM(item.szName));
@@ -47,7 +47,7 @@ namespace Platform
         return TRUE;
     }
 
-    void Platform::WindowStrategy::_BeginViewPort()
+    void Platform::Screen::_BeginViewPort()
     {
         for (auto it = this->_mViewPortSt.Begin(); it != this->_mViewPortSt.End(); ++it)
         {
@@ -55,7 +55,7 @@ namespace Platform
         }
     }
 
-    void Platform::WindowStrategy::_EndViewPort()
+    void Platform::Screen::_EndViewPort()
     {
         for (auto it = this->_mViewPortSt.Begin(); it != this->_mViewPortSt.End(); ++it)
         {
@@ -63,12 +63,12 @@ namespace Platform
         }
     }
 
-    WindowStrategy::WindowStrategy(const WindowConfig& in_rConfig) : _config(in_rConfig)
+    Screen::Screen(const ScreenConfig& in_rConfig) : _config(in_rConfig)
     {
         this->_bBegin = TRUE;
     }
 
-    void WindowStrategy::Begin()
+    void Screen::Begin()
     {
         this->_VBeginWindow();
         this->_BeginViewPort();
@@ -76,13 +76,13 @@ namespace Platform
         this->_bBegin = FALSE;
     }
 
-    void WindowStrategy::End()
+    void Screen::End()
     {
         this->_EndViewPort();
         this->_VEndWindow();
     }
 
-    void WindowStrategy::Render()
+    void Screen::Render()
     {
         this->_VBeginRender();
         // TODO: ビューポートのレンダリング
@@ -93,7 +93,7 @@ namespace Platform
         this->_VEndRender();
     }
 
-    Core::Common::Handle WindowStrategy::CreateViewPort(const Platform::ViewPortConfig& in_rConfig)
+    Core::Common::Handle Screen::CreateViewPort(const Platform::ViewPortConfig& in_rConfig)
     {
         auto spSt = this->_VCreateViewPort(in_rConfig);
 
@@ -104,7 +104,7 @@ namespace Platform
         return handle;
     }
 
-    ViewPortStrategy* WindowStrategy::GetViewPort(const Core::Common::Handle in_handle)
+    ViewPortStrategy* Screen::GetViewPort(const Core::Common::Handle in_handle)
     {
         if (this->_mViewPortSt.Contains(in_handle))
         {

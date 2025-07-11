@@ -1,11 +1,16 @@
 ﻿#include "PlatformSDL2/SDL2Font.h"
 
-#include "PlatformSDL2/Screen/Draw/Material.h"
-#include "PlatformSDL2/Screen/Draw/Texture.h"
+// OpenGL
 #include "GL/glew.h"
+
+// SDL2
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_ttf.h"
 #include "freetype/freetype.h"
+
+// SDL2のモジュール
+#include "PlatformSDL2/Graphic/Draw/Material.h"
+#include "PlatformSDL2/Graphic/Draw/Texture.h"
 
 namespace PlatformSDL2
 {

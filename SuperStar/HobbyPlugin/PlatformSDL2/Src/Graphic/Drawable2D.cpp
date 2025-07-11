@@ -1,11 +1,10 @@
-﻿#include "PlatformSDL2/Screen/Render.h"
+﻿#include "PlatformSDL2/Graphic/Drawable2D.h"
 
 #include "Engine/Common/PoolManager.h"
-#include "Engine/Platform/Screen/ViewPort.h"
+#include "PlatformSDL2/Graphic/Draw/Material.h"
+#include "PlatformSDL2/Graphic/Draw/Mesh.h"
+#include "PlatformSDL2/Graphic/Draw/Texture.h"
 #include "PlatformSDL2/SDL2Font.h"
-#include "PlatformSDL2/Screen/Draw/Material.h"
-#include "PlatformSDL2/Screen/Draw/Mesh.h"
-#include "PlatformSDL2/Screen/Draw/Texture.h"
 
 // SDL2のヘッダーファイル
 #include "GL/glew.h"
@@ -13,13 +12,13 @@
 
 namespace PlatformSDL2
 {
-    DefaultRender::DefaultRender()
+    Drawable2D::Drawable2D()
     {
         // パーティクルのメッシュプールを作成
         this->_poolParticleMesh.POOL_RESERVE_POOL(1024);
     }
 
-    void DefaultRender::VBegin()
+    void Drawable2D::VBegin()
     {
         this->_bBegin = TRUE;
 
@@ -316,7 +315,7 @@ namespace PlatformSDL2
         }
     }
 
-    void DefaultRender::VEnd()
+    void Drawable2D::VEnd()
     {
         {
             auto pWhiteTex = reinterpret_cast<TextureSurface*>(this->_pWhiteTex);
@@ -370,9 +369,39 @@ namespace PlatformSDL2
             pMat->VRelease();
             HE_SAFE_DELETE_MEM(this->_p2DQuadMat);
         }
+
+        this->_spFont = NULL;
     }
 
-    Core::Common::Handle DefaultRender::CreateParticleObject(const HE::Uint32 in_uCount)
+    void Drawable2D::VPreDraw()
+    {
+        ::glViewport(0, 0, this->_viewSize._fX, this->_viewSize._fY);
+
+        // 描画のブレンド設定
+        ::glDisable(GL_DEPTH_TEST);
+        ::glEnable(GL_BLEND);
+
+        // アルファブレンド設定
+        // srcFactor * srcAlpha + (1 - srcAlpha) * dstFactor
+        ::glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    void Drawable2D::VPostDraw()
+    {
+    }
+
+    void Drawable2D::VSetViewSize(const HE::Float32 in_fW, const HE::Float32 in_fH)
+    {
+        this->_viewSize._fX = in_fW;
+        this->_viewSize._fY = in_fH;
+    }
+
+    void Drawable2D::SetFont(Core::Memory::SharedPtr<Platform::FontInterface> in_spFont)
+    {
+        this->_spFont = in_spFont;
+    }
+
+    Core::Common::Handle Drawable2D::CreateParticleObject(const HE::Uint32 in_uCount)
     {
         // パーティクル用のメッシュを生成
         auto [handle, pMesh] = this->_poolParticleMesh.Alloc<ParticleMesh>(in_uCount);
@@ -388,7 +417,7 @@ namespace PlatformSDL2
         return handle;
     }
 
-    void DefaultRender::DeleteParticalObject(Core::Common::Handle in_handle)
+    void Drawable2D::DeleteParticalObject(Core::Common::Handle in_handle)
     {
         HE_ASSERT_RETURN(in_handle.Null() == FALSE);
 
@@ -400,7 +429,7 @@ namespace PlatformSDL2
         this->_poolParticleMesh.Free(in_handle, FALSE);
     }
 
-    void DefaultRender::SetArrayPosParticleObject(
+    void Drawable2D::SetArrayPosParticleObject(
         const Core::Common::Handle in_handle,
         const Core::Common::ArrayBase<Core::Math::Vector3>& in_rPos)
     {
@@ -412,7 +441,7 @@ namespace PlatformSDL2
         pParticleMesh->SetPositions(in_rPos);
     }
 
-    void DefaultRender::SetArrtyVelocityParticelObject(
+    void Drawable2D::SetArrtyVelocityParticelObject(
         const Core::Common::Handle in_handle,
         const Core::Common::ArrayBase<Core::Math::Vector3>& in_rVec)
     {
@@ -422,9 +451,8 @@ namespace PlatformSDL2
         pParticleMesh->SetVelocitys(in_rVec);
     }
 
-    void DefaultRender::Draw2DPartical(const Platform::SceneConfig& in_rSceneConfig,
-                                       const Core::Common::Handle in_handle,
-                                       const Core::Math::Vector3& in_rPos)
+    void Drawable2D::Draw2DPartical(const Core::Common::Handle in_handle,
+                                    const Core::Math::Vector3& in_rPos)
     {
         // 事前に生成したパーティクル用のメッシュを使って描画
         auto pParticleMesh = this->_poolParticleMesh.Ref(in_handle);
@@ -444,8 +472,8 @@ namespace PlatformSDL2
             HE::Float32 fY = static_cast<HE::Float32>(in_rPos._fY);
 
             // -1 から 1に座標変換
-            if (fX != 0.0f) fX /= in_rSceneConfig.GetWidthHalf();
-            if (fY != 0.0f) fY /= in_rSceneConfig.GetHeightHalf();
+            if (fX != 0.0f) fX /= this->_viewSize._fX * 0.5f;
+            if (fY != 0.0f) fY /= this->_viewSize._fY * 0.5f;
 
             Core::Math::Matrix4 transMat;
             Core::Math::Matrix4::OutputTranslation(&transMat, Core::Math::Vector3(fX, fY, 0.0f));
@@ -460,7 +488,7 @@ namespace PlatformSDL2
         //        pMat->Disable();
     }
 
-    void DefaultRender::Cls(const HE::Uint32 in_uR, const HE::Uint32 in_uG, const HE::Uint32 in_uB)
+    void Drawable2D::Cls(const HE::Uint32 in_uR, const HE::Uint32 in_uG, const HE::Uint32 in_uB)
     {
         HE::Float32 fR = static_cast<HE::Float32>(in_uR) * Core::Math::fInvert255;
         HE::Float32 fG = static_cast<HE::Float32>(in_uG) * Core::Math::fInvert255;
@@ -470,12 +498,10 @@ namespace PlatformSDL2
         ::glClearColor(fR, fG, fB, 1.0f);
     }
 
-    void DefaultRender::Draw2DText(const Platform::SceneConfig& in_rViewConfig,
-                                   Platform::FontInterface* in_pFont,
-                                   const Core::Math::Vector2& in_rPos,
-                                   const Core::Math::EAnchor in_eAnchor, const HE::Char* in_szText,
-                                   const HE::Uint32 in_uTextSize, const HE::Uint32 in_uSpace,
-                                   const Core::Math::Color in_color)
+    void Drawable2D::Draw2DText(const Core::Math::Vector2& in_rPos,
+                                const Core::Math::EAnchor in_eAnchor, const HE::Char* in_szText,
+                                const HE::Uint32 in_uTextSize, const HE::Uint32 in_uSpace,
+                                const Core::Math::Color in_color)
     {
         if (in_uTextSize <= 0) return;
 
@@ -484,9 +510,9 @@ namespace PlatformSDL2
 
         // TODO: フォントは事前に生成しておく
         // TODO: フォントの入れ替えもあるから
-        HE_ASSERT_RETURN(in_pFont);
-        HE_ASSERT_RETURN(HE_GENERATED_CHECK_RTTI(*in_pFont, Platform::FontInterface));
-        Font* pFont = reinterpret_cast<Font*>(in_pFont);
+        HE_ASSERT_RETURN(this->_spFont);
+        HE_ASSERT_RETURN(HE_GENERATED_CHECK_RTTI(*this->_spFont, Platform::FontInterface));
+        Font* pFont = reinterpret_cast<Font*>(this->_spFont.get());
 
         // フォントのマテリアルを取得
         auto pFontMat = pFont->GetMaterial();
@@ -669,10 +695,9 @@ namespace PlatformSDL2
         {
             Core::Math::Matrix4 viewProj;
             Core::Math::Matrix4::OutputSimpleViewProj(&viewProj,
+                                                      static_cast<HE::Float32>(this->_viewSize._fX),
                                                       static_cast<HE::Float32>(
-                                                          in_rViewConfig._uWidth),
-                                                      static_cast<HE::Float32>(
-                                                          in_rViewConfig._uHeight));
+                                                          this->_viewSize._fY));
             pFontMat->SetPropertyMatrix("uViewProj", viewProj);
         }
 
@@ -740,10 +765,9 @@ namespace PlatformSDL2
         pMesh->Free();
     }
 
-    void DefaultRender::Draw2DQuad(const Platform::SceneConfig& in_rSceneConfig,
-                                   const Core::Math::RC::Rect2D& in_rRect2D,
-                                   const Core::Math::EAnchor in_eAnchor,
-                                   const Core::Math::Color in_color)
+    void Drawable2D::Draw2DQuad(const Core::Math::RC::Rect2D& in_rRect2D,
+                                const Core::Math::EAnchor in_eAnchor,
+                                const Core::Math::Color in_color)
     {
         auto p2DQuadMat = reinterpret_cast<Material*>(this->_p2DQuadMat);
         p2DQuadMat->Enable();
@@ -756,9 +780,9 @@ namespace PlatformSDL2
                 Core::Math::Matrix4 viewProj;
                 Core::Math::Matrix4::OutputSimpleViewProj(&viewProj,
                                                           static_cast<HE::Float32>(
-                                                              in_rSceneConfig._uWidth),
+                                                              this->_viewSize._fX),
                                                           static_cast<HE::Float32>(
-                                                              in_rSceneConfig._uHeight));
+                                                              this->_viewSize._fY));
                 p2DQuadMat->SetPropertyMatrix("uViewProj", viewProj);
             }
 
@@ -813,10 +837,9 @@ namespace PlatformSDL2
         // p2DQuadMat->Disable();
     }
 
-    void DefaultRender::Draw2DCircle(const Platform::SceneConfig& in_rViewConfig,
-                                     const Core::Math::Vector2& in_rPos,
-                                     const Core::Math::EAnchor in_eAchor,
-                                     const HE::Float32 in_fSize, const Core::Math::Color in_color)
+    void Drawable2D::Draw2DCircle(const Core::Math::Vector2& in_rPos,
+                                  const Core::Math::EAnchor in_eAchor, const HE::Float32 in_fSize,
+                                  const Core::Math::Color in_color)
     {
         auto pMat = reinterpret_cast<Material*>(this->_p2DGeometoryMat);
         pMat->Enable();
@@ -829,9 +852,9 @@ namespace PlatformSDL2
                 Core::Math::Matrix4 viewProj;
                 Core::Math::Matrix4::OutputSimpleViewProj(&viewProj,
                                                           static_cast<HE::Float32>(
-                                                              in_rViewConfig._uWidth),
+                                                              this->_viewSize._fX),
                                                           static_cast<HE::Float32>(
-                                                              in_rViewConfig._uHeight));
+                                                              this->_viewSize._fY));
                 pMat->SetPropertyMatrix("uViewProj", viewProj);
             }
 
@@ -893,11 +916,10 @@ namespace PlatformSDL2
         //        pMat->Disable();
     }
 
-    void DefaultRender::Draw2DTriangle(const Platform::SceneConfig& in_rViewConfig,
-                                       const Core::Math::Vector2& in_rPos,
-                                       const Core::Math::EAnchor in_eAchor,
-                                       const HE::Float32 in_fAngleDegress,
-                                       const HE::Float32 in_fSize, const Core::Math::Color in_color)
+    void Drawable2D::Draw2DTriangle(const Core::Math::Vector2& in_rPos,
+                                    const Core::Math::EAnchor in_eAchor,
+                                    const HE::Float32 in_fAngleDegress, const HE::Float32 in_fSize,
+                                    const Core::Math::Color in_color)
     {
         auto pMat = reinterpret_cast<Material*>(this->_p2DGeometoryMat);
         pMat->Enable();
@@ -910,9 +932,9 @@ namespace PlatformSDL2
                 Core::Math::Matrix4 viewProj;
                 Core::Math::Matrix4::OutputSimpleViewProj(&viewProj,
                                                           static_cast<HE::Float32>(
-                                                              in_rViewConfig._uWidth),
+                                                              this->_viewSize._fX),
                                                           static_cast<HE::Float32>(
-                                                              in_rViewConfig._uHeight));
+                                                              this->_viewSize._fY));
                 pMat->SetPropertyMatrix("uViewProj", viewProj);
             }
 

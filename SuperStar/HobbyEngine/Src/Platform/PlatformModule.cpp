@@ -12,12 +12,12 @@ namespace Platform
         // 各機能の解放
         this->_spInput->VRelease();
         this->_spFont->VRelease();
-        this->_spScreen->VRelease();
+        this->_spGraphic->VRelease();
 
         this->_spTime.reset();
         this->_spInput.reset();
         this->_spFile.reset();
-        this->_spScreen.reset();
+        this->_spGraphic.reset();
         this->_spSysmte.reset();
         this->_spFont.reset();
 
@@ -26,12 +26,12 @@ namespace Platform
 
     void PlatformModule::_VUpdate(const HE::Float32 in_fDeltaTime)
     {
-        this->_spScreen->VUpdate(in_fDeltaTime);
+        this->_spGraphic->VUpdate(in_fDeltaTime);
     }
 
     void PlatformModule::_VLateUpdate(const HE::Float32 in_fDeltaTime)
     {
-        // TODO: レンダリングをする
-        this->_spScreen->VRender();
+        // グラフィックの描画
+        this->_spGraphic->VDraw();
     }
 }  // namespace Platform

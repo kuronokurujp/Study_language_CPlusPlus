@@ -24,7 +24,7 @@ namespace Platform
                                                   Core::Memory::SharedPtr<SceneStrategy>, 32>;
 
         using MapRender = Core::Common::FixedMap<const Core::Common::RTTI*,
-                                                 Core::Memory::SharedPtr<RenderInterface>, 32>;
+                                                 Core::Memory::SharedPtr<DrawableInterface>, 32>;
 
     public:
         ViewPortStrategy(const ViewPortConfig&);
@@ -32,18 +32,18 @@ namespace Platform
         virtual void VBegin();
         virtual void VEnd();
 
-        void Render();
+        void Draw();
 
         // TODO: レンダリングインターフェイスを継承しているかチェックを入れる
         // TODO: シーン個別で設定するのが今はない
         template <class T>
-        Core::Common::Handle CreateScene(SceneStrategy::EventRender in_eventRender)
+        Core::Common::Handle CreateScene(SceneStrategy::EventDrawable in_eventRender)
         {
-            HE_STATIC_ASSERT(std::is_base_of<RenderInterface, T>::value,
+            HE_STATIC_ASSERT(std::is_base_of<DrawableInterface, T>::value,
                              "TクラスはRenderInterfaceクラスを継承していない");
 
             // TODO:レンダリングがすでに存在しているかチェックをしてあれば再利用なければ新規生成
-            Core::Memory::SharedPtr<RenderInterface> spNewRender = NULL;
+            Core::Memory::SharedPtr<DrawableInterface> spNewRender = NULL;
             {
                 auto pAddr = T::StaticRTTI();
                 if (this->_mRender.Contains(pAddr) == FALSE)
@@ -79,8 +79,8 @@ namespace Platform
         /// TODO: Sceneの生成は継承先へ
         /// </summary>
         virtual Core::Memory::SharedPtr<Platform::SceneStrategy> _VCreateScene(
-            const SceneConfig&, Core::Memory::SharedPtr<RenderInterface>,
-            SceneStrategy::EventRender) = 0;
+            const SceneConfig&, Core::Memory::SharedPtr<DrawableInterface>,
+            SceneStrategy::EventDrawable) = 0;
 
     protected:
         ViewPortConfig _config;
