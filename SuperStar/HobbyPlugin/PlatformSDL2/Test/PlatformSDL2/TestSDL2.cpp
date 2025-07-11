@@ -125,8 +125,10 @@ namespace PlatformSDL2
 
         EXPECT_EQ(moduleManager.Release(), TRUE);
     }
-#if 0
-// TODO: 右手座標系と矩形の起点位置を修正したので矩形表示位置がずれているので修正する
+
+//--------------------------------------------------------------------------------------
+// 描画テスト(矩形/円/三角形)
+//--------------------------------------------------------------------------------------
 TEST(HobbyPlugin_PlatformSDL2, QuadDraw)
 {
     Core::Memory::SharedPtr<PlatformSDL2::PlatformSDL2Module> spSDL2Module =
@@ -137,171 +139,131 @@ TEST(HobbyPlugin_PlatformSDL2, QuadDraw)
 
     EXPECT_EQ(moduleManager.Start(), TRUE);
 
-    // フォントデータのバイナリアセットを作成
     auto spPlatformModule = moduleManager.Get<Platform::PlatformModule>();
     {
-        // ロードするフォントファイルパスを渡す
-        // シェーダーファイルも渡す.(プラットフォームによっては使わない)
-        auto bRet =
-            spPlatformModule->Font()->VLoad(Platform::EFontSize_64,
-                                            HE_STR_TEXT("Resources/SDL2/Font/TestFont.ttf"));
+        auto bRet = spPlatformModule->Font()->VLoad(
+            Platform::EFontSize_64,
+            HE_STR_TEXT("Resources/SDL2/Font/TestFont.ttf"));
         EXPECT_EQ(bRet, TRUE);
     }
 
-    // ウィンドウ追加
+    auto inputHandle = spPlatformModule->Input()->VCreateObject();
+
+    class TestEvent : public Platform::EventFrameInterface
     {
-        auto inputHandle = spPlatformModule->Input()->VCreateObject();
-        // ウィンドウの設定
-        auto windowConfig =
-            Platform::WindowConfig{640,  480,         1,
-                                   TRUE, inputHandle, Platform::WindowConfig::EFlags_None};
+    public:
+        TestEvent(HE::Uint32 in_w, HE::Uint32 in_h) : _w(in_w), _h(in_h) {}
 
-        // 設定に基づいたウィンドウを生成
-        auto handle  = spPlatformModule->Graphic()->VCreateWindowStrategy(windowConfig);
-        auto pWindow = spPlatformModule->Graphic()->VGetWindow(handle);
-        // ビューポートの追加
-        auto viewPortConfig = Platform::ViewPortConfig{640, 480};
-        auto viewPortHandle = pWindow->CreateViewPort(viewPortConfig);
-        auto pViewPort      = pWindow->GetViewPort(viewPortHandle);
-        // 描画するシーンの追加
-        auto sceneHandle = pViewPort->CreateScene<PlatformSDL2::DefaultRender>(
-            [spPlatformModule](Core::Memory::SharedPtr<Platform::RenderInterface> in_spRender,
-                               const Platform::SceneConfig& in_rSceneConfig)
+        void VDraw(Platform::MapDrawable& in_mDrawble) override final
+        {
+            EXPECT_EQ(in_mDrawble.Contains(PlatformSDL2::Drawable2D::StaticRTTI()), TRUE);
+
+            auto pDrawable = reinterpret_cast<PlatformSDL2::Drawable2D*>(
+                in_mDrawble.FindKey(PlatformSDL2::Drawable2D::StaticRTTI())->_data.get());
+
+            pDrawable->VPreDraw();
             {
-                // シーンの渡したレンダリングを利用して描画する
-                HE_ASSERT_RETURN(
-                    HE_GENERATED_CHECK_RTTI(*in_spRender, PlatformSDL2::DefaultRender));
-                auto pDrawable = HE_SHADER_PTR_CAST(PlatformSDL2::DefaultRender, in_spRender);
-                {
-                    // 画面左上の座標
-                    auto screenLeftTopPos = Core::Math::Vector2(-in_rSceneConfig.GetWidthHalf(),
-                                                                in_rSceneConfig.GetHeightHalf());
-                    // ウィンドウが閉じたら終了
-                    Core::Math::RC::Rect2D rect(screenLeftTopPos._fX, screenLeftTopPos._fY, 32.f,
-                                                32.0f);
-                    // 左隅にぴったり表示しているかのテスト
-                    {
-                        pDrawable->Draw2DQuad(in_rSceneConfig, rect, Core::Math::EAnchor_Left,
-                                            Core::Math::RGB::Red);
-                    }
+                auto screenLeftTopPos =
+                    Core::Math::Vector2(-static_cast<HE::Float32>(_w) * 0.5f,
+                                       static_cast<HE::Float32>(_h) * 0.5f);
 
-                    // 左隅の矩形と1ドット右にずらして矩形表示しているかテスト
-                    {
-                        rect.Set(screenLeftTopPos._fX + 33.f, screenLeftTopPos._fY, 32.0f, 32.0f);
-                        pDrawable->Draw2DQuad(in_rSceneConfig, rect, Core::Math::EAnchor_Left,
-                                            Core::Math::RGB::Yellow);
-                    }
+                Core::Math::RC::Rect2D rect(screenLeftTopPos._fX, screenLeftTopPos._fY,
+                                            32.f, 32.0f);
+                pDrawable->Draw2DQuad(rect, Core::Math::EAnchor_Left, Core::Math::RGB::Red);
 
-                    // 左隅の矩形と1ドット下にずらして矩形表示しているかテスト
-                    {
-                        rect.Set(screenLeftTopPos._fX, screenLeftTopPos._fY - 33.0f, 32.0f, 32.0f);
-                        pDrawable->Draw2DQuad(in_rSceneConfig, rect, Core::Math::EAnchor_Left,
-                                            Core::Math::RGB::Yellow);
-                    }
-                    // テキストの下地で矩形が表示しているかテスト
-                    {
-                        Core::Common::FixedString1024 s2(
-                            HE_STR_TEXT("タイトルルルルルルルルルルルルルルるあ"));
+                rect.Set(screenLeftTopPos._fX + 33.f, screenLeftTopPos._fY, 32.0f, 32.0f);
+                pDrawable->Draw2DQuad(rect, Core::Math::EAnchor_Left, Core::Math::RGB::Yellow);
 
-                        rect.Set(screenLeftTopPos._fX, screenLeftTopPos._fY - (32.0f * 5.0f),
-                                 (32.0f * s2.Length()) + (2.0f * (s2.Length() - 1)), 32.0f);
-                        pDrawable->Draw2DQuad(in_rSceneConfig, rect, Core::Math::EAnchor_Left,
-                                            Core::Math::RGB::Red);
+                rect.Set(screenLeftTopPos._fX, screenLeftTopPos._fY - 33.0f, 32.0f, 32.0f);
+                pDrawable->Draw2DQuad(rect, Core::Math::EAnchor_Left, Core::Math::RGB::Yellow);
 
-                        // テキスト表示
-                        pDrawable->Draw2DText(in_rSceneConfig, spPlatformModule->Font().get(),
-                                            Core::Math::Vector2(screenLeftTopPos._fX,
-                                                                screenLeftTopPos._fY - 32.0f * 5.f),
-                                            Core::Math::EAnchor_Left, s2.Str(), 32, 2.0f,
-                                            Core::Math::RGB::Blue);
-                    }
+                Core::Common::FixedString1024 s2(
+                    HE_STR_TEXT("タイトルルルルルルルルルルルルルルるあ"));
+                rect.Set(screenLeftTopPos._fX, screenLeftTopPos._fY - (32.0f * 5.0f),
+                         (32.0f * s2.Length()) + (2.0f * (s2.Length() - 1)), 32.0f);
+                pDrawable->Draw2DQuad(rect, Core::Math::EAnchor_Left, Core::Math::RGB::Red);
 
-                    // テキストの下地で矩形が表示しているかテスト
-                    {
-                        Core::Common::FixedString1024 s3(HE_STR_TEXT("MMM"));
-                        rect.Set(screenLeftTopPos._fX, screenLeftTopPos._fY - (64.0f * 5.0f),
-                                 (16.0f * s3.Length()) + (s3.Length() - 1), 16.0f);
-                        pDrawable->Draw2DQuad(in_rSceneConfig, rect, Core::Math::EAnchor_Left,
-                                            Core::Math::RGB::Red);
+                pDrawable->Draw2DText(
+                    Core::Math::Vector2(screenLeftTopPos._fX,
+                                       screenLeftTopPos._fY - 32.0f * 5.f),
+                    Core::Math::EAnchor_Left, s2.Str(), 32, 2.0f, Core::Math::RGB::Blue);
 
-                        pDrawable->Draw2DText(in_rSceneConfig, spPlatformModule->Font().get(),
-                                            Core::Math::Vector2(screenLeftTopPos._fX,
-                                                                screenLeftTopPos._fY - 64.0f * 5.f),
-                                            Core::Math::EAnchor_Left, s3.Str(), 16, 1.0f,
-                                            Core::Math::RGB::Blue);
-                    }
-                    // 画面真ん中に矩形表示のアンカーが真ん中
-                    {
-                        rect.Set(.0f, .0f, 32.0f, 32.0f);
-                        pDrawable->Draw2DQuad(in_rSceneConfig, rect, Core::Math::EAnchor_Center,
-                                            Core::Math::RGB::Red);
-                    }
+                Core::Common::FixedString1024 s3(HE_STR_TEXT("MMM"));
+                rect.Set(screenLeftTopPos._fX, screenLeftTopPos._fY - (64.0f * 5.0f),
+                         (16.0f * s3.Length()) + (s3.Length() - 1), 16.0f);
+                pDrawable->Draw2DQuad(rect, Core::Math::EAnchor_Left, Core::Math::RGB::Red);
 
-                    // 画面真ん中に矩形表示してかつアンカーが左上
-                    {
-                        rect.Set(.0f, .0f, 32.0f, 32.0f);
-                        pDrawable->Draw2DQuad(in_rSceneConfig, rect, Core::Math::EAnchor_Left,
-                                            Core::Math::RGB::White);
-                    }
+                pDrawable->Draw2DText(
+                    Core::Math::Vector2(screenLeftTopPos._fX,
+                                       screenLeftTopPos._fY - 64.0f * 5.f),
+                    Core::Math::EAnchor_Left, s3.Str(), 16, 1.0f, Core::Math::RGB::Blue);
 
-                    // 画面左下に矩形表示してかつアンカーが左上
-                    {
-                        rect.Set(screenLeftTopPos._fX, -in_rSceneConfig.GetHeightHalf() + 32.0f,
-                                 32.0f, 32.0f);
-                        pDrawable->Draw2DQuad(in_rSceneConfig, rect, Core::Math::EAnchor_Left,
-                                            Core::Math::RGB::White);
-                    }
+                rect.Set(.0f, .0f, 32.0f, 32.0f);
+                pDrawable->Draw2DQuad(rect, Core::Math::EAnchor_Center, Core::Math::RGB::Red);
 
-                    // 画面右上に矩形表示してかつアンカーが左上
-                    {
-                        rect.Set(in_rSceneConfig.GetWidthHalf() - 32.0f,
-                                 in_rSceneConfig.GetHeightHalf(), 32.0f, 32.0f);
-                        pDrawable->Draw2DQuad(in_rSceneConfig, rect, Core::Math::EAnchor_Left,
-                                            Core::Math::RGB::White);
-                    }
+                rect.Set(.0f, .0f, 32.0f, 32.0f);
+                pDrawable->Draw2DQuad(rect, Core::Math::EAnchor_Left, Core::Math::RGB::White);
 
-                    // 画面右下に矩形表示してかつアンカーが左上
-                    {
-                        rect.Set(in_rSceneConfig.GetWidthHalf() - 32.0f,
-                                 -in_rSceneConfig.GetHeightHalf() + 32.0f, 32.0f, 32.0f);
-                        pDrawable->Draw2DQuad(in_rSceneConfig, rect, Core::Math::EAnchor_Left,
-                                            Core::Math::RGB::White);
-                    }
+                rect.Set(screenLeftTopPos._fX, -static_cast<HE::Float32>(_h) * 0.5f + 32.0f,
+                         32.0f, 32.0f);
+                pDrawable->Draw2DQuad(rect, Core::Math::EAnchor_Left, Core::Math::RGB::White);
 
-                    // アンカーが左上で円描画の画面真ん中上のテスト
-                    {
-                        Core::Math::Vector2 pos(.0f, .0f);
-                        pDrawable->Draw2DCircle(in_rSceneConfig, pos, Core::Math::EAnchor_Left, 32,
-                                              Core::Math::RGB::White);
-                    }
+                rect.Set(static_cast<HE::Float32>(_w) * 0.5f - 32.0f,
+                         static_cast<HE::Float32>(_h) * 0.5f, 32.0f, 32.0f);
+                pDrawable->Draw2DQuad(rect, Core::Math::EAnchor_Left, Core::Math::RGB::White);
 
-                    // アンカーが中心で画面真ん中下の円描画のテスト
-                    {
-                        Core::Math::Vector2 pos(.0f, .0f);
-                        pDrawable->Draw2DCircle(in_rSceneConfig, pos, Core::Math::EAnchor_Center, 32,
-                                              Core::Math::RGB::White);
-                    }
+                rect.Set(static_cast<HE::Float32>(_w) * 0.5f - 32.0f,
+                         -static_cast<HE::Float32>(_h) * 0.5f + 32.0f, 32.0f, 32.0f);
+                pDrawable->Draw2DQuad(rect, Core::Math::EAnchor_Left, Core::Math::RGB::White);
 
-                    // アンカー中心三角形描画テスト
-                    {
-                        Core::Math::Vector2 pos(.0f, 0.f);
-                        pDrawable->Draw2DTriangle(in_rSceneConfig, pos, Core::Math::EAnchor_Center,
-                                                0.0f, 32.0f, Core::Math::RGB::Blue);
-                    }
+                Core::Math::Vector2 pos(.0f, .0f);
+                pDrawable->Draw2DCircle(pos, Core::Math::EAnchor_Left, 32, Core::Math::RGB::White);
 
-                    // アンカー左上の三角形描画テスト
-                    {
-                        Core::Math::Vector2 pos(200.f, 0.f);
-                        pDrawable->Draw2DTriangle(in_rSceneConfig, pos, Core::Math::EAnchor_Left,
-                                                -90.0f, 32.0f, Core::Math::RGB::White);
-                    }
-                }
-            });
+                pDrawable->Draw2DCircle(pos, Core::Math::EAnchor_Center, 32,
+                                       Core::Math::RGB::White);
 
-        pWindow->VShow();
+                pos.Set(.0f, 0.f);
+                pDrawable->Draw2DTriangle(pos, Core::Math::EAnchor_Center, 0.0f, 32.0f,
+                                           Core::Math::RGB::Blue);
+
+                pos.Set(200.f, 0.f);
+                pDrawable->Draw2DTriangle(pos, Core::Math::EAnchor_Left, -90.0f, 32.0f,
+                                           Core::Math::RGB::White);
+            }
+            pDrawable->VPostDraw();
+        }
+
+    private:
+        HE::Uint32 _w;
+        HE::Uint32 _h;
+    };
+
+    Core::Common::Handle frameHandle;
+    const auto uW = 640u;
+    const auto uH = 480u;
+    {
+        auto windowConfig =
+            Platform::FrameConfig(uW, uH, 1, TRUE, inputHandle,
+                                 Platform::FrameConfig::EFlags_None);
+        auto spGraphicModule = spPlatformModule->Graphic();
+        frameHandle = spGraphicModule->VCreateFrame(
+            windowConfig, HE_MAKE_CUSTOM_UNIQUE_PTR((TestEvent), uW, uH));
     }
 
-    // 描画
+    {
+        auto spGraphicModule = spPlatformModule->Graphic();
+        auto upDrawable2D    = HE_MAKE_CUSTOM_UNIQUE_PTR((PlatformSDL2::Drawable2D));
+        upDrawable2D->VSetViewSize(uW, uH);
+        upDrawable2D->SetFont(spPlatformModule->Font());
+        spGraphicModule->VAddDrawable(std::move(upDrawable2D));
+    }
+
+    {
+        auto spGraphicModule = spPlatformModule->Graphic();
+        auto pFrame          = spGraphicModule->VGetFrame(frameHandle);
+        pFrame->VShow();
+    }
+
     while (spPlatformModule->VIsQuit() == FALSE)
     {
         moduleManager.BeforeUpdate(0);
@@ -312,6 +274,9 @@ TEST(HobbyPlugin_PlatformSDL2, QuadDraw)
     EXPECT_EQ(moduleManager.Release(), TRUE);
 }
 
+//--------------------------------------------------------------------------------------
+// 描画テスト(パーティクル)
+//--------------------------------------------------------------------------------------
 TEST(HobbyPlugin_PlatformSDL2, ParticleDraw)
 {
     Core::Memory::SharedPtr<PlatformSDL2::PlatformSDL2Module> spSDL2Module =
@@ -322,84 +287,91 @@ TEST(HobbyPlugin_PlatformSDL2, ParticleDraw)
 
     EXPECT_EQ(moduleManager.Start(), TRUE);
 
-    // フォントデータのバイナリアセットを作成
     auto spPlatformModule = moduleManager.Get<Platform::PlatformModule>();
     {
-        // ロードするフォントファイルパスを渡す
-        // シェーダーファイルも渡す.(プラットフォームによっては使わない)
-        auto bRet =
-            spPlatformModule->Font()->VLoad(Platform::EFontSize_64,
-                                            HE_STR_TEXT("Resources/SDL2/Font/TestFont.ttf"));
+        auto bRet = spPlatformModule->Font()->VLoad(
+            Platform::EFontSize_64,
+            HE_STR_TEXT("Resources/SDL2/Font/TestFont.ttf"));
         EXPECT_EQ(bRet, TRUE);
     }
 
-    // ウィンドウ追加
+    auto inputHandle = spPlatformModule->Input()->VCreateObject();
+
+    class ParticleEvent : public Platform::EventFrameInterface
     {
-        auto inputHandle = spPlatformModule->Input()->VCreateObject();
-        // ウィンドウの設定
-        auto windowConfig =
-            Platform::WindowConfig{640,  480,         1,
-                                   TRUE, inputHandle, Platform::WindowConfig::EFlags_None};
+    public:
+        void SetHandle(const Core::Common::Handle in_handle) { _particleObj = in_handle; }
 
-        // 設定に基づいたウィンドウを生成
-        auto handle  = spPlatformModule->Graphic()->VCreateWindowStrategy(windowConfig);
-        auto pWindow = spPlatformModule->Graphic()->VGetWindow(handle);
-        // ビューポートの追加
-        auto viewPortConfig = Platform::ViewPortConfig{640, 480};
-        auto viewPortHandle = pWindow->CreateViewPort(viewPortConfig);
-        auto pViewPort      = pWindow->GetViewPort(viewPortHandle);
-
-        Core::Math::Vector3 pos(.0f, .0f, 0.0f);
-        Core::Common::Handle particleObjHandle;
-        // 描画するシーンの追加
-        auto sceneHandle = pViewPort->CreateScene<PlatformSDL2::DefaultRender>(
-            [spPlatformModule, &particleObjHandle,
-             &pos](Core::Memory::SharedPtr<Platform::RenderInterface> in_spRender,
-                   const Platform::SceneConfig& in_rSceneConfig)
-            {
-                // シーンの渡したレンダリングを利用して描画する
-                HE_ASSERT_RETURN(
-                    HE_GENERATED_CHECK_RTTI(*in_spRender, PlatformSDL2::DefaultRender));
-                auto pDrawable = HE_SHADER_PTR_CAST(PlatformSDL2::DefaultRender, in_spRender);
-                // 点群表示
-                pDrawable->Draw2DPartical(in_rSceneConfig, particleObjHandle, pos);
-                // 点群が上に移動
-                pos._fY += 0.5f;
-            });
+        void VDraw(Platform::MapDrawable& in_mDrawble) override final
         {
-            auto spScene         = pViewPort->GetScene(sceneHandle);
-            auto spRender        = spScene->GetRender();
-            auto spDefaultRender = HE_SHADER_PTR_CAST(PlatformSDL2::DefaultRender, spRender);
+            EXPECT_EQ(in_mDrawble.Contains(PlatformSDL2::Drawable2D::StaticRTTI()), TRUE);
 
-            // パーティクルオブジェクト作成
-            particleObjHandle = spDefaultRender->CreateParticleObject(1000);
+            auto pDrawable = reinterpret_cast<PlatformSDL2::Drawable2D*>(
+                in_mDrawble.FindKey(PlatformSDL2::Drawable2D::StaticRTTI())->_data.get());
 
-            // 各パーティクル位置と速度と色のデータ作成
-            Core::Common::FixedArray<Core::Math::Vector3, 1000> aPos;
-            Core::Common::FixedArray<Core::Math::Vector3, 1000> aVelocity;
-            Core::Common::FixedArray<Core::Math::Color, 1000> aColor;
+            pDrawable->VPreDraw();
             {
-                for (HE::Uint32 i = 0; i < 1000; ++i)
-                {
-                    auto x = spPlatformModule->System()->VGetRandByFloat(-1.0f, 1.0f);
-                    auto y = spPlatformModule->System()->VGetRandByFloat(-1.0f, 1.0f);
-
-                    Core::Math::Vector3 p(static_cast<HE::Float32>(x), static_cast<HE::Float32>(y),
-                                          0.0f);
-                    aPos.Set(i, p);
-
-                    Core::Math::Vector3 v(0.0f, 0.0f, 0.0f);
-                    aVelocity.Set(i, v);
-
-                    aColor.Set(i, Core::Math::RGB::White);
-                }
+                pDrawable->Draw2DPartical(_particleObj, _pos);
+                _pos._fY += 0.5f;
             }
-            // 各パーティクル位置と速度のデータ設定
-            spDefaultRender->SetArrayPosParticleObject(particleObjHandle, aPos);
-            spDefaultRender->SetArrtyVelocityParticelObject(particleObjHandle, aVelocity);
+            pDrawable->VPostDraw();
         }
 
-        pWindow->VShow();
+    private:
+        Core::Common::Handle _particleObj;
+        Core::Math::Vector3  _pos{.0f, .0f, 0.0f};
+    };
+
+    Core::Common::Handle frameHandle;
+    const auto uW = 640u;
+    const auto uH = 480u;
+
+    auto upEvent = HE_MAKE_CUSTOM_UNIQUE_PTR((ParticleEvent));
+    auto* pEvent = upEvent.get();
+
+    {
+        auto windowConfig =
+            Platform::FrameConfig(uW, uH, 1, TRUE, inputHandle,
+                                 Platform::FrameConfig::EFlags_None);
+        auto spGraphicModule = spPlatformModule->Graphic();
+        frameHandle = spGraphicModule->VCreateFrame(windowConfig, std::move(upEvent));
+    }
+
+    PlatformSDL2::Drawable2D* pDrawable2D = nullptr;
+    {
+        auto spGraphicModule = spPlatformModule->Graphic();
+        auto upDrawable2D    = HE_MAKE_CUSTOM_UNIQUE_PTR((PlatformSDL2::Drawable2D));
+        pDrawable2D         = upDrawable2D.get();
+        upDrawable2D->VSetViewSize(uW, uH);
+        upDrawable2D->SetFont(spPlatformModule->Font());
+        spGraphicModule->VAddDrawable(std::move(upDrawable2D));
+    }
+
+    Core::Common::Handle particleObjHandle = pDrawable2D->CreateParticleObject(1000);
+
+    Core::Common::FixedArray<Core::Math::Vector3, 1000> aPos;
+    Core::Common::FixedArray<Core::Math::Vector3, 1000> aVelocity;
+    for (HE::Uint32 i = 0; i < 1000; ++i)
+    {
+        auto x = spPlatformModule->System()->VGetRandByFloat(-1.0f, 1.0f);
+        auto y = spPlatformModule->System()->VGetRandByFloat(-1.0f, 1.0f);
+
+        Core::Math::Vector3 p(static_cast<HE::Float32>(x), static_cast<HE::Float32>(y), 0.0f);
+        aPos.Set(i, p);
+
+        Core::Math::Vector3 v(0.0f, 0.0f, 0.0f);
+        aVelocity.Set(i, v);
+    }
+
+    pDrawable2D->SetArrayPosParticleObject(particleObjHandle, aPos);
+    pDrawable2D->SetArrtyVelocityParticelObject(particleObjHandle, aVelocity);
+
+    pEvent->SetHandle(particleObjHandle);
+
+    {
+        auto spGraphicModule = spPlatformModule->Graphic();
+        auto pFrame          = spGraphicModule->VGetFrame(frameHandle);
+        pFrame->VShow();
     }
 
     while (spPlatformModule->VIsQuit() == FALSE)
@@ -411,8 +383,6 @@ TEST(HobbyPlugin_PlatformSDL2, ParticleDraw)
 
     EXPECT_EQ(moduleManager.Release(), TRUE);
 }
-#endif
-
 /// <summary>
 /// SDL2File basic load tests
 /// </summary>
