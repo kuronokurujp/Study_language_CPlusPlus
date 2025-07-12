@@ -1,12 +1,16 @@
-set(RENDER_PLUGIN_NAME HobbyEnginePlugin_Render)
+set(PLUGIN_RENDER_NAME HobbyPlugin_Render)
+set(PLUGIN_RENDER_INC_DIR ${CMAKE_CURRENT_LIST_DIR}/Inc)
 
-# プロジェクトに登録するファイル群
-# ここに全て記載する
-set(RENDER_PLUGIN_TARGET_FILES
+set(PLUGIN_RENDER_TARGET_COMMON_FILES
     .editorconfig
     LICENSE.txt
     README.md
+)
 
+set(PLUGIN_RENDER_TARGET_INC_FILES
     Src/RenderModule.cpp
+)
+
+set(PLUGIN_RENDER_TARGET_SRC_FILES
     Inc/RenderModule.h
 )

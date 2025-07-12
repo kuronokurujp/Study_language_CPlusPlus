@@ -11,11 +11,11 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyEngine/cmake/UTF8.cmake NO_POLICY_SCOPE
 # include(${CMAKE_CURRENT_SOURCE_DIR}/Game/Config.cmake NO_POLICY_SCOPE)
 
 # ゲームエンジン
-# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyEngine/Config.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyEngine/Config.cmake NO_POLICY_SCOPE)
 # SDL2プラットフォーム
 include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/PlatformSDL2/Config.cmake NO_POLICY_SCOPE)
 # 描画プラグイン
-# include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Render/Config.cmake NO_POLICY_SCOPE)
+include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Render/Config.cmake NO_POLICY_SCOPE)
 # アクタープラグイン
 include(${CMAKE_CURRENT_SOURCE_DIR}/HobbyPlugin/Actor/Config.cmake NO_POLICY_SCOPE)
 # アセット管理プラグイン
@@ -62,9 +62,6 @@ set(CHACHE_VCPKG_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/vcpkg" CACHE STRIN
 # 環境変数からvcpkgのパスを取得してツールチェインを設定
 set(CMAKE_TOOLCHAIN_FILE "$CACHE{CHACHE_VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file" FORCE)
 
-# 単体テスト用のビルドUnitTestを追加
-# set(CMAKE_CONFIGURATION_TYPES "Debug;Release;UnitTest" CACHE STRING "Configs" FORCE)
-
 # ビルド成果物を出力するディレクトリ指定.
 # 実行ファイルの出力先
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bin/${WORKSPACE_NAME})
@@ -85,7 +82,7 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release
 # TODO: ファイルを構成を大幅に変更で一つ一つ対応
 add_subdirectory(HobbyEngine)
 add_subdirectory(HobbyPlugin/PlatformSDL2)
-# add_subdirectory(HobbyPlugin/Render)
+add_subdirectory(HobbyPlugin/Render)
 add_subdirectory(HobbyPlugin/Actor)
 add_subdirectory(HobbyPlugin/AssetManager)
 add_subdirectory(HobbyPlugin/Level)
@@ -98,29 +95,8 @@ add_subdirectory(HobbyPlugin/Lua)
 # add_subdirectory(HobbyPlugin/RuntimeDebug)
 # add_subdirectory(HobbyPlugin/GameDevGUI)
 
-# テストプロジェクトを作る
-# include(${CMAKE_CURRENT_SOURCE_DIR}/Test/Config.cmake NO_POLICY_SCOPE)
 
 # add_subdirectory(Game)
-
-
-
-# TODO: 以下のはデバッグのみ利用(リリース版では含めないようにする)
-# common_check_variable(RUNTIMEDEBUG_PLUGIN_NAME)
-# common_check_variable(GAMEDEVGUI_PLUGIN_NAME)
-
-# デバッグ/リリースで含める
-# common_check_variable(LUA_PLUGIN_NAME)
-# common_check_variable(EVENT_PLUGIN_NAME)
-# common_check_variable(ENHANCED_INPUT_PLUGIN_NAME)
-# common_check_variable(UI_PLUGIN_NAME)
-# common_check_variable(LOCALIZATION_PLUGIN_NAME)
-# common_check_variable(LEVEL_PLUGIN_NAME)
-# common_check_variable(ASSET_MANAGER_PLUGIN_NAME)
-# common_check_variable(PLUGIN_ACTOR_NAME)
-# common_check_variable(RENDER_PLUGIN_NAME)
-# common_check_variable(PLUGIN_PLATFORMSDL2_NAME)
-# common_check_variable(ENGINE_NAME)
 
 # ライブラリ名をリストにまとめる
 set(PLUGIN_LIBRARIES
@@ -128,14 +104,14 @@ set(PLUGIN_LIBRARIES
 #   ${GAMEDEVGUI_PLUGIN_NAME}
 # TODO: デバッグのみ入れる
 #   ${RUNTIMEDEBUG_PLUGIN_NAME}
-#   ${LUA_PLUGIN_NAME}
+  ${LUA_PLUGIN_NAME}
   ${EVENT_PLUGIN_NAME}
   ${ENHANCED_INPUT_PLUGIN_NAME}
 #   ${UI_PLUGIN_NAME}
-#   ${LOCALIZATION_PLUGIN_NAME}
+  ${LOCALIZATION_PLUGIN_NAME}
   ${PLUGIN_LEVEL_NAME}
   ${ASSET_MANAGER_PLUGIN_NAME}
-#   ${RENDER_PLUGIN_NAME}
+  ${RENDER_PLUGIN_NAME}
   ${PLUGIN_ACTOR_NAME}
   ${PLUGIN_PLATFORMSDL2_NAME}
   ${ENGINE_NAME}
@@ -144,27 +120,3 @@ set(PLUGIN_LIBRARIES
 # ゲームアプリがリンクするライブラリ
 # 設定プロジェクトのライブラリ・インクルードディレクトリ登録
 # target_link_libraries(${APP_NAME} ${PLUGIN_LIBRARIES})
-
-# TODO: デバッグのみ
-# テストプロジェクト作成
-# add_subdirectory(Test)
-
-# アプリディレクトリのみをインクルード
-# set(APP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Game)
-# target_include_directories(${TEST_APP_NAME} PRIVATE ${APP_INCLUDE_DIR})
-
-# デバッグ実行時に参照する作業ディレクトリ.
-# バイナリ出力先のディレクトリ
-# set_target_properties(${TEST_APP_NAME} PROPERTIES
-#   VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bin/Test/${CMAKE_CFG_INTDIR}
-#   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bin/Test
-# )
-
-# テストしたいライブラリを設定
-# 設定プロジェクトのライブラリ・インクルードディレクトリ登録
-# target_link_libraries(${TEST_APP_NAME} ${PLUGIN_LIBRARIES})
-
-# アプリのビルド前にバッチファイルを実行させるターゲットに依存させて
-# アプリのビルド前にバッチファイルを実行させている
-# TODO: TEST_APP_NAMEはデバッグのみ
-# add_dependencies(${TEST_APP_NAME} RunBatch)

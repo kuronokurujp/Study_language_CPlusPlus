@@ -1,14 +1,27 @@
 cmake_minimum_required(VERSION 3.26)
 
-# プラグインビルドの共通処理.
-include(${CMAKE_CURRENT_SOURCE_DIR}/../Plugin.cmake NO_POLICY_SCOPE)
-# Renderプラグインの共通情報.
+# Engine common cmake
+include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/Project.cmake NO_POLICY_SCOPE)
+# VCPkgの設定
+include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/VCPkg.cmake NO_POLICY_SCOPE)
+# エンジン設定
+include(${CMAKE_SOURCE_DIR}/HobbyEngine/Config.cmake NO_POLICY_SCOPE)
+# Plugin common info
 include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
 
 message("build render plugin lib!")
 
-# 共有ライブラリとして生成するためのオプションの定義.
-option(RENDER_PLUGIN_BUILD_SHARED_LIBS "build shared library" OFF)
+# Static library target
+project_configure_static_lib_target(${PLUGIN_RENDER_NAME})
 
-# プラグイン共通ビルド処理.
-common_build_plugin(${RENDER_PLUGIN_NAME} "${RENDER_PLUGIN_TARGET_FILES}" "$CACHE{CACHE_ENGINE_INCLUDE_CODE}" ${RENDER_PLUGIN_BUILD_SHARED_LIBS})
+# Project configuration
+project_configure_target(${PLUGIN_RENDER_NAME})
+
+# Files for the target
+project_configure_files_target(${PLUGIN_RENDER_NAME}
+    ${PLUGIN_RENDER_TARGET_COMMON_FILES}
+    ${PLUGIN_RENDER_TARGET_SRC_FILES}
+    ${PLUGIN_RENDER_TARGET_INC_FILES}
+)
+
+add_subdirectory(Test)
