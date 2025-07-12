@@ -53,15 +53,6 @@ option(
   OFF
 )
 
-# プロジェクトで参照するファイル群
-# vcpkgから取得するパッケージのライブラリタイプ
-set(CACHE_PROJECT_VCPKG_STATIC_LIB_TYPE "x64-windows-static" CACHE STRING "" FORCE)
-# vcpkgのルートディレクトリ
-set(CHACHE_VCPKG_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/vcpkg" CACHE STRING "Vcpkg toolchain file" FORCE)
-
-# 環境変数からvcpkgのパスを取得してツールチェインを設定
-set(CMAKE_TOOLCHAIN_FILE "$CACHE{CHACHE_VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file" FORCE)
-
 # ビルド成果物を出力するディレクトリ指定.
 # 実行ファイルの出力先
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bin/${WORKSPACE_NAME})
@@ -95,28 +86,5 @@ add_subdirectory(HobbyPlugin/Lua)
 # add_subdirectory(HobbyPlugin/RuntimeDebug)
 # add_subdirectory(HobbyPlugin/GameDevGUI)
 
-
 # add_subdirectory(Game)
 
-# ライブラリ名をリストにまとめる
-set(PLUGIN_LIBRARIES
-# TODO: デバッグのみ入れる
-#   ${GAMEDEVGUI_PLUGIN_NAME}
-# TODO: デバッグのみ入れる
-#   ${RUNTIMEDEBUG_PLUGIN_NAME}
-  ${LUA_PLUGIN_NAME}
-  ${EVENT_PLUGIN_NAME}
-  ${ENHANCED_INPUT_PLUGIN_NAME}
-#   ${UI_PLUGIN_NAME}
-  ${LOCALIZATION_PLUGIN_NAME}
-  ${PLUGIN_LEVEL_NAME}
-  ${ASSET_MANAGER_PLUGIN_NAME}
-  ${RENDER_PLUGIN_NAME}
-  ${PLUGIN_ACTOR_NAME}
-  ${PLUGIN_PLATFORMSDL2_NAME}
-  ${ENGINE_NAME}
-)
-
-# ゲームアプリがリンクするライブラリ
-# 設定プロジェクトのライブラリ・インクルードディレクトリ登録
-# target_link_libraries(${APP_NAME} ${PLUGIN_LIBRARIES})
