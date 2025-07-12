@@ -19,7 +19,9 @@ project_configure_files_target(${ENGINE_TEST_NAME}
 )
 
 # .vcpkg.jsonファイルからvcpkgツールを使ってライブラリをインストール
+if(NOT EXISTS ${CMAKE_SOURCE_DIR}/ThirdParty/googletest)
 vcpkg_install_package(${CMAKE_CURRENT_SOURCE_DIR} "x64-windows-static")
+endif()
 
 # テスト専用のプロジェクト設定
 test_configure_target(${ENGINE_TEST_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/VcPkg/x64-windows-static ${ENGINE_NAME})

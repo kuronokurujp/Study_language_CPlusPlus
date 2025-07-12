@@ -17,7 +17,9 @@ project_configure_files_target(${PLUGIN_PLATFORMSDL2_TEST_NAME}
     ${PLUGIN_PLATFORMSDL2_TARGET_TEST_SRC_FILES}
 )
 
+if(NOT EXISTS ${CMAKE_SOURCE_DIR}/ThirdParty/googletest)
 vcpkg_install_package(${CMAKE_CURRENT_SOURCE_DIR} "x64-windows-static")
+endif()
 
 test_configure_target(
     ${PLUGIN_PLATFORMSDL2_TEST_NAME}

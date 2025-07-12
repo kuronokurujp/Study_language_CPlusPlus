@@ -120,6 +120,12 @@
 
 ### VS2022 プロジェクト作成手順
 
+テストをビルドする前に以下のコマンドでサブモジュールを取得してください。
+
+```bash
+git submodule update --init --recursive
+```
+
 1. **ProjBuild.bat** ファイルを実行
 1. コマンドプロンプトに"All Complete"が表示したら Build ディレクトリが作られているので,<br>
    その中の SuperStar.sln ファイルがあるので開く
