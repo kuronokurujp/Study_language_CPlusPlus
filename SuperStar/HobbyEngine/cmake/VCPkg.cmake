@@ -68,6 +68,8 @@ function(vcpkg_install_package install_dir vcpkg_triplet)
 			message(STATUS "Command Result: ${CMD_RESULT}")
 
 		endif()
+	else()
+		message(STATUS ".vcpkg.jsonファイルがありません。")
 	endif()
 
 endfunction()

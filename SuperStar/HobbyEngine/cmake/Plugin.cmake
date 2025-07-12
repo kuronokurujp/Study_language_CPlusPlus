@@ -35,11 +35,13 @@ function(plugin_configure_target name files engine_includes bShared)
     )
 
     # ランタイムライブラリを設定
-    target_compile_options(
-        ${name}
-        PRIVATE
-        $<IF:$<CONFIG:Debug>,/MTd,/MT>
-    )
+    if(MSVC)
+        target_compile_options(
+            ${name}
+            PRIVATE
+            $<IF:$<CONFIG:Debug>,/MTd,/MT>
+        )
+    endif()
 
     # ビルドのマルチプロセス設定.
     target_compile_options(${name} PRIVATE /MP)

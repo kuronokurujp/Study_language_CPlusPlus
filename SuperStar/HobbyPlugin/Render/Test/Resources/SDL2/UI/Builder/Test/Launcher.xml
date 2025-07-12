@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui id="root">
+  <layer id="DebugLayer" x="0" y="0" style="color: 0x808080FF; w:640; h:480">
+    <btn id="C_TitleSeq" x="50" y="0" input="OnClickLeft" style="w: 300; h: 50; color: white;">
+      <label id="TitleName" loc="1" text="debug.TitleLevelName" style="color: black;"/>
+    </btn>
+    <btn id="C_PlaySeq" x="50" y="60" input="OnClickLeft" style="w: 300; h: 50; color: white;">
+      <label id="GameName" loc="1" text="debug.MainGameLevelName" style="color: black;"/>
+    </btn>
+    <btn id="C_LuaSeq" x="50" y="120" input="OnClickLeft" style="w: 300; h: 50; color: white;">
+      <label id="LuaTest" loc="1" text="debug.LuaTestProcess" style="color: black;"/>
+    </btn>
+  </layer>
+</ui>

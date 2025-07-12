@@ -21,12 +21,8 @@ project_configure_files_target(${PLUGIN_EVENT_TEST_NAME}
 	${PLUGIN_EVENT_TARGET_TEST_SRC_FILES}
 )
 
-# .vcpkg.jsonファイルからvcpkgツールを使ってライブラリをインストール
-vcpkg_install_package(${CMAKE_CURRENT_SOURCE_DIR} "x64-windows-static")
-
 # テスト専用のプロジェクト設定
 test_configure_target(
 	${PLUGIN_EVENT_TEST_NAME}
-	${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/VcPkg/x64-windows-static
 	${PLUGIN_EVENT_NAME}
 )

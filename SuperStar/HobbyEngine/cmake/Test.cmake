@@ -1,5 +1,5 @@
-# テスト専用のプロジェクト設定
-function(test_configure_target target vcpkg_dir)
+# gtest を利用したテストの環境設定
+function(test_gtest_env vcpkg_dir)
     # ARGN に渡されたすべての引数（ライブラリ一覧）が入る
     set(target_test_libs ${ARGN})
 
@@ -10,6 +10,21 @@ function(test_configure_target target vcpkg_dir)
 
         # GTestのパッケージを参照
         find_package(GTest CONFIG REQUIRED)
+    else()
+        message(STATUS "Non VcpkgDir ${vcpkg_dir}")
+    endif()
+endfunction()
+
+# テスト専用のプロジェクト設定
+function(test_configure_target target)
+    # ARGN に渡されたすべての引数（ライブラリ一覧）が入る
+    set(target_test_libs ${ARGN})
+
+    # GTestのパッケージを参照
+    find_package(GTest CONFIG)
+
+    # インストールしたパッケージのディレクトリパス
+    if(GTest_FOUND)
         enable_testing()
 
         # include ディレクトリに gtest のヘッダを追加
@@ -33,8 +48,7 @@ function(test_configure_target target vcpkg_dir)
 
         # CTest に登録
         add_test(NAME ${target} COMMAND ${target})
-
     else()
-        message(STATUS "Non VcpkgDir ${vcpkg_dir}")
+        message(STATUS "GTest not found, skipping test configuration for ${target}")
     endif()
 endfunction()
