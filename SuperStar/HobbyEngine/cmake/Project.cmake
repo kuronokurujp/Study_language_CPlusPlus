@@ -11,11 +11,13 @@ function(project_configure_target target)
 
     # ランタイムライブラリを設定
     # 統一しないとライブラリ結合で問題が起きる
-    target_compile_options(
-        ${target}
-        PRIVATE
-        $<IF:$<CONFIG:Debug>,/MTd,/MT>
-    )
+    if(MSVC)
+        target_compile_options(
+            ${target}
+            PRIVATE
+            $<IF:$<CONFIG:Debug>,/MTd,/MT>
+        )
+    endif()
 
     # マルチプロセスビルド
     target_compile_options(${target} PRIVATE /MP)

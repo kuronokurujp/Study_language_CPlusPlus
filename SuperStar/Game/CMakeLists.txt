@@ -17,11 +17,13 @@ target_sources(${APP_NAME}
 target_include_directories(${APP_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Code)
 
 # ランタイムライブラリを設定
-target_compile_options(
-  ${APP_NAME}
-  PRIVATE
-  $<IF:$<CONFIG:Debug>,/MTd,/MT>
-)
+if(MSVC)
+  target_compile_options(
+    ${APP_NAME}
+    PRIVATE
+    $<IF:$<CONFIG:Debug>,/MTd,/MT>
+  )
+endif()
 
 # ビルドのマルチプロセス設定.
 target_compile_options(${APP_NAME} PRIVATE /MP)
