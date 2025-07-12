@@ -26,5 +26,12 @@ vcpkg_install_package(${CMAKE_CURRENT_SOURCE_DIR} "x64-windows-static")
 # プラグインではエンジンの設定を必ず行うのでgtestの設定済み状態なのでプラグインではgtestの取得は不要
 test_gtest_env(${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/VcPkg/x64-windows-static)
 
+find_package(GTest CONFIG)
+if(NOT GTest_FOUND)
+    include(FetchContent)
+    FetchContent_Declare(googletest SOURCE_DIR ${CMAKE_SOURCE_DIR}/ThirdParty/googletest)
+    FetchContent_MakeAvailable(googletest)
+endif()
+
 # テスト専用のプロジェクト設定
 test_configure_target(${ENGINE_TEST_NAME} ${ENGINE_NAME})

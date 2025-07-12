@@ -9,7 +9,13 @@ function(test_gtest_env vcpkg_dir)
         list(APPEND CMAKE_PREFIX_PATH "${vcpkg_dir}")
 
         # GTestのパッケージを参照
-        find_package(GTest CONFIG REQUIRED)
+        find_package(GTest CONFIG)
+        if(NOT GTest_FOUND)
+            message(STATUS "GTest not found, using local source")
+            include(FetchContent)
+            FetchContent_Declare(googletest SOURCE_DIR ${CMAKE_SOURCE_DIR}/ThirdParty/googletest)
+            FetchContent_MakeAvailable(googletest)
+        endif()
     else()
         message(STATUS "Non VcpkgDir ${vcpkg_dir}")
     endif()
@@ -22,6 +28,12 @@ function(test_configure_target target)
 
     # GTestのパッケージを参照
     find_package(GTest CONFIG)
+    if(NOT GTest_FOUND)
+        message(STATUS "GTest not found, using local source")
+        include(FetchContent)
+        FetchContent_Declare(googletest SOURCE_DIR ${CMAKE_SOURCE_DIR}/ThirdParty/googletest)
+        FetchContent_MakeAvailable(googletest)
+    endif()
 
     # インストールしたパッケージのディレクトリパス
     if(GTest_FOUND)
