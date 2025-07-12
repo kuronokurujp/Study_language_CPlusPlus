@@ -19,8 +19,6 @@ set(PLUGIN_PLATFORMSDL2_TARGET_INC_FILES
     Inc/PlatformSDL2/SDL2Time.h
 
     Inc/PlatformSDL2/Graphic/Frame.h
-#    Inc/PlatformSDL2/Graphic/ViewPort.h
-#    Inc/PlatformSDL2/Graphic/Scene.h
     Inc/PlatformSDL2/Graphic/Drawable2D.h
 
     Inc/PlatformSDL2/Graphic/Draw/Material.h
@@ -39,8 +37,6 @@ set(PLUGIN_PLATFORMSDL2_TARGET_SRC_FILES
     Src/SDL2Time.cpp
 
     Src/Graphic/Frame.cpp
-#    Src/Graphic/ViewPort.cpp
-#    Src/Graphic/Scene.cpp
     Src/Graphic/Drawable2D.cpp
     Src/Graphic/Draw/Material.cpp
     Src/Graphic/Draw/Mesh.cpp
