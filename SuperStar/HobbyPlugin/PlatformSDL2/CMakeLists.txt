@@ -25,7 +25,7 @@ project_configure_files_target(${PLUGIN_PLATFORMSDL2_NAME}
 )
 
 # プラグインが利用するパッケージをvcpkgから取得
-vcpkg_install_package($CACHE{CHACHE_VCPKG_ROOT} ${CMAKE_CURRENT_SOURCE_DIR} "x64-windows-static")
+vcpkg_install_package(${CMAKE_CURRENT_SOURCE_DIR} "x64-windows-static")
 
 # インストールしたパッケージのディレクトリパス
 set(VCPKG_DIR_PATH ThirdParty/VcPkg/x64-windows-static)

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.26)
 include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/Project.cmake NO_POLICY_SCOPE)
 include(${CMAKE_SOURCE_DIR}/HobbyEngine/cmake/Test.cmake NO_POLICY_SCOPE)
 # TODO: 将来DX12など別プラットフォームを利用するケースがあるので分岐する必要がある
-include(${CMAKE_SOURCE_DIR}/HobbyPlugin/PlatformSDL2/Config.cmake NO_POLICY_SCOPE)
+# include(${CMAKE_SOURCE_DIR}/HobbyPlugin/PlatformSDL2/Config.cmake NO_POLICY_SCOPE)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../Config.cmake NO_POLICY_SCOPE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake NO_POLICY_SCOPE)
@@ -21,7 +21,7 @@ project_configure_files_target(${PLUGIN_RENDER_TEST_NAME}
 test_configure_target(
     ${PLUGIN_RENDER_TEST_NAME}
     ${PLUGIN_RENDER_NAME}
-	${PLUGIN_PLATFORMSDL2_NAME}
+#	${PLUGIN_PLATFORMSDL2_NAME}
 )
 
 # POST_BUILD で Resources フォルダをコピー

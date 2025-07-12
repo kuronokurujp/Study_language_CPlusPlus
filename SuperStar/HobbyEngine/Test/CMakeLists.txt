@@ -21,5 +21,10 @@ project_configure_files_target(${ENGINE_TEST_NAME}
 # .vcpkg.jsonファイルからvcpkgツールを使ってライブラリをインストール
 vcpkg_install_package(${CMAKE_CURRENT_SOURCE_DIR} "x64-windows-static")
 
+# gtest を利用したテストの環境設定
+# ここでプロジェクト全体で利用するgtestの設定を行う
+# プラグインではエンジンの設定を必ず行うのでgtestの設定済み状態なのでプラグインではgtestの取得は不要
+test_gtest_env(${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/VcPkg/x64-windows-static)
+
 # テスト専用のプロジェクト設定
-test_configure_target(${ENGINE_TEST_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty/VcPkg/x64-windows-static ${ENGINE_NAME})
+test_configure_target(${ENGINE_TEST_NAME} ${ENGINE_NAME})

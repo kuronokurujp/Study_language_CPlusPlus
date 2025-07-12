@@ -24,4 +24,13 @@ project_configure_files_target(${PLUGIN_RENDER_NAME}
     ${PLUGIN_RENDER_TARGET_INC_FILES}
 )
 
+target_link_libraries(${PLUGIN_RENDER_NAME}
+    PUBLIC
+        # エンジンのライブラリをリンク
+        ${ENGINE_NAME}
+)
+
+# Plugin include path
+target_include_directories(${PLUGIN_RENDER_NAME} PUBLIC ${PLUGIN_RENDER_INC_DIR})
+
 add_subdirectory(Test)

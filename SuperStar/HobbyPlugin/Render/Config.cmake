@@ -8,9 +8,9 @@ set(PLUGIN_RENDER_TARGET_COMMON_FILES
 )
 
 set(PLUGIN_RENDER_TARGET_INC_FILES
-    Src/RenderModule.cpp
+    Inc/RenderModule.h
 )
 
 set(PLUGIN_RENDER_TARGET_SRC_FILES
-    Inc/RenderModule.h
+    Src/RenderModule.cpp
 )
