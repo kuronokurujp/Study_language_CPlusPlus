@@ -1,0 +1,5 @@
+﻿*.db
+*.suo
+*.db
+.DS_Store
+build/
