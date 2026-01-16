@@ -4,7 +4,11 @@
 /// <summary>
 /// SDL3のサンプル
 /// </summary>
-/// <returns></returns>
+/**
+ * @brief Initializes SDL, creates a 640×480 window and renderer, clears the window to white, processes events until a quit event, and then cleans up.
+ *
+ * @return int 0 on normal completion, non-zero if initialization or resource creation fails.
+ */
 int main()
 {
 	// SDLの初期化
